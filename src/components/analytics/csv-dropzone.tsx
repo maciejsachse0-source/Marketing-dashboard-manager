@@ -9,6 +9,9 @@ type Result = {
   source: string;
   rowCount: number;
   path: string;
+  created: number;
+  updated: number;
+  skipped: number;
 };
 
 export function CsvDropzone() {
@@ -99,9 +102,15 @@ export function CsvDropzone() {
         <p className="mt-3 text-xs text-rose-400 text-left">⚠ {error}</p>
       ) : null}
       {result ? (
-        <p className="mt-3 text-xs text-emerald-400 text-left">
-          ✓ Wgrano {result.rowCount} wierszy ({result.source}) → upload #{result.uploadId}
-        </p>
+        <div className="mt-3 text-xs text-left space-y-0.5">
+          <p className="text-emerald-400">
+            ✓ Wgrano {result.rowCount} wierszy ({result.source})
+          </p>
+          <p className="text-muted-foreground">
+            +{result.created} nowych postów, {result.updated} zaktualizowanych
+            {result.skipped > 0 ? `, ${result.skipped} pominiętych (niekompatybilny format)` : ''}
+          </p>
+        </div>
       ) : null}
     </div>
   );

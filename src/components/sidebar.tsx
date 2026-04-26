@@ -9,6 +9,7 @@ const NAV: { href: string; label: string }[] = [
   { href: '/analytics', label: 'Analityka' },
   { href: '/campaigns', label: 'Kampanie' },
   { href: '/artists', label: 'Artyści' },
+  { href: '/briefs', label: 'Briefy & wrapy' },
 ];
 
 export function Sidebar() {
