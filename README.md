@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marketing Crew
 
-## Getting Started
+Lokalna webapka — pulpit do zarządzania kampanią marketingową w short-form video (Reels, TikToki, Shorts).
 
-First, run the development server:
+**Architektura: dashboard w przeglądarce + agenci w Claude Code.** Webapka wizualizuje dane (kalendarz, pakiety, analityka, baza artystów). Wszystkie 8 wirtualnych agentów żyją jako persony w Claude Code — każdy w pliku `agents/<slug>.md`. Mówisz do Claude Code „uruchom schedule-managera", on wczytuje persona prompt, czyta SQLite, działa.
+
+Bez Anthropic API key. Bez kosztów per-token. Korzystasz ze swojej istniejącej subskrypcji Claude Code.
+
+## Wymagania
+
+- Node 20+
+- [Claude Code](https://claude.com/claude-code) (CLI lub IDE extension)
+
+## Setup
 
 ```bash
+cp .env.example .env.local
+npm install
+npm run db:migrate
+npm run db:seed     # opcjonalnie — 2 artystów + 1 kampania + 5 wpisów testowych
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Otwórz <http://localhost:3000>. Otwórz Claude Code w roocie projektu.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Workflow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+┌──────────────────────────┐         ┌─────────────────────────┐
+│   Przeglądarka           │         │   Claude Code (CLI)     │
+│   localhost:3000         │         │                         │
+│                          │         │  @agents/schedule-      │
+│   • Kalendarz tygodnia   │◄────────│    manager.md           │
+│   • Pakiety              │  SQLite │                         │
+│   • Analityka (CSV)      │  shared │  „zaplanuj nagranie     │
+│   • Baza artystów        │         │   z Anią w czwartek"    │
+│   • Reference cards 8    │         │                         │
+│     agentów              │         │  → Server actions       │
+└──────────────────────────┘         └─────────────────────────┘
+```
 
-## Learn More
+1. Otwierasz `localhost:3000/calendar` — widzisz tydzień
+2. W terminalu mówisz: `@agents/schedule-manager.md zaplanuj nagranie z Anią w czwartek po południu, 2h, BTS pod Reels`
+3. Claude Code wczyta persona + odczyta kalendarz z bazy + zaproponuje sloty
+4. Po Twoim OK — wywołuje `createCalendarEntry({ ... })` przez `tsx`
+5. Odświeżasz `/calendar` w przeglądarce — wpis jest
 
-To learn more about Next.js, take a look at the following resources:
+Tak samo dla pozostałych 7 agentów. Lista w `/agents` w UI lub w tabeli niżej.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Struktura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+marketing-crew/
+├── CLAUDE.md             # główny brief dla Claude Code
+├── agents/               # 8 person promptów do @-referencji
+│   ├── schedule-manager.md
+│   ├── social-publisher.md
+│   ├── artist-outreach.md
+│   ├── viral-analyzer.md
+│   ├── trend-scout.md
+│   ├── content-brief.md
+│   ├── campaign-strategist.md
+│   └── weekly-wrap.md
+├── src/
+│   ├── app/              # Next.js App Router (strony + API: upload, csv)
+│   ├── components/       # UI (shadcn/ui w components/ui/)
+│   ├── lib/
+│   │   ├── agents/       # rejestr person + ich system prompty (do wyświetlania w UI)
+│   │   ├── context/      # helpery do dociągania kontekstu z bazy
+│   │   ├── db.ts         # singleton Drizzle + better-sqlite3
+│   │   ├── env.ts        # walidacja env vars (Zod)
+│   │   ├── files.ts      # zapisy do data/files/ z path-traversal guard
+│   │   └── csv-parser.ts # detekcja formatu Meta/TikTok/YT
+│   └── server/actions/   # Server Actions z walidacją Zod (CRUD)
+├── drizzle/
+│   ├── schema.ts         # tabele
+│   ├── migrations/       # generowane przez drizzle-kit
+│   ├── migrate.ts        # apply migrations
+│   └── seed.ts           # dane testowe
+└── data/
+    ├── marketing-crew.db # SQLite (gitignore)
+    └── files/            # assety / briefy / pakiety / CSV / outreach (gitignore)
+```
 
-## Deploy on Vercel
+## Komendy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Komenda | Co robi |
+|---|---|
+| `npm run dev` | dev server (Turbopack) |
+| `npm run build` | build produkcyjny |
+| `npm run start` | start z buildu |
+| `npm run db:generate` | generuj migracje po zmianie `drizzle/schema.ts` |
+| `npm run db:migrate` | apply migracji |
+| `npm run db:studio` | przeglądarka bazy (drizzle-kit studio) |
+| `npm run db:seed` | dane testowe |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Agenci
+
+| Slug | Rola |
+|---|---|
+| `schedule-manager` | Planuje nagrania, montaż, publikacje. Wykrywa kolizje. |
+| `social-publisher` | Pisze copy per platforma (hook + caption + hashtagi + CTA). |
+| `artist-outreach` | Maile do artystów: cold, briefy, follow-upy, podziękowania. |
+| `viral-analyzer` | Analizuje wyniki postów i daje rekomendacje na następny. |
+| `trend-scout` | Znajduje trending formaty / audio / tematy (używa WebSearch w Claude Code). |
+| `content-brief` | Briefy produkcyjne — header, hook, scenariusz, shotlist. |
+| `campaign-strategist` | Strategia kampanii: T-30 → T+30, fazy, KPI. |
+| `weekly-wrap` | Cotygodniowy raport: co było, co działa, co dalej. |
+
+Każdy ma stronę `/agents/<slug>` z pełnym promptem do skopiowania, gotowym wywołaniem `@agents/<slug>.md` i live kontekstem z bazy.
+
+## Świadome ograniczenia
+
+- Brak auto-publikacji na socialki — agent pisze copy, upload robi człowiek.
+- Brak auto-pobierania metryk — wgrywasz CSV z Meta Business Suite / TikTok Analytics / YouTube Studio przez `/analytics`.
+- Aplikacja lokalna — brak multi-user, brak hostingu cloud.
+- Agenci wymagają Claude Code (CLI lub IDE extension) — webapka sama nie ma wbudowanego LLM.
