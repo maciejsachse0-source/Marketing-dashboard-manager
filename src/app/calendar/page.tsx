@@ -7,6 +7,7 @@ import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
 import { listProductionTemplates } from '@/lib/templates';
 import type { Production } from '../../../drizzle/schema';
+import type { ProductionMeta } from '@/components/calendar/production-meta';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,11 +38,38 @@ export default async function CalendarPage({
         where: inArray(schema.productions.id, productionIds),
       })
     : [];
-  const productions: Record<number, Production> = Object.fromEntries(
-    productionsList.map((p) => [p.id, p]),
+
+  // Pull artists/videographers (full list — used by wizard) plus build per-production
+  // meta map so the week tile can show "↳ Świt z Anią · T-7 · @ania_test" inline.
+  const [artists, videographers] = await Promise.all([listArtists(), listVideographers()]);
+  const artistById = new Map(artists.map((a) => [a.id, a]));
+  const videographerById = new Map(videographers.map((v) => [v.id, v]));
+
+  const productions: Record<number, ProductionMeta> = Object.fromEntries(
+    productionsList.map((p) => {
+      const artist = p.artistId ? artistById.get(p.artistId) ?? null : null;
+      const videographer = p.videographerId
+        ? videographerById.get(p.videographerId) ?? null
+        : null;
+      return [
+        p.id,
+        {
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          status: p.status,
+          type: p.type,
+          t0At: p.t0At,
+          platforms: p.platforms ?? null,
+          folderPath: p.folderPath,
+          artistName: artist?.name ?? null,
+          artistHandle: artist?.handle ?? null,
+          videographerName: videographer?.name ?? null,
+        } satisfies ProductionMeta,
+      ];
+    }),
   );
 
-  const [artists, videographers] = await Promise.all([listArtists(), listVideographers()]);
   const templates = listProductionTemplates();
 
   const artistOptions = artists.map((a) => ({ id: a.id, name: a.name, handle: a.handle }));

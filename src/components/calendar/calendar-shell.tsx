@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { ChevronLeft, ChevronRight, Plus, CalendarPlus, Bot } from 'lucide-react';
 import { addDays, startOfWeek } from '@/lib/dates';
-import type { CalendarEntry, CalendarType, Production } from '../../../drizzle/schema';
+import type { CalendarEntry, CalendarType } from '../../../drizzle/schema';
+import type { ProductionMeta } from './production-meta';
 import { Button } from '@/components/ui/button';
 import { WeekView } from './week-view';
 import { EntryDialog } from './entry-dialog';
@@ -40,7 +41,7 @@ export function CalendarShell({
 }: {
   weekStart: Date;
   entries: CalendarEntry[];
-  productions: Record<number, Production>;
+  productions: Record<number, ProductionMeta>;
   templates: ProductionTemplate[];
   artists: ArtistOption[];
   videographers: VideographerOption[];
