@@ -1,9 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import type { CalendarEntry } from '../../../drizzle/schema';
-import { addDays, formatDayShort, formatHM, startOfWeek } from '@/lib/dates';
-import { TYPE_COLOR, TYPE_LABEL } from './type-color';
+import { useEffect, useState } from 'react';
+import { CheckCircle2, Circle, Clock, Sparkles } from 'lucide-react';
+import type { CalendarEntry, Production } from '../../../drizzle/schema';
+import { addDays, formatDayShort, formatHM, startOfWeek, timeUntil } from '@/lib/dates';
+import {
+  TYPE_LABEL,
+  entryClass,
+  getContentState,
+  type ContentState,
+} from './type-color';
 
 const HOUR_START = 6;
 const HOUR_END = 24;
@@ -14,6 +20,7 @@ const SNAP_MINUTES = 15;
 export type WeekViewProps = {
   weekStart: Date;
   entries: CalendarEntry[];
+  productions: Record<number, Production>;
   onEntryClick?: (entry: CalendarEntry) => void;
   onEntryDrop?: (entryId: number, newStartsAt: Date) => void;
 };
@@ -33,11 +40,38 @@ function yToDate(day: Date, y: number, snapMin = SNAP_MINUTES): Date {
   return r;
 }
 
-export function WeekView({ weekStart, entries, onEntryClick, onEntryDrop }: WeekViewProps) {
+const STATE_ICON = {
+  'planned-empty': Circle,
+  'content-ready': Sparkles,
+  done: CheckCircle2,
+  cancelled: Circle,
+} as const;
+
+/**
+ * Re-renders every minute so countdown badges ("za 2h", "za 30min") stay live
+ * without a heavy ticker on each entry. One tick per minute per page is plenty.
+ */
+function useNowTick(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+export function WeekView({
+  weekStart,
+  entries,
+  productions,
+  onEntryClick,
+  onEntryDrop,
+}: WeekViewProps) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const hours = Array.from({ length: HOUR_END - HOUR_START + 1 }, (_, i) => HOUR_START + i);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dropTarget, setDropTarget] = useState<{ dayIdx: number; y: number } | null>(null);
+  const now = useNowTick();
 
   const onDragStart = (e: React.DragEvent, entryId: number) => {
     setDraggingId(entryId);
@@ -146,6 +180,12 @@ export function WeekView({ weekStart, entries, onEntryClick, onEntryDrop }: Week
                 const minutesDur = Math.max(20, (e.endsAt.getTime() - e.startsAt.getTime()) / 60000);
                 const height = (minutesDur / 60) * HOUR_HEIGHT;
                 const isDragging = draggingId === e.id;
+                const production = e.productionId ? productions[e.productionId] : null;
+                const state: ContentState = getContentState(e, production);
+                const StateIcon = STATE_ICON[state];
+                const showCountdown =
+                  e.type === 'publish' && state !== 'done' && state !== 'cancelled';
+                const countdown = showCountdown ? timeUntil(e.startsAt, now, 30) : null;
                 return (
                   <button
                     key={e.id}
@@ -154,16 +194,29 @@ export function WeekView({ weekStart, entries, onEntryClick, onEntryDrop }: Week
                     onDragStart={(ev) => onDragStart(ev, e.id)}
                     onDragEnd={onDragEnd}
                     onClick={() => onEntryClick?.(e)}
-                    className={`absolute left-1 right-1 rounded-md border px-2 py-1 text-left text-xs transition cursor-pointer ${
-                      TYPE_COLOR[e.type]
-                    } ${e.status === 'cancelled' ? 'opacity-50 line-through' : ''} ${
-                      isDragging ? 'opacity-30' : ''
-                    } ${onEntryDrop ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                    className={`absolute left-1 right-1 rounded-md px-2 py-1 text-left text-xs transition cursor-pointer ${entryClass(
+                      e.type,
+                      state,
+                    )} ${isDragging ? 'opacity-30' : ''} ${
+                      onEntryDrop ? 'cursor-grab active:cursor-grabbing' : ''
+                    }`}
                     style={{ top, height: Math.max(height, 28) }}
                   >
-                    <div className="font-medium truncate">{e.title}</div>
-                    <div className="text-[10px] opacity-80">
-                      {formatHM(e.startsAt)}–{formatHM(e.endsAt)} · {TYPE_LABEL[e.type]}
+                    <div className="flex items-center gap-1">
+                      <StateIcon className="w-3 h-3 shrink-0 opacity-80" strokeWidth={2.25} />
+                      <span className="font-medium truncate">{e.title}</span>
+                    </div>
+                    <div className="text-[10px] opacity-80 flex items-center gap-1.5">
+                      <span>
+                        {formatHM(e.startsAt)}–{formatHM(e.endsAt)}
+                      </span>
+                      <span className="opacity-70">·</span>
+                      <span>{TYPE_LABEL[e.type]}</span>
+                      {countdown ? (
+                        <span className="ml-auto inline-flex items-center gap-0.5 px-1 rounded bg-black/30 text-[10px] tabular-nums font-medium">
+                          <Clock className="w-2.5 h-2.5" strokeWidth={2.5} /> {countdown}
+                        </span>
+                      ) : null}
                     </div>
                   </button>
                 );

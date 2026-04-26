@@ -39,3 +39,27 @@ export function isoToInputLocal(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+/**
+ * Compact "time until" label in Polish — e.g. "za 2d", "za 5h", "za 30 min", "JUŻ".
+ * Returns `null` when target is more than `maxDays` away (callers usually want to
+ * suppress the badge entirely for far-future events).
+ */
+export function timeUntil(target: Date, now: Date = new Date(), maxDays = 30): string | null {
+  const ms = target.getTime() - now.getTime();
+  if (ms <= 0) {
+    if (ms > -60 * 60 * 1000) return 'TERAZ';
+    return null;
+  }
+  const minutes = Math.floor(ms / 60000);
+  if (minutes < 60) return `za ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    const remMin = minutes % 60;
+    return remMin > 0 && hours < 6 ? `za ${hours}h ${remMin}min` : `za ${hours}h`;
+  }
+  const days = Math.floor(hours / 24);
+  if (days > maxDays) return null;
+  const remHours = hours % 24;
+  return remHours > 0 && days < 7 ? `za ${days}d ${remHours}h` : `za ${days}d`;
+}

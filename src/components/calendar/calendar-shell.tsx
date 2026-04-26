@@ -5,15 +5,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { addDays, startOfWeek } from '@/lib/dates';
-import type { CalendarEntry, CalendarType } from '../../../drizzle/schema';
+import type { CalendarEntry, CalendarType, Production } from '../../../drizzle/schema';
 import { Button } from '@/components/ui/button';
 import { WeekView } from './week-view';
 import { EntryDialog } from './entry-dialog';
-import { TYPE_LABEL, TYPE_PILL } from './type-color';
+import { TYPE_LABEL, TYPE_PILL, CONTENT_STATE_LABEL } from './type-color';
 import { CALENDAR_TYPES } from '../../../drizzle/schema';
 import { updateCalendarEntry } from '@/server/actions/calendar';
 import { useShortcut } from '@/lib/use-shortcut';
 import { ProductionDrawer } from '@/components/productions/production-drawer';
+import { ProductionWizard } from '@/components/productions/production-wizard';
+import type { ProductionTemplate } from '@/lib/templates';
 
 function formatRange(weekStart: Date) {
   const end = addDays(weekStart, 6);
@@ -24,16 +26,28 @@ function formatRange(weekStart: Date) {
   return `${startLabel} – ${endLabel} ${end.getFullYear()}`;
 }
 
+type ArtistOption = { id: number; name: string; handle: string | null };
+type VideographerOption = { id: number; name: string; hourlyRate: number | null };
+
 export function CalendarShell({
   weekStart,
   entries,
+  productions,
+  templates,
+  artists,
+  videographers,
 }: {
   weekStart: Date;
   entries: CalendarEntry[];
+  productions: Record<number, Production>;
+  templates: ProductionTemplate[];
+  artists: ArtistOption[];
+  videographers: VideographerOption[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [editing, setEditing] = useState<CalendarEntry | null>(null);
   const [drawerEntryId, setDrawerEntryId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<CalendarType | 'all'>('all');
@@ -107,6 +121,7 @@ export function CalendarShell({
   };
 
   useShortcut('n', () => openCreate(), []);
+  useShortcut('p', () => setWizardOpen(true), []);
 
   return (
     <div className="space-y-4">
@@ -129,43 +144,63 @@ export function CalendarShell({
           >
             Zaplanuj przez agenta
           </Link>
-          <Button size="sm" onClick={openCreate}>
-            + Dodaj wpis
+          <Button size="sm" variant="outline" onClick={openCreate}>
+            + Wpis
+          </Button>
+          <Button size="sm" onClick={() => setWizardOpen(true)}>
+            + Nowa produkcja
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1 text-xs">
-        <button
-          type="button"
-          onClick={() => setFilterType('all')}
-          className={`px-2.5 py-1 rounded border transition ${
-            filterType === 'all'
-              ? 'border-foreground bg-foreground text-background'
-              : 'border-border text-muted-foreground hover:border-foreground/40'
-          }`}
-        >
-          Wszystko
-        </button>
-        {CALENDAR_TYPES.map((t) => (
+      <div className="flex flex-wrap items-center gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-1">
           <button
-            key={t}
             type="button"
-            onClick={() => setFilterType(t)}
+            onClick={() => setFilterType('all')}
             className={`px-2.5 py-1 rounded border transition ${
-              filterType === t
-                ? `${TYPE_PILL[t]} ring-1 ring-foreground/20`
+              filterType === 'all'
+                ? 'border-foreground bg-foreground text-background'
                 : 'border-border text-muted-foreground hover:border-foreground/40'
             }`}
           >
-            {TYPE_LABEL[t]}
+            Wszystko
           </button>
-        ))}
+          {CALENDAR_TYPES.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setFilterType(t)}
+              className={`px-2.5 py-1 rounded border transition ${
+                filterType === t
+                  ? `${TYPE_PILL[t]} ring-1 ring-foreground/20`
+                  : 'border-border text-muted-foreground hover:border-foreground/40'
+              }`}
+            >
+              {TYPE_LABEL[t]}
+            </button>
+          ))}
+        </div>
+        <div className="ml-auto flex items-center gap-2 text-[10px] text-muted-foreground">
+          <LegendSwatch
+            className="bg-emerald-500/8 border border-dashed border-emerald-500/50"
+            label={CONTENT_STATE_LABEL['planned-empty']}
+          />
+          <LegendSwatch
+            className="bg-emerald-500/35 border border-emerald-400 ring-1 ring-inset ring-emerald-300/40"
+            label={CONTENT_STATE_LABEL['content-ready']}
+          />
+          <LegendSwatch
+            className="bg-emerald-500/25 border border-emerald-500/70"
+            label={CONTENT_STATE_LABEL.done}
+          />
+        </div>
       </div>
 
       <WeekView
         weekStart={weekStart}
         entries={filtered}
+        productions={productions}
         onEntryClick={onEntryClick}
         onEntryDrop={onEntryDrop}
       />
@@ -177,12 +212,30 @@ export function CalendarShell({
         defaultStart={weekStart}
       />
 
+      <ProductionWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        templates={templates}
+        artists={artists}
+        videographers={videographers}
+        defaultStart={weekStart}
+      />
+
       <ProductionDrawer
         entryId={drawerEntryId}
         open={drawerEntryId !== null}
         onClose={() => setDrawerEntryId(null)}
       />
     </div>
+  );
+}
+
+function LegendSwatch({ className, label }: { className: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className={`inline-block w-3 h-3 rounded-sm ${className}`} />
+      {label}
+    </span>
   );
 }
 

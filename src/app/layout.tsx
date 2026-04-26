@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground">
         <div className="flex min-h-screen">
