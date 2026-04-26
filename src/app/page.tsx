@@ -1,6 +1,17 @@
 import Link from 'next/link';
-import { and, gte, eq, desc, count } from 'drizzle-orm';
+import { gte, eq, desc, count } from 'drizzle-orm';
+import {
+  CalendarDays,
+  TrendingUp,
+  UserPlus,
+  Inbox,
+  Upload,
+  PackageOpen,
+  Sparkles,
+  type LucideIcon,
+} from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
+import { EmptyState } from '@/components/empty-state';
 import { AGENT_LIST } from '@/lib/agents';
 import { db, schema } from '@/lib/db';
 import { getUpcomingCalendar } from '@/lib/context';
@@ -52,14 +63,16 @@ export default async function DashboardPage() {
 
   return (
     <PageShell title="Marketing Crew" description={`${today} · tydzień ${isoWeek}`}>
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
         <MetricCard
+          icon={CalendarDays}
           label="Posty w tym tyg."
           value={`${weekPosts.length}/7`}
-          hint={weekPosts.length === 0 ? 'wgraj CSV lub dodaj manualnie' : undefined}
+          hint={weekPosts.length === 0 ? 'wgraj CSV' : undefined}
         />
         <MetricCard
-          label="Średni ER (30d)"
+          icon={TrendingUp}
+          label="Średni ER · 30d"
           value={avgER !== null ? `${avgER.toFixed(1)}%` : '—'}
           hint={
             avgER === null
@@ -72,61 +85,81 @@ export default async function DashboardPage() {
                     ? 'dobrze'
                     : 'bardzo dobrze'
           }
+          tone={
+            avgER !== null && avgER >= 5
+              ? 'good'
+              : avgER !== null && avgER >= 2
+                ? 'neutral'
+                : 'low'
+          }
         />
         <MetricCard
-          label="Nowi followersi (7d)"
+          icon={UserPlus}
+          label="Nowi followersi · 7d"
           value={newFollowers > 0 ? `+${newFollowers.toLocaleString('pl-PL')}` : '—'}
+          tone={newFollowers > 0 ? 'good' : 'neutral'}
         />
         <MetricCard
+          icon={Inbox}
           label="Do akceptacji"
           value={`${draftCount[0]?.value ?? 0}`}
           hint="pakiety w drafcie"
         />
       </section>
 
-      <section className="mb-8">
-        <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">Agenci</h2>
+      <section className="mb-10">
+        <SectionHeader icon={Sparkles} title="Agenci" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {AGENT_LIST.map((agent) => (
             <Link
               key={agent.slug}
               href={`/agents/${agent.slug}`}
-              className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 transition"
+              className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card/90 transition relative overflow-hidden"
             >
-              <div className="font-medium text-sm">{agent.name}</div>
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="font-medium text-sm group-hover:text-foreground transition">{agent.name}</div>
               <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{agent.description}</div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4 mb-6">
+      <section className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 mb-8">
         <div>
-          <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">
-            Tydzień produkcji
-          </h2>
+          <SectionHeader icon={CalendarDays} title="Tydzień produkcji" />
           {upcoming.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-              Pusto. Otwórz{' '}
-              <Link href="/agents/schedule-manager" className="underline">
-                Schedule Managera
-              </Link>{' '}
-              albo dodaj wpis ręcznie w{' '}
-              <Link href="/calendar" className="underline">
-                kalendarzu
-              </Link>
-              .
-            </div>
+            <EmptyState
+              icon={CalendarDays}
+              title="Pusto na ten tydzień"
+              description={
+                <>
+                  Otwórz{' '}
+                  <Link href="/agents/schedule-manager" className="underline hover:text-foreground">
+                    schedule-managera
+                  </Link>{' '}
+                  albo dodaj wpis ręcznie w{' '}
+                  <Link href="/calendar" className="underline hover:text-foreground">
+                    kalendarzu
+                  </Link>
+                  .
+                </>
+              }
+            />
           ) : (
-            <ul className="rounded-lg border border-border divide-y divide-border">
+            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
               {upcoming.slice(0, 7).map((e) => (
-                <li key={e.id} className="px-4 py-2.5 flex items-center gap-3 text-sm">
-                  <span className="text-xs uppercase tracking-wider text-muted-foreground w-20 shrink-0">
+                <li key={e.id} className="px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-muted/30 transition">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground w-20 shrink-0 font-medium">
                     {TYPE_LABEL[e.type]}
                   </span>
                   <span className="flex-1 truncate">{e.title}</span>
                   <span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                    {e.startsAt.toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    {e.startsAt.toLocaleString('pl-PL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </li>
               ))}
@@ -135,21 +168,25 @@ export default async function DashboardPage() {
         </div>
 
         <div>
-          <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">
-            Top posty (7 dni)
-          </h2>
+          <SectionHeader icon={TrendingUp} title="Top posty · 7 dni" />
           {topPosts.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-              Brak postów. Wgraj CSV w{' '}
-              <Link href="/analytics" className="underline">
-                analityce
-              </Link>
-              .
-            </div>
+            <EmptyState
+              icon={TrendingUp}
+              title="Brak danych"
+              description={
+                <>
+                  Wgraj CSV w{' '}
+                  <Link href="/analytics" className="underline hover:text-foreground">
+                    analityce
+                  </Link>
+                  .
+                </>
+              }
+            />
           ) : (
-            <ul className="rounded-lg border border-border divide-y divide-border">
+            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
               {topPosts.map((p) => (
-                <li key={p.id} className="px-4 py-2.5 flex items-center gap-3 text-sm">
+                <li key={p.id} className="px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-muted/30 transition">
                   <PlatformPill platform={p.platform} />
                   <span className="flex-1 truncate">{p.title}</span>
                   <span className="text-xs text-muted-foreground tabular-nums shrink-0">
@@ -163,13 +200,14 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm uppercase tracking-wider text-muted-foreground">
-              Wgraj CSV
-            </h2>
-            <Link href="/analytics" className="text-xs text-muted-foreground hover:text-foreground underline">
+            <SectionHeader icon={Upload} title="Wgraj CSV" />
+            <Link
+              href="/analytics"
+              className="text-xs text-muted-foreground hover:text-foreground transition"
+            >
               cała analityka →
             </Link>
           </div>
@@ -178,21 +216,32 @@ export default async function DashboardPage() {
 
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm uppercase tracking-wider text-muted-foreground">
-              Pakiety do publikacji
-            </h2>
-            <Link href="/packages" className="text-xs text-muted-foreground hover:text-foreground underline">
+            <SectionHeader icon={PackageOpen} title="Pakiety do publikacji" />
+            <Link
+              href="/packages"
+              className="text-xs text-muted-foreground hover:text-foreground transition"
+            >
               wszystkie →
             </Link>
           </div>
           {readyPackages.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-              Brak pakietów ze statusem <code>ready</code>.
-            </div>
+            <EmptyState
+              icon={PackageOpen}
+              title="Brak pakietów ready"
+              description={
+                <>
+                  Wygeneruj przez{' '}
+                  <Link href="/agents/social-publisher" className="underline hover:text-foreground">
+                    social-publishera
+                  </Link>
+                  .
+                </>
+              }
+            />
           ) : (
-            <ul className="rounded-lg border border-border divide-y divide-border">
+            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
               {readyPackages.map((p) => (
-                <li key={p.id} className="px-4 py-2.5 flex items-center gap-2 text-sm">
+                <li key={p.id} className="px-4 py-2.5 flex items-center gap-2 text-sm hover:bg-muted/30 transition">
                   <Link href={`/packages`} className="flex-1 truncate font-medium">
                     {p.title}
                   </Link>
@@ -208,12 +257,50 @@ export default async function DashboardPage() {
   );
 }
 
-function MetricCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: 'good' | 'neutral' | 'low';
+}) {
+  const toneClass =
+    tone === 'good'
+      ? 'text-emerald-400'
+      : tone === 'low'
+        ? 'text-amber-400'
+        : 'text-muted-foreground';
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="text-2xl font-semibold tabular-nums mt-1">{value}</div>
-      {hint ? <div className="text-xs text-muted-foreground mt-0.5">{hint}</div> : null}
+    <div className="rounded-xl border border-border bg-card p-4 relative overflow-hidden hover:border-primary/20 transition">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+          {label}
+        </span>
+        <Icon className="w-3.5 h-3.5 text-muted-foreground/70" strokeWidth={1.5} />
+      </div>
+      <div className="text-2xl font-semibold tabular-nums tracking-tight">{value}</div>
+      {hint ? <div className={`text-[11px] mt-0.5 ${toneClass}`}>{hint}</div> : null}
     </div>
+  );
+}
+
+function SectionHeader({
+  icon: Icon,
+  title,
+}: {
+  icon: LucideIcon;
+  title: string;
+}) {
+  return (
+    <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-2 mb-3">
+      <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
+      {title}
+    </h2>
   );
 }
