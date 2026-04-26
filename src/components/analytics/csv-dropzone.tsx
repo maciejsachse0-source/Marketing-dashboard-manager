@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 type Result = {
@@ -32,13 +33,19 @@ export function CsvDropzone() {
       const res = await fetch('/api/csv', { method: 'POST', body: fd });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? `HTTP ${res.status}`);
+        const msg = json.error ?? `HTTP ${res.status}`;
+        setError(msg);
+        toast.error('Nie wgrano CSV', { description: msg });
       } else {
         setResult(json);
+        const summary = `${json.created} nowych, ${json.updated} zaktualizowanych${json.skipped ? `, ${json.skipped} pominiętych` : ''}`;
+        toast.success(`CSV wgrany (${json.source})`, { description: summary });
         router.refresh();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      toast.error('Błąd wgrywania', { description: msg });
     } finally {
       setBusy(false);
     }

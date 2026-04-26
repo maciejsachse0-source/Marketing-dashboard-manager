@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -66,13 +67,17 @@ export function ArtistDialog({
       try {
         if (artist) {
           await updateArtist(artist.id, payload);
+          toast.success('Zaktualizowano artystę');
         } else {
-          await createArtist(payload);
+          const row = await createArtist(payload);
+          toast.success(`Dodano artystę: ${row.name}`);
         }
         onOpenChange(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        toast.error('Nie udało się zapisać', { description: msg });
       }
     });
   };
@@ -83,10 +88,13 @@ export function ArtistDialog({
     startTransition(async () => {
       try {
         await deleteArtist(artist.id);
+        toast.success(`Usunięto: ${artist.name}`);
         onOpenChange(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        toast.error('Nie udało się usunąć', { description: msg });
       }
     });
   };

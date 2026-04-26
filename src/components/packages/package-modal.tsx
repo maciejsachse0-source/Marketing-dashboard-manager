@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/copy-button';
@@ -25,17 +26,31 @@ export function PackageModal({
 
   const setStatus = (status: 'draft' | 'ready' | 'published') => {
     startTransition(async () => {
-      await updatePackage(pkg.id, { status });
-      router.refresh();
+      try {
+        await updatePackage(pkg.id, { status });
+        toast.success(`Status: ${status}`);
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się zmienić statusu', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+      }
     });
   };
 
   const remove = () => {
     if (!confirm(`Usunąć pakiet "${pkg.title}"?`)) return;
     startTransition(async () => {
-      await deletePackage(pkg.id);
-      onOpenChange(false);
-      router.refresh();
+      try {
+        await deletePackage(pkg.id);
+        toast.success(`Usunięto pakiet "${pkg.title}"`);
+        onOpenChange(false);
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się usunąć', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+      }
     });
   };
 
@@ -88,12 +103,19 @@ export function PackageModal({
                 {s}
               </Button>
             ))}
+            <a
+              href={`/api/packages/${pkg.id}/zip`}
+              download
+              className="ml-auto inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium border border-border hover:border-primary/40 hover:bg-primary/5 transition"
+            >
+              ⬇ Pobierz ZIP
+            </a>
             <Button
               variant="ghost"
               size="sm"
               onClick={remove}
               disabled={pending}
-              className="ml-auto text-rose-400 hover:text-rose-300"
+              className="text-rose-400 hover:text-rose-300"
             >
               Usuń pakiet
             </Button>

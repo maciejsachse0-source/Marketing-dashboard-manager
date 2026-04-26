@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -76,10 +77,13 @@ export function PostDialog({ open, onOpenChange }: { open: boolean; onOpenChange
           const { updatePostMetrics } = await import('@/server/actions/posts');
           await updatePostMetrics(post.id, metricsAny);
         }
+        toast.success(`Dodano post #${post.id}`);
         onOpenChange(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        toast.error('Nie udało się dodać posta', { description: msg });
       }
     });
   };

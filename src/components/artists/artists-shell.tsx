@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArtistDialog } from './artist-dialog';
@@ -73,9 +73,8 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
               {rows.map(({ artist, collabCount, outreachFiles }) => {
                 const isExpanded = expanded === artist.id;
                 return (
-                  <>
+                  <Fragment key={artist.id}>
                     <tr
-                      key={artist.id}
                       className="hover:bg-muted/20 transition cursor-pointer"
                       onClick={() => setExpanded(isExpanded ? null : artist.id)}
                     >
@@ -103,7 +102,7 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
                       </td>
                     </tr>
                     {isExpanded ? (
-                      <tr key={`${artist.id}-detail`} className="bg-muted/10">
+                      <tr className="bg-muted/10">
                         <td colSpan={7} className="px-4 py-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                             <div>
@@ -146,7 +145,7 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
                         </td>
                       </tr>
                     ) : null}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>

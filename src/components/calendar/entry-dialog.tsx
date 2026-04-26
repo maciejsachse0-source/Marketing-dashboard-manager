@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -109,13 +110,17 @@ export function EntryDialog({ open, onOpenChange, entry, defaultStart }: EntryDi
       try {
         if (entry) {
           await updateCalendarEntry({ id: entry.id, ...payload });
+          toast.success('Zapisano zmiany');
         } else {
-          await createCalendarEntry(payload);
+          const row = await createCalendarEntry(payload);
+          toast.success(`Dodano wpis #${row.id}`);
         }
         onOpenChange(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        toast.error('Nie udało się zapisać', { description: msg });
       }
     });
   };
@@ -126,10 +131,13 @@ export function EntryDialog({ open, onOpenChange, entry, defaultStart }: EntryDi
     startTransition(async () => {
       try {
         await deleteCalendarEntry(entry.id);
+        toast.success('Usunięto wpis');
         onOpenChange(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        toast.error('Nie udało się usunąć', { description: msg });
       }
     });
   };
