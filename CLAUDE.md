@@ -78,6 +78,8 @@ User otwiera `http://localhost:3000/calendar` w przeglądarce — widzi zmiany l
 
 ## Lista agentów
 
+Persony do `@agents/<slug>.md` (Claude Code czyta je tym znacznikiem):
+
 - `agents/schedule-manager.md` — terminarz produkcji
 - `agents/social-publisher.md` — copy publikacyjne per platforma
 - `agents/artist-outreach.md` — maile do artystów
@@ -86,6 +88,8 @@ User otwiera `http://localhost:3000/calendar` w przeglądarce — widzi zmiany l
 - `agents/content-brief.md` — briefy produkcyjne
 - `agents/campaign-strategist.md` — strategia kampanii (T-30 → T+30)
 - `agents/weekly-wrap.md` — cotygodniowe podsumowanie
+
+Te same agenty + ich metadane (sidePanel, dashboardWidget, system prompt do edycji w UI) żyją w `data/agents/<slug>.json`. Loader (`src/lib/agents/index.ts`, `loadAgents()`) czyta katalog na każdy request — hot-reload, bez restartu. UI: `/agents/new` (kreator + opcja klonowania), `/agents/<slug>/edit` (edycja + usuń + klonuj).
 
 ## Co NIE jest Twoją robotą
 

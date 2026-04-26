@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { EmptyState } from '@/components/empty-state';
-import { AGENT_LIST } from '@/lib/agents';
+import { loadAgents } from '@/lib/agents';
+import { runAgentWidget } from '@/lib/agents/widget';
 import { db, schema } from '@/lib/db';
 import { getUpcomingCalendar } from '@/lib/context';
 import { getRecentActivity, type ActivityEvent } from '@/lib/activity';
@@ -118,17 +119,23 @@ export default async function DashboardPage() {
       <section className="mb-10">
         <SectionHeader icon={Sparkles} title="Agenci" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {AGENT_LIST.map((agent) => (
-            <Link
-              key={agent.slug}
-              href={`/agents/${agent.slug}`}
-              className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card/90 transition relative overflow-hidden"
-            >
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="font-medium text-sm group-hover:text-foreground transition">{agent.name}</div>
-              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{agent.description}</div>
-            </Link>
-          ))}
+          {loadAgents().map((agent) => {
+            const hint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
+            return (
+              <Link
+                key={agent.slug}
+                href={`/agents/${agent.slug}`}
+                className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card/90 transition relative overflow-hidden"
+              >
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="font-medium text-sm group-hover:text-foreground transition">{agent.name}</div>
+                <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{agent.description}</div>
+                {hint ? (
+                  <div className="text-[11px] text-primary/80 mt-2 font-medium tabular-nums">{hint}</div>
+                ) : null}
+              </Link>
+            );
+          })}
         </div>
       </section>
 

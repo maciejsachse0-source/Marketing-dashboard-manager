@@ -1,6 +1,9 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Pencil, Copy } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { getAgent } from '@/lib/agents';
+import { runAgentWidget } from '@/lib/agents/widget';
 import { AgentContextPanel } from '@/components/agent-context-panel';
 import { CopyButton } from '@/components/copy-button';
 
@@ -17,9 +20,29 @@ export default async function AgentPage({
 
   const promptFile = `agents/${agent.slug}.md`;
   const invocation = `@${promptFile} ${agent.name} — działaj zgodnie z promptem.`;
+  const widgetHint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
 
   return (
-    <PageShell title={agent.name} description={agent.description}>
+    <PageShell
+      title={agent.name}
+      description={agent.description}
+      actions={
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/agents/new?clone=${agent.slug}`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-sm hover:bg-muted/40 transition"
+          >
+            <Copy className="w-4 h-4" /> Klonuj
+          </Link>
+          <Link
+            href={`/agents/${agent.slug}/edit`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition"
+          >
+            <Pencil className="w-4 h-4" /> Edytuj
+          </Link>
+        </div>
+      }
+    >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <div className="space-y-4">
           <section className="rounded-lg border border-border bg-card p-5">
@@ -72,6 +95,14 @@ export default async function AgentPage({
 
         <div className="space-y-4">
           <AgentContextPanel kind={agent.sidePanel} />
+          {widgetHint ? (
+            <div className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                Widget pulpitu
+              </div>
+              <div className="text-sm font-medium text-primary">{widgetHint}</div>
+            </div>
+          ) : null}
           <div className="rounded-lg border border-dashed border-border p-4 text-xs text-muted-foreground">
             <div className="font-medium text-foreground mb-1">Workflow w Claude Code</div>
             Agent czyta kontekst (kalendarz/posty/artyści) bezpośrednio z SQLite. Po zmianach

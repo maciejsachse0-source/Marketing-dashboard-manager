@@ -21,7 +21,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { AGENT_META } from '@/lib/agents/meta';
+import type { AgentMeta } from '@/lib/agents/types';
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/', label: 'Pulpit', icon: LayoutDashboard },
@@ -43,7 +43,7 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(href + '/');
 }
 
-export function Sidebar() {
+export function Sidebar({ agents }: { agents: AgentMeta[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -148,7 +148,7 @@ export function Sidebar() {
             Agenci · Claude Code
           </div>
           <ul className="flex flex-col gap-0.5 mb-2">
-            {AGENT_META.map((a) => {
+            {agents.map((a) => {
               const active = pathname === `/agents/${a.slug}`;
               return (
                 <li key={a.slug}>

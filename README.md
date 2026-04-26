@@ -52,7 +52,7 @@ Tak samo dla pozostałych 7 agentów. Lista w `/agents` w UI lub w tabeli niżej
 ```
 marketing-crew/
 ├── CLAUDE.md             # główny brief dla Claude Code
-├── agents/               # 8 person promptów do @-referencji
+├── agents/               # persony promptów do @-referencji
 │   ├── schedule-manager.md
 │   ├── social-publisher.md
 │   ├── artist-outreach.md
@@ -79,7 +79,9 @@ marketing-crew/
 │   └── seed.ts           # dane testowe
 └── data/
     ├── marketing-crew.db # SQLite (gitignore)
-    └── files/            # assety / briefy / pakiety / CSV / outreach (gitignore)
+    ├── agents/           # JSON-y z metadanymi agentów + system prompty (edytowalne z UI)
+    ├── templates/        # production templates + post templates + rytm tygodniowy
+    └── files/            # assety / briefy / pakiety / CSV / outreach / output (gitignore)
 ```
 
 ## Komendy
@@ -107,7 +109,11 @@ marketing-crew/
 | `campaign-strategist` | Strategia kampanii: T-30 → T+30, fazy, KPI. |
 | `weekly-wrap` | Cotygodniowy raport: co było, co działa, co dalej. |
 
-Każdy ma stronę `/agents/<slug>` z pełnym promptem do skopiowania, gotowym wywołaniem `@agents/<slug>.md` i live kontekstem z bazy.
+Każdy ma stronę `/agents/<slug>` z pełnym promptem do skopiowania, gotowym wywołaniem `@agents/<slug>.md` i live kontekstem z bazy. Możesz też:
+
+- `/agents/<slug>/edit` — edytuj system prompt, opis, side panel, widget pulpitu (zapis do JSON)
+- `/agents/new` — wizard nowego agenta (od zera albo od kopii istniejącego)
+- na pulpicie pod każdym agentem widać 1-linijkowy hint z `dashboardWidget` (np. „2 artystów bez kontaktu >14d")
 
 ## Świadome ograniczenia
 

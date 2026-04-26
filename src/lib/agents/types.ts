@@ -1,34 +1,56 @@
-import 'server-only';
+import { z } from 'zod';
 
-export type AgentSlug =
-  | 'schedule-manager'
-  | 'social-publisher'
-  | 'artist-outreach'
-  | 'viral-analyzer'
-  | 'trend-scout'
-  | 'content-brief'
-  | 'campaign-strategist'
-  | 'weekly-wrap';
+/** Sidebar/context panel kinds — must match cases in AgentContextPanel. */
+export const AGENT_SIDE_PANELS = [
+  'calendar-14',
+  'recent-posts',
+  'artists-list',
+  'brief-templates',
+  'active-campaigns',
+  'wrap-history',
+  'trend-bookmarks',
+  'recent-packages',
+] as const;
 
-export type AgentSidePanel =
-  | 'calendar-14'
-  | 'recent-posts'
-  | 'artists-list'
-  | 'brief-templates'
-  | 'active-campaigns'
-  | 'wrap-history'
-  | 'trend-bookmarks'
-  | 'recent-packages';
+export type AgentSidePanel = (typeof AGENT_SIDE_PANELS)[number];
+
+export type AgentSlug = string;
+
+export type DashboardWidget = {
+  /** Parameterless SELECT that yields a single row with named columns. Read-only. */
+  query: string;
+  /** Mustache-lite template — `{{column}}` is interpolated from the row. */
+  template: string;
+};
 
 export type AgentDef = {
   slug: AgentSlug;
   name: string;
   description: string;
-  /** Sidebar status — 1 line, dynamic. Optional helper for dashboard tile. */
-  statusHint?: string;
   systemPrompt: string;
-  /** Loads context appended to system prompt at request time. */
-  contextLoader: () => Promise<string>;
-  /** Which side panel UI shows next to this agent's chat. */
   sidePanel: AgentSidePanel;
+  dashboardWidget?: DashboardWidget | null;
 };
+
+/** Client-safe metadata — no system prompt, no widget query. */
+export type AgentMeta = Pick<AgentDef, 'slug' | 'name' | 'description' | 'sidePanel'>;
+
+const slugSchema = z
+  .string()
+  .min(2, 'min 2 znaki')
+  .max(48, 'max 48 znaków')
+  .regex(/^[a-z0-9][a-z0-9-]*$/, 'tylko małe litery, cyfry i myślniki');
+
+export const dashboardWidgetSchema = z.object({
+  query: z.string().min(10, 'query za krótki'),
+  template: z.string().min(1, 'template wymagany'),
+});
+
+export const agentDefSchema: z.ZodType<AgentDef> = z.object({
+  slug: slugSchema,
+  name: z.string().min(1).max(80),
+  description: z.string().min(1).max(280),
+  systemPrompt: z.string().min(1),
+  sidePanel: z.enum(AGENT_SIDE_PANELS),
+  dashboardWidget: dashboardWidgetSchema.nullable().optional(),
+});

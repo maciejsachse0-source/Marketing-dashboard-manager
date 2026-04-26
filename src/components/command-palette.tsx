@@ -22,7 +22,7 @@ import {
   Clock,
   type LucideIcon,
 } from 'lucide-react';
-import { AGENT_META } from '@/lib/agents/meta';
+import type { AgentMeta } from '@/lib/agents/types';
 
 type CommandItem = {
   id: string;
@@ -33,7 +33,7 @@ type CommandItem = {
   action: () => void;
 };
 
-export function CommandPalette() {
+export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
@@ -84,7 +84,7 @@ export function CommandPalette() {
       { id: 'p:rhythm', label: 'Rytm tygodniowy', hint: '/templates/rhythm', group: 'Strony', icon: Clock, action: go('/templates/rhythm') },
     ];
 
-    const agents: CommandItem[] = AGENT_META.map((a) => ({
+    const agentItems: CommandItem[] = agents.map((a) => ({
       id: `a:${a.slug}`,
       label: a.name,
       hint: a.description,
@@ -128,8 +128,8 @@ export function CommandPalette() {
       },
     ];
 
-    return [...pages, ...agents, ...actions];
-  }, [router]);
+    return [...pages, ...agentItems, ...actions];
+  }, [router, agents]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

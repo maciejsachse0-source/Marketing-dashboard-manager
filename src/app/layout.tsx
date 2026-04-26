@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/sidebar';
 import { CommandPalette } from '@/components/command-palette';
 import { ShortcutsHelp } from '@/components/shortcuts-help';
 import { Toaster } from '@/components/ui/sonner';
+import { loadAgentMeta } from '@/lib/agents';
 import './globals.css';
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const agents = loadAgentMeta();
   return (
     <html
       lang="pl"
@@ -33,10 +35,10 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-background text-foreground">
         <div className="flex min-h-screen">
-          <Sidebar />
+          <Sidebar agents={agents} />
           <main className="flex-1 min-w-0">{children}</main>
         </div>
-        <CommandPalette />
+        <CommandPalette agents={agents} />
         <ShortcutsHelp />
         <Toaster />
       </body>
