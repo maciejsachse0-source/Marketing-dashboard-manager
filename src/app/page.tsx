@@ -8,6 +8,10 @@ import {
   Upload,
   PackageOpen,
   Sparkles,
+  Activity,
+  Megaphone,
+  Users,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
@@ -15,6 +19,8 @@ import { EmptyState } from '@/components/empty-state';
 import { AGENT_LIST } from '@/lib/agents';
 import { db, schema } from '@/lib/db';
 import { getUpcomingCalendar } from '@/lib/context';
+import { getRecentActivity, type ActivityEvent } from '@/lib/activity';
+import { timeAgo } from '@/lib/time-ago';
 import { CsvDropzone } from '@/components/analytics/csv-dropzone';
 import { PlatformPills, PlatformPill, StatusPill } from '@/components/platforms-pills';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
@@ -26,25 +32,27 @@ export default async function DashboardPage() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
 
-  const [upcoming, weekPosts, monthPosts, draftCount, topPosts, readyPackages] = await Promise.all([
-    getUpcomingCalendar(7),
-    db.query.posts.findMany({ where: gte(schema.posts.publishedAt, sevenDaysAgo) }),
-    db.query.posts.findMany({ where: gte(schema.posts.publishedAt, thirtyDaysAgo) }),
-    db
-      .select({ value: count() })
-      .from(schema.packages)
-      .where(eq(schema.packages.status, 'draft')),
-    db.query.posts.findMany({
-      where: gte(schema.posts.publishedAt, sevenDaysAgo),
-      orderBy: desc(schema.posts.reach),
-      limit: 4,
-    }),
-    db.query.packages.findMany({
-      where: eq(schema.packages.status, 'ready'),
-      orderBy: desc(schema.packages.createdAt),
-      limit: 6,
-    }),
-  ]);
+  const [upcoming, weekPosts, monthPosts, draftCount, topPosts, readyPackages, activity] =
+    await Promise.all([
+      getUpcomingCalendar(7),
+      db.query.posts.findMany({ where: gte(schema.posts.publishedAt, sevenDaysAgo) }),
+      db.query.posts.findMany({ where: gte(schema.posts.publishedAt, thirtyDaysAgo) }),
+      db
+        .select({ value: count() })
+        .from(schema.packages)
+        .where(eq(schema.packages.status, 'draft')),
+      db.query.posts.findMany({
+        where: gte(schema.posts.publishedAt, sevenDaysAgo),
+        orderBy: desc(schema.posts.reach),
+        limit: 4,
+      }),
+      db.query.packages.findMany({
+        where: eq(schema.packages.status, 'ready'),
+        orderBy: desc(schema.packages.createdAt),
+        limit: 6,
+      }),
+      getRecentActivity(8),
+    ]);
 
   const ersInMonth = monthPosts.filter((p) => p.engagementRate !== null);
   const avgER = ersInMonth.length
@@ -200,6 +208,19 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      <section className="mb-8">
+        <SectionHeader icon={Activity} title="Ostatnie zmiany" />
+        {activity.length === 0 ? (
+          <EmptyState icon={Activity} title="Brak aktywności" description="Po pierwszych akcjach pojawią się tu wpisy." />
+        ) : (
+          <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+            {activity.map((event, idx) => (
+              <ActivityRow key={`${event.kind}-${event.title}-${idx}`} event={event} />
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -302,5 +323,34 @@ function SectionHeader({
       <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
       {title}
     </h2>
+  );
+}
+
+const ACTIVITY_ICON: Record<ActivityEvent['kind'], LucideIcon> = {
+  'calendar-entry': CalendarDays,
+  post: TrendingUp,
+  package: PackageOpen,
+  artist: Users,
+  campaign: Megaphone,
+};
+
+function ActivityRow({ event }: { event: ActivityEvent }) {
+  const Icon = ACTIVITY_ICON[event.kind] ?? FileText;
+  return (
+    <li>
+      <Link
+        href={event.href}
+        className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted/30 transition"
+      >
+        <Icon className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+        <div className="flex-1 min-w-0">
+          <div className="truncate">{event.title}</div>
+          <div className="text-xs text-muted-foreground">{event.subtitle}</div>
+        </div>
+        <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+          {timeAgo(event.at)}
+        </span>
+      </Link>
+    </li>
   );
 }

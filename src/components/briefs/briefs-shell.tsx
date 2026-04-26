@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { CopyButton } from '@/components/copy-button';
 import { MarkdownView } from './markdown-view';
 
@@ -22,18 +24,34 @@ export function BriefsShell({
   contentByFilename: Record<string, string>;
 }) {
   const [filter, setFilter] = useState<'all' | 'brief' | 'wrap'>('all');
+  const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<BriefRow | null>(null);
 
-  const filtered = useMemo(
-    () => (filter === 'all' ? rows : rows.filter((r) => r.kind === filter)),
-    [rows, filter],
-  );
+  const filtered = useMemo(() => {
+    const byKind = filter === 'all' ? rows : rows.filter((r) => r.kind === filter);
+    const q = search.trim().toLowerCase();
+    if (!q) return byKind;
+    return byKind.filter((r) => {
+      if (r.filename.toLowerCase().includes(q)) return true;
+      const content = (contentByFilename[r.filename] ?? '').toLowerCase();
+      return content.includes(q);
+    });
+  }, [rows, filter, search, contentByFilename]);
 
   const briefCount = rows.filter((r) => r.kind === 'brief').length;
   const wrapCount = rows.filter((r) => r.kind === 'wrap').length;
 
   return (
     <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Szukaj po nazwie pliku lub treści..."
+          className="pl-9"
+        />
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1 text-xs">
           <button
@@ -93,8 +111,8 @@ export function BriefsShell({
             : 'Żaden plik nie pasuje do filtra.'}
         </div>
       ) : (
-        <div className="rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-lg border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
             <thead className="bg-muted/30 border-b border-border">
               <tr className="text-left">
                 <th className="px-4 py-2 font-medium text-xs uppercase tracking-wider text-muted-foreground">Typ</th>

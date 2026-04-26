@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { CsvDropzone } from './csv-dropzone';
 import { PostDialog } from './post-dialog';
 import { PlatformPill } from '@/components/platforms-pills';
@@ -21,10 +23,18 @@ export function AnalyticsShell({
   const [postDialogOpen, setPostDialogOpen] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [platformFilter, setPlatformFilter] = useState<Platform | 'all'>('all');
+  const [search, setSearch] = useState('');
 
   const sorted = useMemo(() => {
-    const filtered = platformFilter === 'all' ? posts : posts.filter((p) => p.platform === platformFilter);
-    const arr = [...filtered];
+    const byPlatform =
+      platformFilter === 'all' ? posts : posts.filter((p) => p.platform === platformFilter);
+    const q = search.trim().toLowerCase();
+    const bySearch = q
+      ? byPlatform.filter(
+          (p) => p.title.toLowerCase().includes(q) || p.caption.toLowerCase().includes(q),
+        )
+      : byPlatform;
+    const arr = [...bySearch];
     arr.sort((a, b) => {
       if (sortKey === 'date') return b.publishedAt.getTime() - a.publishedAt.getTime();
       if (sortKey === 'reach') return (b.reach ?? -1) - (a.reach ?? -1);
@@ -33,7 +43,7 @@ export function AnalyticsShell({
       return 0;
     });
     return arr;
-  }, [posts, sortKey, platformFilter]);
+  }, [posts, sortKey, platformFilter, search]);
 
   return (
     <div className="space-y-6">
@@ -66,6 +76,18 @@ export function AnalyticsShell({
       </section>
 
       <section>
+        <div className="relative mb-3">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+            strokeWidth={1.5}
+          />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Szukaj postów po tytule lub captionie..."
+            className="pl-9"
+          />
+        </div>
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
             Posty ({sorted.length})
@@ -140,8 +162,8 @@ export function AnalyticsShell({
               : 'Żaden post nie pasuje do filtrów.'}
           </div>
         ) : (
-          <div className="rounded-lg border border-border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border border-border overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
               <thead className="bg-muted/30 border-b border-border">
                 <tr className="text-left">
                   <th className="px-3 py-2 text-xs uppercase tracking-wider text-muted-foreground font-medium">Tytuł</th>

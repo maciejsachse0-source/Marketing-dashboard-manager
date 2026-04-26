@@ -75,7 +75,8 @@ export function WeekView({ weekStart, entries, onEntryClick, onEntryDrop }: Week
   };
 
   return (
-    <div className="border border-border rounded-lg bg-card overflow-hidden">
+    <div className="border border-border rounded-lg bg-card overflow-x-auto">
+     <div className="min-w-[700px]">
       <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-border bg-muted/30">
         <div />
         {days.map((d) => {
@@ -171,6 +172,7 @@ export function WeekView({ weekStart, entries, onEntryClick, onEntryDrop }: Week
           );
         })}
       </div>
+     </div>
     </div>
   );
 }
