@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { ChevronLeft, ChevronRight, Plus, CalendarPlus, Bot } from 'lucide-react';
 import { addDays, startOfWeek } from '@/lib/dates';
 import type { CalendarEntry, CalendarType, Production } from '../../../drizzle/schema';
 import { Button } from '@/components/ui/button';
@@ -125,43 +126,59 @@ export function CalendarShell({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-          ←
-        </Button>
-        <Button variant="outline" size="sm" onClick={goToday}>
-          Dziś
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => navigate(1)}>
-          →
-        </Button>
-        <div className="text-sm font-medium px-2">{formatRange(weekStart)}</div>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="inline-flex rounded-md border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-2 py-1.5 hover:bg-muted/60 transition"
+            aria-label="Poprzedni tydzień"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={goToday}
+            className="px-3 py-1.5 text-xs font-medium border-x border-border hover:bg-muted/60 transition"
+          >
+            Dziś
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(1)}
+            className="px-2 py-1.5 hover:bg-muted/60 transition"
+            aria-label="Następny tydzień"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="text-sm font-semibold tabular-nums">{formatRange(weekStart)}</div>
 
         <div className="ml-auto flex items-center gap-2">
           <Link
             href="/agents/schedule-manager"
-            className="text-xs px-3 py-1.5 rounded border border-border hover:border-foreground/40 transition"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted/40 hover:border-foreground/30 transition"
           >
-            Zaplanuj przez agenta
+            <Bot className="w-3.5 h-3.5" /> Zaplanuj przez agenta
           </Link>
           <Button size="sm" variant="outline" onClick={openCreate}>
-            + Wpis
+            <CalendarPlus className="w-4 h-4 mr-1" /> Wpis
           </Button>
           <Button size="sm" onClick={() => setWizardOpen(true)}>
-            + Nowa produkcja
+            <Plus className="w-4 h-4 mr-1" /> Nowa produkcja
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-1">
           <button
             type="button"
             onClick={() => setFilterType('all')}
-            className={`px-2.5 py-1 rounded border transition ${
+            className={`px-2.5 py-1 rounded-md border transition ${
               filterType === 'all'
                 ? 'border-foreground bg-foreground text-background'
-                : 'border-border text-muted-foreground hover:border-foreground/40'
+                : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
             }`}
           >
             Wszystko
@@ -171,17 +188,17 @@ export function CalendarShell({
               key={t}
               type="button"
               onClick={() => setFilterType(t)}
-              className={`px-2.5 py-1 rounded border transition ${
+              className={`px-2.5 py-1 rounded-md border transition ${
                 filterType === t
-                  ? `${TYPE_PILL[t]} ring-1 ring-foreground/20`
-                  : 'border-border text-muted-foreground hover:border-foreground/40'
+                  ? `${TYPE_PILL[t]} ring-1 ring-foreground/30`
+                  : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
               }`}
             >
               {TYPE_LABEL[t]}
             </button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-3 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
           <LegendSwatch
             className={LEGEND_SWATCH['planned-empty']}
             label={CONTENT_STATE_LABEL['planned-empty']}

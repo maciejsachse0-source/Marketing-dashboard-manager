@@ -109,20 +109,23 @@ export function WeekView({
   };
 
   return (
-    <div className="border border-border rounded-lg bg-card overflow-x-auto">
+    <div className="border border-border rounded-lg bg-card overflow-x-auto shadow-sm">
      <div className="min-w-[700px]">
-      <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-border bg-muted/30">
+      <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-border bg-muted/40">
         <div />
         {days.map((d) => {
-          const isToday = new Date().toDateString() === d.toDateString();
+          const isToday = now.toDateString() === d.toDateString();
           return (
             <div
               key={d.toISOString()}
-              className={`px-2 py-2 text-xs font-medium border-l border-border ${
-                isToday ? 'text-foreground' : 'text-muted-foreground'
+              className={`px-2 py-2.5 text-xs font-medium border-l border-border ${
+                isToday
+                  ? 'text-primary bg-primary/5 border-b-2 border-b-primary -mb-px'
+                  : 'text-muted-foreground'
               }`}
             >
               {formatDayShort(d)}
+              {isToday ? <span className="ml-1 text-[9px] uppercase tracking-wider opacity-80">dziś</span> : null}
             </div>
           );
         })}
@@ -132,7 +135,7 @@ export function WeekView({
           {hours.slice(0, -1).map((h, i) => (
             <div
               key={h}
-              className="absolute right-2 text-[10px] text-muted-foreground"
+              className="absolute right-2 text-[10px] text-muted-foreground tabular-nums"
               style={{ top: i * HOUR_HEIGHT - 6 }}
             >
               {String(h).padStart(2, '0')}:00
@@ -147,12 +150,22 @@ export function WeekView({
 
           const dayEntries = entries.filter((e) => e.startsAt >= dayStart && e.startsAt <= dayEnd);
           const isDropTarget = dropTarget?.dayIdx === dayIdx && draggingId !== null;
+          const isToday = now.toDateString() === d.toDateString();
+
+          // Now-line position (only on today's column, only if within shown hours)
+          const nowMinutes = now.getHours() * 60 + now.getMinutes();
+          const startMinutes = HOUR_START * 60;
+          const endMinutes = HOUR_END * 60;
+          const nowY =
+            isToday && nowMinutes >= startMinutes && nowMinutes <= endMinutes
+              ? ((nowMinutes - startMinutes) / 60) * HOUR_HEIGHT
+              : null;
 
           return (
             <div
               key={d.toISOString()}
               className={`relative border-l border-border transition ${
-                isDropTarget ? 'bg-primary/5' : ''
+                isDropTarget ? 'bg-primary/5' : isToday ? 'bg-primary/[0.02]' : ''
               }`}
               onDragOver={(e) => onColDragOver(e, dayIdx)}
               onDragLeave={() => setDropTarget((t) => (t?.dayIdx === dayIdx ? null : t))}
@@ -165,6 +178,15 @@ export function WeekView({
                   style={{ top: (i + 1) * HOUR_HEIGHT, height: 1 }}
                 />
               ))}
+              {nowY !== null ? (
+                <div
+                  className="absolute left-0 right-0 h-0.5 bg-rose-500 pointer-events-none z-20 shadow"
+                  style={{ top: nowY }}
+                  aria-label="teraz"
+                >
+                  <span className="absolute -left-1 -top-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-card" />
+                </div>
+              ) : null}
               {isDropTarget ? (
                 <div
                   className="absolute left-0 right-0 h-px bg-primary pointer-events-none z-10"
@@ -194,26 +216,25 @@ export function WeekView({
                     onDragStart={(ev) => onDragStart(ev, e.id)}
                     onDragEnd={onDragEnd}
                     onClick={() => onEntryClick?.(e)}
-                    className={`absolute left-1 right-1 rounded-md px-2 py-1 text-left text-xs transition cursor-pointer ${entryClass(
+                    className={`absolute left-1 right-1 rounded-md px-2 py-1.5 text-left text-xs transition cursor-pointer overflow-hidden ${entryClass(
                       e.type,
                       state,
                     )} ${isDragging ? 'opacity-30' : ''} ${
                       onEntryDrop ? 'cursor-grab active:cursor-grabbing' : ''
                     }`}
-                    style={{ top, height: Math.max(height, 28) }}
+                    style={{ top, height: Math.max(height, 36) }}
+                    title={`${e.title} · ${formatHM(e.startsAt)}–${formatHM(e.endsAt)} · ${TYPE_LABEL[e.type]}`}
                   >
-                    <div className="flex items-center gap-1">
-                      <StateIcon className="w-3 h-3 shrink-0 opacity-80" strokeWidth={2.25} />
-                      <span className="font-medium truncate">{e.title}</span>
+                    <div className="flex items-start gap-1 leading-tight">
+                      <StateIcon className="w-3.5 h-3.5 shrink-0 mt-0.5" strokeWidth={2.25} />
+                      <span className="font-semibold flex-1 line-clamp-2 break-words">{e.title}</span>
                     </div>
-                    <div className="text-[10px] opacity-80 flex items-center gap-1.5">
-                      <span>
-                        {formatHM(e.startsAt)}–{formatHM(e.endsAt)}
-                      </span>
-                      <span className="opacity-70">·</span>
-                      <span>{TYPE_LABEL[e.type]}</span>
+                    <div className="text-[10px] mt-1 flex items-center gap-1 opacity-90">
+                      <span className="tabular-nums font-medium">{formatHM(e.startsAt)}</span>
+                      <span className="opacity-60">·</span>
+                      <span className="uppercase tracking-wide opacity-80">{TYPE_LABEL[e.type]}</span>
                       {countdown ? (
-                        <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-px rounded bg-white/90 border border-current/20 text-[10px] tabular-nums font-semibold">
+                        <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/95 text-current border border-current/30 text-[10px] tabular-nums font-bold shadow-sm">
                           <Clock className="w-2.5 h-2.5" strokeWidth={2.5} /> {countdown}
                         </span>
                       ) : null}

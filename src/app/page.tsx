@@ -128,10 +128,13 @@ export default async function DashboardPage() {
                 className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card/90 transition relative overflow-hidden"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="font-medium text-sm group-hover:text-foreground transition">{agent.name}</div>
+                <div className="font-semibold text-sm group-hover:text-foreground transition">{agent.name}</div>
                 <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{agent.description}</div>
                 {hint ? (
-                  <div className="text-[11px] text-primary/80 mt-2 font-medium tabular-nums">{hint}</div>
+                  <div className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
+                    {hint}
+                  </div>
                 ) : null}
               </Link>
             );

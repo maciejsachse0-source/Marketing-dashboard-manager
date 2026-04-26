@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Folder, RefreshCw } from 'lucide-react';
+import { Folder, RefreshCw, Film } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/copy-button';
@@ -70,16 +70,19 @@ export function OutputGallery({ items }: { items: OutputItem[] }) {
             onClick={() => setSelected(item)}
             className="text-left rounded-xl border border-border bg-card overflow-hidden hover:border-primary/30 transition group"
           >
-            <div className="aspect-video bg-muted/40 grid place-items-center text-muted-foreground/40 relative">
+            <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/60 grid place-items-center text-muted-foreground relative border-b border-border">
               {item.thumbnailPath ? (
-                <span className="text-xs">[{item.thumbnailPath.split('/').pop()}]</span>
+                <span className="text-xs font-mono opacity-60">{item.thumbnailPath.split('/').pop()}</span>
               ) : item.videoPath ? (
-                <span className="text-xs flex flex-col items-center gap-1">
-                  <Folder className="w-6 h-6" strokeWidth={1.5} />
-                  {item.videoPath.split('/').pop()}
-                </span>
+                <div className="flex flex-col items-center gap-1.5 opacity-60">
+                  <Film className="w-8 h-8" strokeWidth={1.25} />
+                  <span className="text-[10px] font-mono">{item.videoPath.split('/').pop()}</span>
+                </div>
               ) : (
-                <span className="text-xs">brak wideo</span>
+                <div className="flex flex-col items-center gap-1.5 opacity-40">
+                  <Folder className="w-8 h-8" strokeWidth={1.25} />
+                  <span className="text-[10px] uppercase tracking-wider">brak assetu</span>
+                </div>
               )}
             </div>
             <div className="p-3 space-y-2">
