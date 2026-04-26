@@ -12,6 +12,7 @@ import {
   Users,
   FileText,
   Sparkles,
+  Film,
   Plus,
   Upload,
   Search,
@@ -66,6 +67,7 @@ export function CommandPalette() {
     const pages: CommandItem[] = [
       { id: 'p:dashboard', label: 'Pulpit', hint: '/', group: 'Strony', icon: LayoutDashboard, action: go('/') },
       { id: 'p:calendar', label: 'Kalendarz', hint: '/calendar', group: 'Strony', icon: CalendarDays, action: go('/calendar') },
+      { id: 'p:productions', label: 'Produkcje', hint: '/productions', group: 'Strony', icon: Film, action: go('/productions') },
       { id: 'p:agents', label: 'Agenci', hint: '/agents', group: 'Strony', icon: Bot, action: go('/agents') },
       { id: 'p:packages', label: 'Pakiety', hint: '/packages', group: 'Strony', icon: PackageOpen, action: go('/packages') },
       { id: 'p:analytics', label: 'Analityka', hint: '/analytics', group: 'Strony', icon: BarChart3, action: go('/analytics') },

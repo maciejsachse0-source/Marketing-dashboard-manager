@@ -13,6 +13,7 @@ import {
   Users,
   FileText,
   Sparkles,
+  Film,
   Menu,
   X,
   type LucideIcon,
@@ -22,6 +23,7 @@ import { AGENT_META } from '@/lib/agents/meta';
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/', label: 'Pulpit', icon: LayoutDashboard },
   { href: '/calendar', label: 'Kalendarz', icon: CalendarDays },
+  { href: '/productions', label: 'Produkcje', icon: Film },
   { href: '/agents', label: 'Agenci', icon: Bot },
   { href: '/packages', label: 'Pakiety', icon: PackageOpen },
   { href: '/analytics', label: 'Analityka', icon: BarChart3 },

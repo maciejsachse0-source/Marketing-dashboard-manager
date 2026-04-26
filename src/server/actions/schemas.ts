@@ -6,6 +6,8 @@ import {
   CAMPAIGN_PHASES,
   PACKAGE_STATUSES,
   CSV_SOURCES,
+  PRODUCTION_TYPES,
+  PRODUCTION_STATUSES,
 } from '../../../drizzle/schema';
 
 const isoDate = z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
@@ -18,6 +20,8 @@ export const calendarStatusSchema = z.enum(CALENDAR_STATUSES);
 export const campaignPhaseSchema = z.enum(CAMPAIGN_PHASES);
 export const packageStatusSchema = z.enum(PACKAGE_STATUSES);
 export const csvSourceSchema = z.enum(CSV_SOURCES);
+export const productionTypeSchema = z.enum(PRODUCTION_TYPES);
+export const productionStatusSchema = z.enum(PRODUCTION_STATUSES);
 
 export const calendarEntryInputSchema = z.object({
   type: calendarTypeSchema,
@@ -107,3 +111,18 @@ export const outreachInputSchema = z.object({
   filename: z.string().min(1).max(200),
 });
 export type OutreachInput = z.infer<typeof outreachInputSchema>;
+
+export const productionInputSchema = z.object({
+  type: productionTypeSchema,
+  templateSlug: z.string().min(1).max(60).default('manual'),
+  title: z.string().min(1).max(200),
+  slug: z.string().min(1).max(120).optional(),
+  t0At: isoDate,
+  artistId: z.number().int().positive().optional().nullable(),
+  videographerId: z.number().int().positive().optional().nullable(),
+  platforms: z.array(platformSchema).optional().nullable(),
+  campaignId: z.number().int().positive().optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+  status: productionStatusSchema.optional(),
+});
+export type ProductionInput = z.infer<typeof productionInputSchema>;

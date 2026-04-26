@@ -13,6 +13,7 @@ import { TYPE_LABEL, TYPE_PILL } from './type-color';
 import { CALENDAR_TYPES } from '../../../drizzle/schema';
 import { updateCalendarEntry } from '@/server/actions/calendar';
 import { useShortcut } from '@/lib/use-shortcut';
+import { ProductionDrawer } from '@/components/productions/production-drawer';
 
 function formatRange(weekStart: Date) {
   const end = addDays(weekStart, 6);
@@ -34,8 +35,18 @@ export function CalendarShell({
   const searchParams = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CalendarEntry | null>(null);
+  const [drawerEntryId, setDrawerEntryId] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<CalendarType | 'all'>('all');
   const [, startTransition] = useTransition();
+
+  const onEntryClick = (entry: CalendarEntry) => {
+    if (entry.productionId) {
+      setDrawerEntryId(entry.id);
+    } else {
+      setEditing(entry);
+      setDialogOpen(true);
+    }
+  };
 
   const onEntryDrop = (entryId: number, newStartsAt: Date) => {
     const entry = entries.find((e) => e.id === entryId);
@@ -155,10 +166,7 @@ export function CalendarShell({
       <WeekView
         weekStart={weekStart}
         entries={filtered}
-        onEntryClick={(e) => {
-          setEditing(e);
-          setDialogOpen(true);
-        }}
+        onEntryClick={onEntryClick}
         onEntryDrop={onEntryDrop}
       />
 
@@ -167,6 +175,12 @@ export function CalendarShell({
         onOpenChange={setDialogOpen}
         entry={editing}
         defaultStart={weekStart}
+      />
+
+      <ProductionDrawer
+        entryId={drawerEntryId}
+        open={drawerEntryId !== null}
+        onClose={() => setDrawerEntryId(null)}
       />
     </div>
   );

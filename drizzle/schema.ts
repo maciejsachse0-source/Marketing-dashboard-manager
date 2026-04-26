@@ -19,6 +19,44 @@ export type PackageStatus = (typeof PACKAGE_STATUSES)[number];
 export const CSV_SOURCES = ['meta', 'tiktok', 'youtube'] as const;
 export type CsvSource = (typeof CSV_SOURCES)[number];
 
+export const PRODUCTION_TYPES = ['with-artist', 'solo'] as const;
+export type ProductionType = (typeof PRODUCTION_TYPES)[number];
+
+export const PRODUCTION_STATUSES = [
+  'idea',
+  'planning',
+  'outreach',
+  'confirmed',
+  'briefing',
+  'ready-to-shoot',
+  'shooting',
+  'editing',
+  'review',
+  'approved',
+  'publishing',
+  'published',
+  'analyzed',
+  'cancelled',
+] as const;
+export type ProductionStatus = (typeof PRODUCTION_STATUSES)[number];
+
+/** Workflow order — used for next/prev step UI. `cancelled` is terminal off-track. */
+export const PRODUCTION_PROGRESSION: ProductionStatus[] = [
+  'idea',
+  'planning',
+  'outreach',
+  'confirmed',
+  'briefing',
+  'ready-to-shoot',
+  'shooting',
+  'editing',
+  'review',
+  'approved',
+  'publishing',
+  'published',
+  'analyzed',
+];
+
 const now = sql`(unixepoch() * 1000)`;
 
 export const artists = sqliteTable('artists', {
@@ -43,6 +81,23 @@ export const campaigns = sqliteTable('campaigns', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
 
+export const productions = sqliteTable('productions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  type: text('type').$type<ProductionType>().notNull(),
+  templateSlug: text('template_slug').notNull().default('manual'),
+  status: text('status').$type<ProductionStatus>().notNull().default('idea'),
+  title: text('title').notNull(),
+  slug: text('slug').notNull(),
+  t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
+  artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
+  videographerId: integer('videographer_id'),
+  platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
+  campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
+  folderPath: text('folder_path'),
+  notes: text('notes'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+});
+
 export const calendarEntries = sqliteTable('calendar_entries', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type').$type<CalendarType>().notNull(),
@@ -53,6 +108,7 @@ export const calendarEntries = sqliteTable('calendar_entries', {
   platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
+  productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
   briefPath: text('brief_path'),
   status: text('status').$type<CalendarStatus>().notNull().default('planned'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
@@ -81,6 +137,7 @@ export const posts = sqliteTable('posts', {
   hashtags: text('hashtags', { mode: 'json' }).$type<string[]>(),
   assetPath: text('asset_path'),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
+  productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
   reach: integer('reach'),
   impressions: integer('impressions'),
   engagementRate: real('engagement_rate'),
@@ -104,6 +161,7 @@ export const packages = sqliteTable('packages', {
   status: text('status').$type<PackageStatus>().notNull().default('draft'),
   publishedPostIds: text('published_post_ids', { mode: 'json' }).$type<number[]>(),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
+  productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
   scheduledFor: integer('scheduled_for', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
@@ -132,3 +190,5 @@ export type NewPackage = typeof packages.$inferInsert;
 export type CsvUpload = typeof csvUploads.$inferSelect;
 export type CsvRow = typeof csvRows.$inferSelect;
 export type AgentRun = typeof agentRuns.$inferSelect;
+export type Production = typeof productions.$inferSelect;
+export type NewProduction = typeof productions.$inferInsert;
