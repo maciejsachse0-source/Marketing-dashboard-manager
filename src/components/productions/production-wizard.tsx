@@ -17,6 +17,7 @@ import { isoToInputLocal } from '@/lib/dates';
 import type { ProductionTemplate } from '@/lib/templates';
 
 type ArtistOption = { id: number; name: string; handle: string | null };
+type VideographerOption = { id: number; name: string; hourlyRate: number | null };
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -25,12 +26,14 @@ export function ProductionWizard({
   onOpenChange,
   templates,
   artists,
+  videographers = [],
   defaultStart,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   templates: ProductionTemplate[];
   artists: ArtistOption[];
+  videographers?: VideographerOption[];
   defaultStart?: Date;
 }) {
   const [step, setStep] = useState<Step>(1);
@@ -39,6 +42,7 @@ export function ProductionWizard({
   const [title, setTitle] = useState('');
   const [t0Local, setT0Local] = useState(() => isoToInputLocal(defaultStart ?? new Date()));
   const [artistId, setArtistId] = useState<number | null>(null);
+  const [videographerId, setVideographerId] = useState<number | null>(null);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +66,7 @@ export function ProductionWizard({
     setTitle('');
     setT0Local(isoToInputLocal(defaultStart ?? new Date()));
     setArtistId(null);
+    setVideographerId(null);
     setPlatforms([]);
     setNotes('');
     setError(null);
@@ -96,6 +101,7 @@ export function ProductionWizard({
             title: title.trim(),
             t0At: t0Iso,
             artistId: type === 'with-artist' ? artistId : null,
+            videographerId: type === 'with-artist' ? videographerId : null,
             platformsOverride: platforms.length > 0 ? platforms : null,
             notes: notes.trim() || null,
           });
@@ -110,6 +116,7 @@ export function ProductionWizard({
             title: title.trim(),
             t0At: t0Iso,
             artistId: type === 'with-artist' ? artistId : null,
+            videographerId: type === 'with-artist' ? videographerId : null,
             platforms: platforms.length > 0 ? platforms : null,
             notes: notes.trim() || null,
             status: 'idea',
@@ -156,6 +163,9 @@ export function ProductionWizard({
               artistId={artistId}
               setArtistId={setArtistId}
               artists={artists}
+              videographerId={videographerId}
+              setVideographerId={setVideographerId}
+              videographers={videographers}
               platforms={platforms}
               togglePlatform={togglePlatform}
               notes={notes}
@@ -169,6 +179,7 @@ export function ProductionWizard({
               title={title}
               t0Local={t0Local}
               artist={artists.find((a) => a.id === artistId) ?? null}
+              videographer={videographers.find((v) => v.id === videographerId) ?? null}
               platforms={platforms}
               notes={notes}
             />
@@ -344,6 +355,9 @@ function StepDetails({
   artistId,
   setArtistId,
   artists,
+  videographerId,
+  setVideographerId,
+  videographers,
   platforms,
   togglePlatform,
   notes,
@@ -357,6 +371,9 @@ function StepDetails({
   artistId: number | null;
   setArtistId: (v: number | null) => void;
   artists: ArtistOption[];
+  videographerId: number | null;
+  setVideographerId: (v: number | null) => void;
+  videographers: VideographerOption[];
   platforms: Platform[];
   togglePlatform: (p: Platform) => void;
   notes: string;
@@ -421,6 +438,42 @@ function StepDetails({
           </p>
         </div>
       ) : null}
+      {type === 'with-artist' ? (
+        <div className="grid gap-1.5">
+          <Label>Kamerzysta</Label>
+          <div className="flex flex-wrap gap-1">
+            <button
+              type="button"
+              onClick={() => setVideographerId(null)}
+              className={`px-2.5 py-1 text-xs rounded border transition ${
+                videographerId === null
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border text-muted-foreground hover:border-foreground/40'
+              }`}
+            >
+              brak / solo cam
+            </button>
+            {videographers.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setVideographerId(v.id)}
+                className={`px-2.5 py-1 text-xs rounded border transition ${
+                  videographerId === v.id
+                    ? 'border-foreground bg-foreground text-background'
+                    : 'border-border text-muted-foreground hover:border-foreground/40'
+                }`}
+              >
+                {v.name}
+                {v.hourlyRate ? <span className="opacity-60 ml-1">{v.hourlyRate}zł/h</span> : null}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Brakuje? Dodaj w <span className="font-mono">/videographers</span>.
+          </p>
+        </div>
+      ) : null}
       <div className="grid gap-1.5">
         <Label>Platformy publikacji (opcjonalnie — nadpisuje template)</Label>
         <div className="flex flex-wrap gap-1">
@@ -460,6 +513,7 @@ function StepReview({
   title,
   t0Local,
   artist,
+  videographer,
   platforms,
   notes,
 }: {
@@ -468,6 +522,7 @@ function StepReview({
   title: string;
   t0Local: string;
   artist: ArtistOption | null;
+  videographer: VideographerOption | null;
   platforms: Platform[];
   notes: string;
 }) {
@@ -491,6 +546,16 @@ function StepReview({
         />
         {type === 'with-artist' ? (
           <Row label="Artysta" value={artist ? `${artist.name}${artist.handle ? ' · ' + artist.handle : ''}` : 'brak'} />
+        ) : null}
+        {type === 'with-artist' ? (
+          <Row
+            label="Kamerzysta"
+            value={
+              videographer
+                ? `${videographer.name}${videographer.hourlyRate ? ` · ${videographer.hourlyRate}zł/h` : ''}`
+                : 'brak / solo cam'
+            }
+          />
         ) : null}
         <Row
           label="Platformy"

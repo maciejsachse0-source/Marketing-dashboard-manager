@@ -112,6 +112,16 @@ export const outreachInputSchema = z.object({
 });
 export type OutreachInput = z.infer<typeof outreachInputSchema>;
 
+export const videographerInputSchema = z.object({
+  name: z.string().min(1).max(120),
+  contact: z.string().max(200).optional().nullable(),
+  hourlyRate: z.number().min(0).optional().nullable(),
+  equipment: z.string().max(2000).optional().nullable(),
+  availabilityNotes: z.string().max(1000).optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+});
+export type VideographerInput = z.infer<typeof videographerInputSchema>;
+
 export const productionInputSchema = z.object({
   type: productionTypeSchema,
   templateSlug: z.string().min(1).max(60).default('manual'),

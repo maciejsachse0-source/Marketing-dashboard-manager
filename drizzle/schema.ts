@@ -81,6 +81,17 @@ export const campaigns = sqliteTable('campaigns', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
 
+export const videographers = sqliteTable('videographers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  contact: text('contact'),
+  hourlyRate: real('hourly_rate'),
+  equipment: text('equipment'),
+  availabilityNotes: text('availability_notes'),
+  notes: text('notes'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+});
+
 export const productions = sqliteTable('productions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type').$type<ProductionType>().notNull(),
@@ -90,7 +101,7 @@ export const productions = sqliteTable('productions', {
   slug: text('slug').notNull(),
   t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
-  videographerId: integer('videographer_id'),
+  videographerId: integer('videographer_id').references(() => videographers.id, { onDelete: 'set null' }),
   platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
   folderPath: text('folder_path'),
@@ -192,3 +203,5 @@ export type CsvRow = typeof csvRows.$inferSelect;
 export type AgentRun = typeof agentRuns.$inferSelect;
 export type Production = typeof productions.$inferSelect;
 export type NewProduction = typeof productions.$inferInsert;
+export type Videographer = typeof videographers.$inferSelect;
+export type NewVideographer = typeof videographers.$inferInsert;

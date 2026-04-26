@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { PageShell } from '@/components/page-shell';
 import { listProductions } from '@/server/actions/productions';
 import { listArtists } from '@/server/actions/artists';
+import { listVideographers } from '@/server/actions/videographers';
 import { listProductionTemplates } from '@/lib/templates';
 import { EmptyState } from '@/components/empty-state';
 import { ProductionStatusPill, ProductionTypeBadge } from '@/components/productions/status-pill';
@@ -17,7 +18,11 @@ export default async function ProductionsListPage({
   searchParams: Promise<{ type?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const [productions, artists] = await Promise.all([listProductions(), listArtists()]);
+  const [productions, artists, videographers] = await Promise.all([
+    listProductions(),
+    listArtists(),
+    listVideographers(),
+  ]);
   const templates = listProductionTemplates();
 
   const filtered = productions.filter((p) => {
@@ -27,12 +32,23 @@ export default async function ProductionsListPage({
   });
 
   const artistOptions = artists.map((a) => ({ id: a.id, name: a.name, handle: a.handle }));
+  const videographerOptions = videographers.map((v) => ({
+    id: v.id,
+    name: v.name,
+    hourlyRate: v.hourlyRate,
+  }));
 
   return (
     <PageShell
       title="Produkcje"
       description="Każde wideo to produkcja — łańcuch kroków od pomysłu do analizy."
-      actions={<NewProductionButton templates={templates} artists={artistOptions} />}
+      actions={
+        <NewProductionButton
+          templates={templates}
+          artists={artistOptions}
+          videographers={videographerOptions}
+        />
+      }
     >
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <FilterLink href="/productions" active={!sp.type}>

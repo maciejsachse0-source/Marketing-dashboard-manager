@@ -16,6 +16,7 @@ import {
   Film,
   LayoutTemplate,
   FolderOpen,
+  Camera,
   Menu,
   X,
   type LucideIcon,
@@ -32,6 +33,7 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/analytics', label: 'Analityka', icon: BarChart3 },
   { href: '/campaigns', label: 'Kampanie', icon: Megaphone },
   { href: '/artists', label: 'Artyści', icon: Users },
+  { href: '/videographers', label: 'Kamerzyści', icon: Camera },
   { href: '/briefs', label: 'Briefy & wrapy', icon: FileText },
   { href: '/templates', label: 'Templates', icon: LayoutTemplate },
 ];

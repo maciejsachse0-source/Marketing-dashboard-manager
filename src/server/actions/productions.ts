@@ -138,7 +138,7 @@ export async function getProduction(id: number) {
     where: eq(schema.productions.id, id),
   });
   if (!production) return null;
-  const [entries, packages, posts, artist, campaign] = await Promise.all([
+  const [entries, packages, posts, artist, videographer, campaign] = await Promise.all([
     db.query.calendarEntries.findMany({
       where: eq(schema.calendarEntries.productionId, id),
       orderBy: schema.calendarEntries.startsAt,
@@ -154,11 +154,16 @@ export async function getProduction(id: number) {
     production.artistId
       ? db.query.artists.findFirst({ where: eq(schema.artists.id, production.artistId) })
       : Promise.resolve(null),
+    production.videographerId
+      ? db.query.videographers.findFirst({
+          where: eq(schema.videographers.id, production.videographerId),
+        })
+      : Promise.resolve(null),
     production.campaignId
       ? db.query.campaigns.findFirst({ where: eq(schema.campaigns.id, production.campaignId) })
       : Promise.resolve(null),
   ]);
-  return { production, entries, packages, posts, artist, campaign };
+  return { production, entries, packages, posts, artist, videographer, campaign };
 }
 
 export type CreateFromTemplateInput = {

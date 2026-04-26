@@ -11,7 +11,10 @@ if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
 const sqlite = new Database(dbPath);
 sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
+// Turn FK OFF for migrations — Drizzle's "recreate table" pattern (used for SQLite
+// schema changes) drops/renames tables, which would otherwise violate FK pointing
+// to that table. Re-enable after.
+sqlite.pragma('foreign_keys = OFF');
 
 const db = drizzle(sqlite);
 
@@ -19,4 +22,5 @@ console.log(`[migrate] applying migrations to ${dbPath}`);
 migrate(db, { migrationsFolder: './drizzle/migrations' });
 console.log('[migrate] done');
 
+sqlite.pragma('foreign_keys = ON');
 sqlite.close();

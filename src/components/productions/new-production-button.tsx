@@ -7,14 +7,17 @@ import { useShortcut } from '@/lib/use-shortcut';
 import type { ProductionTemplate } from '@/lib/templates';
 
 type ArtistOption = { id: number; name: string; handle: string | null };
+type VideographerOption = { id: number; name: string; hourlyRate: number | null };
 
 export function NewProductionButton({
   templates,
   artists,
+  videographers,
   variant = 'default',
 }: {
   templates: ProductionTemplate[];
   artists: ArtistOption[];
+  videographers: VideographerOption[];
   variant?: 'default' | 'outline';
 }) {
   const [open, setOpen] = useState(false);
@@ -31,6 +34,7 @@ export function NewProductionButton({
         onOpenChange={setOpen}
         templates={templates}
         artists={artists}
+        videographers={videographers}
       />
     </>
   );
