@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { addDays, startOfWeek } from '@/lib/dates';
 import type { CalendarEntry, CalendarType } from '../../../drizzle/schema';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,8 @@ import { WeekView } from './week-view';
 import { EntryDialog } from './entry-dialog';
 import { TYPE_LABEL, TYPE_PILL } from './type-color';
 import { CALENDAR_TYPES } from '../../../drizzle/schema';
+import { updateCalendarEntry } from '@/server/actions/calendar';
+import { useShortcut } from '@/lib/use-shortcut';
 
 function formatRange(weekStart: Date) {
   const end = addDays(weekStart, 6);
@@ -32,6 +35,42 @@ export function CalendarShell({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CalendarEntry | null>(null);
   const [filterType, setFilterType] = useState<CalendarType | 'all'>('all');
+  const [, startTransition] = useTransition();
+
+  const onEntryDrop = (entryId: number, newStartsAt: Date) => {
+    const entry = entries.find((e) => e.id === entryId);
+    if (!entry) return;
+    const duration = entry.endsAt.getTime() - entry.startsAt.getTime();
+    const newEndsAt = new Date(newStartsAt.getTime() + duration);
+    if (
+      newStartsAt.getTime() === entry.startsAt.getTime() &&
+      newEndsAt.getTime() === entry.endsAt.getTime()
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      try {
+        await updateCalendarEntry({
+          id: entryId,
+          startsAt: newStartsAt.toISOString(),
+          endsAt: newEndsAt.toISOString(),
+        });
+        toast.success(
+          `Przeniesiono "${entry.title}" → ${newStartsAt.toLocaleString('pl-PL', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}`,
+        );
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się przenieść', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+      }
+    });
+  };
 
   const filtered = useMemo(
     () => (filterType === 'all' ? entries : entries.filter((e) => e.type === filterType)),
@@ -55,6 +94,8 @@ export function CalendarShell({
     setEditing(null);
     setDialogOpen(true);
   };
+
+  useShortcut('n', () => openCreate(), []);
 
   return (
     <div className="space-y-4">
@@ -118,6 +159,7 @@ export function CalendarShell({
           setEditing(e);
           setDialogOpen(true);
         }}
+        onEntryDrop={onEntryDrop}
       />
 
       <EntryDialog

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArtistDialog } from './artist-dialog';
 import type { Artist } from '../../../drizzle/schema';
+import { useShortcut } from '@/lib/use-shortcut';
 
 export type ArtistRow = {
   artist: Artist;
@@ -26,6 +27,8 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
     setEditing(artist);
     setDialogOpen(true);
   };
+
+  useShortcut('n', () => openCreate(), []);
 
   return (
     <div className="space-y-4">

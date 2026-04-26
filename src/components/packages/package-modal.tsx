@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -20,9 +20,48 @@ export function PackageModal({
   onOpenChange: (o: boolean) => void;
 }) {
   const [pending, startTransition] = useTransition();
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   if (!pkg) return null;
+
+  const onAssetSelect = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('category', 'packages');
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
+      await updatePackage(pkg.id, { assetPath: json.path });
+      toast.success('Asset wgrany', { description: json.path });
+      router.refresh();
+    } catch (e) {
+      toast.error('Nie udało się wgrać assetu', {
+        description: e instanceof Error ? e.message : String(e),
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAsset = async () => {
+    if (!confirm('Odłączyć asset od pakietu? (plik nie zostanie usunięty z dysku)')) return;
+    startTransition(async () => {
+      try {
+        await updatePackage(pkg.id, { assetPath: null });
+        toast.success('Asset odłączony');
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się odłączyć', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+      }
+    });
+  };
 
   const setStatus = (status: 'draft' | 'ready' | 'published') => {
     startTransition(async () => {
@@ -81,14 +120,43 @@ export function PackageModal({
             />
           ))}
 
-          {pkg.assetPath ? (
-            <div className="rounded-md border border-border bg-muted/20 p-3">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-                Asset
+          <div className="rounded-md border border-border bg-muted/20 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Asset</div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*,image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onAssetSelect(f);
+                }}
+              />
+              <div className="flex items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading || pending}
+                >
+                  {uploading ? 'Wgrywanie…' : pkg.assetPath ? 'Zmień plik' : 'Wgraj plik'}
+                </Button>
+                {pkg.assetPath ? (
+                  <Button size="sm" variant="ghost" onClick={removeAsset} disabled={pending} className="text-muted-foreground">
+                    Odłącz
+                  </Button>
+                ) : null}
               </div>
-              <code className="text-xs font-mono">{pkg.assetPath}</code>
             </div>
-          ) : null}
+            {pkg.assetPath ? (
+              <code className="text-xs font-mono text-muted-foreground break-all">{pkg.assetPath}</code>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Brak assetu. Wgraj plik video/foto (max 100MB) — pojawi się w ZIP-ie i README.
+              </p>
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border">
             <span className="text-xs text-muted-foreground mr-2">Zmień status:</span>
