@@ -1,0 +1,161 @@
+{
+  "slug": "campaign-6w",
+  "name": "Premiera / kampania (6 tyg)",
+  "description": "Kampania premierowa: build-up T-30 → teaser T-14 → reveal T-7 → release T-0 → afterglow T+30. Zarządzana przez campaign-strategist.",
+  "type": "with-artist",
+  "durationDays": 60,
+  "steps": [
+    {
+      "tDays": -30,
+      "hourStart": 14,
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "title": "[BUILD-UP] Brief strategiczny",
+      "agent": "campaign-strategist",
+      "description": "Pozycjonowanie, audytorium, hook strategiczny, KPI."
+    },
+    {
+      "tDays": -28,
+      "hourStart": 12,
+      "durationMinutes": 180,
+      "calendarType": "shoot",
+      "title": "[BUILD-UP] Nagranie zasiewające",
+      "description": "Easter egg w regularnym contencie — subtelne odniesienie."
+    },
+    {
+      "tDays": -25,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[BUILD-UP] Post zasiewający",
+      "platforms": ["instagram", "tiktok"]
+    },
+    {
+      "tDays": -21,
+      "hourStart": 10,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Outreach do współpracowników premiery",
+      "agent": "artist-outreach"
+    },
+    {
+      "tDays": -14,
+      "hourStart": 14,
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "title": "[TEASER] Brief produkcyjny teasera",
+      "agent": "content-brief"
+    },
+    {
+      "tDays": -12,
+      "hourStart": 12,
+      "durationMinutes": 180,
+      "calendarType": "shoot",
+      "title": "[TEASER] Nagranie teasera"
+    },
+    {
+      "tDays": -10,
+      "hourStart": 14,
+      "durationMinutes": 240,
+      "calendarType": "edit",
+      "title": "[TEASER] Montaż teasera"
+    },
+    {
+      "tDays": -9,
+      "hourStart": 18,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[TEASER] Publikacja teasera",
+      "agent": "social-publisher",
+      "platforms": ["instagram", "tiktok"]
+    },
+    {
+      "tDays": -7,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[REVEAL] Ogłoszenie daty premiery",
+      "agent": "social-publisher",
+      "platforms": ["instagram", "tiktok", "youtube"]
+    },
+    {
+      "tDays": -5,
+      "hourStart": 11,
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "title": "Trend check przed premierą",
+      "agent": "trend-scout"
+    },
+    {
+      "tDays": -3,
+      "hourStart": 18,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[REVEAL] Pełen reveal — co premiera oferuje",
+      "platforms": ["instagram", "tiktok"]
+    },
+    {
+      "tDays": -1,
+      "hourStart": 18,
+      "durationMinutes": 60,
+      "calendarType": "deadline",
+      "title": "Final checklist przed premierą"
+    },
+    {
+      "tDays": 0,
+      "hourStart": 18,
+      "durationMinutes": 60,
+      "calendarType": "publish",
+      "title": "[T-0] PREMIERA",
+      "platforms": ["instagram", "tiktok", "youtube"]
+    },
+    {
+      "tDays": 1,
+      "hourStart": 11,
+      "durationMinutes": 60,
+      "calendarType": "shoot",
+      "title": "[RELEASE] Reaction / B-roll",
+      "description": "Szybkie nagranie reakcji do amplifikacji."
+    },
+    {
+      "tDays": 2,
+      "hourStart": 18,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[RELEASE] Publikacja reaction",
+      "platforms": ["tiktok"]
+    },
+    {
+      "tDays": 7,
+      "hourStart": 14,
+      "durationMinutes": 45,
+      "calendarType": "meeting",
+      "title": "Post-release analiza pierwszego tygodnia",
+      "agent": "viral-analyzer"
+    },
+    {
+      "tDays": 14,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[AFTERGLOW] Recykling top momentu",
+      "platforms": ["instagram", "tiktok"]
+    },
+    {
+      "tDays": 21,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "[AFTERGLOW] Reakcje fanów / UGC",
+      "platforms": ["instagram"]
+    },
+    {
+      "tDays": 30,
+      "hourStart": 15,
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "title": "[AFTERGLOW] Wrap kampanii",
+      "agent": "weekly-wrap"
+    }
+  ]
+}

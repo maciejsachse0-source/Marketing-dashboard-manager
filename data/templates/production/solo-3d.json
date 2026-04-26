@@ -1,0 +1,71 @@
+{
+  "slug": "solo-3d",
+  "name": "Solo BTS / Trending (3 dni)",
+  "description": "Szybkie solo nagranie — pomysł, nagranie, montaż, publikacja w 3 dni.",
+  "type": "solo",
+  "durationDays": 10,
+  "steps": [
+    {
+      "tDays": -2,
+      "hourStart": 10,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Pomysł + mini-brief",
+      "agent": "content-brief",
+      "description": "Hook (3 warianty) + szkic sceny."
+    },
+    {
+      "tDays": -1,
+      "hourStart": 11,
+      "durationMinutes": 20,
+      "calendarType": "meeting",
+      "title": "Trend check (jeśli sound-driven)",
+      "agent": "trend-scout"
+    },
+    {
+      "tDays": 0,
+      "hourStart": 11,
+      "durationMinutes": 60,
+      "calendarType": "shoot",
+      "title": "Nagranie solo"
+    },
+    {
+      "tDays": 0,
+      "hourStart": 14,
+      "durationMinutes": 90,
+      "calendarType": "edit",
+      "title": "Montaż"
+    },
+    {
+      "tDays": 1,
+      "hourStart": 10,
+      "durationMinutes": 30,
+      "calendarType": "edit",
+      "title": "Akceptacja"
+    },
+    {
+      "tDays": 1,
+      "hourStart": 11,
+      "durationMinutes": 45,
+      "calendarType": "meeting",
+      "title": "Copy",
+      "agent": "social-publisher"
+    },
+    {
+      "tDays": 2,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "Publikacja",
+      "platforms": ["instagram", "tiktok"]
+    },
+    {
+      "tDays": 8,
+      "hourStart": 15,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Analiza",
+      "agent": "viral-analyzer"
+    }
+  ]
+}

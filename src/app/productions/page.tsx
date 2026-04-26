@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/page-shell';
 import { listProductions } from '@/server/actions/productions';
+import { listArtists } from '@/server/actions/artists';
+import { listProductionTemplates } from '@/lib/templates';
 import { EmptyState } from '@/components/empty-state';
 import { ProductionStatusPill, ProductionTypeBadge } from '@/components/productions/status-pill';
+import { NewProductionButton } from '@/components/productions/new-production-button';
 import { PlatformPills } from '@/components/platforms-pills';
 import { Film } from 'lucide-react';
 
@@ -14,7 +17,8 @@ export default async function ProductionsListPage({
   searchParams: Promise<{ type?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const productions = await listProductions();
+  const [productions, artists] = await Promise.all([listProductions(), listArtists()]);
+  const templates = listProductionTemplates();
 
   const filtered = productions.filter((p) => {
     if (sp.type && p.type !== sp.type) return false;
@@ -22,13 +26,18 @@ export default async function ProductionsListPage({
     return true;
   });
 
+  const artistOptions = artists.map((a) => ({ id: a.id, name: a.name, handle: a.handle }));
+
   return (
     <PageShell
       title="Produkcje"
       description="Każde wideo to produkcja — łańcuch kroków od pomysłu do analizy."
+      actions={<NewProductionButton templates={templates} artists={artistOptions} />}
     >
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <FilterLink href="/productions" active={!sp.type}>Wszystkie ({productions.length})</FilterLink>
+        <FilterLink href="/productions" active={!sp.type}>
+          Wszystkie ({productions.length})
+        </FilterLink>
         <FilterLink href="/productions?type=with-artist" active={sp.type === 'with-artist'}>
           Z artystą ({productions.filter((p) => p.type === 'with-artist').length})
         </FilterLink>
@@ -41,7 +50,7 @@ export default async function ProductionsListPage({
         <EmptyState
           icon={Film}
           title="Brak produkcji"
-          description="Nowa produkcja dostępna w Fazie B (wizard z templateami)."
+          description={'Kliknij „+ Nowa produkcja” lub użyj skrótu p — wybierz template i T-0, wpisy kalendarza wygenerują się same.'}
         />
       ) : (
         <ul className="space-y-2">

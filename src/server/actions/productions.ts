@@ -9,6 +9,7 @@ import {
   type ProductionInput,
 } from './schemas';
 import type { Production, ProductionStatus, ProductionType } from '../../../drizzle/schema';
+import { getProductionTemplate, stepStartsAt, stepEndsAt } from '@/lib/templates';
 
 function safeSlug(input: string, fallback: string): string {
   const s = input
@@ -139,6 +140,93 @@ export async function getProduction(id: number) {
       : Promise.resolve(null),
   ]);
   return { production, entries, packages, posts, artist, campaign };
+}
+
+export type CreateFromTemplateInput = {
+  templateSlug: string;
+  title: string;
+  t0At: string;
+  artistId?: number | null;
+  videographerId?: number | null;
+  campaignId?: number | null;
+  platformsOverride?: ('instagram' | 'tiktok' | 'youtube' | 'facebook' | 'x' | 'linkedin')[] | null;
+  notes?: string | null;
+};
+
+export async function createProductionFromTemplate(input: CreateFromTemplateInput): Promise<{
+  production: Production;
+  entriesCreated: number;
+}> {
+  const template = getProductionTemplate(input.templateSlug);
+  if (!template) {
+    throw new Error(`Unknown template: ${input.templateSlug}`);
+  }
+  if (!input.title.trim()) {
+    throw new Error('Tytuł nie może być pusty');
+  }
+
+  const t0 = new Date(input.t0At);
+  if (!Number.isFinite(t0.getTime())) {
+    throw new Error('Nieprawidłowa data T-0');
+  }
+
+  // Default platforms — union of all steps that publish
+  const defaultPlatforms = Array.from(
+    new Set(
+      template.steps
+        .filter((s) => s.calendarType === 'publish' && s.platforms?.length)
+        .flatMap((s) => s.platforms ?? []),
+    ),
+  );
+  const platforms = input.platformsOverride && input.platformsOverride.length > 0
+    ? input.platformsOverride
+    : defaultPlatforms.length > 0
+      ? defaultPlatforms
+      : null;
+
+  const yyyymmdd = `${t0.getFullYear()}${String(t0.getMonth() + 1).padStart(2, '0')}${String(t0.getDate()).padStart(2, '0')}`;
+  const slug = `${safeSlug(input.title, 'production')}-${yyyymmdd}`;
+
+  const [production] = await db
+    .insert(schema.productions)
+    .values({
+      type: template.type,
+      templateSlug: template.slug,
+      status: 'planning',
+      title: input.title.trim(),
+      slug,
+      t0At: t0,
+      artistId: input.artistId ?? null,
+      videographerId: input.videographerId ?? null,
+      platforms: platforms ?? null,
+      campaignId: input.campaignId ?? null,
+      notes: input.notes ?? null,
+    })
+    .returning();
+
+  let entriesCreated = 0;
+  for (const step of template.steps) {
+    await db.insert(schema.calendarEntries).values({
+      type: step.calendarType,
+      title: step.title,
+      description: step.description ?? null,
+      startsAt: stepStartsAt(t0, step),
+      endsAt: stepEndsAt(t0, step),
+      platforms: step.platforms ?? null,
+      artistId: input.artistId ?? null,
+      campaignId: input.campaignId ?? null,
+      productionId: production.id,
+      status: 'planned',
+    });
+    entriesCreated++;
+  }
+
+  revalidatePath('/productions');
+  revalidatePath(`/productions/${production.id}`);
+  revalidatePath('/calendar');
+  revalidatePath('/');
+
+  return { production, entriesCreated };
 }
 
 export async function getProductionByEntryId(entryId: number) {

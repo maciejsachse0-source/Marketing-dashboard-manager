@@ -1,0 +1,136 @@
+{
+  "slug": "collab-3w",
+  "name": "Kolaba z artystą (3 tyg)",
+  "description": "Pełna produkcja z artystą + kamerzysta — od cold outreachu przez nagranie do analizy.",
+  "type": "with-artist",
+  "durationDays": 33,
+  "steps": [
+    {
+      "tDays": -21,
+      "hourStart": 10,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Cold outreach do artysty",
+      "agent": "artist-outreach",
+      "description": "Wysyłka cold maila — krótka propozycja, niski próg odpowiedzi."
+    },
+    {
+      "tDays": -14,
+      "hourStart": 18,
+      "durationMinutes": 0,
+      "calendarType": "deadline",
+      "title": "Deadline odpowiedzi artysty",
+      "description": "Brak odpowiedzi → wygeneruj follow-up draft przez artist-outreach."
+    },
+    {
+      "tDays": -12,
+      "hourStart": 14,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Konfirmacja terminu z artystą",
+      "description": "Ustal datę, godzinę, lokację."
+    },
+    {
+      "tDays": -10,
+      "hourStart": 11,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Booking kamerzysty",
+      "description": "Potwierdzenie sprzętu, dojazdu, stawki."
+    },
+    {
+      "tDays": -7,
+      "hourStart": 14,
+      "durationMinutes": 90,
+      "calendarType": "meeting",
+      "title": "Brief produkcyjny",
+      "agent": "content-brief",
+      "description": "Scenariusz beat-by-beat + shotlist + propsy."
+    },
+    {
+      "tDays": -5,
+      "hourStart": 16,
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "title": "Trend check",
+      "agent": "trend-scout",
+      "description": "Czy wpleść aktualny format / trending audio."
+    },
+    {
+      "tDays": -3,
+      "hourStart": 10,
+      "durationMinutes": 15,
+      "calendarType": "meeting",
+      "title": "Wysyłka briefu do ekipy + artysty",
+      "agent": "artist-outreach",
+      "description": "Plan dnia, lokacja, dojazd, co przygotować."
+    },
+    {
+      "tDays": -1,
+      "hourStart": 18,
+      "durationMinutes": 60,
+      "calendarType": "deadline",
+      "title": "Przygotowanie sprzętu",
+      "description": "Checklist: kamera, mikrofon, baterie, karty, oświetlenie, props."
+    },
+    {
+      "tDays": 0,
+      "hourStart": 12,
+      "durationMinutes": 240,
+      "calendarType": "shoot",
+      "title": "NAGRANIE",
+      "description": "Shoot z artystą + kamerzystą."
+    },
+    {
+      "tDays": 1,
+      "hourStart": 10,
+      "durationMinutes": 240,
+      "calendarType": "edit",
+      "title": "Selekcja ujęć + pierwszy cut"
+    },
+    {
+      "tDays": 3,
+      "hourStart": 14,
+      "durationMinutes": 60,
+      "calendarType": "edit",
+      "title": "Akceptacja wideo (review)",
+      "description": "Finalna wersja → status 'approved' generuje folder publikacyjny."
+    },
+    {
+      "tDays": 3,
+      "hourStart": 16,
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "title": "Copy publikacyjne",
+      "agent": "social-publisher",
+      "description": "Caption + hashtagi + CTA per platforma → zapisz jako pakiet."
+    },
+    {
+      "tDays": 5,
+      "hourStart": 18,
+      "durationMinutes": 30,
+      "calendarType": "publish",
+      "title": "Publikacja na socjale",
+      "description": "Manual upload — IG + TikTok + YT.",
+      "platforms": ["instagram", "tiktok", "youtube"]
+    },
+    {
+      "tDays": 6,
+      "hourStart": 11,
+      "durationMinutes": 15,
+      "calendarType": "meeting",
+      "title": "Podziękowanie do artysty",
+      "agent": "artist-outreach",
+      "description": "Mail z linkami i krótką informacją o starcie."
+    },
+    {
+      "tDays": 12,
+      "hourStart": 15,
+      "durationMinutes": 45,
+      "calendarType": "meeting",
+      "title": "Analiza wyników",
+      "agent": "viral-analyzer",
+      "description": "Po wgraniu CSV — wyciągnij wnioski na następny post."
+    }
+  ]
+}
