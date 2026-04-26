@@ -10,6 +10,7 @@ import {
 } from './schemas';
 import type { Production, ProductionStatus, ProductionType } from '../../../drizzle/schema';
 import { getProductionTemplate, stepStartsAt, stepEndsAt } from '@/lib/templates';
+import { generateOutputFolder } from '@/lib/output-folder';
 
 function safeSlug(input: string, fallback: string): string {
   const s = input
@@ -79,8 +80,26 @@ export async function setProductionStatus(id: number, status: ProductionStatus):
   revalidatePath(`/productions/${id}`);
   revalidatePath('/calendar');
   revalidatePath('/');
-  // TODO Phase D: trigger folder generation when status === 'approved'
+
+  // Side-effect: when production reaches 'approved' for the first time, generate output folder
+  if (validStatus === 'approved' && !row.folderPath) {
+    try {
+      await generateOutputFolder(id);
+      revalidatePath('/output');
+    } catch (e) {
+      console.error('[output-folder] generation failed for production', id, e);
+      // Status change still succeeds — folder generation is best-effort
+    }
+  }
+
   return row;
+}
+
+export async function regenerateOutputFolder(id: number) {
+  const result = await generateOutputFolder(id);
+  revalidatePath(`/productions/${id}`);
+  revalidatePath('/output');
+  return result;
 }
 
 export async function deleteProduction(id: number): Promise<void> {
