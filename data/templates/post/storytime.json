@@ -1,0 +1,14 @@
+{
+  "slug": "storytime",
+  "name": "Storytime",
+  "description": "Krótka historia z wnioskiem. Najlepiej osobiste, prawdziwe wydarzenie.",
+  "hookPattern": "'Kiedy [niespodziewane wydarzenie]…' — pierwsze słowa zapowiadają napięcie",
+  "duration": { "min": 30, "max": 90 },
+  "platforms": ["tiktok", "instagram"],
+  "captionLength": "średni (150-300 zn)",
+  "ctaStyle": "share z kimś / save",
+  "agentHints": {
+    "content-brief": "Struktura: setup (3s) → problem (15s) → eskalacja (15s) → puenta (5s). NIE wyjawiaj puenty w hooku.",
+    "social-publisher": "Caption: pierwsze 2 zdania zapowiadają, reszta po 'więcej'. Hashtagi storytelling."
+  }
+}

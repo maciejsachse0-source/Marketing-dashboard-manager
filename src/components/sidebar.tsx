@@ -14,6 +14,7 @@ import {
   FileText,
   Sparkles,
   Film,
+  LayoutTemplate,
   Menu,
   X,
   type LucideIcon,
@@ -30,6 +31,7 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/campaigns', label: 'Kampanie', icon: Megaphone },
   { href: '/artists', label: 'Artyści', icon: Users },
   { href: '/briefs', label: 'Briefy & wrapy', icon: FileText },
+  { href: '/templates', label: 'Templates', icon: LayoutTemplate },
 ];
 
 function isActive(pathname: string, href: string): boolean {

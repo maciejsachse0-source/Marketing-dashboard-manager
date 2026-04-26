@@ -13,9 +13,11 @@ import {
   FileText,
   Sparkles,
   Film,
+  LayoutTemplate,
   Plus,
   Upload,
   Search,
+  Clock,
   type LucideIcon,
 } from 'lucide-react';
 import { AGENT_META } from '@/lib/agents/meta';
@@ -74,6 +76,8 @@ export function CommandPalette() {
       { id: 'p:campaigns', label: 'Kampanie', hint: '/campaigns', group: 'Strony', icon: Megaphone, action: go('/campaigns') },
       { id: 'p:artists', label: 'Artyści', hint: '/artists', group: 'Strony', icon: Users, action: go('/artists') },
       { id: 'p:briefs', label: 'Briefy & wrapy', hint: '/briefs', group: 'Strony', icon: FileText, action: go('/briefs') },
+      { id: 'p:templates', label: 'Templates', hint: '/templates', group: 'Strony', icon: LayoutTemplate, action: go('/templates') },
+      { id: 'p:rhythm', label: 'Rytm tygodniowy', hint: '/templates/rhythm', group: 'Strony', icon: Clock, action: go('/templates/rhythm') },
     ];
 
     const agents: CommandItem[] = AGENT_META.map((a) => ({
@@ -86,6 +90,14 @@ export function CommandPalette() {
     }));
 
     const actions: CommandItem[] = [
+      {
+        id: 'act:new-production',
+        label: 'Nowa produkcja',
+        hint: 'wizard z templateu',
+        group: 'Akcje',
+        icon: Film,
+        action: go('/productions'),
+      },
       {
         id: 'act:csv',
         label: 'Wgraj CSV z metrykami',

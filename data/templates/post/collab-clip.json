@@ -1,0 +1,15 @@
+{
+  "slug": "collab-clip",
+  "name": "Kolaba — clip",
+  "description": "Krótki wycinek z sesji kolaby — moment, błąd, reakcja. Drugi/trzeci wycinek z tego samego nagrania.",
+  "hookPattern": "Best moment first — 'click' lub reakcja w pierwszej sekundzie",
+  "duration": { "min": 8, "max": 20 },
+  "platforms": ["tiktok", "instagram"],
+  "captionLength": "krótki (do 80 zn)",
+  "ctaStyle": "comment z reakcją / save",
+  "agentHints": {
+    "social-publisher": "Tag artysty. Caption: jednolinijkowa reakcja. Hashtagi 3-5.",
+    "content-brief": "Wybierz 1 mocny moment. Bez kontekstu — niech zaintryguje."
+  },
+  "notes": "Daje ci 2-3 dodatkowe posty z jednego shoot-a. Razem z collab-full = 3-4 outputy."
+}
