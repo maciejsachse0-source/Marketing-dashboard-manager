@@ -184,7 +184,7 @@ export function ProductionWizard({
               notes={notes}
             />
           ) : null}
-          {error ? <p className="mt-3 text-xs text-rose-400">{error}</p> : null}
+          {error ? <p className="mt-3 text-xs text-rose-600">{error}</p> : null}
         </div>
 
         <DialogFooter className="flex justify-between sm:justify-between gap-2">
@@ -530,7 +530,7 @@ function StepReview({
   return (
     <div className="space-y-3">
       <div className="rounded-lg border border-border bg-card p-3 text-sm space-y-1">
-        <Row label="Tytuł" value={title || <span className="text-rose-400">brak (uzupełnij krok 3)</span>} />
+        <Row label="Tytuł" value={title || <span className="text-rose-600">brak (uzupełnij krok 3)</span>} />
         <Row
           label="Typ"
           value={type === 'with-artist' ? 'Z artystą' : 'Solo'}

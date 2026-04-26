@@ -1,12 +1,12 @@
 import type { Platform } from '../../drizzle/schema';
 
 const COLORS: Record<Platform, string> = {
-  instagram: 'bg-pink-500/15 text-pink-300 border-pink-500/40',
-  tiktok: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
-  youtube: 'bg-red-500/15 text-red-300 border-red-500/40',
-  facebook: 'bg-blue-500/15 text-blue-300 border-blue-500/40',
-  x: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/40',
-  linkedin: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+  instagram: 'bg-pink-100 text-pink-800 border-pink-300',
+  tiktok: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+  youtube: 'bg-red-100 text-red-800 border-red-300',
+  facebook: 'bg-blue-100 text-blue-800 border-blue-300',
+  x: 'bg-zinc-100 text-zinc-800 border-zinc-300',
+  linkedin: 'bg-sky-100 text-sky-800 border-sky-300',
 };
 
 const LABELS: Record<Platform, string> = {
@@ -41,10 +41,10 @@ export function PlatformPills({ platforms, full = false }: { platforms: Platform
 export function StatusPill({ status }: { status: string }) {
   const color =
     status === 'published'
-      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
       : status === 'ready'
-        ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-        : 'bg-zinc-500/15 text-zinc-300 border-zinc-500/40';
+        ? 'bg-amber-100 text-amber-800 border-amber-300'
+        : 'bg-zinc-100 text-zinc-700 border-zinc-300';
   return (
     <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border ${color}`}>
       {status}

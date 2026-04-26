@@ -183,7 +183,7 @@ export function PackageModal({
               size="sm"
               onClick={remove}
               disabled={pending}
-              className="text-rose-400 hover:text-rose-300"
+              className="text-rose-600 hover:text-rose-700"
             >
               Usuń pakiet
             </Button>

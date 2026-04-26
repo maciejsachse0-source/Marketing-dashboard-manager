@@ -69,7 +69,7 @@ export function ProductionStatusButtons({
         variant="ghost"
         onClick={() => change('cancelled')}
         disabled={pending}
-        className="ml-auto text-rose-400 hover:text-rose-300"
+        className="ml-auto text-rose-600 hover:text-rose-700"
       >
         Anuluj produkcję
       </Button>

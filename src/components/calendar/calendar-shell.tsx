@@ -9,7 +9,7 @@ import type { CalendarEntry, CalendarType, Production } from '../../../drizzle/s
 import { Button } from '@/components/ui/button';
 import { WeekView } from './week-view';
 import { EntryDialog } from './entry-dialog';
-import { TYPE_LABEL, TYPE_PILL, CONTENT_STATE_LABEL } from './type-color';
+import { TYPE_LABEL, TYPE_PILL, CONTENT_STATE_LABEL, LEGEND_SWATCH } from './type-color';
 import { CALENDAR_TYPES } from '../../../drizzle/schema';
 import { updateCalendarEntry } from '@/server/actions/calendar';
 import { useShortcut } from '@/lib/use-shortcut';
@@ -181,17 +181,17 @@ export function CalendarShell({
             </button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-2 text-[10px] text-muted-foreground">
+        <div className="ml-auto flex items-center gap-3 text-[11px] text-muted-foreground">
           <LegendSwatch
-            className="bg-emerald-500/8 border border-dashed border-emerald-500/50"
+            className={LEGEND_SWATCH['planned-empty']}
             label={CONTENT_STATE_LABEL['planned-empty']}
           />
           <LegendSwatch
-            className="bg-emerald-500/35 border border-emerald-400 ring-1 ring-inset ring-emerald-300/40"
+            className={LEGEND_SWATCH['content-ready']}
             label={CONTENT_STATE_LABEL['content-ready']}
           />
           <LegendSwatch
-            className="bg-emerald-500/25 border border-emerald-500/70"
+            className={LEGEND_SWATCH.done}
             label={CONTENT_STATE_LABEL.done}
           />
         </div>
@@ -233,7 +233,7 @@ export function CalendarShell({
 function LegendSwatch({ className, label }: { className: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className={`inline-block w-3 h-3 rounded-sm ${className}`} />
+      <span className={`inline-block w-3.5 h-3.5 rounded ${className}`} />
       {label}
     </span>
   );

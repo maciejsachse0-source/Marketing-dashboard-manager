@@ -1,20 +1,20 @@
 import type { ProductionStatus } from '../../../drizzle/schema';
 
 const STATUS_COLORS: Record<ProductionStatus, string> = {
-  idea: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/40',
-  planning: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/40',
-  outreach: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-  confirmed: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-  briefing: 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  'ready-to-shoot': 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  shooting: 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  editing: 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  review: 'bg-blue-500/15 text-blue-300 border-blue-500/40',
-  approved: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-  publishing: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-  published: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
-  analyzed: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
-  cancelled: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+  idea: 'bg-zinc-100 text-zinc-700 border-zinc-300',
+  planning: 'bg-zinc-100 text-zinc-700 border-zinc-300',
+  outreach: 'bg-amber-100 text-amber-800 border-amber-300',
+  confirmed: 'bg-amber-100 text-amber-800 border-amber-300',
+  briefing: 'bg-violet-100 text-violet-800 border-violet-300',
+  'ready-to-shoot': 'bg-violet-100 text-violet-800 border-violet-300',
+  shooting: 'bg-violet-100 text-violet-800 border-violet-300',
+  editing: 'bg-violet-100 text-violet-800 border-violet-300',
+  review: 'bg-blue-100 text-blue-800 border-blue-300',
+  approved: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  publishing: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  published: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+  analyzed: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+  cancelled: 'bg-rose-100 text-rose-800 border-rose-300',
 };
 
 export const STATUS_LABEL: Record<ProductionStatus, string> = {
@@ -49,8 +49,8 @@ export function ProductionTypeBadge({ type }: { type: 'with-artist' | 'solo' }) 
     <span
       className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border ${
         type === 'with-artist'
-          ? 'bg-pink-500/15 text-pink-300 border-pink-500/40'
-          : 'bg-sky-500/15 text-sky-300 border-sky-500/40'
+          ? 'bg-pink-100 text-pink-800 border-pink-300'
+          : 'bg-sky-100 text-sky-800 border-sky-300'
       }`}
     >
       {type === 'with-artist' ? 'z artystą' : 'solo'}

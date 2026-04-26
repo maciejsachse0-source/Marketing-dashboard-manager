@@ -253,13 +253,13 @@ export function EntryDialog({ open, onOpenChange, entry, defaultStart }: EntryDi
             />
           </div>
 
-          {error ? <p className="text-xs text-rose-400">{error}</p> : null}
+          {error ? <p className="text-xs text-rose-600">{error}</p> : null}
         </div>
 
         <DialogFooter className="flex justify-between sm:justify-between gap-2">
           <div>
             {entry ? (
-              <Button variant="ghost" onClick={remove} disabled={pending} className="text-rose-400 hover:text-rose-300">
+              <Button variant="ghost" onClick={remove} disabled={pending} className="text-rose-600 hover:text-rose-700">
                 Usuń
               </Button>
             ) : null}

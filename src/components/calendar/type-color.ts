@@ -5,21 +5,24 @@ import type {
   ProductionStatus,
 } from '../../../drizzle/schema';
 
-/** Base color per calendar type (used as the visual hue for filter pills + week tiles). */
+/**
+ * Base color per calendar type — used for filter pills + small color dots in
+ * the campaign timeline. Tuned for light theme.
+ */
 export const TYPE_COLOR: Record<CalendarType, string> = {
-  shoot: 'bg-amber-500/20 border-amber-500/60 text-amber-100 hover:bg-amber-500/30',
-  edit: 'bg-violet-500/20 border-violet-500/60 text-violet-100 hover:bg-violet-500/30',
-  publish: 'bg-emerald-500/20 border-emerald-500/60 text-emerald-100 hover:bg-emerald-500/30',
-  meeting: 'bg-sky-500/20 border-sky-500/60 text-sky-100 hover:bg-sky-500/30',
-  deadline: 'bg-rose-500/20 border-rose-500/60 text-rose-100 hover:bg-rose-500/30',
+  shoot: 'bg-amber-200 border-amber-500 text-amber-900',
+  edit: 'bg-violet-200 border-violet-500 text-violet-900',
+  publish: 'bg-emerald-200 border-emerald-500 text-emerald-900',
+  meeting: 'bg-sky-200 border-sky-500 text-sky-900',
+  deadline: 'bg-rose-200 border-rose-500 text-rose-900',
 };
 
 export const TYPE_PILL: Record<CalendarType, string> = {
-  shoot: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-  edit: 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  publish: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-  meeting: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
-  deadline: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+  shoot: 'bg-amber-100 text-amber-800 border-amber-300',
+  edit: 'bg-violet-100 text-violet-800 border-violet-300',
+  publish: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  meeting: 'bg-sky-100 text-sky-800 border-sky-300',
+  deadline: 'bg-rose-100 text-rose-800 border-rose-300',
 };
 
 export const TYPE_LABEL: Record<CalendarType, string> = {
@@ -57,39 +60,45 @@ export function getContentState(
 }
 
 /**
- * Static (type × content-state) → Tailwind class table. Has to be literal so
- * Tailwind's JIT scanner picks up every class — never build via string concat.
+ * Static (type × content-state) → Tailwind class table. Literal so the JIT
+ * scanner picks up every class — never build via string concat.
+ *
+ * Visual hierarchy in light theme:
+ * - planned-empty → light fill (50), dashed border, readable text → "slot, czeka na kontent"
+ * - content-ready → mid fill (100) + solid border (500) + ring → "kontent gotowy, ❗"
+ * - done         → strong fill (200) + solid border (400) → "zaklepane"
+ * - cancelled    → very light fill, dashed, line-through, faded
  */
 const ENTRY_CLASS: Record<CalendarType, Record<ContentState, string>> = {
   shoot: {
-    'planned-empty': 'bg-amber-500/8 border border-dashed border-amber-500/50 text-amber-100/90 hover:bg-amber-500/15',
-    'content-ready': 'bg-amber-500/35 border border-amber-400 text-amber-50 ring-1 ring-inset ring-amber-300/40 shadow-sm hover:bg-amber-500/45',
-    done: 'bg-amber-500/25 border border-amber-500/70 text-amber-100 opacity-90 ring-1 ring-inset ring-foreground/10',
-    cancelled: 'bg-amber-500/10 border border-dashed border-amber-500/40 text-amber-200/60 line-through opacity-60',
+    'planned-empty': 'bg-amber-50 border-2 border-dashed border-amber-300 text-amber-900 hover:bg-amber-100',
+    'content-ready': 'bg-amber-100 border-2 border-amber-500 text-amber-950 ring-1 ring-amber-400 shadow-sm hover:bg-amber-200',
+    done: 'bg-amber-200 border border-amber-500 text-amber-900 opacity-90',
+    cancelled: 'bg-amber-50 border border-dashed border-amber-200 text-amber-700 line-through opacity-60',
   },
   edit: {
-    'planned-empty': 'bg-violet-500/8 border border-dashed border-violet-500/50 text-violet-100/90 hover:bg-violet-500/15',
-    'content-ready': 'bg-violet-500/35 border border-violet-400 text-violet-50 ring-1 ring-inset ring-violet-300/40 shadow-sm hover:bg-violet-500/45',
-    done: 'bg-violet-500/25 border border-violet-500/70 text-violet-100 opacity-90 ring-1 ring-inset ring-foreground/10',
-    cancelled: 'bg-violet-500/10 border border-dashed border-violet-500/40 text-violet-200/60 line-through opacity-60',
+    'planned-empty': 'bg-violet-50 border-2 border-dashed border-violet-300 text-violet-900 hover:bg-violet-100',
+    'content-ready': 'bg-violet-100 border-2 border-violet-500 text-violet-950 ring-1 ring-violet-400 shadow-sm hover:bg-violet-200',
+    done: 'bg-violet-200 border border-violet-500 text-violet-900 opacity-90',
+    cancelled: 'bg-violet-50 border border-dashed border-violet-200 text-violet-700 line-through opacity-60',
   },
   publish: {
-    'planned-empty': 'bg-emerald-500/8 border border-dashed border-emerald-500/50 text-emerald-100/90 hover:bg-emerald-500/15',
-    'content-ready': 'bg-emerald-500/35 border border-emerald-400 text-emerald-50 ring-1 ring-inset ring-emerald-300/40 shadow-sm hover:bg-emerald-500/45',
-    done: 'bg-emerald-500/25 border border-emerald-500/70 text-emerald-100 opacity-90 ring-1 ring-inset ring-foreground/10',
-    cancelled: 'bg-emerald-500/10 border border-dashed border-emerald-500/40 text-emerald-200/60 line-through opacity-60',
+    'planned-empty': 'bg-emerald-50 border-2 border-dashed border-emerald-300 text-emerald-900 hover:bg-emerald-100',
+    'content-ready': 'bg-emerald-100 border-2 border-emerald-500 text-emerald-950 ring-1 ring-emerald-400 shadow-sm hover:bg-emerald-200',
+    done: 'bg-emerald-200 border border-emerald-500 text-emerald-900 opacity-90',
+    cancelled: 'bg-emerald-50 border border-dashed border-emerald-200 text-emerald-700 line-through opacity-60',
   },
   meeting: {
-    'planned-empty': 'bg-sky-500/8 border border-dashed border-sky-500/50 text-sky-100/90 hover:bg-sky-500/15',
-    'content-ready': 'bg-sky-500/35 border border-sky-400 text-sky-50 ring-1 ring-inset ring-sky-300/40 shadow-sm hover:bg-sky-500/45',
-    done: 'bg-sky-500/25 border border-sky-500/70 text-sky-100 opacity-90 ring-1 ring-inset ring-foreground/10',
-    cancelled: 'bg-sky-500/10 border border-dashed border-sky-500/40 text-sky-200/60 line-through opacity-60',
+    'planned-empty': 'bg-sky-50 border-2 border-dashed border-sky-300 text-sky-900 hover:bg-sky-100',
+    'content-ready': 'bg-sky-100 border-2 border-sky-500 text-sky-950 ring-1 ring-sky-400 shadow-sm hover:bg-sky-200',
+    done: 'bg-sky-200 border border-sky-500 text-sky-900 opacity-90',
+    cancelled: 'bg-sky-50 border border-dashed border-sky-200 text-sky-700 line-through opacity-60',
   },
   deadline: {
-    'planned-empty': 'bg-rose-500/8 border border-dashed border-rose-500/50 text-rose-100/90 hover:bg-rose-500/15',
-    'content-ready': 'bg-rose-500/35 border border-rose-400 text-rose-50 ring-1 ring-inset ring-rose-300/40 shadow-sm hover:bg-rose-500/45',
-    done: 'bg-rose-500/25 border border-rose-500/70 text-rose-100 opacity-90 ring-1 ring-inset ring-foreground/10',
-    cancelled: 'bg-rose-500/10 border border-dashed border-rose-500/40 text-rose-200/60 line-through opacity-60',
+    'planned-empty': 'bg-rose-50 border-2 border-dashed border-rose-300 text-rose-900 hover:bg-rose-100',
+    'content-ready': 'bg-rose-100 border-2 border-rose-500 text-rose-950 ring-1 ring-rose-400 shadow-sm hover:bg-rose-200',
+    done: 'bg-rose-200 border border-rose-500 text-rose-900 opacity-90',
+    cancelled: 'bg-rose-50 border border-dashed border-rose-200 text-rose-700 line-through opacity-60',
   },
 };
 
@@ -102,4 +111,12 @@ export const CONTENT_STATE_LABEL: Record<ContentState, string> = {
   'content-ready': 'kontent gotowy',
   done: 'wykonane',
   cancelled: 'anulowane',
+};
+
+/** Legend swatches — solid colors so the user can match them visually. */
+export const LEGEND_SWATCH: Record<ContentState, string> = {
+  'planned-empty': 'bg-emerald-50 border-2 border-dashed border-emerald-300',
+  'content-ready': 'bg-emerald-100 border-2 border-emerald-500 ring-1 ring-emerald-400',
+  done: 'bg-emerald-200 border border-emerald-500',
+  cancelled: 'bg-emerald-50 border border-dashed border-emerald-200',
 };

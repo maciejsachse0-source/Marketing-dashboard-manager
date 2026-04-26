@@ -268,7 +268,7 @@ export function AgentForm({
       </details>
 
       {error ? (
-        <p className="text-sm text-rose-400 px-3 py-2 rounded border border-rose-900/50 bg-rose-950/30">
+        <p className="text-sm text-rose-600 px-3 py-2 rounded border border-rose-200 bg-rose-50">
           {error}
         </p>
       ) : null}
@@ -281,7 +281,7 @@ export function AgentForm({
                 variant="ghost"
                 onClick={remove}
                 disabled={pending}
-                className="text-rose-400 hover:text-rose-300"
+                className="text-rose-600 hover:text-rose-700"
               >
                 <Trash2 className="w-4 h-4 mr-1.5" /> Usuń
               </Button>

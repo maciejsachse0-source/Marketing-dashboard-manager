@@ -155,7 +155,7 @@ export function CsvDropzone() {
             Wybierz plik
           </Button>
         </div>
-        {error ? <p className="mt-3 text-xs text-rose-400 text-left">⚠ {error}</p> : null}
+        {error ? <p className="mt-3 text-xs text-rose-600 text-left">⚠ {error}</p> : null}
       </div>
 
       <Dialog open={!!dry} onOpenChange={(open) => (!open ? cancel() : null)}>
@@ -248,8 +248,8 @@ function SummaryCard({
   value: number;
 }) {
   const colors = {
-    emerald: 'border-emerald-500/30 text-emerald-300',
-    sky: 'border-sky-500/30 text-sky-300',
+    emerald: 'border-emerald-300 text-emerald-700',
+    sky: 'border-sky-300 text-sky-700',
     zinc: 'border-border text-muted-foreground',
   };
   return (
@@ -262,9 +262,9 @@ function SummaryCard({
 
 function ActionPill({ action }: { action: 'create' | 'update' | 'skip' }) {
   const map = {
-    create: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-    update: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
-    skip: 'bg-zinc-500/15 text-zinc-400 border-border',
+    create: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    update: 'bg-sky-100 text-sky-800 border-sky-300',
+    skip: 'bg-zinc-100 text-zinc-600 border-zinc-300',
   };
   const labels = { create: 'nowy', update: 'update', skip: 'pomiń' };
   return (

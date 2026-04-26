@@ -300,9 +300,9 @@ function MetricCard({
 }) {
   const toneClass =
     tone === 'good'
-      ? 'text-emerald-400'
+      ? 'text-emerald-600'
       : tone === 'low'
-        ? 'text-amber-400'
+        ? 'text-amber-600'
         : 'text-muted-foreground';
   return (
     <div className="rounded-xl border border-border bg-card p-4 relative overflow-hidden hover:border-primary/20 transition">

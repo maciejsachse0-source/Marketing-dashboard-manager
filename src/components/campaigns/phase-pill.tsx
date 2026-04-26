@@ -1,11 +1,11 @@
 import type { CampaignPhase } from '../../../drizzle/schema';
 
 const COLORS: Record<CampaignPhase, string> = {
-  'build-up': 'bg-zinc-500/15 text-zinc-300 border-zinc-500/40',
-  teaser: 'bg-violet-500/15 text-violet-300 border-violet-500/40',
-  reveal: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-  release: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-  afterglow: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+  'build-up': 'bg-zinc-100 text-zinc-700 border-zinc-300',
+  teaser: 'bg-violet-100 text-violet-800 border-violet-300',
+  reveal: 'bg-amber-100 text-amber-800 border-amber-300',
+  release: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  afterglow: 'bg-sky-100 text-sky-800 border-sky-300',
   done: 'bg-muted text-muted-foreground border-border',
 };
 

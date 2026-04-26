@@ -50,7 +50,7 @@ export default async function CampaignsListPage() {
                       daysToT0 < 0
                         ? 'text-muted-foreground'
                         : daysToT0 < 7
-                          ? 'text-amber-400'
+                          ? 'text-amber-600'
                           : 'text-foreground'
                     }`}
                   >

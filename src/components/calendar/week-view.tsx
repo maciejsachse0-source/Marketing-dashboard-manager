@@ -213,7 +213,7 @@ export function WeekView({
                       <span className="opacity-70">·</span>
                       <span>{TYPE_LABEL[e.type]}</span>
                       {countdown ? (
-                        <span className="ml-auto inline-flex items-center gap-0.5 px-1 rounded bg-black/30 text-[10px] tabular-nums font-medium">
+                        <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-px rounded bg-white/90 border border-current/20 text-[10px] tabular-nums font-semibold">
                           <Clock className="w-2.5 h-2.5" strokeWidth={2.5} /> {countdown}
                         </span>
                       ) : null}

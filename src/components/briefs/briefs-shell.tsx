@@ -132,8 +132,8 @@ export function BriefsShell({
                     <span
                       className={`inline-block px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border ${
                         row.kind === 'wrap'
-                          ? 'bg-sky-500/15 text-sky-300 border-sky-500/40'
-                          : 'bg-violet-500/15 text-violet-300 border-violet-500/40'
+                          ? 'bg-sky-100 text-sky-800 border-sky-300'
+                          : 'bg-violet-100 text-violet-800 border-violet-300'
                       }`}
                     >
                       {row.kind}

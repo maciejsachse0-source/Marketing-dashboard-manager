@@ -166,7 +166,7 @@ export function PostDialog({ open, onOpenChange }: { open: boolean; onOpenChange
               <Input value={form.saves} onChange={(e) => setForm({ ...form, saves: e.target.value })} type="number" />
             </div>
           </div>
-          {error ? <p className="text-xs text-rose-400">{error}</p> : null}
+          {error ? <p className="text-xs text-rose-600">{error}</p> : null}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
