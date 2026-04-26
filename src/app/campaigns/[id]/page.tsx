@@ -6,6 +6,11 @@ import { db, schema } from '@/lib/db';
 import { CampaignTimeline } from '@/components/campaigns/timeline';
 import { PhasePill } from '@/components/campaigns/phase-pill';
 import { PhaseButtons } from '@/components/campaigns/phase-buttons';
+import {
+  CampaignNameField,
+  CampaignGoalField,
+  CampaignNotesField,
+} from '@/components/campaigns/campaign-inline-fields';
 import { PlatformPills, StatusPill } from '@/components/platforms-pills';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
 
@@ -53,8 +58,8 @@ export default async function CampaignDetailPage({
 
   return (
     <PageShell
-      title={campaign.name}
-      description={campaign.goal}
+      title={<CampaignNameField id={campaign.id} name={campaign.name} />}
+      description={<CampaignGoalField id={campaign.id} goal={campaign.goal} />}
     >
       <div className="space-y-6">
         <header className="flex flex-wrap items-center gap-3 text-sm">
@@ -89,6 +94,15 @@ export default async function CampaignDetailPage({
           />
           <KpiCard label="Posty kampanii" value={`${posts.length}`} target={undefined} />
         </div>
+
+        <section>
+          <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">
+            Notatki
+          </h2>
+          <div className="rounded-lg border border-border bg-card px-4 py-3">
+            <CampaignNotesField id={campaign.id} notes={campaign.notes} />
+          </div>
+        </section>
 
         <section>
           <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">

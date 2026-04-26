@@ -2,10 +2,13 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArtistDialog } from './artist-dialog';
 import type { Artist } from '../../../drizzle/schema';
 import { useShortcut } from '@/lib/use-shortcut';
+import { InlineEdit } from '@/components/inline-edit';
+import { updateArtist } from '@/server/actions/artists';
 
 export type ArtistRow = {
   artist: Artist;
@@ -17,6 +20,7 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Artist | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const router = useRouter();
 
   const openCreate = () => {
     setEditing(null);
@@ -112,9 +116,18 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
                               <div className="font-medium text-muted-foreground uppercase tracking-wider mb-1.5 text-[10px]">
                                 Notatki
                               </div>
-                              <p className="whitespace-pre-wrap text-foreground/85">
-                                {artist.notes ?? <span className="text-muted-foreground">brak</span>}
-                              </p>
+                              <div className="text-foreground/85">
+                                <InlineEdit
+                                  value={artist.notes ?? ''}
+                                  multiline
+                                  emptyHint="+ Dodaj notatkę"
+                                  className="text-xs"
+                                  onSave={async (next) => {
+                                    await updateArtist(artist.id, { notes: next || null });
+                                    router.refresh();
+                                  }}
+                                />
+                              </div>
                               {artist.phone ? (
                                 <p className="mt-2 text-muted-foreground">📞 {artist.phone}</p>
                               ) : null}

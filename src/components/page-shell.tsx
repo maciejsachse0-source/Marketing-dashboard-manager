@@ -4,8 +4,8 @@ export function PageShell({
   actions,
   children,
 }: {
-  title: string;
-  description?: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
   actions?: React.ReactNode;
   children?: React.ReactNode;
 }) {
