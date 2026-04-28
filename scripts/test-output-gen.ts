@@ -8,8 +8,8 @@ async function main() {
   await db.update(schema.packages).set({ productionId: 1 }).where(eq(schema.packages.id, 1));
   console.log('linked package #1 → production #1');
 
-  // Set production #1 status to approved → triggers folder generation
-  const result = await setProductionStatus(1, 'approved');
+  // Set production #1 status to publishing → triggers folder generation
+  const result = await setProductionStatus(1, 'publishing');
   console.log('production #1 status:', result.status);
 
   // Read it back to see folderPath

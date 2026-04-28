@@ -83,7 +83,7 @@ export async function saveProductionAttachment(
   const full = normalize(join(dir, safe));
   if (!full.startsWith(dir + sep) && full !== dir) throw new Error('Path traversal');
 
-  const buffer = data instanceof Buffer ? data : Buffer.from(data);
+  const buffer: Buffer = Buffer.isBuffer(data) ? data : Buffer.from(data);
   await writeFile(full, buffer);
   return {
     filename: safe,

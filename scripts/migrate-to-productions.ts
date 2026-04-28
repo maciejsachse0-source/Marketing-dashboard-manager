@@ -18,24 +18,24 @@ function safeSlug(input: string, fallback: string): string {
 function mapStatus(entryType: CalendarType, entryStatus: 'planned' | 'done' | 'cancelled'): ProductionStatus {
   if (entryStatus === 'cancelled') return 'cancelled';
   if (entryStatus === 'done') {
-    if (entryType === 'publish') return 'published';
-    if (entryType === 'shoot' || entryType === 'edit') return 'approved';
-    return 'planning';
+    if (entryType === 'publish') return 'publishing';
+    if (entryType === 'shoot' || entryType === 'edit') return 'editing';
+    return 'email-sent';
   }
   // planned
   switch (entryType) {
     case 'shoot':
-      return 'ready-to-shoot';
+      return 'script-sent';
     case 'edit':
       return 'editing';
     case 'publish':
       return 'publishing';
     case 'meeting':
-      return 'planning';
+      return 'cam-meeting-set';
     case 'deadline':
-      return 'briefing';
+      return 'cam-meeting-set';
     default:
-      return 'idea';
+      return 'email-sent';
   }
 }
 
