@@ -1,21 +1,19 @@
 import Link from 'next/link';
-import { Film, FileText, Clock } from 'lucide-react';
+import { Film, Clock } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { listProductionTemplates } from '@/lib/templates';
-import { listPostTemplates, loadRhythm } from '@/lib/rhythm';
-import { PlatformPills } from '@/components/platforms-pills';
+import { loadRhythm } from '@/lib/rhythm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TemplatesPage() {
   const productionTemplates = listProductionTemplates();
-  const postTemplates = listPostTemplates();
   const rhythm = loadRhythm();
 
   return (
     <PageShell
       title="Templates"
-      description="Wzorce produkcyjne (workflow), postowe (typy contentu) i rytm tygodniowy."
+      description="Wzorce produkcyjne (workflow) i rytm tygodniowy."
     >
       <div className="space-y-8">
         <section>
@@ -53,30 +51,6 @@ export default async function TemplatesPage() {
                   {t.steps.length} kroków · {t.durationDays} dni
                 </div>
                 <code className="text-[10px] text-muted-foreground/60 font-mono">{t.slug}.json</code>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <SectionHeader icon={FileText} title={`Postowe (${postTemplates.length})`} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {postTemplates.map((t) => (
-              <div
-                key={t.slug}
-                className="rounded-lg border border-border bg-card p-4"
-              >
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <div className="font-medium">{t.name}</div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground tabular-nums">
-                    {t.duration.min}-{t.duration.max}s
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mb-3">{t.description}</p>
-                <div className="flex items-center justify-between gap-2">
-                  <PlatformPills platforms={t.platforms} />
-                  <code className="text-[10px] text-muted-foreground/60 font-mono">{t.slug}.json</code>
-                </div>
               </div>
             ))}
           </div>

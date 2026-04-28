@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Platform } from '../../drizzle/schema';
 
@@ -18,22 +18,7 @@ export type Rhythm = {
   slots: RhythmSlot[];
 };
 
-export type PostTemplate = {
-  slug: string;
-  name: string;
-  description: string;
-  hookPattern: string;
-  duration: { min: number; max: number };
-  platforms: Platform[];
-  captionLength: string;
-  ctaStyle: string;
-  agentHints?: Record<string, string>;
-  warnings?: string[];
-  notes?: string;
-};
-
 const RHYTHM_PATH = () => join(process.cwd(), 'data', 'templates', 'rhythm.json');
-const POST_DIR = () => join(process.cwd(), 'data', 'templates', 'post');
 
 export function loadRhythm(): Rhythm {
   const path = RHYTHM_PATH();
@@ -45,20 +30,6 @@ export function loadRhythm(): Rhythm {
 
 export function saveRhythm(rhythm: Rhythm) {
   writeFileSync(RHYTHM_PATH(), JSON.stringify(rhythm, null, 2), 'utf8');
-}
-
-export function listPostTemplates(): PostTemplate[] {
-  const dir = POST_DIR();
-  if (!existsSync(dir)) return [];
-  const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
-  return files.map((file) => JSON.parse(readFileSync(join(dir, file), 'utf8')) as PostTemplate);
-}
-
-export function getPostTemplate(slug: string): PostTemplate | null {
-  if (slug.includes('..') || slug.includes('/') || slug.includes('\\')) return null;
-  const path = join(POST_DIR(), `${slug}.json`);
-  if (!existsSync(path)) return null;
-  return JSON.parse(readFileSync(path, 'utf8')) as PostTemplate;
 }
 
 const DAY_PL = ['niedz', 'pn', 'wt', 'śr', 'cz', 'pt', 'sob']; // index = JS getDay() value

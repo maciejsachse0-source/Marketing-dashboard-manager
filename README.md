@@ -80,7 +80,7 @@ marketing-crew/
 └── data/
     ├── marketing-crew.db # SQLite (gitignore)
     ├── agents/           # JSON-y z metadanymi agentów + system prompty (edytowalne z UI)
-    ├── templates/        # production templates + post templates + rytm tygodniowy
+    ├── templates/        # production templates + rytm tygodniowy
     └── files/            # assety / briefy / pakiety / CSV / outreach / output (gitignore)
 ```
 

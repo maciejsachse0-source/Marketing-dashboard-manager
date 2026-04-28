@@ -1,13 +1,11 @@
 import { PageShell } from '@/components/page-shell';
-import { loadRhythm, isoDayLabel, listPostTemplates } from '@/lib/rhythm';
+import { loadRhythm, isoDayLabel } from '@/lib/rhythm';
 import { PlatformPills } from '@/components/platforms-pills';
 
 export const dynamic = 'force-dynamic';
 
 export default async function RhythmPage() {
   const rhythm = loadRhythm();
-  const postTemplates = listPostTemplates();
-  const postTypeMap = new Map(postTemplates.map((t) => [t.slug, t.name]));
 
   // Group slots by day
   const byDay = new Map<number, typeof rhythm.slots>();
@@ -54,8 +52,8 @@ export default async function RhythmPage() {
                           {String(slot.hour).padStart(2, '0')}:
                           {String(slot.minute).padStart(2, '0')}
                         </div>
-                        <div className="text-muted-foreground truncate" title={postTypeMap.get(slot.postType) ?? slot.postType}>
-                          {postTypeMap.get(slot.postType) ?? slot.postType}
+                        <div className="text-muted-foreground truncate" title={slot.postType}>
+                          {slot.postType}
                         </div>
                       </li>
                     ))}
@@ -87,7 +85,7 @@ export default async function RhythmPage() {
                     <td className="px-4 py-2 font-mono tabular-nums">
                       {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
                     </td>
-                    <td className="px-4 py-2">{postTypeMap.get(slot.postType) ?? slot.postType}</td>
+                    <td className="px-4 py-2">{slot.postType}</td>
                     <td className="px-4 py-2">
                       <PlatformPills platforms={slot.platforms} />
                     </td>
