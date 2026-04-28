@@ -71,8 +71,12 @@ export default async function DashboardPage() {
   })();
 
   return (
-    <PageShell title="Marketing Crew" description={`${today} · tydzień ${isoWeek}`}>
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+    <PageShell
+      title="Marketing Crew"
+      eyebrow={`tydzień ${isoWeek}`}
+      description={`${today} · dyspozytornia kampanii short-form`}
+    >
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
         <MetricCard
           icon={CalendarDays}
           label="Posty w tym tyg."
@@ -116,23 +120,27 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <section className="mb-10">
+      <section className="mb-14">
         <SectionHeader icon={Sparkles} title="Agenci" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {loadAgents().map((agent) => {
             const hint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
             return (
               <Link
                 key={agent.slug}
                 href={`/agents/${agent.slug}`}
-                className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card/90 transition relative overflow-hidden"
+                className="group card-editorial p-5 relative overflow-hidden"
               >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="font-semibold text-sm group-hover:text-foreground transition">{agent.name}</div>
-                <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{agent.description}</div>
+                <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-gradient-to-br from-[var(--accent-blue-soft)] to-transparent opacity-0 group-hover:opacity-60 transition-opacity blur-2xl" />
+                <div className="relative font-semibold text-[0.95rem] tracking-tight group-hover:text-foreground transition">
+                  {agent.name}
+                </div>
+                <div className="relative text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                  {agent.description}
+                </div>
                 {hint ? (
-                  <div className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
+                  <div className="relative mt-3 pill-label pill-label-sm">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-blue)]" />
                     {hint}
                   </div>
                 ) : null}
@@ -164,7 +172,7 @@ export default async function DashboardPage() {
               }
             />
           ) : (
-            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+            <ul className="card-editorial divide-y divide-border overflow-hidden">
               {upcoming.slice(0, 7).map((e) => (
                 <li key={e.id} className="px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-muted/30 transition">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground w-20 shrink-0 font-medium">
@@ -202,7 +210,7 @@ export default async function DashboardPage() {
               }
             />
           ) : (
-            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+            <ul className="card-editorial divide-y divide-border overflow-hidden">
               {topPosts.map((p) => (
                 <li key={p.id} className="px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-muted/30 transition">
                   <PlatformPill platform={p.platform} />
@@ -223,7 +231,7 @@ export default async function DashboardPage() {
         {activity.length === 0 ? (
           <EmptyState icon={Activity} title="Brak aktywności" description="Po pierwszych akcjach pojawią się tu wpisy." />
         ) : (
-          <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+          <ul className="card-editorial divide-y divide-border overflow-hidden">
             {activity.map((event, idx) => (
               <ActivityRow key={`${event.kind}-${event.title}-${idx}`} event={event} />
             ))}
@@ -270,7 +278,7 @@ export default async function DashboardPage() {
               }
             />
           ) : (
-            <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+            <ul className="card-editorial divide-y divide-border overflow-hidden">
               {readyPackages.map((p) => (
                 <li key={p.id} className="px-4 py-2.5 flex items-center gap-2 text-sm hover:bg-muted/30 transition">
                   <Link href={`/packages`} className="flex-1 truncate font-medium">
@@ -308,15 +316,16 @@ function MetricCard({
         ? 'text-amber-600'
         : 'text-muted-foreground';
   return (
-    <div className="rounded-xl border border-border bg-card p-4 relative overflow-hidden hover:border-primary/20 transition">
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+    <div className="card-editorial p-5 relative overflow-hidden">
+      <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br from-[var(--accent-blue-tint)] to-transparent opacity-50 blur-2xl pointer-events-none" />
+      <div className="relative flex items-center justify-between gap-2 mb-3">
+        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-medium">
           {label}
         </span>
-        <Icon className="w-3.5 h-3.5 text-muted-foreground/70" strokeWidth={1.5} />
+        <Icon className="w-4 h-4 text-[var(--accent-blue)]/70" strokeWidth={1.5} />
       </div>
-      <div className="text-2xl font-semibold tabular-nums tracking-tight">{value}</div>
-      {hint ? <div className={`text-[11px] mt-0.5 ${toneClass}`}>{hint}</div> : null}
+      <div className="relative text-3xl font-bold tabular-nums tracking-tight">{value}</div>
+      {hint ? <div className={`relative text-[11px] mt-1 ${toneClass}`}>{hint}</div> : null}
     </div>
   );
 }
@@ -329,9 +338,11 @@ function SectionHeader({
   title: string;
 }) {
   return (
-    <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-2 mb-3">
-      <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
-      {title}
+    <h2 className="flex items-center gap-2 mb-4">
+      <span className="pill-label pill-label-sm">
+        <Icon className="w-3.5 h-3.5" strokeWidth={2} />
+        {title}
+      </span>
     </h2>
   );
 }

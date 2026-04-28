@@ -2,27 +2,46 @@ export function PageShell({
   title,
   description,
   actions,
+  eyebrow,
   children,
 }: {
   title: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
+  eyebrow?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   return (
-    <div className="px-4 sm:px-6 lg:px-8 pt-16 lg:pt-8 pb-8 max-w-7xl mx-auto w-full">
-      <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
-            {title}
-          </h1>
+    <div className="relative px-4 sm:px-6 lg:px-10 pt-16 lg:pt-12 pb-12 max-w-7xl mx-auto w-full">
+      {/* Ambient blue blob — top-right of the content area */}
+      <div
+        aria-hidden
+        className="blob blob-tint pointer-events-none"
+        style={{
+          width: '36rem',
+          height: '36rem',
+          top: '-8rem',
+          right: '-12rem',
+          opacity: 0.4,
+        }}
+      />
+      <header className="relative mb-10 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="min-w-0 flex flex-col gap-3">
+          {eyebrow ? (
+            <span className="pill-label pill-label-sm pill-label-outline self-start">
+              {eyebrow}
+            </span>
+          ) : null}
+          <h1 className="display-lg text-foreground">{title}</h1>
           {description ? (
-            <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{description}</p>
+            <p className="text-sm sm:text-[0.95rem] text-muted-foreground max-w-2xl leading-relaxed">
+              {description}
+            </p>
           ) : null}
         </div>
-        {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+        {actions ? <div className="flex items-center gap-2 shrink-0">{actions}</div> : null}
       </header>
-      {children}
+      <div className="relative">{children}</div>
     </div>
   );
 }

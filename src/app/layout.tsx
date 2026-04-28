@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Manrope, Geist_Mono } from 'next/font/google';
 import { Sidebar } from '@/components/sidebar';
 import { CommandPalette } from '@/components/command-palette';
 import { ShortcutsHelp } from '@/components/shortcuts-help';
@@ -7,9 +7,10 @@ import { Toaster } from '@/components/ui/sonner';
 import { loadAgentMeta } from '@/lib/agents';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+const manrope = Manrope({
+  variable: '--font-sans',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const geistMono = Geist_Mono({
@@ -31,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground">
         <div className="flex min-h-screen">

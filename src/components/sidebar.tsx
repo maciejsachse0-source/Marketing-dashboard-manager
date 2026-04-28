@@ -94,14 +94,24 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="px-5 py-5 border-b border-sidebar-border flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-chart-2 grid place-items-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition">
-              <Sparkles className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
+        <div className="px-5 py-5 border-b border-sidebar-border flex items-center justify-between relative overflow-hidden">
+          <div
+            aria-hidden
+            className="absolute -top-12 -right-8 w-32 h-32 rounded-full pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle, var(--accent-blue-soft) 0%, transparent 70%)',
+              opacity: 0.4,
+              filter: 'blur(20px)',
+            }}
+          />
+          <Link href="/" className="relative flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform">
+              <Sparkles className="w-4 h-4 text-background" strokeWidth={2.5} />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight">Marketing Crew</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              <span className="text-sm font-bold tracking-tight">Marketing Crew</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
                 dyspozytornia
               </span>
             </div>
@@ -127,16 +137,16 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition ${
+                className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-full text-sm transition ${
                   active
-                    ? 'bg-sidebar-accent text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                    ? 'bg-foreground text-background font-medium'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
                 }`}
               >
-                {active ? (
-                  <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-primary" />
-                ) : null}
-                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : ''}`} />
+                <Icon
+                  className={`w-4 h-4 shrink-0 ${active ? 'text-background' : ''}`}
+                  strokeWidth={active ? 2.25 : 1.75}
+                />
                 <span className="truncate">{item.label}</span>
               </Link>
             );
