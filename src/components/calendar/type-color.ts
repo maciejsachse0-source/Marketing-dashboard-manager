@@ -42,12 +42,7 @@ export const TYPE_LABEL: Record<CalendarType, string> = {
  */
 export type ContentState = 'planned-empty' | 'content-ready' | 'done' | 'cancelled';
 
-const READY_STATUSES = new Set<ProductionStatus>([
-  'approved',
-  'publishing',
-  'published',
-  'analyzed',
-]);
+const READY_STATUSES = new Set<ProductionStatus>(['publishing']);
 
 export function getContentState(
   entry: Pick<CalendarEntry, 'status' | 'type' | 'productionId'>,

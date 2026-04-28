@@ -1,6 +1,8 @@
 import { and, gte, lte, inArray } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { CalendarShell } from '@/components/calendar/calendar-shell';
+import { KanbanView } from '@/components/calendar/kanban-view';
+import { ViewToggle } from '@/components/calendar/view-toggle';
 import { db, schema } from '@/lib/db';
 import { addDays, endOfDay, startOfWeek } from '@/lib/dates';
 import { listArtists } from '@/server/actions/artists';
@@ -11,27 +13,56 @@ import type { ProductionMeta } from '@/components/calendar/production-meta';
 
 export const dynamic = 'force-dynamic';
 
+const KANBAN_WEEKS = 5;
+// Productions whose T-0 falls up to 2 weeks past the visible window still have
+// outreach/shoot phases inside the window (T-2/T-1) and must be fetched.
+const KANBAN_T0_LOOKAHEAD_WEEKS = KANBAN_WEEKS + 2;
+
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; view?: string }>;
 }) {
   const sp = await searchParams;
+  const view: 'week' | 'kanban' = sp.view === 'kanban' ? 'kanban' : 'week';
   const baseDate = sp.week ? new Date(sp.week) : new Date();
   const weekStart = startOfWeek(baseDate);
-  const weekEnd = endOfDay(addDays(weekStart, 6));
+
+  // Time range: week view = 1 week, kanban view = 5 weeks
+  const rangeStart = weekStart;
+  const rangeEnd =
+    view === 'kanban'
+      ? endOfDay(addDays(weekStart, KANBAN_WEEKS * 7 - 1))
+      : endOfDay(addDays(weekStart, 6));
 
   const entries = await db.query.calendarEntries.findMany({
     where: and(
-      gte(schema.calendarEntries.startsAt, weekStart),
-      lte(schema.calendarEntries.startsAt, weekEnd),
+      gte(schema.calendarEntries.startsAt, rangeStart),
+      lte(schema.calendarEntries.startsAt, rangeEnd),
     ),
     orderBy: schema.calendarEntries.startsAt,
   });
 
-  const productionIds = Array.from(
-    new Set(entries.map((e) => e.productionId).filter((x): x is number => x != null)),
-  );
+  // For kanban: pull productions whose T-0 sits anywhere from this week up to
+  // 2 weeks after the visible window — those still have outreach/shoot phases
+  // landing in the visible 5-week strip.
+  const productionsInRange =
+    view === 'kanban'
+      ? await db.query.productions.findMany({
+          where: and(
+            gte(schema.productions.t0At, rangeStart),
+            lte(
+              schema.productions.t0At,
+              endOfDay(addDays(weekStart, KANBAN_T0_LOOKAHEAD_WEEKS * 7 - 1)),
+            ),
+          ),
+        })
+      : [];
+
+  const productionIdSet = new Set<number>();
+  for (const e of entries) if (e.productionId) productionIdSet.add(e.productionId);
+  for (const p of productionsInRange) productionIdSet.add(p.id);
+  const productionIds = [...productionIdSet];
 
   const productionsList: Production[] = productionIds.length
     ? await db.query.productions.findMany({
@@ -39,8 +70,6 @@ export default async function CalendarPage({
       })
     : [];
 
-  // Pull artists/videographers (full list — used by wizard) plus build per-production
-  // meta map so the week tile can show "↳ Świt z Anią · T-7 · @ania_test" inline.
   const [artists, videographers] = await Promise.all([listArtists(), listVideographers()]);
   const artistById = new Map(artists.map((a) => [a.id, a]));
   const videographerById = new Map(videographers.map((v) => [v.id, v]));
@@ -79,19 +108,30 @@ export default async function CalendarPage({
     hourlyRate: v.hourlyRate,
   }));
 
+  const weeks = Array.from({ length: KANBAN_WEEKS }, (_, i) => addDays(weekStart, i * 7));
+
   return (
     <PageShell
       title="Kalendarz"
-      description="Tygodniowy widok produkcji. Przeciągnij wpis, aby zmienić termin."
+      description={
+        view === 'kanban'
+          ? 'Pipeline 5 tygodni — T1 outreach + ustalenia → T2 nagrywka + obróbka → T3 publikacja.'
+          : 'Tygodniowy widok produkcji. Przeciągnij wpis, aby zmienić termin.'
+      }
+      actions={<ViewToggle view={view} />}
     >
-      <CalendarShell
-        weekStart={weekStart}
-        entries={entries}
-        productions={productions}
-        templates={templates}
-        artists={artistOptions}
-        videographers={videographerOptions}
-      />
+      {view === 'kanban' ? (
+        <KanbanView weeks={weeks} productions={productions} />
+      ) : (
+        <CalendarShell
+          weekStart={weekStart}
+          entries={entries}
+          productions={productions}
+          templates={templates}
+          artists={artistOptions}
+          videographers={videographerOptions}
+        />
+      )}
     </PageShell>
   );
 }
