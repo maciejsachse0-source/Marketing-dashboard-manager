@@ -35,7 +35,7 @@ export async function createProduction(input: ProductionInput): Promise<Producti
     .values({
       type: parsed.type,
       templateSlug: parsed.templateSlug ?? 'manual',
-      status: parsed.status ?? 'idea',
+      status: parsed.status ?? 'email-sent',
       title: parsed.title,
       slug,
       t0At: t0,
@@ -81,8 +81,8 @@ export async function setProductionStatus(id: number, status: ProductionStatus):
   revalidatePath('/calendar');
   revalidatePath('/');
 
-  // Side-effect: when production reaches 'approved' for the first time, generate output folder
-  if (validStatus === 'approved' && !row.folderPath) {
+  // Side-effect: when production reaches 'publishing' for the first time, generate output folder
+  if (validStatus === 'publishing' && !row.folderPath) {
     try {
       await generateOutputFolder(id);
       revalidatePath('/output');
@@ -216,7 +216,7 @@ export async function createProductionFromTemplate(input: CreateFromTemplateInpu
     .values({
       type: template.type,
       templateSlug: template.slug,
-      status: 'planning',
+      status: 'email-sent',
       title: input.title.trim(),
       slug,
       t0At: t0,

@@ -40,7 +40,7 @@ export function ProductionStatusButtons({
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs text-muted-foreground">Anulowane.</span>
-        <Button size="sm" variant="outline" onClick={() => change('idea')} disabled={pending}>
+        <Button size="sm" variant="outline" onClick={() => change('email-sent')} disabled={pending}>
           Wznów
         </Button>
       </div>

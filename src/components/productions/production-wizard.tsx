@@ -119,7 +119,7 @@ export function ProductionWizard({
             videographerId: type === 'with-artist' ? videographerId : null,
             platforms: platforms.length > 0 ? platforms : null,
             notes: notes.trim() || null,
-            status: 'idea',
+            status: 'email-sent',
           });
           toast.success(`Utworzono produkcję #${prod.id}`);
           router.push(`/productions/${prod.id}`);
