@@ -22,6 +22,27 @@
       "when": 1777213021452,
       "tag": "0002_odd_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1777366778792,
+      "tag": "0003_spooky_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1777369823296,
+      "tag": "0004_equal_frank_castle",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1777372481663,
+      "tag": "0005_steep_random",
+      "breakpoints": true
     }
   ]
 }

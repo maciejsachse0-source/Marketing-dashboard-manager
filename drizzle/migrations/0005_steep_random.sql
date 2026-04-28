@@ -1,0 +1,1 @@
+ALTER TABLE `videographers` ADD `avatar_url` text;

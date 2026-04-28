@@ -46,6 +46,7 @@ export const artistInputSchema = z.object({
   handle: z.string().max(80).optional().nullable(),
   email: z.string().email().optional().nullable(),
   phone: z.string().max(40).optional().nullable(),
+  avatarUrl: z.string().url().max(500).optional().nullable(),
   notes: z.string().max(2000).optional().nullable(),
 });
 export type ArtistInput = z.infer<typeof artistInputSchema>;
@@ -118,6 +119,7 @@ export const videographerInputSchema = z.object({
   hourlyRate: z.number().min(0).optional().nullable(),
   equipment: z.string().max(2000).optional().nullable(),
   availabilityNotes: z.string().max(1000).optional().nullable(),
+  avatarUrl: z.string().url().max(500).optional().nullable(),
   notes: z.string().max(2000).optional().nullable(),
 });
 export type VideographerInput = z.infer<typeof videographerInputSchema>;

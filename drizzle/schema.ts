@@ -23,38 +23,33 @@ export const PRODUCTION_TYPES = ['with-artist', 'solo'] as const;
 export type ProductionType = (typeof PRODUCTION_TYPES)[number];
 
 export const PRODUCTION_STATUSES = [
-  'idea',
-  'planning',
-  'outreach',
-  'confirmed',
-  'briefing',
-  'ready-to-shoot',
+  // Outreach
+  'email-sent',
+  'terms-accepted',
+  'cam-meeting-set',
+  // Ustalenia z kamerzystą
+  'cam-date-shared',
+  'script-discussed',
+  'script-sent',
+  // Produkcja
   'shooting',
   'editing',
-  'review',
-  'approved',
   'publishing',
-  'published',
-  'analyzed',
   'cancelled',
 ] as const;
 export type ProductionStatus = (typeof PRODUCTION_STATUSES)[number];
 
 /** Workflow order — used for next/prev step UI. `cancelled` is terminal off-track. */
 export const PRODUCTION_PROGRESSION: ProductionStatus[] = [
-  'idea',
-  'planning',
-  'outreach',
-  'confirmed',
-  'briefing',
-  'ready-to-shoot',
+  'email-sent',
+  'terms-accepted',
+  'cam-meeting-set',
+  'cam-date-shared',
+  'script-discussed',
+  'script-sent',
   'shooting',
   'editing',
-  'review',
-  'approved',
   'publishing',
-  'published',
-  'analyzed',
 ];
 
 const now = sql`(unixepoch() * 1000)`;
@@ -65,6 +60,7 @@ export const artists = sqliteTable('artists', {
   handle: text('handle'),
   email: text('email'),
   phone: text('phone'),
+  avatarUrl: text('avatar_url'),
   notes: text('notes'),
   lastContactAt: integer('last_contact_at', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
@@ -88,6 +84,7 @@ export const videographers = sqliteTable('videographers', {
   hourlyRate: real('hourly_rate'),
   equipment: text('equipment'),
   availabilityNotes: text('availability_notes'),
+  avatarUrl: text('avatar_url'),
   notes: text('notes'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
@@ -96,10 +93,11 @@ export const productions = sqliteTable('productions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type').$type<ProductionType>().notNull(),
   templateSlug: text('template_slug').notNull().default('manual'),
-  status: text('status').$type<ProductionStatus>().notNull().default('idea'),
+  status: text('status').$type<ProductionStatus>().notNull().default('email-sent'),
   title: text('title').notNull(),
   slug: text('slug').notNull(),
   t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
+  stepDates: text('step_dates', { mode: 'json' }).$type<Partial<Record<ProductionStatus, string>>>(),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   videographerId: integer('videographer_id').references(() => videographers.id, { onDelete: 'set null' }),
   platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
