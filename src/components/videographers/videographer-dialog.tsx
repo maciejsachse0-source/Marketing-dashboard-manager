@@ -21,6 +21,7 @@ type FormState = {
   hourlyRate: string;
   equipment: string;
   availabilityNotes: string;
+  avatarUrl: string;
   notes: string;
 };
 
@@ -31,6 +32,7 @@ function initial(v?: Videographer | null): FormState {
     hourlyRate: v?.hourlyRate?.toString() ?? '',
     equipment: v?.equipment ?? '',
     availabilityNotes: v?.availabilityNotes ?? '',
+    avatarUrl: v?.avatarUrl ?? '',
     notes: v?.notes ?? '',
   };
 }
@@ -64,6 +66,7 @@ export function VideographerDialog({
       hourlyRate: form.hourlyRate ? Number(form.hourlyRate) : null,
       equipment: form.equipment.trim() || null,
       availabilityNotes: form.availabilityNotes.trim() || null,
+      avatarUrl: form.avatarUrl.trim() || null,
       notes: form.notes.trim() || null,
     };
     if (!payload.name) {
@@ -160,12 +163,22 @@ export function VideographerDialog({
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="notes">Notatki</Label>
+            <Label htmlFor="avatarUrl">URL zdjęcia profilowego</Label>
+            <Input
+              id="avatarUrl"
+              value={form.avatarUrl}
+              onChange={(e) => setForm({ ...form, avatarUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="notes">Opis / notatki</Label>
             <Textarea
               id="notes"
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={2}
+              rows={3}
+              placeholder="Krótki opis — styl, doświadczenie, czemu warto z nim pracować..."
             />
           </div>
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}

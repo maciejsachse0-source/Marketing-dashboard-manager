@@ -16,6 +16,7 @@ type FormState = {
   handle: string;
   email: string;
   phone: string;
+  avatarUrl: string;
   notes: string;
 };
 
@@ -25,6 +26,7 @@ function initial(artist?: Artist | null): FormState {
     handle: artist?.handle ?? '',
     email: artist?.email ?? '',
     phone: artist?.phone ?? '',
+    avatarUrl: artist?.avatarUrl ?? '',
     notes: artist?.notes ?? '',
   };
 }
@@ -57,6 +59,7 @@ export function ArtistDialog({
       handle: form.handle.trim() || null,
       email: form.email.trim() || null,
       phone: form.phone.trim() || null,
+      avatarUrl: form.avatarUrl.trim() || null,
       notes: form.notes.trim() || null,
     };
     if (!payload.name) {
@@ -125,8 +128,23 @@ export function ArtistDialog({
             </div>
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="notes">Notatki</Label>
-            <Textarea id="notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} />
+            <Label htmlFor="avatarUrl">URL zdjęcia profilowego</Label>
+            <Input
+              id="avatarUrl"
+              value={form.avatarUrl}
+              onChange={(e) => setForm({ ...form, avatarUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="notes">Opis / notatki</Label>
+            <Textarea
+              id="notes"
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              rows={4}
+              placeholder="Krótki opis artysty — gatunek, styl, czego szuka, czemu warto z nim współpracować..."
+            />
           </div>
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}
         </div>
