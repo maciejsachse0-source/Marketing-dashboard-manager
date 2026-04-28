@@ -39,7 +39,7 @@ type Category = {
   withTime?: boolean;
   /** Label shown next to the date picker per stage. */
   dateLabel: string;
-  /** Pipeline week — same buckets as kanban + stage tracker. */
+  /** Pipeline week — same buckets as gantt + stage tracker. */
   week: WeekPhase;
 };
 
@@ -282,9 +282,12 @@ export default async function ProductionDetailPage({
                 </header>
                 <div className="space-y-4">
                   {weekCategories.map((cat) => {
-                    const relevantEntries = entries.filter((e) =>
-                      cat.entryTypes?.includes(e.type),
-                    );
+                    // Prefer the explicit `stage` set by templates; fall back to entry-type
+                    // matching only for legacy entries that pre-date the stage column.
+                    const relevantEntries = entries.filter((e) => {
+                      if (e.stage) return e.stage === cat.key;
+                      return cat.entryTypes?.includes(e.type) ?? false;
+                    });
                     const relevantAttachments = attachments.filter(
                       (a) => a.stage === cat.key,
                     );

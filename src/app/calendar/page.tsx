@@ -1,7 +1,7 @@
 import { and, gte, lte, inArray } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { CalendarShell } from '@/components/calendar/calendar-shell';
-import { KanbanView } from '@/components/calendar/kanban-view';
+import { GanttView } from '@/components/calendar/gantt-view';
 import { ViewToggle } from '@/components/calendar/view-toggle';
 import { db, schema } from '@/lib/db';
 import { addDays, endOfDay, startOfWeek } from '@/lib/dates';
@@ -13,10 +13,10 @@ import type { ProductionMeta } from '@/components/calendar/production-meta';
 
 export const dynamic = 'force-dynamic';
 
-const KANBAN_WEEKS = 5;
+const GANTT_WEEKS = 5;
 // Productions whose T-0 falls up to 2 weeks past the visible window still have
 // outreach/shoot phases inside the window (T-2/T-1) and must be fetched.
-const KANBAN_T0_LOOKAHEAD_WEEKS = KANBAN_WEEKS + 2;
+const GANTT_T0_LOOKAHEAD_WEEKS = GANTT_WEEKS + 2;
 
 export default async function CalendarPage({
   searchParams,
@@ -24,15 +24,15 @@ export default async function CalendarPage({
   searchParams: Promise<{ week?: string; view?: string }>;
 }) {
   const sp = await searchParams;
-  const view: 'week' | 'kanban' = sp.view === 'kanban' ? 'kanban' : 'week';
+  const view: 'week' | 'gantt' = sp.view === 'gantt' ? 'gantt' : 'week';
   const baseDate = sp.week ? new Date(sp.week) : new Date();
   const weekStart = startOfWeek(baseDate);
 
-  // Time range: week view = 1 week, kanban view = 5 weeks
+  // Time range: week view = 1 week, gantt view = 5 weeks
   const rangeStart = weekStart;
   const rangeEnd =
-    view === 'kanban'
-      ? endOfDay(addDays(weekStart, KANBAN_WEEKS * 7 - 1))
+    view === 'gantt'
+      ? endOfDay(addDays(weekStart, GANTT_WEEKS * 7 - 1))
       : endOfDay(addDays(weekStart, 6));
 
   const entries = await db.query.calendarEntries.findMany({
@@ -43,17 +43,17 @@ export default async function CalendarPage({
     orderBy: schema.calendarEntries.startsAt,
   });
 
-  // For kanban: pull productions whose T-0 sits anywhere from this week up to
+  // For gantt: pull productions whose T-0 sits anywhere from this week up to
   // 2 weeks after the visible window — those still have outreach/shoot phases
   // landing in the visible 5-week strip.
   const productionsInRange =
-    view === 'kanban'
+    view === 'gantt'
       ? await db.query.productions.findMany({
           where: and(
             gte(schema.productions.t0At, rangeStart),
             lte(
               schema.productions.t0At,
-              endOfDay(addDays(weekStart, KANBAN_T0_LOOKAHEAD_WEEKS * 7 - 1)),
+              endOfDay(addDays(weekStart, GANTT_T0_LOOKAHEAD_WEEKS * 7 - 1)),
             ),
           ),
         })
@@ -108,20 +108,20 @@ export default async function CalendarPage({
     hourlyRate: v.hourlyRate,
   }));
 
-  const weeks = Array.from({ length: KANBAN_WEEKS }, (_, i) => addDays(weekStart, i * 7));
+  const weeks = Array.from({ length: GANTT_WEEKS }, (_, i) => addDays(weekStart, i * 7));
 
   return (
     <PageShell
       title="Kalendarz"
       description={
-        view === 'kanban'
+        view === 'gantt'
           ? 'Pipeline 5 tygodni — T1 outreach + ustalenia → T2 nagrywka + obróbka → T3 publikacja.'
           : 'Tygodniowy widok produkcji. Przeciągnij wpis, aby zmienić termin.'
       }
       actions={<ViewToggle view={view} />}
     >
-      {view === 'kanban' ? (
-        <KanbanView weeks={weeks} productions={productions} />
+      {view === 'gantt' ? (
+        <GanttView weeks={weeks} productions={productions} />
       ) : (
         <CalendarShell
           weekStart={weekStart}

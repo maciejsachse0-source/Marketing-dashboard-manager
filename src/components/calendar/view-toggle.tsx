@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { CalendarDays, LayoutGrid } from 'lucide-react';
+import { CalendarDays, ChartGantt } from 'lucide-react';
 
-export function ViewToggle({ view }: { view: 'week' | 'kanban' }) {
+export function ViewToggle({ view }: { view: 'week' | 'gantt' }) {
   return (
     <div className="inline-flex items-center gap-0.5 p-0.5 rounded-full bg-muted border border-border">
       <Link
@@ -16,15 +16,15 @@ export function ViewToggle({ view }: { view: 'week' | 'kanban' }) {
         Tydzień
       </Link>
       <Link
-        href="/calendar?view=kanban"
+        href="/calendar?view=gantt"
         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition ${
-          view === 'kanban'
+          view === 'gantt'
             ? 'bg-foreground text-background'
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
-        <LayoutGrid className="w-3.5 h-3.5" strokeWidth={2} />
-        Kanban
+        <ChartGantt className="w-3.5 h-3.5" strokeWidth={2} />
+        Gantt
       </Link>
     </div>
   );

@@ -18,7 +18,7 @@ type Category = {
   /** Last status in this category — clicking this tick sets production here. */
   endStage: ProductionStatus;
   stages: ProductionStatus[];
-  /** Pipeline week this category belongs to. Same key in kanban-view. */
+  /** Pipeline week this category belongs to. Same key in gantt-view. */
   week: WeekPhase;
 };
 
@@ -130,7 +130,7 @@ export function StageTracker({
         </span>
       </div>
 
-      {/* T1 / T2 / T3 weekly frames — same week-buckets as the kanban */}
+      {/* T1 / T2 / T3 weekly frames — same week-buckets as the gantt */}
       <div className="grid grid-cols-5 gap-1.5 mb-2">
         {WEEK_FRAMES.map((frame) => (
           <div
