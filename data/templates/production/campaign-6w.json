@@ -10,6 +10,7 @@
       "hourStart": 14,
       "durationMinutes": 60,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "[BUILD-UP] Brief strategiczny",
       "agent": "campaign-strategist",
       "description": "Pozycjonowanie, audytorium, hook strategiczny, KPI."
@@ -19,6 +20,7 @@
       "hourStart": 12,
       "durationMinutes": 180,
       "calendarType": "shoot",
+      "stage": "nagrywanie",
       "title": "[BUILD-UP] Nagranie zasiewające",
       "description": "Easter egg w regularnym contencie — subtelne odniesienie."
     },
@@ -27,6 +29,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[BUILD-UP] Post zasiewający",
       "platforms": ["instagram", "tiktok"]
     },
@@ -35,6 +38,7 @@
       "hourStart": 10,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "outreach",
       "title": "Outreach do współpracowników premiery",
       "agent": "artist-outreach"
     },
@@ -43,6 +47,7 @@
       "hourStart": 14,
       "durationMinutes": 60,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "[TEASER] Brief produkcyjny teasera",
       "agent": "content-brief"
     },
@@ -51,6 +56,7 @@
       "hourStart": 12,
       "durationMinutes": 180,
       "calendarType": "shoot",
+      "stage": "nagrywanie",
       "title": "[TEASER] Nagranie teasera"
     },
     {
@@ -58,6 +64,7 @@
       "hourStart": 14,
       "durationMinutes": 240,
       "calendarType": "edit",
+      "stage": "obrobka",
       "title": "[TEASER] Montaż teasera"
     },
     {
@@ -65,6 +72,7 @@
       "hourStart": 18,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[TEASER] Publikacja teasera",
       "agent": "social-publisher",
       "platforms": ["instagram", "tiktok"]
@@ -74,6 +82,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[REVEAL] Ogłoszenie daty premiery",
       "agent": "social-publisher",
       "platforms": ["instagram", "tiktok", "youtube"]
@@ -83,6 +92,7 @@
       "hourStart": 11,
       "durationMinutes": 60,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Trend check przed premierą",
       "agent": "trend-scout"
     },
@@ -91,6 +101,7 @@
       "hourStart": 18,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[REVEAL] Pełen reveal — co premiera oferuje",
       "platforms": ["instagram", "tiktok"]
     },
@@ -99,6 +110,7 @@
       "hourStart": 18,
       "durationMinutes": 60,
       "calendarType": "deadline",
+      "stage": "ustalenia",
       "title": "Final checklist przed premierą"
     },
     {
@@ -106,6 +118,7 @@
       "hourStart": 18,
       "durationMinutes": 60,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[T-0] PREMIERA",
       "platforms": ["instagram", "tiktok", "youtube"]
     },
@@ -114,6 +127,7 @@
       "hourStart": 11,
       "durationMinutes": 60,
       "calendarType": "shoot",
+      "stage": "nagrywanie",
       "title": "[RELEASE] Reaction / B-roll",
       "description": "Szybkie nagranie reakcji do amplifikacji."
     },
@@ -122,6 +136,7 @@
       "hourStart": 18,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[RELEASE] Publikacja reaction",
       "platforms": ["tiktok"]
     },
@@ -130,6 +145,7 @@
       "hourStart": 14,
       "durationMinutes": 45,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Post-release analiza pierwszego tygodnia",
       "agent": "viral-analyzer"
     },
@@ -138,6 +154,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[AFTERGLOW] Recykling top momentu",
       "platforms": ["instagram", "tiktok"]
     },
@@ -146,6 +163,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "[AFTERGLOW] Reakcje fanów / UGC",
       "platforms": ["instagram"]
     },
@@ -154,6 +172,7 @@
       "hourStart": 15,
       "durationMinutes": 60,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "[AFTERGLOW] Wrap kampanii",
       "agent": "weekly-wrap"
     }

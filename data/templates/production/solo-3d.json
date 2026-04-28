@@ -10,6 +10,7 @@
       "hourStart": 10,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Pomysł + mini-brief",
       "agent": "content-brief",
       "description": "Hook (3 warianty) + szkic sceny."
@@ -19,6 +20,7 @@
       "hourStart": 11,
       "durationMinutes": 20,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Trend check (jeśli sound-driven)",
       "agent": "trend-scout"
     },
@@ -27,6 +29,7 @@
       "hourStart": 11,
       "durationMinutes": 60,
       "calendarType": "shoot",
+      "stage": "nagrywanie",
       "title": "Nagranie solo"
     },
     {
@@ -34,6 +37,7 @@
       "hourStart": 14,
       "durationMinutes": 90,
       "calendarType": "edit",
+      "stage": "obrobka",
       "title": "Montaż"
     },
     {
@@ -41,6 +45,7 @@
       "hourStart": 10,
       "durationMinutes": 30,
       "calendarType": "edit",
+      "stage": "obrobka",
       "title": "Akceptacja"
     },
     {
@@ -48,6 +53,7 @@
       "hourStart": 11,
       "durationMinutes": 45,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Copy",
       "agent": "social-publisher"
     },
@@ -56,6 +62,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "Publikacja",
       "platforms": ["instagram", "tiktok"]
     },
@@ -64,6 +71,7 @@
       "hourStart": 15,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Analiza",
       "agent": "viral-analyzer"
     }

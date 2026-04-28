@@ -1,12 +1,19 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CalendarType, Platform, ProductionType } from '../../drizzle/schema';
+import type {
+  CalendarType,
+  Platform,
+  ProductionStage,
+  ProductionType,
+} from '../../drizzle/schema';
 
 export type ProductionTemplateStep = {
   tDays: number;
   hourStart: number;
   durationMinutes: number;
   calendarType: CalendarType;
+  /** Pipeline category this step belongs to — drives placement on the production detail page. */
+  stage: ProductionStage;
   title: string;
   description?: string;
   agent?: string;

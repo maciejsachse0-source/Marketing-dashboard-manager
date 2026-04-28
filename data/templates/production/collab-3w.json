@@ -10,6 +10,7 @@
       "hourStart": 10,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "outreach",
       "title": "Cold outreach do artysty",
       "agent": "artist-outreach",
       "description": "Wysyłka cold maila — krótka propozycja, niski próg odpowiedzi."
@@ -19,6 +20,7 @@
       "hourStart": 18,
       "durationMinutes": 0,
       "calendarType": "deadline",
+      "stage": "outreach",
       "title": "Deadline odpowiedzi artysty",
       "description": "Brak odpowiedzi → wygeneruj follow-up draft przez artist-outreach."
     },
@@ -27,6 +29,7 @@
       "hourStart": 14,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "outreach",
       "title": "Konfirmacja terminu z artystą",
       "description": "Ustal datę, godzinę, lokację."
     },
@@ -35,6 +38,7 @@
       "hourStart": 11,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Booking kamerzysty",
       "description": "Potwierdzenie sprzętu, dojazdu, stawki."
     },
@@ -43,6 +47,7 @@
       "hourStart": 14,
       "durationMinutes": 90,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Brief produkcyjny",
       "agent": "content-brief",
       "description": "Scenariusz beat-by-beat + shotlist + propsy."
@@ -52,6 +57,7 @@
       "hourStart": 16,
       "durationMinutes": 30,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Trend check",
       "agent": "trend-scout",
       "description": "Czy wpleść aktualny format / trending audio."
@@ -61,6 +67,7 @@
       "hourStart": 10,
       "durationMinutes": 15,
       "calendarType": "meeting",
+      "stage": "ustalenia",
       "title": "Wysyłka briefu do ekipy + artysty",
       "agent": "artist-outreach",
       "description": "Plan dnia, lokacja, dojazd, co przygotować."
@@ -70,6 +77,7 @@
       "hourStart": 18,
       "durationMinutes": 60,
       "calendarType": "deadline",
+      "stage": "ustalenia",
       "title": "Przygotowanie sprzętu",
       "description": "Checklist: kamera, mikrofon, baterie, karty, oświetlenie, props."
     },
@@ -78,6 +86,7 @@
       "hourStart": 12,
       "durationMinutes": 240,
       "calendarType": "shoot",
+      "stage": "nagrywanie",
       "title": "NAGRANIE",
       "description": "Shoot z artystą + kamerzystą."
     },
@@ -86,6 +95,7 @@
       "hourStart": 10,
       "durationMinutes": 240,
       "calendarType": "edit",
+      "stage": "obrobka",
       "title": "Selekcja ujęć + pierwszy cut"
     },
     {
@@ -93,6 +103,7 @@
       "hourStart": 14,
       "durationMinutes": 60,
       "calendarType": "edit",
+      "stage": "obrobka",
       "title": "Akceptacja wideo (review)",
       "description": "Finalna wersja → status 'approved' generuje folder publikacyjny."
     },
@@ -101,6 +112,7 @@
       "hourStart": 16,
       "durationMinutes": 60,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Copy publikacyjne",
       "agent": "social-publisher",
       "description": "Caption + hashtagi + CTA per platforma → zapisz jako pakiet."
@@ -110,6 +122,7 @@
       "hourStart": 18,
       "durationMinutes": 30,
       "calendarType": "publish",
+      "stage": "publikacja",
       "title": "Publikacja na socjale",
       "description": "Manual upload — IG + TikTok + YT.",
       "platforms": ["instagram", "tiktok", "youtube"]
@@ -119,6 +132,7 @@
       "hourStart": 11,
       "durationMinutes": 15,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Podziękowanie do artysty",
       "agent": "artist-outreach",
       "description": "Mail z linkami i krótką informacją o starcie."
@@ -128,6 +142,7 @@
       "hourStart": 15,
       "durationMinutes": 45,
       "calendarType": "meeting",
+      "stage": "publikacja",
       "title": "Analiza wyników",
       "agent": "viral-analyzer",
       "description": "Po wgraniu CSV — wyciągnij wnioski na następny post."

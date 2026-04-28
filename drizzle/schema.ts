@@ -22,6 +22,16 @@ export type CsvSource = (typeof CSV_SOURCES)[number];
 export const PRODUCTION_TYPES = ['with-artist', 'solo'] as const;
 export type ProductionType = (typeof PRODUCTION_TYPES)[number];
 
+/** Pipeline category — used to bucket calendar entries on the production detail page. */
+export const PRODUCTION_STAGES = [
+  'outreach',
+  'ustalenia',
+  'nagrywanie',
+  'obrobka',
+  'publikacja',
+] as const;
+export type ProductionStage = (typeof PRODUCTION_STAGES)[number];
+
 export const PRODUCTION_STATUSES = [
   // Outreach
   'email-sent',
@@ -118,6 +128,7 @@ export const calendarEntries = sqliteTable('calendar_entries', {
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
   productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
+  stage: text('stage').$type<ProductionStage>(),
   briefPath: text('brief_path'),
   status: text('status').$type<CalendarStatus>().notNull().default('planned'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),

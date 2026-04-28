@@ -240,6 +240,7 @@ export async function createProductionFromTemplate(input: CreateFromTemplateInpu
       artistId: input.artistId ?? null,
       campaignId: input.campaignId ?? null,
       productionId: production.id,
+      stage: step.stage,
       status: 'planned',
     });
     entriesCreated++;

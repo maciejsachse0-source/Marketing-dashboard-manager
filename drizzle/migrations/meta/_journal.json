@@ -43,6 +43,13 @@
       "when": 1777372481663,
       "tag": "0005_steep_random",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1777379052310,
+      "tag": "0006_bitter_proteus",
+      "breakpoints": true
     }
   ]
 }
