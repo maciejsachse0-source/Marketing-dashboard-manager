@@ -58,7 +58,6 @@ async function main() {
       .insert(schema.productions)
       .values({
         type,
-        templateSlug: 'manual',
         status,
         title: entry.title,
         slug,

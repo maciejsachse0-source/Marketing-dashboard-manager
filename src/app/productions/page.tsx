@@ -3,9 +3,9 @@ import { PageShell } from '@/components/page-shell';
 import { listProductions } from '@/server/actions/productions';
 import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
-import { listProductionTemplates } from '@/lib/templates';
 import { EmptyState } from '@/components/empty-state';
 import { NewProductionButton } from '@/components/productions/new-production-button';
+import { loadTemplates } from '@/lib/production-templates';
 import { PlatformPills } from '@/components/platforms-pills';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
 import { StageTracker } from '@/components/productions/stage-tracker';
@@ -25,7 +25,6 @@ export default async function ProductionsListPage({
     listArtists(),
     listVideographers(),
   ]);
-  const templates = listProductionTemplates();
 
   const artistById = new Map(artists.map((a) => [a.id, a]));
   const videographerById = new Map(videographers.map((v) => [v.id, v]));
@@ -84,9 +83,9 @@ export default async function ProductionsListPage({
       description="Każde wideo to produkcja — od pomysłu, przez nagranie, po analizę. Pogrupowane: kogo dotyczy."
       actions={
         <NewProductionButton
-          templates={templates}
           artists={artistOptions}
           videographers={videographerOptions}
+          templates={loadTemplates()}
         />
       }
     >
@@ -106,7 +105,7 @@ export default async function ProductionsListPage({
         <EmptyState
           icon={Film}
           title="Brak produkcji"
-          description={'Kliknij „+ Nowa produkcja” lub użyj skrótu p — wybierz template i T-0, wpisy kalendarza wygenerują się same.'}
+          description={'Kliknij „+ Nowa produkcja” lub użyj skrótu p — utwórz produkcję od zera, wpisy kalendarza dodaj ręcznie.'}
         />
       ) : (
         <div className="space-y-12">
@@ -167,7 +166,7 @@ export default async function ProductionsListPage({
                     </header>
                     <div className="space-y-3">
                       {orphanSolo.map((p) => (
-                        <ProductionCard key={p.id} production={p} />
+                        <ProductionCard key={p.id} production={p} showHeader />
                       ))}
                     </div>
                   </div>
@@ -229,19 +228,7 @@ function PersonGroup({
       </header>
       <div className="space-y-3">
         {productions.map((p) => (
-          <ProductionCard
-            key={p.id}
-            production={p}
-            displayTitle={kind === 'artist' ? person.name : p.title}
-            avatar={
-              <PersonAvatar
-                name={person.name}
-                seed={handle ?? person.name}
-                size="sm"
-                kind={kind}
-              />
-            }
-          />
+          <ProductionCard key={p.id} production={p} />
         ))}
       </div>
     </div>
@@ -250,63 +237,44 @@ function PersonGroup({
 
 function ProductionCard({
   production: p,
-  avatar,
-  displayTitle,
+  showHeader = false,
 }: {
   production: Production;
-  avatar?: React.ReactNode;
-  displayTitle?: string;
+  /** Render a header row with title + Film icon — used for orphan cards that
+   *  aren't nested under a PersonGroup. Inside a PersonGroup the artist name
+   *  already lives in the group header, so the card stays minimal: just the
+   *  pipeline label and stage tracker. */
+  showHeader?: boolean;
 }) {
-  const days = Math.round((p.t0At.getTime() - Date.now()) / 86400000);
-  const tLabel = days === 0 ? 'T-0' : days > 0 ? `T-${days}` : `T+${Math.abs(days)}`;
-  const isPast = days < 0;
-
   return (
-    <div className="card-editorial p-5">
-      <div className="flex items-start gap-3 mb-4">
-        {avatar ?? (
+    <Link
+      href={`/productions/${p.id}`}
+      className="card-editorial p-5 block ui-transition hover:-translate-y-px"
+    >
+      {showHeader ? (
+        <div className="flex items-start gap-3 mb-4">
           <div className="w-7 h-7 rounded-full bg-muted grid place-items-center text-muted-foreground shrink-0 ring-2 ring-background">
             <Film className="w-3.5 h-3.5" strokeWidth={1.75} />
           </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <Link
-            href={`/productions/${p.id}`}
-            className="font-semibold text-[0.95rem] tracking-tight hover:text-[var(--accent-blue)] transition truncate block"
-          >
-            {displayTitle ?? p.title}
-          </Link>
-          <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
-            <span className="tabular-nums">
-              {p.t0At.toLocaleDateString('pl-PL', { dateStyle: 'medium' })}
+          <div className="flex-1 min-w-0">
+            <span className="font-semibold text-[0.95rem] tracking-tight truncate block">
+              {p.title}
             </span>
-            <span
-              className={`px-1.5 py-px rounded font-medium tabular-nums ${
-                isPast
-                  ? 'bg-muted text-muted-foreground'
-                  : days <= 7
-                    ? 'bg-foreground text-background'
-                    : 'bg-[var(--accent-blue-tint)] text-[var(--accent-blue)]'
-              }`}
-            >
-              {tLabel}
-            </span>
-            {p.templateSlug !== 'manual' ? (
-              <span className="font-mono text-[10px] text-muted-foreground/80">
-                {p.templateSlug}
-              </span>
-            ) : null}
           </div>
+          {p.platforms?.length ? (
+            <div className="shrink-0">
+              <PlatformPills platforms={p.platforms} />
+            </div>
+          ) : null}
         </div>
-        {p.platforms?.length ? (
-          <div className="shrink-0">
-            <PlatformPills platforms={p.platforms} />
-          </div>
-        ) : null}
-      </div>
+      ) : p.platforms?.length ? (
+        <div className="flex justify-end mb-3">
+          <PlatformPills platforms={p.platforms} />
+        </div>
+      ) : null}
 
       <StageTracker productionId={p.id} status={p.status} />
-    </div>
+    </Link>
   );
 }
 

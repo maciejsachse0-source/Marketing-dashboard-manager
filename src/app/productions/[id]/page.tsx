@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Mail, Phone, Sparkles, CalendarDays, Package, Megaphone, FileText } from 'lucide-react';
+import { Mail, Phone, Sparkles, Package, Megaphone, FileText } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { getProduction, listProductions } from '@/server/actions/productions';
+import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
 import { listProductionAttachments } from '@/lib/production-files';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
@@ -10,14 +11,18 @@ import { StageTracker } from '@/components/productions/stage-tracker';
 import { SubStageButton } from '@/components/productions/sub-stage-button';
 import { StageDatePicker } from '@/components/productions/stage-date-picker';
 import { FileZone } from '@/components/productions/file-zone';
+import { CustomStepRow } from '@/components/productions/custom-step-row';
+import { CustomStepAddInline } from '@/components/productions/custom-step-add';
+import { DeleteProductionButton } from '@/components/productions/delete-production-button';
+import { MoveArrows } from '@/components/productions/move-arrows';
+import { resolveCategorySequence } from '@/lib/category-sequence';
 import { VideographerPicker } from '@/components/productions/videographer-picker';
+import { ArtistPicker } from '@/components/productions/artist-picker';
 import { PlatformPills, StatusPill } from '@/components/platforms-pills';
-import { TYPE_LABEL } from '@/components/calendar/type-color';
 import { STAGE_LABEL, STAGE_HINT } from '@/lib/production-stages';
 import {
   PRODUCTION_PROGRESSION,
   type ProductionStatus,
-  type CalendarType,
 } from '../../../../drizzle/schema';
 
 export const dynamic = 'force-dynamic';
@@ -30,8 +35,6 @@ type Category = {
   label: string;
   description: string;
   hint: string;
-  /** What kinds of calendar entries belong here */
-  entryTypes?: CalendarType[];
   stages: ProductionStatus[];
   /** How each stage's date is captured. Default: 'record'. */
   dateMode?: DateMode;
@@ -49,7 +52,6 @@ const CATEGORIES: Category[] = [
     label: 'Outreach',
     description: 'Kontakt z artystą, akceptacja warunków, ustalenie daty z kamerzystą.',
     hint: 'wzorce maila, screen rozmowy, umowa.pdf',
-    entryTypes: ['meeting'],
     stages: ['email-sent', 'terms-accepted', 'cam-meeting-set'],
     dateMode: 'record',
     withTime: false,
@@ -61,7 +63,6 @@ const CATEGORIES: Category[] = [
     label: 'Ustalenia z kamerzystą',
     description: 'Przekazanie daty + omówienie i wysłanie scenariusza.',
     hint: 'scenariusz PDF, shotlist, packing list, callsheet',
-    entryTypes: ['meeting', 'deadline'],
     stages: ['cam-date-shared', 'script-discussed', 'script-sent'],
     dateMode: 'calendar',
     withTime: true,
@@ -73,7 +74,6 @@ const CATEGORIES: Category[] = [
     label: 'Nagrywanie',
     description: 'Nagrywki — w studio lub w terenie.',
     hint: 'surówki, BTS, audio raw',
-    entryTypes: ['shoot'],
     stages: ['shooting'],
     dateMode: 'calendar',
     withTime: true,
@@ -85,7 +85,6 @@ const CATEGORIES: Category[] = [
     label: 'Obróbka',
     description: 'Montaż — następnego dnia po nagrywkach.',
     hint: 'wersje robocze, master video',
-    entryTypes: ['edit'],
     stages: ['editing'],
     dateMode: 'derived',
     withTime: true,
@@ -97,7 +96,6 @@ const CATEGORIES: Category[] = [
     label: 'Publikacja',
     description: 'Upload na platformy.',
     hint: 'thumbs, exports per platforma',
-    entryTypes: ['publish'],
     stages: ['publishing'],
     dateMode: 'none',
     dateLabel: '',
@@ -174,15 +172,24 @@ export default async function ProductionDetailPage({
   const data = await getProduction(productionId);
   if (!data) notFound();
 
-  const { production, entries, packages, posts, artist, videographer, campaign } = data;
+  const { production, packages, posts, artist, videographer, campaign } = data;
   const attachments = listProductionAttachments(production.slug);
-  const allVideographers = await listVideographers();
+  const [allArtists, allVideographers] = await Promise.all([
+    listArtists(),
+    listVideographers(),
+  ]);
+  const artistOptions = allArtists.map((a) => ({
+    id: a.id,
+    name: a.name,
+    handle: a.handle,
+  }));
   const videographerOptions = allVideographers.map((v) => ({
     id: v.id,
     name: v.name,
     contact: v.contact,
     hourlyRate: v.hourlyRate,
   }));
+  const orphanWithArtist = production.type === 'with-artist' && !artist;
 
   // Count this artist's other productions (excluding cancelled) for the bio header
   const allProductions = artist
@@ -206,21 +213,35 @@ export default async function ProductionDetailPage({
           <span className="px-1.5 py-0.5 rounded font-medium tabular-nums bg-foreground text-background text-[11px]">
             {tLabel}
           </span>
-          {production.templateSlug !== 'manual' ? (
-            <span className="font-mono text-[10px] text-muted-foreground/80">
-              template: {production.templateSlug}
-            </span>
-          ) : null}
         </span>
+      }
+      actions={
+        <DeleteProductionButton
+          productionId={production.id}
+          productionName={displayTitle}
+        />
       }
     >
       <div className="space-y-8">
         <Link
           href="/productions"
-          className="inline-flex text-xs text-muted-foreground hover:text-foreground"
+          className="group inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground ui-transition w-fit"
         >
-          ← wszystkie produkcje
+          <span className="inline-block ui-transition group-hover:-translate-x-0.5">←</span>
+          wszystkie produkcje
         </Link>
+
+        {/* Orphan with-artist productions: surface the missing-artist banner up top
+            so the inconsistency between the "z artystą" eyebrow and the empty
+            person header is fixable without leaving the page. */}
+        {orphanWithArtist ? (
+          <ArtistPicker
+            productionId={production.id}
+            currentArtistId={production.artistId}
+            artists={artistOptions}
+            variant="warning"
+          />
+        ) : null}
 
         {/* Person header */}
         {artist ? (
@@ -258,7 +279,22 @@ export default async function ProductionDetailPage({
 
         {/* Categories — grouped by pipeline week (T1 / T2 / T3) */}
         <section className="space-y-6">
-          {WEEK_FRAMES.map((frame) => {
+          {(() => {
+            // Compute global step offset per category — running total of
+            // sequence lengths in canonical CATEGORIES order. Used to assign
+            // each step a 1-based displayNumber matching the gantt sub-step n.
+            let stepOffset = 0;
+            const offsetsByCat = new Map<string, number>();
+            for (const cat of CATEGORIES) {
+              offsetsByCat.set(cat.key, stepOffset);
+              const seq = resolveCategorySequence(
+                cat.key as import('../../../../drizzle/schema').ProductionStage,
+                (production.customSteps ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage] ?? [],
+                (production.stepOrder ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage],
+              );
+              stepOffset += seq.length;
+            }
+            return WEEK_FRAMES.map((frame) => {
             const weekCategories = CATEGORIES.filter((c) => c.week === frame.code);
             return (
               <div
@@ -282,12 +318,6 @@ export default async function ProductionDetailPage({
                 </header>
                 <div className="space-y-4">
                   {weekCategories.map((cat) => {
-                    // Prefer the explicit `stage` set by templates; fall back to entry-type
-                    // matching only for legacy entries that pre-date the stage column.
-                    const relevantEntries = entries.filter((e) => {
-                      if (e.stage) return e.stage === cat.key;
-                      return cat.entryTypes?.includes(e.type) ?? false;
-                    });
                     const relevantAttachments = attachments.filter(
                       (a) => a.stage === cat.key,
                     );
@@ -352,18 +382,20 @@ export default async function ProductionDetailPage({
                         category={cat}
                         currentStatus={production.status}
                         stepDates={production.stepDates ?? {}}
-                        visibleEntries={relevantEntries}
-                        t0={production.t0At}
                         attachments={relevantAttachments}
                         extras={extras}
                         bannerSlot={bannerSlot}
+                        customSteps={(production.customSteps ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage] ?? []}
+                        storedOrder={(production.stepOrder ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage]}
+                        startNumber={(offsetsByCat.get(cat.key) ?? 0) + 1}
                       />
                     );
                   })}
                 </div>
               </div>
             );
-          })}
+          });
+          })()}
         </section>
 
         {/* Notes — at the bottom for context */}
@@ -486,41 +518,39 @@ function PersonHeader({
   );
 }
 
-type EntryRow = {
-  id: number;
-  type: CalendarType;
-  title: string;
-  startsAt: Date;
-  endsAt: Date;
-  status: string;
-  productionId?: number | null;
-};
-
 function CategorySection({
   productionId,
   category,
   currentStatus,
   stepDates,
-  visibleEntries,
-  t0,
   attachments,
   extras,
   bannerSlot,
+  customSteps,
+  storedOrder,
+  startNumber,
 }: {
   productionId: number;
   category: Category;
   currentStatus: ProductionStatus;
   stepDates: Partial<Record<ProductionStatus, string>>;
-  visibleEntries: EntryRow[];
-  t0: Date;
   attachments: ReturnType<typeof listProductionAttachments>;
   extras: React.ReactNode[];
   bannerSlot?: React.ReactNode;
+  customSteps: import('../../../../drizzle/schema').CustomStep[];
+  storedOrder: string[] | undefined;
+  /** 1-based global step number for the first item in this category. */
+  startNumber: number;
 }) {
   const states = category.stages.map((s) => stageState(s, currentStatus));
   const allPassed = states.every((s) => s === 'passed');
   const anyActive = states.includes('active');
   const groupTone = allPassed ? 'passed' : anyActive ? 'active' : 'pending';
+  const sequence = resolveCategorySequence(
+    category.key as import('../../../../drizzle/schema').ProductionStage,
+    customSteps,
+    storedOrder,
+  );
 
   return (
     <div
@@ -552,38 +582,77 @@ function CategorySection({
             Kroki
           </div>
           <div className="space-y-3">
-            {category.stages.map((stage, idx) => {
-              const dateMode = category.dateMode ?? 'none';
-              const stepDateIso = stepDates[stage] ?? null;
-              const derivedIso =
-                stage === 'editing' && stepDates.shooting
-                  ? deriveEditingIso(stepDates.shooting)
-                  : null;
+            {sequence.map((item, seqIdx) => {
+              const canMoveUp = seqIdx > 0;
+              const canMoveDown = seqIdx < sequence.length - 1;
+              if (item.kind === 'canonical') {
+                const stage = item.stage;
+                const stageIdx = category.stages.indexOf(stage);
+                const dateMode = category.dateMode ?? 'none';
+                const stepDateIso = stepDates[stage] ?? null;
+                const derivedIso =
+                  stage === 'editing' && stepDates.shooting
+                    ? deriveEditingIso(stepDates.shooting)
+                    : null;
+                return (
+                  <div key={`c:${stage}`} className="group space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <SubStageButton
+                          productionId={productionId}
+                          stage={stage}
+                          label={STAGE_LABEL[stage]}
+                          state={stageIdx >= 0 ? states[stageIdx] : 'pending'}
+                          displayNumber={startNumber + seqIdx}
+                        />
+                      </div>
+                      <MoveArrows
+                        productionId={productionId}
+                        category={category.key as import('../../../../drizzle/schema').ProductionStage}
+                        stepKey={stage}
+                        canMoveUp={canMoveUp}
+                        canMoveDown={canMoveDown}
+                        className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition pt-1.5"
+                      />
+                    </div>
+                    {STAGE_HINT[stage] ? (
+                      <p className="pl-7 text-[11px] text-muted-foreground/80 italic">
+                        {STAGE_HINT[stage]}
+                      </p>
+                    ) : null}
+                    <StageDatePicker
+                      productionId={productionId}
+                      stage={stage}
+                      mode={dateMode}
+                      currentIso={stepDateIso}
+                      derivedIso={derivedIso}
+                      withTime={category.withTime ?? true}
+                      label={category.dateLabel}
+                    />
+                  </div>
+                );
+              }
               return (
-                <div key={stage} className="space-y-1.5">
-                  <SubStageButton
-                    productionId={productionId}
-                    stage={stage}
-                    label={STAGE_LABEL[stage]}
-                    state={states[idx]}
-                  />
-                  {STAGE_HINT[stage] ? (
-                    <p className="pl-7 text-[11px] text-muted-foreground/80 italic">
-                      {STAGE_HINT[stage]}
-                    </p>
-                  ) : null}
-                  <StageDatePicker
-                    productionId={productionId}
-                    stage={stage}
-                    mode={dateMode}
-                    currentIso={stepDateIso}
-                    derivedIso={derivedIso}
-                    withTime={category.withTime ?? true}
-                    label={category.dateLabel}
-                  />
-                </div>
+                <CustomStepRow
+                  key={`x:${item.step.id}`}
+                  productionId={productionId}
+                  category={
+                    category.key as import('../../../../drizzle/schema').ProductionStage
+                  }
+                  step={item.step}
+                  canMoveUp={canMoveUp}
+                  canMoveDown={canMoveDown}
+                  displayNumber={startNumber + seqIdx}
+                />
               );
             })}
+            <div className="pt-1">
+              <CustomStepAddInline
+                productionId={productionId}
+                category={category.key as import('../../../../drizzle/schema').ProductionStage}
+                canonicalStages={category.stages}
+              />
+            </div>
           </div>
         </div>
 
@@ -604,41 +673,6 @@ function CategorySection({
               attachments={attachments}
             />
           </div>
-
-          {visibleEntries.length > 0 ? (
-            <ItemList
-              icon={CalendarDays}
-              title={`Kalendarz (${visibleEntries.length})`}
-              items={visibleEntries.map((e) => {
-                const offsetDays = Math.round(
-                  (e.startsAt.getTime() - t0.getTime()) / 86400000,
-                );
-                const t =
-                  offsetDays === 0
-                    ? 'T-0'
-                    : offsetDays > 0
-                      ? `T+${offsetDays}`
-                      : `T-${Math.abs(offsetDays)}`;
-                return {
-                  key: `e-${e.id}`,
-                  title: e.title,
-                  meta: (
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {TYPE_LABEL[e.type]} · {t}
-                    </span>
-                  ),
-                  right: (
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {e.startsAt.toLocaleDateString('pl-PL', {
-                        day: '2-digit',
-                        month: '2-digit',
-                      })}
-                    </span>
-                  ),
-                };
-              })}
-            />
-          ) : null}
 
           {extras}
         </div>

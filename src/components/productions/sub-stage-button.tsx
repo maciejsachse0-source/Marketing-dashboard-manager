@@ -10,11 +10,15 @@ export function SubStageButton({
   stage,
   label,
   state,
+  displayNumber,
 }: {
   productionId: number;
   stage: ProductionStatus;
   label: string;
   state: 'passed' | 'active' | 'pending';
+  /** Optional 1-based step number — when provided, prefixed before the label
+   *  to match the corresponding numbered tick on the gantt sub-step bar. */
+  displayNumber?: number;
 }) {
   const [optimisticState, setOptimisticState] = useOptimistic(state);
   const [pending, startTransition] = useTransition();
@@ -60,6 +64,7 @@ export function SubStageButton({
               : 'text-muted-foreground group-hover:text-foreground'
         }`}
       >
+        {displayNumber != null ? <span className="tabular-nums opacity-80 mr-1">{displayNumber}.</span> : null}
         {label}
       </span>
       <span

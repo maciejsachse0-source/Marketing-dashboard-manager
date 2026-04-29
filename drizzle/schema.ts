@@ -32,6 +32,28 @@ export const PRODUCTION_STAGES = [
 ] as const;
 export type ProductionStage = (typeof PRODUCTION_STAGES)[number];
 
+/** User-added extra step inside a category. Slotted INTO the canonical sub-
+ * stage flow at a specific position via {@link CustomStep.positionAfter}.
+ * Doesn't change production.status — its passed/pending state is its own.
+ * For display, custom steps are interleaved with canonical sub-stages and
+ * renumbered 1..N as a single ordered list. */
+export type CustomStep = {
+  id: string;
+  label: string;
+  /** Canonical sub-stage AFTER which this custom step sits in display order.
+   *  Optional: undefined or unrecognised value falls back to "end of category". */
+  positionAfter?: ProductionStatus;
+  /** ISO timestamp when the step was checked off, or null if pending. */
+  doneAt: string | null;
+  /** Optional free-text description / notes for the step. */
+  description?: string;
+  /** Optional uploaded attachment — path relative to repo root, original
+   *  filename and size for display. */
+  attachmentPath?: string;
+  attachmentName?: string;
+  attachmentSize?: number;
+};
+
 export const PRODUCTION_STATUSES = [
   // Outreach
   'email-sent',
@@ -102,12 +124,18 @@ export const videographers = sqliteTable('videographers', {
 export const productions = sqliteTable('productions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type').$type<ProductionType>().notNull(),
-  templateSlug: text('template_slug').notNull().default('manual'),
   status: text('status').$type<ProductionStatus>().notNull().default('email-sent'),
   title: text('title').notNull(),
   slug: text('slug').notNull(),
   t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
   stepDates: text('step_dates', { mode: 'json' }).$type<Partial<Record<ProductionStatus, string>>>(),
+  customSteps: text('custom_steps', { mode: 'json' }).$type<Partial<Record<ProductionStage, CustomStep[]>>>(),
+  /** Per-category explicit order of step keys. A key is either a
+   *  `ProductionStatus` (canonical) or a custom step id. Categories absent
+   *  here render in the legacy default order (subStages first, then customs by
+   *  positionAfter). Mutated by `moveStepInCategory` — once a category gets
+   *  reordered, it switches to this explicit list as the source of truth. */
+  stepOrder: text('step_order', { mode: 'json' }).$type<Partial<Record<ProductionStage, string[]>>>(),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   videographerId: integer('videographer_id').references(() => videographers.id, { onDelete: 'set null' }),
   platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),

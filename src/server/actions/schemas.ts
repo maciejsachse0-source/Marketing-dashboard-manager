@@ -126,7 +126,6 @@ export type VideographerInput = z.infer<typeof videographerInputSchema>;
 
 export const productionInputSchema = z.object({
   type: productionTypeSchema,
-  templateSlug: z.string().min(1).max(60).default('manual'),
   title: z.string().min(1).max(200),
   slug: z.string().min(1).max(120).optional(),
   t0At: isoDate,
