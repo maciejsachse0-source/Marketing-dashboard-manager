@@ -1,4 +1,4 @@
-import { Camera, Mic } from 'lucide-react';
+import { Camera, Mic, UserMinus } from 'lucide-react';
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -88,6 +88,23 @@ export function SoloAvatar({ size = 'md' }: { size?: keyof typeof SIZE }) {
       className={`${cls.box} rounded-full grid place-items-center bg-foreground text-background shrink-0 shadow-sm ring-2 ring-background`}
     >
       <Camera
+        className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'}
+        strokeWidth={2.25}
+      />
+    </div>
+  );
+}
+
+/** "Z artystą" production whose artist hasn't been assigned yet. */
+export function OrphanArtistAvatar({ size = 'md' }: { size?: keyof typeof SIZE }) {
+  const cls = SIZE[size];
+  return (
+    <div
+      aria-hidden
+      title="Brak przypisanego artysty — przypisz w produkcji"
+      className={`${cls.box} rounded-full grid place-items-center bg-amber-100 text-amber-900 ring-2 ring-amber-400 shrink-0 shadow-sm border border-dashed border-amber-500`}
+    >
+      <UserMinus
         className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'}
         strokeWidth={2.25}
       />

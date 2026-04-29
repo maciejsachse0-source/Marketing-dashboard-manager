@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -8,39 +8,75 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import {
-  createProduction,
-  createProductionFromTemplate,
-} from '@/server/actions/productions';
+import { createProduction } from '@/server/actions/productions';
+import { applyTemplateSteps } from '@/server/actions/production-custom-steps';
 import { PLATFORMS, type Platform, type ProductionType } from '../../../drizzle/schema';
-import { isoToInputLocal } from '@/lib/dates';
-import type { ProductionTemplate } from '@/lib/templates';
+import { isoWeekToMonday, toIsoWeekString } from '@/lib/dates';
+import type { ProductionTemplate } from '@/lib/production-templates-types';
 
 type ArtistOption = { id: number; name: string; handle: string | null };
 type VideographerOption = { id: number; name: string; hourlyRate: number | null };
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3;
+
+/**
+ * Default T1 ISO week. T1 = the week the collaboration starts (outreach +
+ * ustalenia); T-0 sits 2 weeks later. Defaults to the current ISO week so a
+ * new production starts "this week" with publication in 2 weeks. If a hint is
+ * provided AND it's in the future, treat it as the desired T-0 and step back.
+ */
+function defaultT1Week(hint?: Date): string {
+  const now = new Date();
+  if (hint && hint.getTime() > now.getTime() + 7 * 24 * 3600 * 1000) {
+    const t1 = new Date(hint);
+    t1.setDate(t1.getDate() - 14);
+    return toIsoWeekString(t1);
+  }
+  return toIsoWeekString(now);
+}
+
+/**
+ * T-0 derived from T1 week: Monday of T1 + 14 days = Monday of T3 (publication
+ * week), set to noon local. User can refine the exact day/time later on the
+ * production page.
+ */
+function deriveT0FromT1(week: string): Date | null {
+  const mon = isoWeekToMonday(week);
+  if (!mon) return null;
+  const t0 = new Date(mon);
+  t0.setDate(t0.getDate() + 14);
+  t0.setHours(12, 0, 0, 0);
+  return t0;
+}
 
 export function ProductionWizard({
   open,
   onOpenChange,
-  templates,
   artists,
   videographers = [],
+  templates,
   defaultStart,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  templates: ProductionTemplate[];
   artists: ArtistOption[];
   videographers?: VideographerOption[];
+  templates: ProductionTemplate[];
   defaultStart?: Date;
 }) {
+  // Local helpers — the templates list now arrives as a prop (server-loaded
+  // upstream) so the wizard stays a pure client component.
+  const templatesForType = (t: ProductionType) => templates.filter((x) => x.type === t);
+  const defaultTemplateFor = (t: ProductionType) => templatesForType(t)[0];
+  const getTemplate = (slug: string) => templates.find((t) => t.slug === slug);
+
   const [step, setStep] = useState<Step>(1);
   const [type, setType] = useState<ProductionType>('with-artist');
-  const [templateSlug, setTemplateSlug] = useState<string>('manual');
+  const [templateSlug, setTemplateSlug] = useState<string>(
+    () => defaultTemplateFor('with-artist')?.slug ?? '',
+  );
   const [title, setTitle] = useState('');
-  const [t0Local, setT0Local] = useState(() => isoToInputLocal(defaultStart ?? new Date()));
+  const [t1Week, setT1Week] = useState(() => defaultT1Week(defaultStart));
   const [artistId, setArtistId] = useState<number | null>(null);
   const [videographerId, setVideographerId] = useState<number | null>(null);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
@@ -49,22 +85,12 @@ export function ProductionWizard({
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
-  const filteredTemplates = useMemo(
-    () => templates.filter((t) => t.type === type),
-    [templates, type],
-  );
-
-  const selectedTemplate = useMemo(
-    () => (templateSlug === 'manual' ? null : templates.find((t) => t.slug === templateSlug) ?? null),
-    [templates, templateSlug],
-  );
-
   const reset = () => {
     setStep(1);
     setType('with-artist');
-    setTemplateSlug('manual');
+    setTemplateSlug(defaultTemplateFor('with-artist')?.slug ?? '');
     setTitle('');
-    setT0Local(isoToInputLocal(defaultStart ?? new Date()));
+    setT1Week(defaultT1Week(defaultStart));
     setArtistId(null);
     setVideographerId(null);
     setPlatforms([]);
@@ -72,12 +98,22 @@ export function ProductionWizard({
     setError(null);
   };
 
+  // When the user flips type, ensure the selected template still belongs to
+  // that type — otherwise reset to the default template for the new type.
+  const onChangeType = (t: ProductionType) => {
+    setType(t);
+    const current = getTemplate(templateSlug);
+    if (!current || current.type !== t) {
+      setTemplateSlug(defaultTemplateFor(t)?.slug ?? '');
+    }
+  };
+
   const close = (val: boolean) => {
     if (!val) reset();
     onOpenChange(val);
   };
 
-  const next = () => setStep((s) => Math.min(4, s + 1) as Step);
+  const next = () => setStep((s) => Math.min(3, s + 1) as Step);
   const back = () => setStep((s) => Math.max(1, s - 1) as Step);
 
   const togglePlatform = (p: Platform) => {
@@ -88,42 +124,45 @@ export function ProductionWizard({
     setError(null);
     if (!title.trim()) {
       setError('Tytuł nie może być pusty');
-      setStep(3);
+      setStep(2);
       return;
     }
-    const t0Iso = new Date(t0Local).toISOString();
+    const t0 = deriveT0FromT1(t1Week);
+    if (!t0) {
+      setError('Wybierz tydzień startowy (T-1)');
+      setStep(2);
+      return;
+    }
+    const t0Iso = t0.toISOString();
+
+    const template = getTemplate(templateSlug);
 
     startTransition(async () => {
       try {
-        if (selectedTemplate) {
-          const result = await createProductionFromTemplate({
-            templateSlug: selectedTemplate.slug,
-            title: title.trim(),
-            t0At: t0Iso,
-            artistId: type === 'with-artist' ? artistId : null,
-            videographerId: type === 'with-artist' ? videographerId : null,
-            platformsOverride: platforms.length > 0 ? platforms : null,
-            notes: notes.trim() || null,
-          });
-          toast.success(`Utworzono produkcję #${result.production.id}`, {
-            description: `${result.entriesCreated} wpisów w kalendarzu`,
-          });
-          router.push(`/productions/${result.production.id}`);
-        } else {
-          const prod = await createProduction({
-            type,
-            templateSlug: 'manual',
-            title: title.trim(),
-            t0At: t0Iso,
-            artistId: type === 'with-artist' ? artistId : null,
-            videographerId: type === 'with-artist' ? videographerId : null,
-            platforms: platforms.length > 0 ? platforms : null,
-            notes: notes.trim() || null,
-            status: 'email-sent',
-          });
-          toast.success(`Utworzono produkcję #${prod.id}`);
-          router.push(`/productions/${prod.id}`);
+        const prod = await createProduction({
+          type,
+          title: title.trim(),
+          t0At: t0Iso,
+          artistId: type === 'with-artist' ? artistId : null,
+          videographerId: type === 'with-artist' ? videographerId : null,
+          platforms: platforms.length > 0 ? platforms : null,
+          notes: notes.trim() || null,
+          status: 'email-sent',
+        });
+        // Apply template's custom steps in a single follow-up write. Failure
+        // here shouldn't block production creation — surface a soft warning.
+        if (template && template.customSteps.length > 0) {
+          const res = await applyTemplateSteps(prod.id, template.customSteps);
+          if (!res.ok) {
+            toast.warning('Produkcja utworzona, ale nie udało się dodać kroków z szablonu', {
+              description: res.error,
+            });
+          }
         }
+        toast.success(
+          `Utworzono produkcję #${prod.id}${template ? ` · szablon: ${template.name}` : ''}`,
+        );
+        router.push(`/productions/${prod.id}`);
         close(false);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -139,27 +178,27 @@ export function ProductionWizard({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span>Nowa produkcja</span>
-            <span className="text-xs font-normal text-muted-foreground">krok {step}/4</span>
+            <span className="text-xs font-normal text-muted-foreground">krok {step}/3</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-2">
-          {step === 1 ? <StepType type={type} onChange={setType} /> : null}
-          {step === 2 ? (
-            <StepTemplate
-              templates={filteredTemplates}
-              selected={templateSlug}
-              onSelect={setTemplateSlug}
+          {step === 1 ? (
+            <StepType
               type={type}
+              onChangeType={onChangeType}
+              templateSlug={templateSlug}
+              onChangeTemplate={setTemplateSlug}
+              templates={templatesForType(type)}
             />
           ) : null}
-          {step === 3 ? (
+          {step === 2 ? (
             <StepDetails
               type={type}
               title={title}
               setTitle={setTitle}
-              t0Local={t0Local}
-              setT0Local={setT0Local}
+              t1Week={t1Week}
+              setT1Week={setT1Week}
               artistId={artistId}
               setArtistId={setArtistId}
               artists={artists}
@@ -172,12 +211,12 @@ export function ProductionWizard({
               setNotes={setNotes}
             />
           ) : null}
-          {step === 4 ? (
+          {step === 3 ? (
             <StepReview
               type={type}
-              template={selectedTemplate}
+              template={getTemplate(templateSlug) ?? null}
               title={title}
-              t0Local={t0Local}
+              t1Week={t1Week}
               artist={artists.find((a) => a.id === artistId) ?? null}
               videographer={videographers.find((v) => v.id === videographerId) ?? null}
               platforms={platforms}
@@ -195,7 +234,7 @@ export function ProductionWizard({
             <Button variant="ghost" onClick={() => close(false)} disabled={pending}>
               Anuluj
             </Button>
-            {step < 4 ? (
+            {step < 3 ? (
               <Button onClick={next} disabled={pending}>
                 Dalej →
               </Button>
@@ -213,29 +252,107 @@ export function ProductionWizard({
 
 function StepType({
   type,
-  onChange,
+  onChangeType,
+  templateSlug,
+  onChangeTemplate,
+  templates,
 }: {
   type: ProductionType;
-  onChange: (t: ProductionType) => void;
+  onChangeType: (t: ProductionType) => void;
+  templateSlug: string;
+  onChangeTemplate: (slug: string) => void;
+  templates: ProductionTemplate[];
 }) {
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">Typ produkcji</p>
-      <div className="grid grid-cols-2 gap-3">
-        <TypeCard
-          active={type === 'with-artist'}
-          onClick={() => onChange('with-artist')}
-          title="Z artystą"
-          description="Kolaba — outreach, briefing, nagranie z gościem, podziękowanie."
-        />
-        <TypeCard
-          active={type === 'solo'}
-          onClick={() => onChange('solo')}
-          title="Solo"
-          description="Twój content — szybki cykl, BTS, trending, refleksje."
-        />
+    <div className="space-y-5">
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">Typ produkcji</p>
+        <div className="grid grid-cols-2 gap-3">
+          <TypeCard
+            active={type === 'with-artist'}
+            onClick={() => onChangeType('with-artist')}
+            title="Z artystą"
+            description="Kolaba — outreach, briefing, nagranie z gościem, podziękowanie."
+          />
+          <TypeCard
+            active={type === 'solo'}
+            onClick={() => onChangeType('solo')}
+            title="Solo"
+            description="Twój content — szybki cykl, BTS, trending, refleksje."
+          />
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="text-sm text-muted-foreground">Szablon kroków</p>
+          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70 tabular-nums">
+            {templates.length} {templates.length === 1 ? 'szablon' : 'szablony'}
+          </span>
+        </div>
+        <div className="grid gap-2">
+          {templates.map((t) => (
+            <TemplateCard
+              key={t.slug}
+              template={t}
+              active={t.slug === templateSlug}
+              onClick={() => onChangeTemplate(t.slug)}
+            />
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground">
+          Każdy szablon to ten sam fundament 9-krokowy + opcjonalne kroki dodatkowe. Możesz je później zmieniać w produkcji.
+        </p>
       </div>
     </div>
+  );
+}
+
+function TemplateCard({
+  template,
+  active,
+  onClick,
+}: {
+  template: ProductionTemplate;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const extra = template.customSteps.length;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group text-left rounded-lg border p-3.5 ui-transition ${
+        active
+          ? 'border-primary bg-primary/10 shadow-sm'
+          : 'border-border hover:border-foreground/30 hover:bg-muted/30'
+      }`}
+      aria-pressed={active}
+    >
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <span className="font-semibold text-sm tracking-tight">{template.name}</span>
+        <span
+          className={`text-[10px] uppercase tracking-[0.12em] tabular-nums shrink-0 ${
+            active ? 'text-primary font-bold' : 'text-muted-foreground'
+          }`}
+        >
+          9 + {extra} {extra === 1 ? 'krok' : 'kroków'}
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground leading-snug">{template.summary}</p>
+      {extra > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {template.customSteps.map((s, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-muted/60 text-muted-foreground"
+            >
+              + {s.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </button>
   );
 }
 
@@ -264,94 +381,12 @@ function TypeCard({
   );
 }
 
-function StepTemplate({
-  templates,
-  selected,
-  onSelect,
-  type,
-}: {
-  templates: ProductionTemplate[];
-  selected: string;
-  onSelect: (slug: string) => void;
-  type: ProductionType;
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">
-        Wybierz template (kroki + offsety zostaną auto-wygenerowane jako wpisy kalendarza)
-      </p>
-      <div className="space-y-2">
-        <TemplateOption
-          active={selected === 'manual'}
-          onClick={() => onSelect('manual')}
-          name="Bez templateu (manual)"
-          description="Pusta produkcja — dodasz wpisy kalendarza ręcznie."
-          stepCount={0}
-          duration={null}
-        />
-        {templates.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">
-            Brak templateów dla typu „{type}".
-          </p>
-        ) : null}
-        {templates.map((t) => (
-          <TemplateOption
-            key={t.slug}
-            active={selected === t.slug}
-            onClick={() => onSelect(t.slug)}
-            name={t.name}
-            description={t.description}
-            stepCount={t.steps.length}
-            duration={t.durationDays}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TemplateOption({
-  active,
-  onClick,
-  name,
-  description,
-  stepCount,
-  duration,
-}: {
-  active: boolean;
-  onClick: () => void;
-  name: string;
-  description: string;
-  stepCount: number;
-  duration: number | null;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full text-left rounded-lg border p-3 transition ${
-        active ? 'border-primary bg-primary/10' : 'border-border hover:border-foreground/30'
-      }`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div className="font-medium text-sm">{name}</div>
-        {stepCount > 0 ? (
-          <span className="text-[10px] text-muted-foreground tabular-nums">
-            {stepCount} kroków · {duration} dni
-          </span>
-        ) : null}
-      </div>
-      <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
-    </button>
-  );
-}
-
 function StepDetails({
   type,
   title,
   setTitle,
-  t0Local,
-  setT0Local,
+  t1Week,
+  setT1Week,
   artistId,
   setArtistId,
   artists,
@@ -366,8 +401,8 @@ function StepDetails({
   type: ProductionType;
   title: string;
   setTitle: (s: string) => void;
-  t0Local: string;
-  setT0Local: (s: string) => void;
+  t1Week: string;
+  setT1Week: (s: string) => void;
   artistId: number | null;
   setArtistId: (v: number | null) => void;
   artists: ArtistOption[];
@@ -379,6 +414,14 @@ function StepDetails({
   notes: string;
   setNotes: (s: string) => void;
 }) {
+  const t1Mon = isoWeekToMonday(t1Week);
+  const t1Sun = t1Mon ? new Date(t1Mon) : null;
+  if (t1Sun) t1Sun.setDate(t1Sun.getDate() + 6);
+  const t0 = deriveT0FromT1(t1Week);
+  const t3Sun = t0 ? new Date(t0) : null;
+  if (t3Sun) t3Sun.setDate(t3Sun.getDate() + 6);
+  const fmt = (d: Date) => d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+  const fmtFull = (d: Date) => d.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
   return (
     <div className="space-y-3">
       <div className="grid gap-1.5">
@@ -391,16 +434,29 @@ function StepDetails({
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="t0">T-0 (data nagrania / premiery)</Label>
+        <Label htmlFor="t1week">Tydzień startowy (T-1) — outreach + ustalenia</Label>
         <Input
-          id="t0"
-          type="datetime-local"
-          value={t0Local}
-          onChange={(e) => setT0Local(e.target.value)}
+          id="t1week"
+          type="week"
+          value={t1Week}
+          onChange={(e) => setT1Week(e.target.value)}
         />
-        <p className="text-[10px] text-muted-foreground">
-          Wszystkie wpisy templateu liczone są od tej daty (T-21, T-0, T+12 itd.).
-        </p>
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground space-y-0.5">
+          {t1Mon && t1Sun ? (
+            <p className="tabular-nums">
+              <span className="font-bold text-amber-700">T-1</span> {fmt(t1Mon)}–{fmt(t1Sun)}
+              <span className="opacity-70"> · outreach + ustalenia z kamerzystą</span>
+            </p>
+          ) : (
+            <p className="text-rose-600">Wybierz tydzień kalendarzowy.</p>
+          )}
+          {t0 && t3Sun ? (
+            <p className="tabular-nums">
+              <span className="font-bold text-emerald-700">T-0</span> {fmtFull(t0)}
+              <span className="opacity-70"> · publikacja w tygodniu {fmt(t0)}–{fmt(t3Sun)}</span>
+            </p>
+          ) : null}
+        </div>
       </div>
       {type === 'with-artist' ? (
         <div className="grid gap-1.5">
@@ -475,7 +531,7 @@ function StepDetails({
         </div>
       ) : null}
       <div className="grid gap-1.5">
-        <Label>Platformy publikacji (opcjonalnie — nadpisuje template)</Label>
+        <Label>Platformy publikacji (opcjonalnie)</Label>
         <div className="flex flex-wrap gap-1">
           {PLATFORMS.map((p) => (
             <button
@@ -511,7 +567,7 @@ function StepReview({
   type,
   template,
   title,
-  t0Local,
+  t1Week,
   artist,
   videographer,
   platforms,
@@ -520,26 +576,53 @@ function StepReview({
   type: ProductionType;
   template: ProductionTemplate | null;
   title: string;
-  t0Local: string;
+  t1Week: string;
   artist: ArtistOption | null;
   videographer: VideographerOption | null;
   platforms: Platform[];
   notes: string;
 }) {
-  const t0 = new Date(t0Local);
+  const t1Mon = isoWeekToMonday(t1Week);
+  const t1Sun = t1Mon ? new Date(t1Mon) : null;
+  if (t1Sun) t1Sun.setDate(t1Sun.getDate() + 6);
+  const t0 = deriveT0FromT1(t1Week);
+  const fmt = (d: Date) => d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
   return (
     <div className="space-y-3">
       <div className="rounded-lg border border-border bg-card p-3 text-sm space-y-1">
-        <Row label="Tytuł" value={title || <span className="text-rose-600">brak (uzupełnij krok 3)</span>} />
+        <Row label="Tytuł" value={title || <span className="text-rose-600">brak (uzupełnij krok 2)</span>} />
         <Row
           label="Typ"
           value={type === 'with-artist' ? 'Z artystą' : 'Solo'}
         />
-        <Row label="Template" value={template?.name ?? 'Bez templateu (manual)'} />
+        <Row
+          label="Szablon"
+          value={
+            template ? (
+              <span>
+                {template.name}
+                <span className="text-muted-foreground ml-1.5 tabular-nums">
+                  · 9 + {template.customSteps.length}{' '}
+                  {template.customSteps.length === 1 ? 'krok' : 'kroków'}
+                </span>
+              </span>
+            ) : (
+              'standard'
+            )
+          }
+        />
+        <Row
+          label="T-1 (start)"
+          value={
+            t1Mon && t1Sun
+              ? `${fmt(t1Mon)}–${fmt(t1Sun)} · outreach + ustalenia`
+              : <span className="text-rose-600">brak</span>
+          }
+        />
         <Row
           label="T-0"
           value={
-            Number.isFinite(t0.getTime())
+            t0
               ? t0.toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' })
               : '—'
           }
@@ -559,48 +642,14 @@ function StepReview({
         ) : null}
         <Row
           label="Platformy"
-          value={
-            platforms.length > 0
-              ? platforms.join(', ')
-              : template
-                ? 'z templateu'
-                : 'brak'
-          }
+          value={platforms.length > 0 ? platforms.join(', ') : 'brak'}
         />
         {notes ? <Row label="Notatki" value={notes} /> : null}
       </div>
 
-      {template ? (
-        <div>
-          <p className="text-xs text-muted-foreground mb-2">
-            Zostanie utworzonych <strong className="text-foreground">{template.steps.length}</strong> wpisów kalendarza:
-          </p>
-          <ul className="rounded-lg border border-border bg-card divide-y divide-border max-h-48 overflow-y-auto text-xs">
-            {template.steps.map((s, i) => {
-              const date = new Date(t0);
-              date.setDate(date.getDate() + s.tDays);
-              date.setHours(s.hourStart, 0, 0, 0);
-              return (
-                <li key={i} className="px-3 py-1.5 flex items-center gap-2">
-                  <span className="font-mono text-muted-foreground w-10 tabular-nums shrink-0">
-                    {s.tDays === 0 ? 'T-0' : s.tDays > 0 ? `T+${s.tDays}` : `T-${Math.abs(s.tDays)}`}
-                  </span>
-                  <span className="text-[10px] uppercase text-muted-foreground w-16 shrink-0">{s.calendarType}</span>
-                  <span className="flex-1 truncate">{s.title}</span>
-                  <span className="text-muted-foreground tabular-nums shrink-0">
-                    {date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}{' '}
-                    {String(s.hourStart).padStart(2, '0')}:00
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          Brak templateu — utworzymy pustą produkcję, wpisy kalendarza dodasz ręcznie.
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground">
+        Pusta produkcja zostanie utworzona — wpisy kalendarza dodasz ręcznie z poziomu kalendarza lub strony produkcji.
+      </p>
     </div>
   );
 }

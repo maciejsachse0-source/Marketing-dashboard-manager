@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  CalendarDays,
+  ChartGantt,
   Bot,
   PackageOpen,
   BarChart3,
@@ -13,9 +13,9 @@ import {
   FileText,
   Sparkles,
   Film,
-  LayoutTemplate,
   FolderOpen,
   Camera,
+  LayoutTemplate,
   Menu,
   X,
   type LucideIcon,
@@ -24,8 +24,9 @@ import type { AgentMeta } from '@/lib/agents/types';
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/', label: 'Pulpit', icon: LayoutDashboard },
-  { href: '/calendar', label: 'Kalendarz', icon: CalendarDays },
+  { href: '/calendar', label: 'Pipeline', icon: ChartGantt },
   { href: '/productions', label: 'Produkcje', icon: Film },
+  { href: '/templates', label: 'Templaty', icon: LayoutTemplate },
   { href: '/agents', label: 'Agenci', icon: Bot },
   { href: '/packages', label: 'Pakiety', icon: PackageOpen },
   { href: '/output', label: 'Folder publikacji', icon: FolderOpen },
@@ -33,7 +34,6 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/artists', label: 'Artyści', icon: Users },
   { href: '/videographers', label: 'Kamerzyści', icon: Camera },
   { href: '/briefs', label: 'Briefy & wrapy', icon: FileText },
-  { href: '/templates', label: 'Templates', icon: LayoutTemplate },
 ];
 
 function isActive(pathname: string, href: string): boolean {

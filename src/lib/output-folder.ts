@@ -134,7 +134,6 @@ export async function generateOutputFolder(productionId: number): Promise<Genera
     '',
     `**Status:** approved`,
     `**Typ:** ${production.type === 'with-artist' ? 'z artystą' : 'solo'}`,
-    `**Template:** ${production.templateSlug}`,
     `**T-0:** ${production.t0At.toISOString()}`,
     platforms.length ? `**Platformy:** ${platforms.join(', ')}` : '',
     production.notes ? `**Notatki:** ${production.notes}` : '',

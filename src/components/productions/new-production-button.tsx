@@ -4,20 +4,20 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductionWizard } from './production-wizard';
 import { useShortcut } from '@/lib/use-shortcut';
-import type { ProductionTemplate } from '@/lib/templates';
+import type { ProductionTemplate } from '@/lib/production-templates-types';
 
 type ArtistOption = { id: number; name: string; handle: string | null };
 type VideographerOption = { id: number; name: string; hourlyRate: number | null };
 
 export function NewProductionButton({
-  templates,
   artists,
   videographers,
+  templates,
   variant = 'default',
 }: {
-  templates: ProductionTemplate[];
   artists: ArtistOption[];
   videographers: VideographerOption[];
+  templates: ProductionTemplate[];
   variant?: 'default' | 'outline';
 }) {
   const [open, setOpen] = useState(false);
@@ -32,9 +32,9 @@ export function NewProductionButton({
       <ProductionWizard
         open={open}
         onOpenChange={setOpen}
-        templates={templates}
         artists={artists}
         videographers={videographers}
+        templates={templates}
       />
     </>
   );
