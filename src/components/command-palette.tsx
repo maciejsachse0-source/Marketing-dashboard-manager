@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
-  CalendarDays,
+  ChartGantt,
   Bot,
   PackageOpen,
   BarChart3,
@@ -13,13 +13,11 @@ import {
   FileText,
   Sparkles,
   Film,
-  LayoutTemplate,
   FolderOpen,
   Camera,
   Plus,
   Upload,
   Search,
-  Clock,
   type LucideIcon,
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
@@ -70,7 +68,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
     };
     const pages: CommandItem[] = [
       { id: 'p:dashboard', label: 'Pulpit', hint: '/', group: 'Strony', icon: LayoutDashboard, action: go('/') },
-      { id: 'p:calendar', label: 'Kalendarz', hint: '/calendar', group: 'Strony', icon: CalendarDays, action: go('/calendar') },
+      { id: 'p:calendar', label: 'Pipeline (Gantt)', hint: '/calendar', group: 'Strony', icon: ChartGantt, action: go('/calendar') },
       { id: 'p:productions', label: 'Produkcje', hint: '/productions', group: 'Strony', icon: Film, action: go('/productions') },
       { id: 'p:agents', label: 'Agenci', hint: '/agents', group: 'Strony', icon: Bot, action: go('/agents') },
       { id: 'p:packages', label: 'Pakiety', hint: '/packages', group: 'Strony', icon: PackageOpen, action: go('/packages') },
@@ -80,8 +78,6 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
       { id: 'p:artists', label: 'Artyści', hint: '/artists', group: 'Strony', icon: Users, action: go('/artists') },
       { id: 'p:videographers', label: 'Kamerzyści', hint: '/videographers', group: 'Strony', icon: Camera, action: go('/videographers') },
       { id: 'p:briefs', label: 'Briefy & wrapy', hint: '/briefs', group: 'Strony', icon: FileText, action: go('/briefs') },
-      { id: 'p:templates', label: 'Templates', hint: '/templates', group: 'Strony', icon: LayoutTemplate, action: go('/templates') },
-      { id: 'p:rhythm', label: 'Rytm tygodniowy', hint: '/templates/rhythm', group: 'Strony', icon: Clock, action: go('/templates/rhythm') },
     ];
 
     const agentItems: CommandItem[] = agents.map((a) => ({
@@ -97,7 +93,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
       {
         id: 'act:new-production',
         label: 'Nowa produkcja',
-        hint: 'wizard z templateu',
+        hint: 'wizard',
         group: 'Akcje',
         icon: Film,
         action: go('/productions'),

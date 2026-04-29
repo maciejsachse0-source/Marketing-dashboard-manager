@@ -1,81 +1,193 @@
 import Link from 'next/link';
-import { Film, Clock } from 'lucide-react';
+import { LayoutTemplate, Pencil, Plus } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
-import { listProductionTemplates } from '@/lib/templates';
-import { loadRhythm } from '@/lib/rhythm';
+import { CANONICAL_STAGES_BY_CATEGORY } from '@/lib/category-sequence';
+import { loadTemplates } from '@/lib/production-templates';
+import { STAGE_LABEL } from '@/lib/production-stages';
+import {
+  CATEGORY_LABEL,
+  FRAME_FOR_CATEGORY,
+  FRAME_STYLE,
+} from '@/lib/category-colors';
+import type { ProductionTemplate } from '@/lib/production-templates-types';
+import { TemplateRowActions } from '@/components/templates/template-row-actions';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/empty-state';
+import type { ProductionStage } from '../../../drizzle/schema';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TemplatesPage() {
-  const productionTemplates = listProductionTemplates();
-  const rhythm = loadRhythm();
+const CATEGORY_ORDER: ProductionStage[] = [
+  'outreach',
+  'ustalenia',
+  'nagrywanie',
+  'obrobka',
+  'publikacja',
+];
+
+export default function TemplatesPage() {
+  const templates = loadTemplates();
+  const withArtist = templates.filter((t) => t.type === 'with-artist');
+  const solo = templates.filter((t) => t.type === 'solo');
 
   return (
     <PageShell
-      title="Templates"
-      description="Wzorce produkcyjne (workflow) i rytm tygodniowy."
+      title="Templaty"
+      eyebrow="biblioteka pipeline'ów"
+      description={
+        <>
+          Predefiniowane scenariusze produkcji — każdy zawiera fundament 9 kanonicznych kroków
+          (od pierwszego maila do publikacji) plus opcjonalne kroki dodatkowe dopasowane do typu
+          pracy. Edytuj istniejące lub stwórz własny.
+        </>
+      }
+      actions={
+        <Link href="/templates/new">
+          <Button size="sm">
+            <Plus className="w-4 h-4 mr-1" /> Nowy szablon
+          </Button>
+        </Link>
+      }
     >
-      <div className="space-y-8">
-        <section>
-          <SectionHeader icon={Clock} title="Rytm tygodniowy" />
-          <Link
-            href="/templates/rhythm"
-            className="block rounded-xl border border-border bg-card p-4 hover:border-primary/30 transition"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-medium">{rhythm.name}</div>
-                <div className="text-xs text-muted-foreground mt-1">{rhythm.description}</div>
+      {templates.length === 0 ? (
+        <EmptyState
+          icon={LayoutTemplate}
+          title="Brak szablonów"
+          description='Kliknij „+ Nowy szablon" — zdefiniujesz własny scenariusz pipeline, a kreator nowej produkcji zaproponuje go do wyboru.'
+        />
+      ) : (
+        <div className="space-y-10">
+          {withArtist.length > 0 ? (
+            <section>
+              <SectionHeading title="Z artystą" count={withArtist.length} />
+              <div className="grid lg:grid-cols-2 gap-5">
+                {withArtist.map((t) => (
+                  <TemplateCard key={t.slug} template={t} />
+                ))}
               </div>
-              <span className="text-2xl font-semibold tabular-nums">{rhythm.slots.length}</span>
-            </div>
-          </Link>
-        </section>
+            </section>
+          ) : null}
 
-        <section>
-          <SectionHeader icon={Film} title={`Produkcyjne (${productionTemplates.length})`} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {productionTemplates.map((t) => (
-              <div
-                key={t.slug}
-                className="rounded-lg border border-border bg-card p-4"
-              >
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <div className="font-medium">{t.name}</div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {t.type === 'with-artist' ? 'z artystą' : 'solo'}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mb-3">{t.description}</p>
-                <div className="text-xs text-muted-foreground">
-                  {t.steps.length} kroków · {t.durationDays} dni
-                </div>
-                <code className="text-[10px] text-muted-foreground/60 font-mono">{t.slug}.json</code>
+          {solo.length > 0 ? (
+            <section>
+              <SectionHeading title="Solo" count={solo.length} />
+              <div className="grid lg:grid-cols-2 gap-5">
+                {solo.map((t) => (
+                  <TemplateCard key={t.slug} template={t} />
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
-
-        <p className="text-xs text-muted-foreground border-t border-border pt-4">
-          Templates żyją w <code className="font-mono">data/templates/</code> jako JSON-y. Edytuj
-          w edytorze, refresh strony — zmiany live.
-        </p>
-      </div>
+            </section>
+          ) : null}
+        </div>
+      )}
     </PageShell>
   );
 }
 
-function SectionHeader({
-  icon: Icon,
-  title,
-}: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  title: string;
-}) {
+function SectionHeading({ title, count }: { title: string; count: number }) {
   return (
-    <h2 className="text-sm uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-2 mb-3">
-      <Icon className="w-4 h-4" strokeWidth={1.5} />
-      {title}
-    </h2>
+    <div className="flex items-center gap-3 mb-5">
+      <span className="pill-label pill-label-sm">{title}</span>
+      <span className="text-xs text-muted-foreground tabular-nums">
+        {count} {count === 1 ? 'szablon' : 'szablony'}
+      </span>
+      <div className="flex-1 h-px bg-border" />
+    </div>
+  );
+}
+
+function TemplateCard({ template }: { template: ProductionTemplate }) {
+  const totalSteps =
+    Object.values(CANONICAL_STAGES_BY_CATEGORY).reduce((s, arr) => s + arr.length, 0) +
+    template.customSteps.length;
+
+  return (
+    <article className="card-editorial p-6 flex flex-col gap-5">
+      <header className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-foreground text-background grid place-items-center shrink-0">
+          <LayoutTemplate className="w-5 h-5" strokeWidth={2} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-lg font-bold tracking-tight leading-tight">{template.name}</h2>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{template.description}</p>
+        </div>
+        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0">
+          {totalSteps} kroków
+        </span>
+      </header>
+
+      <div className="space-y-3">
+        {CATEGORY_ORDER.map((cat) => {
+          const canonicals = CANONICAL_STAGES_BY_CATEGORY[cat];
+          const customs = template.customSteps.filter((s) => s.category === cat);
+          const frame = FRAME_FOR_CATEGORY[cat];
+          const tone = FRAME_STYLE[frame];
+
+          const sequence: { kind: 'canonical' | 'custom'; label: string }[] = [];
+          for (const stage of canonicals) {
+            sequence.push({ kind: 'canonical', label: STAGE_LABEL[stage] });
+            for (const c of customs) {
+              if (c.positionAfter === stage) {
+                sequence.push({ kind: 'custom', label: c.label });
+              }
+            }
+          }
+          for (const c of customs) {
+            if (!canonicals.includes(c.positionAfter)) {
+              sequence.push({ kind: 'custom', label: c.label });
+            }
+          }
+
+          return (
+            <div
+              key={cat}
+              className={`rounded-lg border-2 px-3 py-2.5 ${tone.border} ${tone.bg}`}
+            >
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1.5 rounded text-[10px] font-bold tracking-[0.16em] tabular-nums ${tone.badge}`}
+                  >
+                    {frame}
+                  </span>
+                  <span className={`text-[11px] uppercase tracking-[0.14em] font-bold ${tone.accent}`}>
+                    {CATEGORY_LABEL[cat]}
+                  </span>
+                </div>
+                <span className="text-[10px] tabular-nums text-muted-foreground">
+                  {sequence.length} {sequence.length === 1 ? 'krok' : 'kroków'}
+                </span>
+              </div>
+              <ol className="flex flex-wrap gap-1.5">
+                {sequence.map((item, i) => (
+                  <li
+                    key={i}
+                    className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded border ${
+                      item.kind === 'custom'
+                        ? `${tone.chip} font-semibold`
+                        : 'bg-background border-border text-foreground/70'
+                    }`}
+                  >
+                    {item.kind === 'custom' ? <Plus className="w-2.5 h-2.5" strokeWidth={3} /> : null}
+                    {item.label}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          );
+        })}
+      </div>
+
+      <footer className="flex items-center justify-between gap-3 pt-3 border-t border-border">
+        <Link
+          href={`/templates/${template.slug}/edit`}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-[var(--accent-blue)] ui-transition"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          Edytuj
+        </Link>
+        <TemplateRowActions slug={template.slug} name={template.name} />
+      </footer>
+    </article>
   );
 }
