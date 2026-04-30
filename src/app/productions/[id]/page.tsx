@@ -7,66 +7,45 @@ import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
 import { listProductionAttachments } from '@/lib/production-files';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
-import { StageTracker } from '@/components/productions/stage-tracker';
-import { SubStageButton } from '@/components/productions/sub-stage-button';
-import { StageDatePicker } from '@/components/productions/stage-date-picker';
+import { ProductionStepTrackerClient } from '@/components/productions/production-step-tracker-client';
+import { ProductionStepRow } from '@/components/productions/production-step-row';
+import { AddStepInline } from '@/components/productions/add-step-inline';
 import { FileZone } from '@/components/productions/file-zone';
-import { CustomStepRow } from '@/components/productions/custom-step-row';
-import { CustomStepAddInline } from '@/components/productions/custom-step-add';
 import { DeleteProductionButton } from '@/components/productions/delete-production-button';
-import { MoveArrows } from '@/components/productions/move-arrows';
-import { resolveCategorySequence } from '@/lib/category-sequence';
+import { CancelProductionButton } from '@/components/productions/cancel-production-button';
 import { VideographerPicker } from '@/components/productions/videographer-picker';
 import { ArtistPicker } from '@/components/productions/artist-picker';
 import { PlatformPills, StatusPill } from '@/components/platforms-pills';
-import { STAGE_LABEL, STAGE_HINT } from '@/lib/production-stages';
-import {
-  PRODUCTION_PROGRESSION,
-  type ProductionStatus,
+import type {
+  ProductionStage,
+  ProductionStep,
 } from '../../../../drizzle/schema';
 
 export const dynamic = 'force-dynamic';
 
-type DateMode = 'record' | 'calendar' | 'derived' | 'none';
 type WeekPhase = 'T1' | 'T2' | 'T3';
 
-type Category = {
-  key: string;
+type CategoryMeta = {
+  key: ProductionStage;
   label: string;
   description: string;
   hint: string;
-  stages: ProductionStatus[];
-  /** How each stage's date is captured. Default: 'record'. */
-  dateMode?: DateMode;
-  /** Whether the date input includes time. Default: true. */
-  withTime?: boolean;
-  /** Label shown next to the date picker per stage. */
-  dateLabel: string;
-  /** Pipeline week — same buckets as gantt + stage tracker. */
   week: WeekPhase;
 };
 
-const CATEGORIES: Category[] = [
+const CATEGORIES: CategoryMeta[] = [
   {
     key: 'outreach',
     label: 'Outreach',
     description: 'Kontakt z artystą, akceptacja warunków, ustalenie daty z kamerzystą.',
     hint: 'wzorce maila, screen rozmowy, umowa.pdf',
-    stages: ['email-sent', 'terms-accepted', 'cam-meeting-set'],
-    dateMode: 'record',
-    withTime: false,
-    dateLabel: 'kiedy się wydarzyło',
     week: 'T1',
   },
   {
     key: 'ustalenia',
-    label: 'Ustalenia z kamerzystą',
+    label: 'Ustalenia + scenariusz',
     description: 'Przekazanie daty + omówienie i wysłanie scenariusza.',
     hint: 'scenariusz PDF, shotlist, packing list, callsheet',
-    stages: ['cam-date-shared', 'script-discussed', 'script-sent'],
-    dateMode: 'calendar',
-    withTime: true,
-    dateLabel: 'termin',
     week: 'T1',
   },
   {
@@ -74,10 +53,6 @@ const CATEGORIES: Category[] = [
     label: 'Nagrywanie',
     description: 'Nagrywki — w studio lub w terenie.',
     hint: 'surówki, BTS, audio raw',
-    stages: ['shooting'],
-    dateMode: 'calendar',
-    withTime: true,
-    dateLabel: 'data nagrań',
     week: 'T2',
   },
   {
@@ -85,10 +60,6 @@ const CATEGORIES: Category[] = [
     label: 'Obróbka',
     description: 'Montaż — następnego dnia po nagrywkach.',
     hint: 'wersje robocze, master video',
-    stages: ['editing'],
-    dateMode: 'derived',
-    withTime: true,
-    dateLabel: 'auto: dzień po nagrywkach',
     week: 'T2',
   },
   {
@@ -96,9 +67,6 @@ const CATEGORIES: Category[] = [
     label: 'Publikacja',
     description: 'Upload na platformy.',
     hint: 'thumbs, exports per platforma',
-    stages: ['publishing'],
-    dateMode: 'none',
-    dateLabel: '',
     week: 'T3',
   },
 ];
@@ -137,27 +105,26 @@ const WEEK_FRAMES: {
   },
 ];
 
-const STAGE_INDEX: Record<ProductionStatus, number> = Object.fromEntries(
-  PRODUCTION_PROGRESSION.map((s, i) => [s, i]),
-) as Record<ProductionStatus, number>;
-
-function stageState(
-  stage: ProductionStatus,
-  current: ProductionStatus,
-): 'passed' | 'active' | 'pending' {
-  if (current === 'cancelled') return 'pending';
-  const cur = STAGE_INDEX[current];
-  const idx = STAGE_INDEX[stage];
-  if (idx < cur) return 'passed';
-  if (idx === cur) return 'active';
-  return 'pending';
-}
-
-function deriveEditingIso(shootIso: string): string {
-  const d = new Date(shootIso);
-  d.setDate(d.getDate() + 1);
-  d.setHours(10, 0, 0, 0);
-  return d.toISOString();
+/** Step state derived from doneAt + position relative to first non-done step.
+ *  - passed: doneAt is set
+ *  - active: first non-done step in the whole production
+ *  - pending: any other not-done step */
+function buildStepStates(
+  steps: ProductionStep[],
+): Map<string, 'passed' | 'active' | 'pending'> {
+  const states = new Map<string, 'passed' | 'active' | 'pending'>();
+  let activeAssigned = false;
+  for (const s of steps) {
+    if (s.doneAt) {
+      states.set(s.id, 'passed');
+    } else if (!activeAssigned) {
+      states.set(s.id, 'active');
+      activeAssigned = true;
+    } else {
+      states.set(s.id, 'pending');
+    }
+  }
+  return states;
 }
 
 export default async function ProductionDetailPage({
@@ -191,7 +158,6 @@ export default async function ProductionDetailPage({
   }));
   const orphanWithArtist = production.type === 'with-artist' && !artist;
 
-  // Count this artist's other productions (excluding cancelled) for the bio header
   const allProductions = artist
     ? await listProductions().then((rows) => rows.filter((r) => r.artistId === artist.id))
     : [];
@@ -200,6 +166,10 @@ export default async function ProductionDetailPage({
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
 
   const displayTitle = artist ? artist.name : production.title;
+
+  const steps: ProductionStep[] = production.steps ?? [];
+  const stepStates = buildStepStates(steps);
+  const cancelled = !!production.cancelledAt;
 
   return (
     <PageShell
@@ -213,13 +183,21 @@ export default async function ProductionDetailPage({
           <span className="px-1.5 py-0.5 rounded font-medium tabular-nums bg-foreground text-background text-[11px]">
             {tLabel}
           </span>
+          {cancelled ? (
+            <span className="px-1.5 py-0.5 rounded font-medium bg-rose-100 text-rose-700 text-[11px] uppercase tracking-[0.12em]">
+              Anulowana
+            </span>
+          ) : null}
         </span>
       }
       actions={
-        <DeleteProductionButton
-          productionId={production.id}
-          productionName={displayTitle}
-        />
+        <div className="flex items-center gap-2">
+          <CancelProductionButton productionId={production.id} cancelled={cancelled} />
+          <DeleteProductionButton
+            productionId={production.id}
+            productionName={displayTitle}
+          />
+        </div>
       }
     >
       <div className="space-y-8">
@@ -231,9 +209,6 @@ export default async function ProductionDetailPage({
           wszystkie produkcje
         </Link>
 
-        {/* Orphan with-artist productions: surface the missing-artist banner up top
-            so the inconsistency between the "z artystą" eyebrow and the empty
-            person header is fixable without leaving the page. */}
         {orphanWithArtist ? (
           <ArtistPicker
             productionId={production.id}
@@ -243,7 +218,6 @@ export default async function ProductionDetailPage({
           />
         ) : null}
 
-        {/* Person header */}
         {artist ? (
           <PersonHeader
             kind="artist"
@@ -269,136 +243,133 @@ export default async function ProductionDetailPage({
           />
         ) : null}
 
-        {/* Top-line stage tracker (compact 5-tick) */}
+        {/* Top-line pipeline progress */}
         <section className="card-editorial p-5">
           <div className="mb-3">
             <span className="pill-label pill-label-sm">Pipeline</span>
           </div>
-          <StageTracker productionId={production.id} status={production.status} />
+          <ProductionStepTrackerClient
+            productionId={production.id}
+            steps={steps}
+            cancelled={cancelled}
+          />
         </section>
 
         {/* Categories — grouped by pipeline week (T1 / T2 / T3) */}
         <section className="space-y-6">
           {(() => {
-            // Compute global step offset per category — running total of
-            // sequence lengths in canonical CATEGORIES order. Used to assign
-            // each step a 1-based displayNumber matching the gantt sub-step n.
-            let stepOffset = 0;
-            const offsetsByCat = new Map<string, number>();
+            // Pre-compute global step numbering — running offset across categories
+            // so each step gets a 1-based index spanning the whole pipeline.
+            let runningOffset = 0;
+            const offsetsByCat = new Map<ProductionStage, number>();
             for (const cat of CATEGORIES) {
-              offsetsByCat.set(cat.key, stepOffset);
-              const seq = resolveCategorySequence(
-                cat.key as import('../../../../drizzle/schema').ProductionStage,
-                (production.customSteps ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage] ?? [],
-                (production.stepOrder ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage],
-              );
-              stepOffset += seq.length;
+              offsetsByCat.set(cat.key, runningOffset);
+              runningOffset += steps.filter((s) => s.category === cat.key).length;
             }
+
             return WEEK_FRAMES.map((frame) => {
-            const weekCategories = CATEGORIES.filter((c) => c.week === frame.code);
-            return (
-              <div
-                key={frame.code}
-                className={`relative rounded-2xl border ${frame.border} ${frame.bg} p-4 sm:p-5 space-y-4`}
-              >
-                <header className="flex items-center gap-2.5 px-1">
-                  <span
-                    className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-md text-[11px] font-bold tracking-[0.18em] tabular-nums ${frame.badge}`}
-                  >
-                    {frame.code}
-                  </span>
-                  <span
-                    className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${frame.accent}`}
-                  >
-                    {frame.label}
-                  </span>
-                  <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
-                    tydzień {frame.code.replace('T', '')}
-                  </span>
-                </header>
-                <div className="space-y-4">
-                  {weekCategories.map((cat) => {
-                    const relevantAttachments = attachments.filter(
-                      (a) => a.stage === cat.key,
-                    );
+              const weekCategories = CATEGORIES.filter((c) => c.week === frame.code);
+              return (
+                <div
+                  key={frame.code}
+                  className={`relative rounded-2xl border ${frame.border} ${frame.bg} p-4 sm:p-5 space-y-4`}
+                >
+                  <header className="flex items-center gap-2.5 px-1">
+                    <span
+                      className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-md text-[11px] font-bold tracking-[0.18em] tabular-nums ${frame.badge}`}
+                    >
+                      {frame.code}
+                    </span>
+                    <span
+                      className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${frame.accent}`}
+                    >
+                      {frame.label}
+                    </span>
+                    <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                      tydzień {frame.code.replace('T', '')}
+                    </span>
+                  </header>
+                  <div className="space-y-4">
+                    {weekCategories.map((cat) => {
+                      const relevantAttachments = attachments.filter(
+                        (a) => a.stage === cat.key,
+                      );
 
-                    // Items pinned to specific category
-                    const extras: React.ReactNode[] = [];
-                    if (cat.key === 'publikacja') {
-                      if (packages.length > 0) {
-                        extras.push(
-                          <ItemList
-                            key="pkgs"
-                            icon={Package}
-                            title={`Pakiety (${packages.length})`}
-                            items={packages.map((p) => ({
-                              key: `pkg-${p.id}`,
-                              title: p.title,
-                              meta: <PlatformPills platforms={p.platforms} />,
-                              right: <StatusPill status={p.status} />,
-                              href: '/packages',
-                            }))}
-                          />,
-                        );
+                      const extras: React.ReactNode[] = [];
+                      if (cat.key === 'publikacja') {
+                        if (packages.length > 0) {
+                          extras.push(
+                            <ItemList
+                              key="pkgs"
+                              icon={Package}
+                              title={`Pakiety (${packages.length})`}
+                              items={packages.map((p) => ({
+                                key: `pkg-${p.id}`,
+                                title: p.title,
+                                meta: <PlatformPills platforms={p.platforms} />,
+                                right: <StatusPill status={p.status} />,
+                                href: '/packages',
+                              }))}
+                            />,
+                          );
+                        }
+                        if (posts.length > 0) {
+                          extras.push(
+                            <ItemList
+                              key="posts"
+                              icon={Megaphone}
+                              title={`Posty (${posts.length})`}
+                              items={posts.map((p) => ({
+                                key: `post-${p.id}`,
+                                title: p.title,
+                                meta: (
+                                  <span className="text-xs text-muted-foreground tabular-nums">
+                                    [{p.platform}] {p.publishedAt.toLocaleDateString('pl-PL')}
+                                  </span>
+                                ),
+                                right: (
+                                  <span className="text-xs tabular-nums">
+                                    {p.reach ? p.reach.toLocaleString('pl-PL') : '—'}
+                                  </span>
+                                ),
+                              }))}
+                            />,
+                          );
+                        }
                       }
-                      if (posts.length > 0) {
-                        extras.push(
-                          <ItemList
-                            key="posts"
-                            icon={Megaphone}
-                            title={`Posty (${posts.length})`}
-                            items={posts.map((p) => ({
-                              key: `post-${p.id}`,
-                              title: p.title,
-                              meta: (
-                                <span className="text-xs text-muted-foreground tabular-nums">
-                                  [{p.platform}] {p.publishedAt.toLocaleDateString('pl-PL')}
-                                </span>
-                              ),
-                              right: (
-                                <span className="text-xs tabular-nums">
-                                  {p.reach ? p.reach.toLocaleString('pl-PL') : '—'}
-                                </span>
-                              ),
-                            }))}
-                          />,
-                        );
-                      }
-                    }
 
-                    const bannerSlot =
-                      cat.key === 'ustalenia' ? (
-                        <VideographerPicker
+                      const bannerSlot =
+                        cat.key === 'ustalenia' ? (
+                          <VideographerPicker
+                            productionId={production.id}
+                            currentVideographerId={production.videographerId}
+                            videographers={videographerOptions}
+                          />
+                        ) : null;
+
+                      return (
+                        <CategorySection
+                          key={cat.key}
                           productionId={production.id}
-                          currentVideographerId={production.videographerId}
-                          videographers={videographerOptions}
+                          productionT0At={production.t0At}
+                          category={cat}
+                          steps={steps}
+                          stepStates={stepStates}
+                          startNumber={(offsetsByCat.get(cat.key) ?? 0) + 1}
+                          attachments={relevantAttachments}
+                          extras={extras}
+                          bannerSlot={bannerSlot}
+                          cancelled={cancelled}
                         />
-                      ) : null;
-
-                    return (
-                      <CategorySection
-                        key={cat.key}
-                        productionId={production.id}
-                        category={cat}
-                        currentStatus={production.status}
-                        stepDates={production.stepDates ?? {}}
-                        attachments={relevantAttachments}
-                        extras={extras}
-                        bannerSlot={bannerSlot}
-                        customSteps={(production.customSteps ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage] ?? []}
-                        storedOrder={(production.stepOrder ?? {})[cat.key as import('../../../../drizzle/schema').ProductionStage]}
-                        startNumber={(offsetsByCat.get(cat.key) ?? 0) + 1}
-                      />
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            );
-          });
+              );
+            });
           })()}
         </section>
 
-        {/* Notes — at the bottom for context */}
         {production.notes ? (
           <section>
             <div className="mb-3">
@@ -520,37 +491,34 @@ function PersonHeader({
 
 function CategorySection({
   productionId,
+  productionT0At,
   category,
-  currentStatus,
-  stepDates,
+  steps,
+  stepStates,
+  startNumber,
   attachments,
   extras,
   bannerSlot,
-  customSteps,
-  storedOrder,
-  startNumber,
+  cancelled,
 }: {
   productionId: number;
-  category: Category;
-  currentStatus: ProductionStatus;
-  stepDates: Partial<Record<ProductionStatus, string>>;
+  productionT0At: Date;
+  category: CategoryMeta;
+  steps: ProductionStep[];
+  stepStates: Map<string, 'passed' | 'active' | 'pending'>;
+  startNumber: number;
   attachments: ReturnType<typeof listProductionAttachments>;
   extras: React.ReactNode[];
   bannerSlot?: React.ReactNode;
-  customSteps: import('../../../../drizzle/schema').CustomStep[];
-  storedOrder: string[] | undefined;
-  /** 1-based global step number for the first item in this category. */
-  startNumber: number;
+  cancelled: boolean;
 }) {
-  const states = category.stages.map((s) => stageState(s, currentStatus));
-  const allPassed = states.every((s) => s === 'passed');
-  const anyActive = states.includes('active');
-  const groupTone = allPassed ? 'passed' : anyActive ? 'active' : 'pending';
-  const sequence = resolveCategorySequence(
-    category.key as import('../../../../drizzle/schema').ProductionStage,
-    customSteps,
-    storedOrder,
-  );
+  const stepsInCat = steps.filter((s) => s.category === category.key);
+  const passedCount = stepsInCat.filter((s) => !!s.doneAt).length;
+  const groupTone = stepsInCat.length > 0 && passedCount === stepsInCat.length
+    ? 'passed'
+    : stepsInCat.some((s) => stepStates.get(s.id) === 'active')
+      ? 'active'
+      : 'pending';
 
   return (
     <div
@@ -558,7 +526,6 @@ function CategorySection({
         groupTone === 'active' ? 'border-foreground/40 shadow-sm' : ''
       }`}
     >
-      {/* Section header */}
       <div className="px-5 py-4 border-b border-border flex items-center gap-3 flex-wrap bg-muted/30">
         <span
           className={`pill-label pill-label-sm ${
@@ -569,94 +536,47 @@ function CategorySection({
         </span>
         <span className="text-sm text-muted-foreground">{category.description}</span>
         <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums font-medium">
-          {states.filter((s) => s === 'passed').length}/{category.stages.length} kroków
+          {passedCount}/{stepsInCat.length} kroków
         </span>
       </div>
 
       {bannerSlot ? <div className="px-5 pt-5">{bannerSlot}</div> : null}
 
       <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6">
-        {/* Sub-stages column */}
         <div>
           <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-2 font-medium">
             Kroki
           </div>
           <div className="space-y-3">
-            {sequence.map((item, seqIdx) => {
-              const canMoveUp = seqIdx > 0;
-              const canMoveDown = seqIdx < sequence.length - 1;
-              if (item.kind === 'canonical') {
-                const stage = item.stage;
-                const stageIdx = category.stages.indexOf(stage);
-                const dateMode = category.dateMode ?? 'none';
-                const stepDateIso = stepDates[stage] ?? null;
-                const derivedIso =
-                  stage === 'editing' && stepDates.shooting
-                    ? deriveEditingIso(stepDates.shooting)
-                    : null;
+            {stepsInCat.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-4 text-center text-[11px] text-muted-foreground">
+                Brak kroków w tej kategorii.
+              </div>
+            ) : (
+              stepsInCat.map((step, posInCat) => {
+                const canMoveUp = posInCat > 0;
+                const canMoveDown = posInCat < stepsInCat.length - 1;
                 return (
-                  <div key={`c:${stage}`} className="group space-y-1.5">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1 min-w-0">
-                        <SubStageButton
-                          productionId={productionId}
-                          stage={stage}
-                          label={STAGE_LABEL[stage]}
-                          state={stageIdx >= 0 ? states[stageIdx] : 'pending'}
-                          displayNumber={startNumber + seqIdx}
-                        />
-                      </div>
-                      <MoveArrows
-                        productionId={productionId}
-                        category={category.key as import('../../../../drizzle/schema').ProductionStage}
-                        stepKey={stage}
-                        canMoveUp={canMoveUp}
-                        canMoveDown={canMoveDown}
-                        className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition pt-1.5"
-                      />
-                    </div>
-                    {STAGE_HINT[stage] ? (
-                      <p className="pl-7 text-[11px] text-muted-foreground/80 italic">
-                        {STAGE_HINT[stage]}
-                      </p>
-                    ) : null}
-                    <StageDatePicker
-                      productionId={productionId}
-                      stage={stage}
-                      mode={dateMode}
-                      currentIso={stepDateIso}
-                      derivedIso={derivedIso}
-                      withTime={category.withTime ?? true}
-                      label={category.dateLabel}
-                    />
-                  </div>
+                  <ProductionStepRow
+                    key={step.id}
+                    productionId={productionId}
+                    productionT0At={productionT0At}
+                    step={step}
+                    state={stepStates.get(step.id) ?? 'pending'}
+                    displayNumber={startNumber + posInCat}
+                    canMoveUp={canMoveUp}
+                    canMoveDown={canMoveDown}
+                    productionCancelled={cancelled}
+                  />
                 );
-              }
-              return (
-                <CustomStepRow
-                  key={`x:${item.step.id}`}
-                  productionId={productionId}
-                  category={
-                    category.key as import('../../../../drizzle/schema').ProductionStage
-                  }
-                  step={item.step}
-                  canMoveUp={canMoveUp}
-                  canMoveDown={canMoveDown}
-                  displayNumber={startNumber + seqIdx}
-                />
-              );
-            })}
+              })
+            )}
             <div className="pt-1">
-              <CustomStepAddInline
-                productionId={productionId}
-                category={category.key as import('../../../../drizzle/schema').ProductionStage}
-                canonicalStages={category.stages}
-              />
+              <AddStepInline productionId={productionId} category={category.key} />
             </div>
           </div>
         </div>
 
-        {/* Files + related items column */}
         <div className="space-y-4">
           <div>
             <div className="flex items-baseline justify-between mb-2">

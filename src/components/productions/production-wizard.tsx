@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { createProduction } from '@/server/actions/productions';
-import { applyTemplateSteps } from '@/server/actions/production-custom-steps';
+import { applyTemplateToProduction } from '@/server/actions/production-steps';
 import { PLATFORMS, type Platform, type ProductionType } from '../../../drizzle/schema';
 import { isoWeekToMonday, toIsoWeekString } from '@/lib/dates';
 import type { ProductionTemplate } from '@/lib/production-templates-types';
@@ -143,18 +143,23 @@ export function ProductionWizard({
           type,
           title: title.trim(),
           t0At: t0Iso,
-          artistId: type === 'with-artist' ? artistId : null,
+          // Both solo and with-artist productions can be tied to an artist:
+          // a single artist can have a solo timeline (self-recorded content
+          // we just supervise) AND a with-artist timeline (collab shoot)
+          // running side-by-side. Videographer stays a with-artist concept
+          // only — solo means the artist records themselves.
+          artistId,
           videographerId: type === 'with-artist' ? videographerId : null,
           platforms: platforms.length > 0 ? platforms : null,
           notes: notes.trim() || null,
-          status: 'email-sent',
         });
-        // Apply template's custom steps in a single follow-up write. Failure
-        // here shouldn't block production creation — surface a soft warning.
-        if (template && template.customSteps.length > 0) {
-          const res = await applyTemplateSteps(prod.id, template.customSteps);
+        // Apply template steps as a single follow-up write — clones the
+        // full template.steps[] onto productions.steps. Failure here shouldn't
+        // block production creation — surface a soft warning.
+        if (template) {
+          const res = await applyTemplateToProduction(prod.id, template.slug);
           if (!res.ok) {
-            toast.warning('Produkcja utworzona, ale nie udało się dodać kroków z szablonu', {
+            toast.warning('Produkcja utworzona, ale nie udało się zaaplikować szablonu', {
               description: res.error,
             });
           }
@@ -317,7 +322,7 @@ function TemplateCard({
   active: boolean;
   onClick: () => void;
 }) {
-  const extra = template.customSteps.length;
+  const total = template.steps.length;
   return (
     <button
       type="button"
@@ -336,22 +341,10 @@ function TemplateCard({
             active ? 'text-primary font-bold' : 'text-muted-foreground'
           }`}
         >
-          9 + {extra} {extra === 1 ? 'krok' : 'kroków'}
+          {total} {total === 1 ? 'krok' : 'kroków'}
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-snug">{template.summary}</p>
-      {extra > 0 ? (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {template.customSteps.map((s, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-muted/60 text-muted-foreground"
-            >
-              + {s.label}
-            </span>
-          ))}
-        </div>
-      ) : null}
     </button>
   );
 }
@@ -458,42 +451,44 @@ function StepDetails({
           ) : null}
         </div>
       </div>
-      {type === 'with-artist' ? (
-        <div className="grid gap-1.5">
-          <Label>Artysta</Label>
-          <div className="flex flex-wrap gap-1">
+      <div className="grid gap-1.5">
+        <Label>Artysta</Label>
+        <div className="flex flex-wrap gap-1">
+          <button
+            type="button"
+            onClick={() => setArtistId(null)}
+            className={`px-2.5 py-1 text-xs rounded border transition ${
+              artistId === null
+                ? 'border-foreground bg-foreground text-background'
+                : 'border-border text-muted-foreground hover:border-foreground/40'
+            }`}
+          >
+            brak
+          </button>
+          {artists.map((a) => (
             <button
+              key={a.id}
               type="button"
-              onClick={() => setArtistId(null)}
+              onClick={() => setArtistId(a.id)}
               className={`px-2.5 py-1 text-xs rounded border transition ${
-                artistId === null
+                artistId === a.id
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-muted-foreground hover:border-foreground/40'
               }`}
             >
-              brak
+              {a.name}
+              {a.handle ? <span className="opacity-60 ml-1">{a.handle}</span> : null}
             </button>
-            {artists.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                onClick={() => setArtistId(a.id)}
-                className={`px-2.5 py-1 text-xs rounded border transition ${
-                  artistId === a.id
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:border-foreground/40'
-                }`}
-              >
-                {a.name}
-                {a.handle ? <span className="opacity-60 ml-1">{a.handle}</span> : null}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-muted-foreground">
-            Brakuje? Dodaj w <span className="font-mono">/artists</span> i wróć tutaj.
-          </p>
+          ))}
         </div>
-      ) : null}
+        <p className="text-[10px] text-muted-foreground">
+          {type === 'solo'
+            ? 'Solo = artysta nagrywa sam, Ty nadzorujesz koncept i montaż. Wybór artysty pokazuje produkcję obok jego kolab w gancie.'
+            : 'Brakuje? Dodaj w '}
+          {type === 'with-artist' ? <span className="font-mono">/artists</span> : null}
+          {type === 'with-artist' ? ' i wróć tutaj.' : null}
+        </p>
+      </div>
       {type === 'with-artist' ? (
         <div className="grid gap-1.5">
           <Label>Kamerzysta</Label>
@@ -602,8 +597,8 @@ function StepReview({
               <span>
                 {template.name}
                 <span className="text-muted-foreground ml-1.5 tabular-nums">
-                  · 9 + {template.customSteps.length}{' '}
-                  {template.customSteps.length === 1 ? 'krok' : 'kroków'}
+                  · {template.steps.length}{' '}
+                  {template.steps.length === 1 ? 'krok' : 'kroków'}
                 </span>
               </span>
             ) : (
@@ -627,9 +622,7 @@ function StepReview({
               : '—'
           }
         />
-        {type === 'with-artist' ? (
-          <Row label="Artysta" value={artist ? `${artist.name}${artist.handle ? ' · ' + artist.handle : ''}` : 'brak'} />
-        ) : null}
+        <Row label="Artysta" value={artist ? `${artist.name}${artist.handle ? ' · ' + artist.handle : ''}` : 'brak'} />
         {type === 'with-artist' ? (
           <Row
             label="Kamerzysta"

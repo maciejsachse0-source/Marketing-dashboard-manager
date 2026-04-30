@@ -32,11 +32,9 @@ export const PRODUCTION_STAGES = [
 ] as const;
 export type ProductionStage = (typeof PRODUCTION_STAGES)[number];
 
-/** User-added extra step inside a category. Slotted INTO the canonical sub-
- * stage flow at a specific position via {@link CustomStep.positionAfter}.
- * Doesn't change production.status — its passed/pending state is its own.
- * For display, custom steps are interleaved with canonical sub-stages and
- * renumbered 1..N as a single ordered list. */
+/** Legacy: user-added extra step inside a category. Slotted INTO the canonical
+ *  sub-stage flow at a specific position via {@link CustomStep.positionAfter}.
+ *  Being phased out — see {@link ProductionStep}. Kept for migration window. */
 export type CustomStep = {
   id: string;
   label: string;
@@ -49,6 +47,58 @@ export type CustomStep = {
   description?: string;
   /** Optional uploaded attachment — path relative to repo root, original
    *  filename and size for display. */
+  attachmentPath?: string;
+  attachmentName?: string;
+  attachmentSize?: number;
+};
+
+/** Step's date semantics — copied from template at creation, controls how the
+ *  step interacts with calendar entries and date-derivation rules. */
+export const STEP_DATE_MODES = [
+  /** No date attached to this step (e.g. publication final). */
+  'none',
+  /** User-recorded date — saved on the step but does NOT create a calendar entry. */
+  'record',
+  /** User-set date — creates/updates a linked calendar entry. */
+  'calendar',
+  /** Auto-derived from the step that has `isT0Anchor: true` (typically shooting). */
+  'derived-from-shooting',
+] as const;
+export type StepDateMode = (typeof STEP_DATE_MODES)[number];
+
+/** Calendar entry type used when a step has `dateMode: 'calendar'`. Mirrors
+ *  the existing `CALENDAR_TYPES` enum (no new values). */
+export type StepCalendarType = 'shoot' | 'edit' | 'meeting' | 'deadline';
+
+/**
+ * Flexible production step — replaces the old (canonical-status + customSteps
+ * + stepOrder) trio. Each production now owns a flat ordered list of these,
+ * cloned from a template at creation time. After cloning, the production is
+ * fully independent — editing the template doesn't retroactively touch
+ * existing productions.
+ *
+ * `id` is unique within the production. Templates use stable string ids; new
+ * steps added via UI use a random id.
+ */
+export type ProductionStep = {
+  id: string;
+  category: ProductionStage;
+  label: string;
+  description?: string;
+  /** ISO timestamp when the step was checked off; null if pending. */
+  doneAt: string | null;
+  /** ISO date — user-set when dateMode is record/calendar, auto-derived when
+   *  dateMode is derived-from-shooting. */
+  dateIso?: string;
+  /** Static config copied from the template at creation. Drives calendar
+   *  upserts, date pickers, and gantt anchoring. */
+  dateMode?: StepDateMode;
+  durationMinutes?: number;
+  calendarType?: StepCalendarType;
+  /** Exactly 0 or 1 step per production has this set — gantt uses it as the
+   *  pipeline T-0 anchor (typically the shooting day). */
+  isT0Anchor?: boolean;
+  /** Optional uploaded attachment — same shape as legacy CustomStep. */
   attachmentPath?: string;
   attachmentName?: string;
   attachmentSize?: number;
@@ -124,18 +174,15 @@ export const videographers = sqliteTable('videographers', {
 export const productions = sqliteTable('productions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type').$type<ProductionType>().notNull(),
-  status: text('status').$type<ProductionStatus>().notNull().default('email-sent'),
   title: text('title').notNull(),
   slug: text('slug').notNull(),
   t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
-  stepDates: text('step_dates', { mode: 'json' }).$type<Partial<Record<ProductionStatus, string>>>(),
-  customSteps: text('custom_steps', { mode: 'json' }).$type<Partial<Record<ProductionStage, CustomStep[]>>>(),
-  /** Per-category explicit order of step keys. A key is either a
-   *  `ProductionStatus` (canonical) or a custom step id. Categories absent
-   *  here render in the legacy default order (subStages first, then customs by
-   *  positionAfter). Mutated by `moveStepInCategory` — once a category gets
-   *  reordered, it switches to this explicit list as the source of truth. */
-  stepOrder: text('step_order', { mode: 'json' }).$type<Partial<Record<ProductionStage, string[]>>>(),
+  /** Flexible-steps model — one ordered list per production, cloned from a
+   *  template at creation. Replaces the legacy (status + stepDates +
+   *  customSteps + stepOrder) quartet that was dropped in migration 0011. */
+  steps: text('steps', { mode: 'json' }).$type<ProductionStep[]>().notNull().default(sql`'[]'`),
+  /** Production cancellation timestamp — replaces `status: 'cancelled'`. */
+  cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   videographerId: integer('videographer_id').references(() => videographers.id, { onDelete: 'set null' }),
   platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),

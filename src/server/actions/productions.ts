@@ -1,15 +1,15 @@
 'use server';
 
 import { safeRevalidatePath as revalidatePath } from './revalidate';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import {
   productionInputSchema,
-  productionStatusSchema,
   type ProductionInput,
 } from './schemas';
-import type { Production, ProductionStatus, ProductionType } from '../../../drizzle/schema';
+import type { Production, ProductionType } from '../../../drizzle/schema';
 import { generateOutputFolder } from '@/lib/output-folder';
+import { ensureWorkFolderStructure } from '@/lib/production-work-folder';
 
 function safeSlug(input: string, fallback: string): string {
   const s = input
@@ -33,10 +33,13 @@ export async function createProduction(input: ProductionInput): Promise<Producti
     .insert(schema.productions)
     .values({
       type: parsed.type,
-      status: parsed.status ?? 'email-sent',
       title: parsed.title,
       slug,
       t0At: t0,
+      // `steps[]` is populated separately by applyTemplateToProduction after
+      // creation — wizard handles that. Default empty so the row is valid.
+      steps: [],
+      cancelledAt: null,
       artistId: parsed.artistId ?? null,
       videographerId: parsed.videographerId ?? null,
       platforms: parsed.platforms ?? null,
@@ -44,6 +47,15 @@ export async function createProduction(input: ProductionInput): Promise<Producti
       notes: parsed.notes ?? null,
     })
     .returning();
+  // Auto-create the production work folder layout (nagrywanie/, obrobka/,
+  // publikacja/ + nested subfolders). Idempotent and side-effect-only on
+  // disk — DB row is already persisted, so a transient mkdir failure (e.g.
+  // permission issue) shouldn't block the production itself.
+  try {
+    ensureWorkFolderStructure(row.slug);
+  } catch (err) {
+    console.warn(`[createProduction] ensureWorkFolderStructure failed for ${row.slug}:`, err);
+  }
   revalidatePath('/productions');
   revalidatePath('/calendar');
   revalidatePath('/');
@@ -67,32 +79,6 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
   return row;
 }
 
-export async function setProductionStatus(id: number, status: ProductionStatus): Promise<Production> {
-  const validStatus = productionStatusSchema.parse(status);
-  const [row] = await db
-    .update(schema.productions)
-    .set({ status: validStatus })
-    .where(eq(schema.productions.id, id))
-    .returning();
-  revalidatePath('/productions');
-  revalidatePath(`/productions/${id}`);
-  revalidatePath('/calendar');
-  revalidatePath('/');
-
-  // Side-effect: when production reaches 'publishing' for the first time, generate output folder
-  if (validStatus === 'publishing' && !row.folderPath) {
-    try {
-      await generateOutputFolder(id);
-      revalidatePath('/output');
-    } catch (e) {
-      console.error('[output-folder] generation failed for production', id, e);
-      // Status change still succeeds — folder generation is best-effort
-    }
-  }
-
-  return row;
-}
-
 export async function regenerateOutputFolder(id: number) {
   const result = await generateOutputFolder(id);
   revalidatePath(`/productions/${id}`);
@@ -101,10 +87,25 @@ export async function regenerateOutputFolder(id: number) {
 }
 
 export async function deleteProduction(id: number): Promise<void> {
+  // Migration 0001 added the back-references (calendar_entries.production_id,
+  // packages.production_id, posts.production_id) without ON DELETE SET NULL,
+  // so SQLite blocks the production delete with a FK constraint. Manually
+  // null those references first — same end state as the cascade rule we
+  // wanted, just done in the app layer.
+  await db
+    .update(schema.calendarEntries)
+    .set({ productionId: null })
+    .where(eq(schema.calendarEntries.productionId, id));
+  await db
+    .update(schema.packages)
+    .set({ productionId: null })
+    .where(eq(schema.packages.productionId, id));
+  await db
+    .update(schema.posts)
+    .set({ productionId: null })
+    .where(eq(schema.posts.productionId, id));
+
   await db.delete(schema.productions).where(eq(schema.productions.id, id));
-  // Cascading FKs are `set null` (calendar entries, packages, posts) so those
-  // rows survive — just unlinked. Revalidate every surface that lists or
-  // mirrors production rows so the deletion is visible immediately.
   revalidatePath('/productions');
   revalidatePath(`/productions/${id}`);
   revalidatePath('/calendar');
@@ -115,23 +116,10 @@ export async function deleteProduction(id: number): Promise<void> {
 
 export async function listProductions(filter?: {
   type?: ProductionType;
-  status?: ProductionStatus;
 }): Promise<Production[]> {
-  if (filter?.type && filter?.status) {
-    return db.query.productions.findMany({
-      where: and(eq(schema.productions.type, filter.type), eq(schema.productions.status, filter.status)),
-      orderBy: desc(schema.productions.t0At),
-    });
-  }
   if (filter?.type) {
     return db.query.productions.findMany({
       where: eq(schema.productions.type, filter.type),
-      orderBy: desc(schema.productions.t0At),
-    });
-  }
-  if (filter?.status) {
-    return db.query.productions.findMany({
-      where: eq(schema.productions.status, filter.status),
       orderBy: desc(schema.productions.t0At),
     });
   }

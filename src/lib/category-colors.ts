@@ -13,7 +13,7 @@ export const FRAME_FOR_CATEGORY: Record<ProductionStage, WeekFrame> = {
 
 export const CATEGORY_LABEL: Record<ProductionStage, string> = {
   outreach: 'Outreach',
-  ustalenia: 'Ustalenia z kamerzystą',
+  ustalenia: 'Ustalenia + scenariusz',
   nagrywanie: 'Nagrywanie',
   obrobka: 'Obróbka',
   publikacja: 'Publikacja',
@@ -49,7 +49,7 @@ export const FRAME_STYLE: Record<
 > = {
   T1: {
     code: 'T1',
-    label: 'Outreach + ustalenia z kamerzystą',
+    label: 'Outreach + ustalenia',
     bg: 'bg-amber-50/40',
     border: 'border-amber-300/70',
     badge: 'bg-amber-900 text-amber-50',

@@ -4,5 +4,80 @@
   "type": "with-artist",
   "summary": "Pełny pipeline kolaboracji — od pierwszego maila po publikację. Bez dodatkowych kroków.",
   "description": "Klasyczny scenariusz pracy z artystą: outreach, akceptacja warunków, ustalenie kamerzysty, omówienie i wysłanie scenariusza, nagrywka, obróbka, publikacja. Polecane dla większości kolab — minimalistyczne, bez nadmiarowych kroków.",
-  "customSteps": []
+  "steps": [
+    {
+      "id": "email-sent",
+      "category": "outreach",
+      "label": "wysłanie maila",
+      "dateMode": "record",
+      "description": "Cold mail / DM z propozycją współpracy."
+    },
+    {
+      "id": "terms-accepted",
+      "category": "outreach",
+      "label": "akceptacja warunków współpracy",
+      "dateMode": "record",
+      "description": "Artysta zgodził się na warunki — termin, lokację, zakres."
+    },
+    {
+      "id": "cam-meeting-set",
+      "category": "outreach",
+      "label": "ustalenie daty spotkania z kamerzystą",
+      "dateMode": "record",
+      "description": "Ustalona konkretna data spotkania z kamerzystą."
+    },
+    {
+      "id": "cam-date-shared",
+      "category": "ustalenia",
+      "label": "przekazanie daty spotkania",
+      "dateMode": "calendar",
+      "durationMinutes": 30,
+      "calendarType": "meeting",
+      "description": "Data przekazana kamerzyście — gotowy w terminarzu."
+    },
+    {
+      "id": "script-discussed",
+      "category": "ustalenia",
+      "label": "omówienie scenariusza z kamerzystą",
+      "dateMode": "calendar",
+      "durationMinutes": 60,
+      "calendarType": "meeting",
+      "description": "Omówienie scenariusza, ujęć, sprzętu."
+    },
+    {
+      "id": "script-sent",
+      "category": "ustalenia",
+      "label": "wysłanie scenariusza",
+      "dateMode": "calendar",
+      "durationMinutes": 0,
+      "calendarType": "deadline",
+      "description": "Final scenariusz wysłany do kamerzysty + artysty."
+    },
+    {
+      "id": "shooting",
+      "category": "nagrywanie",
+      "label": "nagrywki",
+      "dateMode": "calendar",
+      "durationMinutes": 240,
+      "calendarType": "shoot",
+      "isT0Anchor": true,
+      "description": "W studio / w terenie. Nagranie głównego materiału + BTS."
+    },
+    {
+      "id": "editing",
+      "category": "obrobka",
+      "label": "obróbka",
+      "dateMode": "derived-from-shooting",
+      "durationMinutes": 240,
+      "calendarType": "edit",
+      "description": "Selekcja ujęć, montaż, color grading, audio mix."
+    },
+    {
+      "id": "publishing",
+      "category": "publikacja",
+      "label": "publikacja",
+      "dateMode": "none",
+      "description": "Manualny upload na platformy (IG, TT, YT)."
+    }
+  ]
 }
