@@ -1,0 +1,8 @@
+{
+  "slug": "standard-with-artist",
+  "name": "Standard z artystą (9 kroków)",
+  "type": "with-artist",
+  "summary": "Pełny pipeline kolaboracji — od pierwszego maila po publikację. Bez dodatkowych kroków.",
+  "description": "Klasyczny scenariusz pracy z artystą: outreach, akceptacja warunków, ustalenie kamerzysty, omówienie i wysłanie scenariusza, nagrywka, obróbka, publikacja. Polecane dla większości kolab — minimalistyczne, bez nadmiarowych kroków.",
+  "customSteps": []
+}
