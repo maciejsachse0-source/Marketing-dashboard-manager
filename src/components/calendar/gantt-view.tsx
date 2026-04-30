@@ -797,6 +797,10 @@ function GanttRowView({
     dayIdx: number;
     dateLabel: string;
     n: number;
+    /** Index within the same-day stack (0 = topmost). */
+    stackIdx: number;
+    /** Total pins sharing this dayIdx — used to center the stack. */
+    stackSize: number;
   }[] = [];
   for (const step of row.steps ?? []) {
     if (!step.dateIso) continue;
@@ -819,7 +823,29 @@ function GanttRowView({
       dayIdx: idx,
       dateLabel,
       n: sub.n,
+      stackIdx: 0,
+      stackSize: 1,
     });
+  }
+  // Pins sharing the same dayIdx would render on top of each other. Group
+  // them and assign vertical stack positions so the user can see and hover
+  // each one individually. Order within the stack follows step number `n`
+  // so the visual stack reads top→bottom in step order.
+  {
+    const byDay = new Map<number, typeof stagePins>();
+    for (const pin of stagePins) {
+      const list = byDay.get(pin.dayIdx);
+      if (list) list.push(pin);
+      else byDay.set(pin.dayIdx, [pin]);
+    }
+    for (const list of byDay.values()) {
+      if (list.length <= 1) continue;
+      list.sort((a, b) => a.n - b.n);
+      list.forEach((pin, i) => {
+        pin.stackIdx = i;
+        pin.stackSize = list.length;
+      });
+    }
   }
 
   // Right column dynamic height. After removing the per-step date chips and
@@ -1057,6 +1083,13 @@ function GanttRowView({
             ]
               .filter(Boolean)
               .join(' — ');
+            // Vertical offset for same-day pin stacks. 1.875rem ≈ pin
+            // height (1.75rem) + 0.125rem gap so neighbours never touch.
+            // We center the stack around 50% so a 2-pin stack reads as
+            // one above the other within the band.
+            const PIN_STACK_SPACING_REM = 1.875;
+            const offsetRem =
+              (pin.stackIdx - (pin.stackSize - 1) / 2) * PIN_STACK_SPACING_REM;
             return (
               <div
                 key={`pin-${pin.stepId}`}
@@ -1064,7 +1097,7 @@ function GanttRowView({
                 style={{
                   left: `${x}%`,
                   top: '50%',
-                  transform: 'translate(-50%, -50%)',
+                  transform: `translate(-50%, calc(-50% + ${offsetRem}rem))`,
                 }}
               >
                 {/* vertical guide — thin tick connecting chip to the band edges
