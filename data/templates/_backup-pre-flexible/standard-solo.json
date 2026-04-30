@@ -1,0 +1,27 @@
+{
+  "slug": "standard-solo",
+  "name": "Standard solo",
+  "type": "solo",
+  "summary": "Twój content — szybki cykl: koncept, scenariusz, nagrywka, montaż, publikacja.",
+  "description": "Pipeline solo dopasowany do własnego contentu: krótszy outreach (sam ze sobą), za to dwa kroki przygotowawcze — koncept i scenariusz — żeby nie nagrywać improwizacji bez planu. Po publikacji krok analizy wyników.",
+  "customSteps": [
+    {
+      "category": "outreach",
+      "label": "koncept odcinka",
+      "positionAfter": "email-sent",
+      "description": "Pomysł, hook, audience target, dlaczego teraz."
+    },
+    {
+      "category": "ustalenia",
+      "label": "scenariusz roboczy",
+      "positionAfter": "cam-date-shared",
+      "description": "Pierwsza wersja scenariusza — później wraca do \"scenariusz omówiony\"."
+    },
+    {
+      "category": "publikacja",
+      "label": "analiza pierwszych 24h",
+      "positionAfter": "publishing",
+      "description": "CTR, completion rate, save/share ratio. Notatka co zadziałało."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "slug": "rozszerzony-z-artysta",
+  "name": "Rozszerzony z artystą",
+  "type": "with-artist",
+  "summary": "Standard + research, moodboard, lokacja, follow-up. Dla większych projektów.",
+  "description": "Dla bardziej dopracowanych kolab: dodatkowe kroki researchowe (analiza twórczości artysty, moodboard wizualny), uzgodnienie lokacji, follow-up po publikacji. Idealne dla pierwszej współpracy z nowym artystą lub większych premier.",
+  "customSteps": [
+    {
+      "category": "outreach",
+      "label": "research artysty",
+      "positionAfter": "email-sent",
+      "description": "Analiza twórczości — utwory, social, audience, ostatnie premiery."
+    },
+    {
+      "category": "ustalenia",
+      "label": "moodboard wizualny",
+      "positionAfter": "cam-date-shared",
+      "description": "Reference — kadry, kolory, tempo. Wspólny board (Pinterest/FigJam)."
+    },
+    {
+      "category": "ustalenia",
+      "label": "ustalenie lokacji",
+      "positionAfter": "script-discussed",
+      "description": "Studio vs plener — adres, dojazd, rekwizyty, godziny dostępu."
+    },
+    {
+      "category": "publikacja",
+      "label": "follow-up z artystą",
+      "positionAfter": "publishing",
+      "description": "Przesłać linki, podziękować, zapytać o wyniki na ich stronie."
+    }
+  ]
+}
