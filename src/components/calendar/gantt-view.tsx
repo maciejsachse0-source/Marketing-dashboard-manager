@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useOptimistic, useState, useTransition } from 'react';
-import { ArrowRight, Check, CheckCircle2, ChevronDown, ExternalLink } from 'lucide-react';
+import { ArrowRight, Check, CheckCircle2, ChevronDown, ExternalLink, FolderOpen } from 'lucide-react';
 import { PersonAvatar, SoloAvatar, OrphanArtistAvatar } from '@/components/productions/artist-avatar';
 import {
   ProductionTypeBadge,
@@ -10,6 +10,7 @@ import {
 } from '@/components/productions/status-pill';
 import { DeleteProductionButton } from '@/components/productions/delete-production-button';
 import { cascadeStepsTo } from '@/server/actions/production-steps';
+import { openProductionFolder } from '@/server/actions/production-folder';
 import { startOfWeek as startOfWeekFn } from '@/lib/dates';
 import { STAGE_LABEL, STAGE_HINT } from '@/lib/production-stages';
 import { resolveCategorySequence } from '@/lib/category-sequence';
@@ -1064,6 +1065,54 @@ function GanttRowView({
                 >
                   {band.code}
                 </span>
+              </div>
+            );
+          })}
+
+          {/* Folder shortcuts — quick-open the production work-folder stage in
+              the OS file manager. T2 hosts nagrywanie + obrobka (raw footage
+              + edit projects); T3 hosts publikacja (per-platform finals).
+              T1 is communication-only — no working folder. Rendered as
+              siblings of the band rectangles so the band can stay
+              pointer-events-none while the buttons remain clickable. */}
+          {frameBands.map((band) => {
+            const stages: { stage: 'nagrywanie' | 'obrobka' | 'publikacja'; label: string }[] =
+              band.code === 'T2'
+                ? [
+                    { stage: 'nagrywanie', label: 'nagrywanie' },
+                    { stage: 'obrobka', label: 'obróbka' },
+                  ]
+                : band.code === 'T3'
+                  ? [{ stage: 'publikacja', label: 'publikacja' }]
+                  : [];
+            if (stages.length === 0) return null;
+            const tone = FRAME_TONE[band.code];
+            const right = (band.endDay + 1) * dayWidthPct;
+            return (
+              <div
+                key={`folders-${band.code}`}
+                className="absolute top-1.5 flex gap-1 pointer-events-auto z-10"
+                style={{
+                  left: `${right}%`,
+                  transform: 'translateX(calc(-100% - 0.375rem))',
+                }}
+              >
+                {stages.map(({ stage, label }) => (
+                  <button
+                    key={stage}
+                    type="button"
+                    onClick={() => {
+                      void openProductionFolder(row.id, stage).then((res) => {
+                        if (!res.ok) console.warn('[gantt] open folder failed:', res.error);
+                      });
+                    }}
+                    aria-label={`Otwórz folder ${label} dla ${displayName}`}
+                    title={`Otwórz folder: ${label}`}
+                    className={`grid place-items-center w-6 h-6 rounded ${tone.passed} shadow-sm hover:scale-110 hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
+                  >
+                    <FolderOpen className="w-3.5 h-3.5" />
+                  </button>
+                ))}
               </div>
             );
           })}

@@ -9,6 +9,7 @@ import {
 } from './schemas';
 import type { Production, ProductionType } from '../../../drizzle/schema';
 import { generateOutputFolder } from '@/lib/output-folder';
+import { ensureWorkFolderStructure } from '@/lib/production-work-folder';
 
 function safeSlug(input: string, fallback: string): string {
   const s = input
@@ -46,6 +47,15 @@ export async function createProduction(input: ProductionInput): Promise<Producti
       notes: parsed.notes ?? null,
     })
     .returning();
+  // Auto-create the production work folder layout (nagrywanie/, obrobka/,
+  // publikacja/ + nested subfolders). Idempotent and side-effect-only on
+  // disk — DB row is already persisted, so a transient mkdir failure (e.g.
+  // permission issue) shouldn't block the production itself.
+  try {
+    ensureWorkFolderStructure(row.slug);
+  } catch (err) {
+    console.warn(`[createProduction] ensureWorkFolderStructure failed for ${row.slug}:`, err);
+  }
   revalidatePath('/productions');
   revalidatePath('/calendar');
   revalidatePath('/');
