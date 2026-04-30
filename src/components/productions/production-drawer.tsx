@@ -3,11 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import {
-  ProductionStatusPill,
-  ProductionTypeBadge,
-} from './status-pill';
-import { ProductionStatusButtons, ProductionStatusPicker } from './status-buttons';
+import { ProductionTypeBadge } from './status-pill';
+import { CancelProductionButton } from './cancel-production-button';
+import { deriveProductionState } from '@/lib/production-steps';
 import { TYPE_LABEL } from '../calendar/type-color';
 import { PlatformPills, StatusPill } from '@/components/platforms-pills';
 import { getProductionByEntryId } from '@/server/actions/productions';
@@ -106,6 +104,17 @@ export function ProductionDrawer({
 function DrawerContent({ data }: { data: Bundle }) {
   const { production, entries, packages, posts, artist, campaign } = data;
   const t0Days = Math.round((production.t0At.getTime() - Date.now()) / 86400000);
+  const state = deriveProductionState(production.steps ?? [], production.cancelledAt);
+  const STATE_LABEL = {
+    'in-progress': 'w trakcie',
+    done: 'ukończone',
+    cancelled: 'anulowane',
+  } as const;
+  const STATE_TONE = {
+    'in-progress': 'bg-amber-100 text-amber-800 border-amber-300',
+    done: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    cancelled: 'bg-rose-100 text-rose-800 border-rose-300',
+  } as const;
 
   return (
     <div className="px-5 py-4 space-y-5">
@@ -118,7 +127,11 @@ function DrawerContent({ data }: { data: Bundle }) {
         </Link>
         <div className="flex flex-wrap items-center gap-2 mt-2">
           <ProductionTypeBadge type={production.type} />
-          <ProductionStatusPill status={production.status} />
+          <span
+            className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border ${STATE_TONE[state]}`}
+          >
+            {STATE_LABEL[state]}
+          </span>
           <span className="text-xs text-muted-foreground tabular-nums">
             T-0: {production.t0At.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })} (
             {t0Days >= 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`})
@@ -126,11 +139,14 @@ function DrawerContent({ data }: { data: Bundle }) {
         </div>
       </header>
 
-      <section className="rounded-lg border border-border bg-card p-3">
-        <ProductionStatusButtons id={production.id} current={production.status} />
-        <div className="mt-2.5">
-          <ProductionStatusPicker id={production.id} current={production.status} />
-        </div>
+      <section className="rounded-lg border border-border bg-card p-3 flex items-center justify-between gap-3">
+        <span className="text-xs text-muted-foreground">
+          Pełny pipeline kroków na karcie produkcji.
+        </span>
+        <CancelProductionButton
+          productionId={production.id}
+          cancelled={!!production.cancelledAt}
+        />
       </section>
 
       {production.notes ? (

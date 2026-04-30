@@ -1,8 +1,8 @@
+import { isProductionDone } from '@/lib/production-steps';
 import type {
   CalendarEntry,
   CalendarType,
   Production,
-  ProductionStatus,
 } from '../../../drizzle/schema';
 
 /**
@@ -42,15 +42,15 @@ export const TYPE_LABEL: Record<CalendarType, string> = {
  */
 export type ContentState = 'planned-empty' | 'content-ready' | 'done' | 'cancelled';
 
-const READY_STATUSES = new Set<ProductionStatus>(['publishing']);
-
 export function getContentState(
   entry: Pick<CalendarEntry, 'status' | 'type' | 'productionId'>,
-  production: Pick<Production, 'status'> | null | undefined,
+  production: Pick<Production, 'steps' | 'cancelledAt'> | null | undefined,
 ): ContentState {
   if (entry.status === 'cancelled') return 'cancelled';
   if (entry.status === 'done') return 'done';
-  if (production && READY_STATUSES.has(production.status)) return 'content-ready';
+  if (production && !production.cancelledAt && isProductionDone(production.steps ?? [])) {
+    return 'content-ready';
+  }
   return 'planned-empty';
 }
 

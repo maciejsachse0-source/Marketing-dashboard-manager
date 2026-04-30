@@ -134,6 +134,5 @@ export const productionInputSchema = z.object({
   platforms: z.array(platformSchema).optional().nullable(),
   campaignId: z.number().int().positive().optional().nullable(),
   notes: z.string().max(2000).optional().nullable(),
-  status: productionStatusSchema.optional(),
 });
 export type ProductionInput = z.infer<typeof productionInputSchema>;

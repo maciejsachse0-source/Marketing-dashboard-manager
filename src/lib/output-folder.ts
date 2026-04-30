@@ -203,10 +203,16 @@ export async function listOutputFolders(): Promise<OutputFolderInfo[]> {
       /* ignore */
     }
 
+    // Derived state — replaces the legacy `status` field. The output gallery
+    // uses this string to label each production card ("publikacja"/"anulowana"/
+    // "w trakcie"). Mapping mirrors the wording used elsewhere in the UI.
+    const isCancelled = !!p.cancelledAt;
+    const allDone = (p.steps ?? []).length > 0 && (p.steps ?? []).every((s) => !!s.doneAt);
+    const status = isCancelled ? 'cancelled' : allDone ? 'publishing' : 'in-progress';
     result.push({
       productionId: p.id,
       title: p.title,
-      status: p.status,
+      status,
       type: p.type,
       t0At: p.t0At.toISOString(),
       folderPath: p.folderPath,

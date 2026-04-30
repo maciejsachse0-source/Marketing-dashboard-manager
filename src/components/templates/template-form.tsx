@@ -1,24 +1,23 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { createTemplate, deleteTemplate, updateTemplate } from '@/server/actions/templates';
 import {
-  PRODUCTION_STAGES,
   PRODUCTION_TYPES,
+  STEP_DATE_MODES,
   type ProductionStage,
-  type ProductionStatus,
   type ProductionType,
+  type StepCalendarType,
+  type StepDateMode,
 } from '../../../drizzle/schema';
-import { CANONICAL_STAGES_BY_CATEGORY } from '@/lib/category-sequence';
-import { STAGE_LABEL } from '@/lib/production-stages';
 import {
   CATEGORY_LABEL,
   FRAME_FOR_CATEGORY,
@@ -26,7 +25,7 @@ import {
 } from '@/lib/category-colors';
 import type {
   ProductionTemplate,
-  TemplateCustomStep,
+  TemplateStep,
 } from '@/lib/production-templates-types';
 
 const TYPE_LABEL: Record<ProductionType, string> = {
@@ -34,7 +33,33 @@ const TYPE_LABEL: Record<ProductionType, string> = {
   solo: 'Solo',
 };
 
+const CATEGORY_ORDER: ProductionStage[] = [
+  'outreach',
+  'ustalenia',
+  'nagrywanie',
+  'obrobka',
+  'publikacja',
+];
+
+const DATE_MODE_LABEL: Record<StepDateMode, string> = {
+  none: 'brak daty',
+  record: 'tylko data (bez kalendarza)',
+  calendar: 'data + wpis w kalendarzu',
+  'derived-from-shooting': 'auto: dzień po nagrywce',
+};
+
+const CALENDAR_TYPE_LABEL: Record<StepCalendarType, string> = {
+  shoot: 'Nagrywka',
+  edit: 'Obróbka',
+  meeting: 'Spotkanie',
+  deadline: 'Deadline',
+};
+
 type Mode = { kind: 'create' } | { kind: 'edit'; slug: string };
+
+function newStepId(): string {
+  return Math.random().toString(36).slice(2, 14);
+}
 
 export function TemplateForm({ mode, initial }: { mode: Mode; initial?: ProductionTemplate }) {
   const router = useRouter();
@@ -46,43 +71,123 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
   const [type, setType] = useState<ProductionType>(initial?.type ?? 'with-artist');
   const [summary, setSummary] = useState(initial?.summary ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
-  const [steps, setSteps] = useState<TemplateCustomStep[]>(initial?.customSteps ?? []);
+  const [steps, setSteps] = useState<TemplateStep[]>(initial?.steps ?? []);
 
-  const totalSteps = 9 + steps.length;
+  const totalSteps = steps.length;
 
-  const updateStep = (i: number, patch: Partial<TemplateCustomStep>) => {
-    setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  const updateStep = (idx: number, patch: Partial<TemplateStep>) => {
+    setSteps((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
-  const removeStep = (i: number) =>
-    setSteps((prev) => prev.filter((_, idx) => idx !== i));
-  const moveStep = (i: number, dir: -1 | 1) => {
+
+  const removeStep = (idx: number) => {
+    if (!confirm(`Usunąć krok „${steps[idx].label || 'bez etykiety'}"?`)) return;
+    setSteps((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  /** Move a step up/down within its category. Skips swaps that would cross
+   *  category boundaries — the user uses category re-assignment for that. */
+  const moveStepInCategory = (idx: number, direction: -1 | 1) => {
     setSteps((prev) => {
+      const target = prev[idx];
+      if (!target) return prev;
+      // Find the previous/next step in the SAME category.
+      let neighborIdx = -1;
+      if (direction === -1) {
+        for (let i = idx - 1; i >= 0; i--) {
+          if (prev[i].category === target.category) {
+            neighborIdx = i;
+            break;
+          }
+        }
+      } else {
+        for (let i = idx + 1; i < prev.length; i++) {
+          if (prev[i].category === target.category) {
+            neighborIdx = i;
+            break;
+          }
+        }
+      }
+      if (neighborIdx === -1) return prev;
       const next = [...prev];
-      const j = i + dir;
-      if (j < 0 || j >= next.length) return prev;
-      [next[i], next[j]] = [next[j], next[i]];
+      [next[idx], next[neighborIdx]] = [next[neighborIdx], next[idx]];
       return next;
     });
   };
-  const addStep = () => {
-    // Default to first canonical of outreach so the user only has to type a label.
-    const firstStage = CANONICAL_STAGES_BY_CATEGORY.outreach[0];
-    setSteps((prev) => [
-      ...prev,
-      { category: 'outreach', label: '', positionAfter: firstStage, description: '' },
-    ]);
+
+  const addStepInCategory = (category: ProductionStage) => {
+    setSteps((prev) => {
+      // Insert the new step at the END of its category — find the index of
+      // the last step in this category, or the start of the next category.
+      const newStep: TemplateStep = {
+        id: newStepId(),
+        category,
+        label: '',
+        dateMode: 'none',
+      };
+      // Strategy: find the boundary index = first index where step.category
+      // comes AFTER our category (in CATEGORY_ORDER). Insert before that.
+      const myCatOrder = CATEGORY_ORDER.indexOf(category);
+      let boundaryIdx = prev.length;
+      for (let i = 0; i < prev.length; i++) {
+        const otherCatOrder = CATEGORY_ORDER.indexOf(prev[i].category);
+        if (otherCatOrder > myCatOrder) {
+          boundaryIdx = i;
+          break;
+        }
+      }
+      return [...prev.slice(0, boundaryIdx), newStep, ...prev.slice(boundaryIdx)];
+    });
+  };
+
+  /** Toggle the unique T-0 anchor — exactly one step is allowed to carry
+   *  the flag. Setting it on one step clears all others. */
+  const setT0Anchor = (idx: number, value: boolean) => {
+    setSteps((prev) =>
+      prev.map((s, i) => {
+        if (i === idx) return { ...s, isT0Anchor: value || undefined };
+        if (value && s.isT0Anchor) return { ...s, isT0Anchor: undefined };
+        return s;
+      }),
+    );
   };
 
   const onSubmit = () => {
     setError(null);
-    const cleanSteps: TemplateCustomStep[] = steps.map((s) => ({
-      category: s.category,
-      label: s.label.trim(),
-      positionAfter: s.positionAfter,
-      ...(s.description?.trim() ? { description: s.description.trim() } : {}),
-    }));
+    const cleanSteps: TemplateStep[] = steps.map((s) => {
+      const out: TemplateStep = {
+        id: s.id,
+        category: s.category,
+        label: s.label.trim(),
+      };
+      const desc = s.description?.trim();
+      if (desc) out.description = desc;
+      if (s.dateMode && s.dateMode !== 'none') out.dateMode = s.dateMode;
+      else out.dateMode = 'none';
+      if (s.durationMinutes != null && s.durationMinutes > 0) {
+        out.durationMinutes = s.durationMinutes;
+      }
+      if (s.calendarType) out.calendarType = s.calendarType;
+      if (s.isT0Anchor) out.isT0Anchor = true;
+      return out;
+    });
     if (cleanSteps.some((s) => !s.label)) {
-      setError('Każdy krok dodatkowy musi mieć etykietę.');
+      setError('Każdy krok musi mieć etykietę.');
+      return;
+    }
+    const ids = new Set<string>();
+    for (const s of cleanSteps) {
+      if (ids.has(s.id)) {
+        setError(`Duplikujący się id kroku: ${s.id}`);
+        return;
+      }
+      ids.add(s.id);
+    }
+    if (cleanSteps.filter((s) => s.isT0Anchor).length > 1) {
+      setError('Tylko jeden krok może być oznaczony jako T-0.');
+      return;
+    }
+    if (cleanSteps.length === 0) {
+      setError('Szablon musi mieć co najmniej jeden krok.');
       return;
     }
 
@@ -92,7 +197,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
       type,
       summary: summary.trim(),
       description: description.trim(),
-      customSteps: cleanSteps,
+      steps: cleanSteps,
     };
 
     startTransition(async () => {
@@ -229,43 +334,108 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
         </div>
       </section>
 
-      {/* Custom steps */}
-      <section className="card-editorial p-5 space-y-4">
-        <header className="flex items-baseline justify-between gap-3 flex-wrap">
+      {/* Pipeline — every step (no canonical/custom distinction). All editable,
+          movable in-category, removable. One step optionally flagged T-0. */}
+      <section className="space-y-4">
+        <header className="flex items-baseline justify-between gap-3 flex-wrap px-1">
           <div>
             <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
-              Kroki dodatkowe
+              Kroki szablonu
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              9 kanonicznych kroków zawsze w komplecie. Tu dodajesz dodatkowe — wskakują w wybranej
-              kategorii, po wybranym etapie kanonicznym.
+              Pełna definicja pipeline'u. Każdy krok jest edytowalny i można go usunąć.
+              Strzałki przesuwają w obrębie tej samej kategorii. Jeden krok można oznaczyć
+              jako „T-0" (oś czasu na gantcie — zwykle nagrywka).
             </p>
           </div>
-          <Button size="sm" variant="outline" onClick={addStep} type="button">
-            <Plus className="w-3.5 h-3.5 mr-1" /> Dodaj krok
-          </Button>
+          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0">
+            {totalSteps} kroków
+          </span>
         </header>
 
-        {steps.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-            Brak kroków dodatkowych — szablon używa wyłącznie standardowego pipeline&apos;u 9 kroków.
-          </div>
-        ) : (
-          <ol className="space-y-3">
-            {steps.map((s, i) => (
-              <StepRow
-                key={i}
-                index={i}
-                total={steps.length}
-                step={s}
-                onChange={(patch) => updateStep(i, patch)}
-                onRemove={() => removeStep(i)}
-                onMoveUp={() => moveStep(i, -1)}
-                onMoveDown={() => moveStep(i, 1)}
-              />
-            ))}
-          </ol>
-        )}
+        {(() => {
+          // Walk steps once and emit per-category sections, computing global
+          // step numbers as we go. Strict O(n) pass — categories without
+          // any steps still render their header so the user can add into them.
+          let runningOffset = 0;
+          return CATEGORY_ORDER.map((cat) => {
+            // Indices (in `steps[]`) of steps belonging to this category, in
+            // their on-screen order.
+            const indicesInCat: number[] = [];
+            steps.forEach((s, i) => {
+              if (s.category === cat) indicesInCat.push(i);
+            });
+            const startNumber = runningOffset + 1;
+            runningOffset += indicesInCat.length;
+            const frame = FRAME_FOR_CATEGORY[cat];
+            const tone = FRAME_STYLE[frame];
+
+            return (
+              <div
+                key={cat}
+                className={`rounded-2xl border-2 ${tone.border} ${tone.bg} p-4 sm:p-5 space-y-3`}
+              >
+                <header className="flex items-center gap-2.5 flex-wrap">
+                  <span
+                    className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-md text-[11px] font-bold tracking-[0.18em] tabular-nums ${tone.badge}`}
+                  >
+                    {frame}
+                  </span>
+                  <span
+                    className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.accent}`}
+                  >
+                    {CATEGORY_LABEL[cat]}
+                  </span>
+                  <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                    {indicesInCat.length} {indicesInCat.length === 1 ? 'krok' : 'kroków'}
+                  </span>
+                </header>
+
+                {indicesInCat.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-4 text-center text-[11px] text-muted-foreground">
+                    Brak kroków w tej kategorii.
+                  </div>
+                ) : (
+                  <ol className="space-y-2">
+                    {indicesInCat.map((stepsIdx, posInCat) => {
+                      const step = steps[stepsIdx];
+                      const displayNumber = startNumber + posInCat;
+                      const canMoveUp = posInCat > 0;
+                      const canMoveDown = posInCat < indicesInCat.length - 1;
+                      return (
+                        <StepRow
+                          key={step.id}
+                          step={step}
+                          displayNumber={displayNumber}
+                          canMoveUp={canMoveUp}
+                          canMoveDown={canMoveDown}
+                          tone={tone}
+                          onChange={(patch) => updateStep(stepsIdx, patch)}
+                          onRemove={() => removeStep(stepsIdx)}
+                          onMoveUp={() => moveStepInCategory(stepsIdx, -1)}
+                          onMoveDown={() => moveStepInCategory(stepsIdx, 1)}
+                          onToggleT0={(v) => setT0Anchor(stepsIdx, v)}
+                        />
+                      );
+                    })}
+                  </ol>
+                )}
+
+                <div className="pt-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addStepInCategory(cat)}
+                    type="button"
+                    className="bg-card"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Dodaj krok do {CATEGORY_LABEL[cat]}
+                  </Button>
+                </div>
+              </div>
+            );
+          });
+        })()}
       </section>
 
       {error ? (
@@ -307,136 +477,208 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
   );
 }
 
+type Tone = {
+  bg: string;
+  border: string;
+  badge: string;
+  chip: string;
+  dot: string;
+  rail: string;
+};
+
 function StepRow({
-  index,
-  total,
   step,
+  displayNumber,
+  canMoveUp,
+  canMoveDown,
+  tone,
   onChange,
   onRemove,
   onMoveUp,
   onMoveDown,
+  onToggleT0,
 }: {
-  index: number;
-  total: number;
-  step: TemplateCustomStep;
-  onChange: (patch: Partial<TemplateCustomStep>) => void;
+  step: TemplateStep;
+  displayNumber: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  tone: Tone;
+  onChange: (patch: Partial<TemplateStep>) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onToggleT0: (v: boolean) => void;
 }) {
-  // positionAfter options depend on the chosen category — restrict to its
-  // canonical stages so the user can't anchor outside the bucket.
-  const positionOptions = useMemo<ProductionStatus[]>(
-    () => CANONICAL_STAGES_BY_CATEGORY[step.category],
-    [step.category],
-  );
-
-  // When category changes, snap positionAfter back to the first canonical of the
-  // new category so we never persist an invalid anchor.
-  const onChangeCategory = (cat: ProductionStage) => {
-    const first = CANONICAL_STAGES_BY_CATEGORY[cat][0];
-    onChange({ category: cat, positionAfter: first });
-  };
-
-  // Frame-tinted row — same T1/T2/T3 palette as the gantt strip and the
-  // templates list. Solid colored left rail makes the bucket scannable at a
-  // glance even when many rows stack vertically.
-  const frame = FRAME_FOR_CATEGORY[step.category];
-  const tone = FRAME_STYLE[frame];
+  const [expanded, setExpanded] = useState(false);
+  const isCalendar = step.dateMode === 'calendar';
 
   return (
-    <li
-      className={`relative rounded-lg border-2 ${tone.border} ${tone.bg} p-3.5 pl-4 space-y-3 group ui-transition`}
-    >
-      <span aria-hidden className={`absolute left-0 top-2 bottom-2 w-1 rounded-full ${tone.rail}`} />
-      <div className="flex items-center gap-2">
+    <li className={`group rounded-xl border-2 ${tone.border} bg-card transition`}>
+      <div className="flex items-center gap-2 px-3 py-2">
         <span
-          className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-bold tabular-nums text-white shrink-0 ${tone.dot}`}
-          title={`${frame} · ${CATEGORY_LABEL[step.category]}`}
+          className={`grid place-items-center w-5 h-5 rounded-full text-[10px] font-bold tabular-nums text-white shrink-0 ${tone.dot}`}
         >
-          {index + 1}
+          {displayNumber}
         </span>
         <Input
           value={step.label}
           onChange={(e) => onChange({ label: e.target.value })}
-          placeholder="Etykieta kroku — np. moodboard wizualny"
+          placeholder="Etykieta kroku — np. wysłanie maila"
           maxLength={80}
-          className="flex-1 bg-card"
+          className="flex-1 bg-card h-8 text-sm"
         />
+        {step.isT0Anchor ? (
+          <span
+            className={`shrink-0 text-[9px] uppercase tracking-[0.14em] font-bold px-1.5 py-0.5 rounded border ${tone.chip}`}
+            title="Krok-kotwica T-0 — oś czasu na gantcie"
+          >
+            T-0
+          </span>
+        ) : null}
         <div className="flex items-center gap-0.5 shrink-0">
           <button
             type="button"
             onClick={onMoveUp}
-            disabled={index === 0}
-            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            disabled={!canMoveUp}
+            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń wyżej"
+            aria-label="Przesuń wyżej"
           >
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             onClick={onMoveDown}
-            disabled={index === total - 1}
-            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            disabled={!canMoveDown}
+            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń niżej"
+            aria-label="Przesuń niżej"
           >
             <ArrowDown className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             onClick={onRemove}
-            className="p-1.5 rounded-md hover:bg-rose-50 text-muted-foreground hover:text-rose-700 ui-transition"
+            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
             title="Usuń krok"
+            aria-label="Usuń krok"
           >
             <Trash2 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted ui-transition"
+            aria-expanded={expanded}
+            title={expanded ? 'Zwiń' : 'Ustawienia kroku'}
+          >
+            <ChevronDown
+              className={`w-3.5 h-3.5 ui-transition ${expanded ? 'rotate-180' : ''}`}
+            />
           </button>
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-3 pl-8">
-        <div className="grid gap-1">
-          <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            Kategoria
-          </Label>
-          <select
-            value={step.category}
-            onChange={(e) => onChangeCategory(e.target.value as ProductionStage)}
-            className="rounded-md border border-input bg-card px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {PRODUCTION_STAGES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABEL[c]}
-              </option>
-            ))}
-          </select>
+      {step.description && !expanded ? (
+        <div className="px-3 pb-2 -mt-1 pl-10 text-[11px] text-muted-foreground/80 italic truncate">
+          {step.description}
         </div>
-        <div className="grid gap-1">
-          <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            Po kroku kanonicznym
-          </Label>
-          <select
-            value={step.positionAfter}
-            onChange={(e) => onChange({ positionAfter: e.target.value as ProductionStatus })}
-            className="rounded-md border border-input bg-card px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {positionOptions.map((s) => (
-              <option key={s} value={s}>
-                {STAGE_LABEL[s]}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      ) : null}
 
-      <div className="pl-8">
-        <Input
-          value={step.description ?? ''}
-          onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Opis kroku (opcjonalnie) — co konkretnie zrobić"
-          maxLength={500}
-          className="text-sm"
-        />
-      </div>
+      {expanded ? (
+        <div className="border-t border-border/60 px-3 py-3 space-y-3 text-xs">
+          <div className="grid gap-1.5">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              Opis (podpowiedź dla użytkownika)
+            </Label>
+            <Textarea
+              value={step.description ?? ''}
+              onChange={(e) => onChange({ description: e.target.value })}
+              placeholder="Co konkretnie zrobić w tym kroku, na co zwrócić uwagę…"
+              maxLength={1000}
+              rows={2}
+              className="text-xs"
+            />
+          </div>
+
+          <div className="grid gap-1.5 sm:grid-cols-2">
+            <div className="grid gap-1">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                Tryb daty
+              </Label>
+              <select
+                value={step.dateMode ?? 'none'}
+                onChange={(e) => onChange({ dateMode: e.target.value as StepDateMode })}
+                className="rounded-md border border-input bg-card px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {STEP_DATE_MODES.map((m) => (
+                  <option key={m} value={m}>
+                    {DATE_MODE_LABEL[m]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {isCalendar ? (
+              <div className="grid gap-1">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                  Typ wpisu kalendarza
+                </Label>
+                <select
+                  value={step.calendarType ?? 'meeting'}
+                  onChange={(e) =>
+                    onChange({ calendarType: e.target.value as StepCalendarType })
+                  }
+                  className="rounded-md border border-input bg-card px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {(['meeting', 'shoot', 'edit', 'deadline'] as StepCalendarType[]).map((t) => (
+                    <option key={t} value={t}>
+                      {CALENDAR_TYPE_LABEL[t]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+          </div>
+
+          {isCalendar ? (
+            <div className="grid gap-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                Domyślny czas trwania (minuty)
+              </Label>
+              <Input
+                type="number"
+                min={0}
+                max={1440}
+                value={step.durationMinutes ?? 0}
+                onChange={(e) =>
+                  onChange({ durationMinutes: Math.max(0, Number(e.target.value) || 0) })
+                }
+                className="h-8 text-xs"
+              />
+              <p className="text-[10px] text-muted-foreground">
+                0 = punkt w czasie (deadline). Inaczej — domyślny zakres na kalendarzu.
+              </p>
+            </div>
+          ) : null}
+
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              type="checkbox"
+              id={`t0-${step.id}`}
+              checked={!!step.isT0Anchor}
+              onChange={(e) => onToggleT0(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-input"
+            />
+            <Label htmlFor={`t0-${step.id}`} className="text-[11px] cursor-pointer">
+              Oznacz jako kotwicę T-0 (oś czasu w gantcie)
+            </Label>
+          </div>
+
+          <div className="text-[10px] text-muted-foreground">
+            <span className="font-mono">id: {step.id}</span>
+          </div>
+        </div>
+      ) : null}
     </li>
   );
 }

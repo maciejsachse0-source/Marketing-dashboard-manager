@@ -4,17 +4,15 @@ import path from 'node:path';
 import { z } from 'zod';
 import {
   PRODUCTION_STAGES,
-  PRODUCTION_STATUSES,
   PRODUCTION_TYPES,
+  STEP_DATE_MODES,
 } from '../../drizzle/schema';
 import type { ProductionTemplate } from './production-templates-types';
 
 /**
- * Production template — a recipe that pre-populates a new production with
- * extra custom steps inside the canonical 9-step pipeline. Every template
- * keeps the canonical steps (email-sent → publishing). Differences live in
- * the `customSteps` array: each entry is inserted into a category at a
- * chosen anchor (`positionAfter`).
+ * Production template — a recipe that defines the complete step list for new
+ * productions. After the flexible-steps refactor, templates own a flat
+ * `steps[]` array (no more implicit canonical 9-step base + customSteps[]).
  *
  * Templates live as JSON files under data/templates/ and are read on every
  * request — same hot-reload pattern as agents, no cache busting.
@@ -24,39 +22,63 @@ import type { ProductionTemplate } from './production-templates-types';
  *   - `getTemplate(slug)` — single template by slug, or undefined
  *   - `templateFilePath(slug)` — helper for CRUD actions
  *   - `productionTemplateSchema` — Zod schema for validation in CRUD actions
- *
- * Helpers like `templatesForType` / `defaultTemplateFor` live as locals in
- * client components — this file is `server-only` and clients can't import it.
  */
 const productionStageSchema = z.enum(PRODUCTION_STAGES);
-// Status enum sans `cancelled` — templates never anchor on the cancellation
-// terminal state (no canonical pipeline category contains it).
-const productionStatusSchema = z.enum(
-  PRODUCTION_STATUSES.filter((s) => s !== 'cancelled') as readonly [string, ...string[]],
-);
 const productionTypeSchema = z.enum(PRODUCTION_TYPES);
+const stepDateModeSchema = z.enum(STEP_DATE_MODES);
+const stepCalendarTypeSchema = z.enum(['shoot', 'edit', 'meeting', 'deadline']);
 
-const templateCustomStepSchema = z.object({
+const templateStepSchema = z.object({
+  id: z.string().min(1).max(80),
   category: productionStageSchema,
   label: z.string().min(1).max(80),
-  positionAfter: productionStatusSchema,
-  description: z.string().max(500).optional(),
+  description: z.string().max(1000).optional(),
+  dateMode: stepDateModeSchema.optional(),
+  durationMinutes: z.number().int().min(0).max(60 * 24).optional(),
+  calendarType: stepCalendarTypeSchema.optional(),
+  isT0Anchor: z.boolean().optional(),
 });
 
-export const productionTemplateSchema = z.object({
-  slug: z
-    .string()
-    .min(1)
-    .max(60)
-    .regex(/^[a-z0-9-]+$/, 'slug: tylko małe litery, cyfry i myślnik'),
-  name: z.string().min(1).max(80),
-  type: productionTypeSchema,
-  summary: z.string().min(1).max(160),
-  description: z.string().min(1).max(1000),
-  customSteps: z.array(templateCustomStepSchema).max(20),
-});
+export const productionTemplateSchema = z
+  .object({
+    slug: z
+      .string()
+      .min(1)
+      .max(60)
+      .regex(/^[a-z0-9-]+$/, 'slug: tylko małe litery, cyfry i myślnik'),
+    name: z.string().min(1).max(80),
+    type: productionTypeSchema,
+    summary: z.string().min(1).max(160),
+    description: z.string().min(1).max(1000),
+    steps: z.array(templateStepSchema).min(1).max(40),
+  })
+  .superRefine((tpl, ctx) => {
+    // Step ids must be unique within a template — they're used as React keys
+    // and as anchors in `productions.steps[]`, so collisions would cause
+    // silent overwrite bugs.
+    const ids = new Set<string>();
+    for (const [i, s] of tpl.steps.entries()) {
+      if (ids.has(s.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Duplikujący się id kroku: ${s.id}`,
+          path: ['steps', i, 'id'],
+        });
+      }
+      ids.add(s.id);
+    }
+    // At most one T0 anchor — gantt would otherwise jitter between dates.
+    const anchors = tpl.steps.filter((s) => s.isT0Anchor).length;
+    if (anchors > 1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Tylko jeden krok może być oznaczony jako isT0Anchor',
+        path: ['steps'],
+      });
+    }
+  });
 
-export type { TemplateCustomStep, ProductionTemplate } from './production-templates-types';
+export type { TemplateStep, ProductionTemplate, TemplateCustomStep } from './production-templates-types';
 
 const TEMPLATES_DIR = path.join(process.cwd(), 'data', 'templates');
 

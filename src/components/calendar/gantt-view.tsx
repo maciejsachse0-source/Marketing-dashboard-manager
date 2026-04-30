@@ -8,26 +8,23 @@ import {
   ProductionTypeBadge,
   STATUS_LABEL as PROD_STATUS_LABEL,
 } from '@/components/productions/status-pill';
-import { SubStageButton } from '@/components/productions/sub-stage-button';
-import { StageDatePicker } from '@/components/productions/stage-date-picker';
-import { CustomStepRow } from '@/components/productions/custom-step-row';
-import { CustomStepAddInline } from '@/components/productions/custom-step-add';
 import { DeleteProductionButton } from '@/components/productions/delete-production-button';
-import { setProductionStatus } from '@/server/actions/productions';
-import { cascadeStepsTo } from '@/server/actions/production-custom-steps';
+import { cascadeStepsTo } from '@/server/actions/production-steps';
 import { startOfWeek as startOfWeekFn } from '@/lib/dates';
 import { STAGE_LABEL, STAGE_HINT } from '@/lib/production-stages';
 import { resolveCategorySequence } from '@/lib/category-sequence';
 import { FRAME_STYLE, type WeekFrame } from '@/lib/category-colors';
-import { MoveArrows } from '@/components/productions/move-arrows';
 import {
   PRODUCTION_PROGRESSION,
   type CustomStep,
   type Platform,
   type ProductionStage,
   type ProductionStatus,
+  type ProductionStep,
   type ProductionType,
 } from '../../../drizzle/schema';
+import { ProductionStepRow } from '@/components/productions/production-step-row';
+import { AddStepInline } from '@/components/productions/add-step-inline';
 
 type DateMode = 'record' | 'calendar' | 'derived' | 'none';
 
@@ -74,7 +71,7 @@ const STAGE_CATEGORIES: StageCategory[] = [
   },
   {
     key: 'ustalenia',
-    label: 'Ustalenia z kamerzystą',
+    label: 'Ustalenia + scenariusz',
     short: 'UST.',
     description: 'Przekazanie daty + omówienie i wysłanie scenariusza.',
     hint: 'scenariusz PDF, shotlist, packing list, callsheet',
@@ -178,33 +175,37 @@ const TENTATIVE_OFFSET_FROM_T0_MON: Partial<Record<ProductionStatus, number>> = 
   publishing: 0, // Mon of T3 (= T-0)
 };
 
+// Wyciszone tła pasów (100/55) zamiast 200/70 — pasy nadal czytelnie kodują
+// fazę, ale nie konkurują z krokami nad nimi. Ramki cieńsze (border zamiast
+// border-2) i mniej nasycone (400/50). Mocne kolory (500) zostają dla
+// chip-pinów i passed-stanów — tam liczy się kontrast vs. tła.
 const FRAME_TONE: Record<
   WeekFrameCode,
   { bg: string; border: string; ink: string; chip: string; passed: string; active: string; pending: string }
 > = {
   T1: {
-    bg: 'bg-amber-200/70',
-    border: 'border-amber-500/70',
-    ink: 'text-amber-950',
-    chip: 'bg-amber-300/80 border-amber-500',
+    bg: 'bg-amber-100/55',
+    border: 'border-amber-400/55',
+    ink: 'text-amber-900',
+    chip: 'bg-amber-200/80 border-amber-400',
     passed: 'bg-amber-500 border-amber-600 text-white',
     active: 'bg-amber-50 border-amber-500 ring-4 ring-amber-300/50 text-amber-900',
     pending: 'bg-white border-amber-300 hover:border-amber-500 text-amber-700',
   },
   T2: {
-    bg: 'bg-violet-200/70',
-    border: 'border-violet-500/70',
-    ink: 'text-violet-950',
-    chip: 'bg-violet-300/80 border-violet-500',
+    bg: 'bg-violet-100/55',
+    border: 'border-violet-400/55',
+    ink: 'text-violet-900',
+    chip: 'bg-violet-200/80 border-violet-400',
     passed: 'bg-violet-500 border-violet-600 text-white',
     active: 'bg-violet-50 border-violet-500 ring-4 ring-violet-300/50 text-violet-900',
     pending: 'bg-white border-violet-300 hover:border-violet-500 text-violet-700',
   },
   T3: {
-    bg: 'bg-emerald-200/70',
-    border: 'border-emerald-500/70',
-    ink: 'text-emerald-950',
-    chip: 'bg-emerald-300/80 border-emerald-500',
+    bg: 'bg-emerald-100/55',
+    border: 'border-emerald-400/55',
+    ink: 'text-emerald-900',
+    chip: 'bg-emerald-200/80 border-emerald-400',
     passed: 'bg-emerald-500 border-emerald-600 text-white',
     active: 'bg-emerald-50 border-emerald-500 ring-4 ring-emerald-300/50 text-emerald-900',
     pending: 'bg-white border-emerald-300 hover:border-emerald-500 text-emerald-700',
@@ -235,6 +236,11 @@ export type GanttRow = {
   stepDates: Partial<Record<ProductionStatus, string>> | null;
   customSteps: Partial<Record<ProductionStage, CustomStep[]>> | null;
   stepOrder: Partial<Record<ProductionStage, string[]>> | null;
+  /** New flexible-steps payload — used by the expanded view to render the
+   *  full pipeline list. Synthesized legacy fields above stay for now to
+   *  keep the strip's status/date math unchanged during the cleanup window. */
+  steps: ProductionStep[];
+  cancelled: boolean;
   artistName: string | null;
   artistHandle: string | null;
   videographerName: string | null;
@@ -252,6 +258,15 @@ function categoryState(
   if (cur >= endIdx) return 'passed';
   if (cur >= startIdx) return 'active';
   return 'pending';
+}
+
+/** Stable key for a sub-step regardless of where it's referenced from. The
+ *  optimistic-done map (shared between the milestone bar and sub-step bar)
+ *  is keyed off this so a click on either surface updates both views in the
+ *  same paint. Must be type-only — defined here, not inside any component —
+ *  so all readers compute the same key. */
+function subStepKey(s: { kind: 'canonical' | 'custom'; stage: ProductionStatus | null; customId: string | null }): string {
+  return s.kind === 'canonical' ? `cn:${s.stage}` : `cs:${s.customId}`;
 }
 
 type MilestoneSource = 'recorded' | 'derived' | 't0' | 'tentative';
@@ -381,7 +396,7 @@ export function GanttView({
           className="grid gap-0 sticky top-0 z-30 bg-background/95 backdrop-blur"
           style={{ gridTemplateColumns: `22rem 1fr` }}
         >
-          <div className="border-b border-border/60 px-5 py-3 text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold">
+          <div className="border-b border-r border-border/60 px-5 py-3 text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold sticky left-0 z-40 bg-background/95 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]">
             Produkcja · pipeline
           </div>
           <div>
@@ -396,7 +411,7 @@ export function GanttView({
                 return (
                   <div
                     key={i}
-                    className={`px-3 py-2.5 border-l border-border/60 ${
+                    className={`px-3 py-2 border-l border-border/60 ${
                       i === totalWeeks - 1 ? 'border-r' : ''
                     } ${isCurrent ? 'bg-foreground/5' : ''}`}
                   >
@@ -427,7 +442,7 @@ export function GanttView({
                 return (
                   <div
                     key={i}
-                    className={`px-1 py-1.5 border-l text-center ${
+                    className={`px-1 py-1 border-l text-center ${
                       d.isMonday ? 'border-border/60' : 'border-border/20'
                     } ${i === totalDays - 1 ? 'border-r border-border/60' : ''} ${
                       d.isWeekend ? 'bg-muted/40' : ''
@@ -467,18 +482,32 @@ export function GanttView({
         ) : null}
 
         <div className="flex flex-col stagger-children">
-          {rows.map((row) => (
-            <GanttRowView
-              key={row.id}
-              row={row}
-              firstDay={firstDay}
-              totalDays={totalDays}
-              dayWidthPct={dayWidthPct}
-              days={days}
-              todayIdx={todayIdx}
-              todayInWindow={todayInWindow}
-            />
-          ))}
+          {rows.map((row, idx) => {
+            // Visually merge consecutive rows that belong to the same artist:
+            // hide the account block on follow-ups and drop the separator line
+            // so the eye reads the cluster as one artist with multiple tracks.
+            const prev = idx > 0 ? rows[idx - 1] : null;
+            const sameArtistAsPrev =
+              !!row.artistName &&
+              !!prev?.artistName &&
+              prev.artistName === row.artistName &&
+              prev.artistHandle === row.artistHandle;
+            const isFirstOfArtist = !sameArtistAsPrev;
+            return (
+              <GanttRowView
+                key={row.id}
+                row={row}
+                firstDay={firstDay}
+                totalDays={totalDays}
+                dayWidthPct={dayWidthPct}
+                days={days}
+                todayIdx={todayIdx}
+                todayInWindow={todayInWindow}
+                isFirstOfArtist={isFirstOfArtist}
+                showArtistGap={isFirstOfArtist && idx > 0}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
@@ -493,6 +522,8 @@ function GanttRowView({
   days,
   todayIdx,
   todayInWindow,
+  isFirstOfArtist,
+  showArtistGap,
 }: {
   row: GanttRow;
   firstDay: Date;
@@ -501,26 +532,187 @@ function GanttRowView({
   days: { isWeekend: boolean }[];
   todayIdx: number;
   todayInWindow: boolean;
+  isFirstOfArtist: boolean;
+  showArtistGap: boolean;
 }) {
   const [optimisticStatus, setOptimisticStatus] = useOptimistic(row.status);
   const [, startTransition] = useTransition();
   const [expanded, setExpanded] = useState(false);
+  // Shared optimistic done-state keyed by subStepKey. Both PipelineMilestones
+  // (clicking the Outreach/Ustalenia/etc. tick) and SubStepBar (clicking a
+  // numbered circle) update this same map so the two surfaces never disagree
+  // during the optimistic window. Without this lift, clicking the milestone
+  // tick would only update `optimisticStatus` while the per-step doneAts
+  // (which now drive sub-step rendering after the cascade-doneAt rewrite)
+  // stayed stale until the server revalidate landed.
+  const [optimisticDoneByKey, setOptimisticDoneByKey] = useState<Record<string, boolean>>({});
 
   const setStatus = (next: ProductionStatus) => {
-    startTransition(async () => {
+    // Optimistic-only update — the children (PipelineMilestones, SubStepBar)
+    // call `cascadeStepsTo` themselves to persist; this just keeps the UI
+    // mirror in sync until the cascade revalidates.
+    startTransition(() => {
       setOptimisticStatus(next);
-      await setProductionStatus(row.id, next);
     });
   };
+
+  // T1/T2/T3 full-week bands anchored on T-0
+  const frameBands = computeFrameBands(row.t0At, firstDay, totalDays);
+
+  // Sub-step pins are computed FURTHER DOWN — after `allSubSteps` is built —
+  // so each pin can carry the global step number `n` and the matching frame
+  // resolved by the placement model. Keeping the band render code below the
+  // pin computation keeps the JSX clean.
+
+  // Effective sub-step list — joint canonical + custom sequence per category,
+  // resolved via `resolveCategorySequence` so a category that has been touched
+  // by `moveStepInCategory` reads from its persisted `stepOrder` while
+  // untouched categories fall back to legacy positionAfter ordering.
+  const t0MonForSteps = startOfWeekFn(row.t0At);
+  const customStepsByCat = row.customSteps ?? {};
+  const stepOrderByCat = row.stepOrder ?? {};
+
+  // PLACEMENT MODEL — uniform distribution INSIDE the T-frame.
+  //
+  // Each T-frame (T1 / T2 / T3) is exactly 7 days (Mon..Sun) anchored on
+  // T-0's week. Every category belongs to a single frame:
+  //   T1 = outreach + ustalenia      (must finish in week T-2)
+  //   T2 = nagrywanie + obróbka      (must finish in week T-1)
+  //   T3 = publikacja                (release week)
+  //
+  // Items belonging to a frame are distributed uniformly across that frame's
+  // INNER span (a 5-day window inside the 7-day band). The 1-day reserve at
+  // each cross-frame boundary keeps adjacent milestone labels — OBRÓBKA and
+  // PUBLIKACJA, USTALENIA and NAGRYWANIE — from colliding when the frames
+  // happen to have items at their respective edges.
+  //
+  // T3 anchors its first slot on T-0 (Monday) so single-item publikacja still
+  // lands on the release day; trailing publikacja customs spread from there.
+  //
+  // The end canonical of each category (cat.endStage) carries the milestone
+  // tick. With uniform distribution it lands wherever its position in the
+  // frame's flat sequence puts it; the tick re-anchors on that swept day so
+  // the trunk + tick + circle stay vertically aligned.
+  //
+  // Recorded sub-stage dates of NON-end canonicals no longer drive the step
+  // circle's x-coordinate (uniform distribution wins — that's what keeps
+  // items inside their band). Those recorded dates remain visible as
+  // `stagePins` on the colored band — separate visual layer, no overlap risk.
+  const FRAME_BOUNDS: Record<WeekFrameCode, { startDay: number; endDay: number }> = {
+    T1: { startDay: -14, endDay: -9 },
+    T2: { startDay: -7, endDay: -2 },
+    T3: { startDay: 0, endDay: 5 },
+  };
+
+  type WorkItem = {
+    cat: StageCategory;
+    frame: WeekFrameCode;
+    kind: 'canonical' | 'custom';
+    stage: ProductionStatus | null;
+    customId: string | null;
+    label: string;
+    positionAfter: ProductionStatus | null;
+    doneAt: string | null;
+    day: number;
+    isEnd: boolean;
+  };
+  const draft: WorkItem[] = [];
+
+  for (const frameCode of ['T1', 'T2', 'T3'] as const) {
+    const bounds = FRAME_BOUNDS[frameCode];
+    const frameSpan = bounds.endDay - bounds.startDay; // 6 days
+    const cats = STAGE_CATEGORIES.filter((c) => c.frame === frameCode);
+
+    type FrameSeqItem =
+      | { cat: StageCategory; kind: 'canonical'; stage: ProductionStatus }
+      | { cat: StageCategory; kind: 'custom'; step: CustomStep };
+    const frameSeq: FrameSeqItem[] = [];
+
+    for (const cat of cats) {
+      const allCustoms = (customStepsByCat[cat.key] ?? []) as CustomStep[];
+      const storedOrder = stepOrderByCat[cat.key];
+      const sequence = resolveCategorySequence(cat.key, allCustoms, storedOrder);
+      for (const it of sequence) {
+        if (it.kind === 'canonical') {
+          frameSeq.push({ cat, kind: 'canonical', stage: it.stage });
+        } else {
+          frameSeq.push({ cat, kind: 'custom', step: it.step });
+        }
+      }
+    }
+
+    const N = frameSeq.length;
+    if (N === 0) continue;
+
+    frameSeq.forEach((entry, k) => {
+      // Single-item frame anchors on its band's Monday — preserves the
+      // semantic that publikacja (T3 alone) sits on T-0.
+      const day =
+        N === 1 ? bounds.startDay : bounds.startDay + (k / (N - 1)) * frameSpan;
+
+      if (entry.kind === 'canonical') {
+        // Pull the canonical's actual doneAt out of the production's flat
+        // steps[] so the gantt's per-step state can rely on the real source
+        // of truth instead of inferring done-ness from the derived
+        // ProductionStatus alone. Status-only derivation goes wrong at the
+        // terminal stage (status='publishing' marks publishing canonical as
+        // 'active' even after it's been marked done), and that mismatch
+        // causes the canonical to appear to "unmark itself" when a later
+        // custom is unmarked.
+        const canonicalStep = (row.steps ?? []).find((x) => x.id === entry.stage);
+        draft.push({
+          cat: entry.cat,
+          frame: frameCode,
+          kind: 'canonical',
+          stage: entry.stage,
+          customId: null,
+          label: PROD_STATUS_LABEL[entry.stage],
+          positionAfter: null,
+          doneAt: canonicalStep?.doneAt ?? null,
+          day,
+          isEnd: entry.stage === entry.cat.endStage,
+        });
+      } else {
+        draft.push({
+          cat: entry.cat,
+          frame: frameCode,
+          kind: 'custom',
+          stage: null,
+          customId: entry.step.id,
+          label: entry.step.label,
+          positionAfter: entry.step.positionAfter ?? null,
+          doneAt: entry.step.doneAt,
+          day,
+          isEnd: false,
+        });
+      }
+    });
+  }
+
+  // Each category's milestone tick re-anchors on the swept position of its
+  // end canonical so the trunk line + tick + circle always share an x.
+  const endDayByCategory: Partial<Record<ProductionStage, number>> = {};
+  for (const d of draft) {
+    if (d.isEnd) endDayByCategory[d.cat.key] = d.day;
+  }
 
   // Per-category checkpoints (5 of them). Out-of-window checkpoints are
   // filtered — clipping them all to dayIdx=0 stacks ticks + labels on top of
   // each other for productions whose pipeline starts before/after the visible
   // strip (e.g. a published production where T-0 is days behind, so all
   // earlier-stage milestones land at the left edge). Same pattern as subSteps.
+  const t0MonOffsetForCheckpoints = dayDiff(t0MonForSteps, firstDay);
   const allCheckpoints = STAGE_CATEGORIES.map((cat) => {
     const { date, source } = resolveStageDate(cat.endStage, row);
-    const rawIdx = dayDiff(date, firstDay);
+    // Position from the SWEPT end-canonical day if available — keeps tick
+    // glued to its circle even after sweep-shifts. Date label uses the
+    // original resolved date (so users still see the recorded calendar
+    // date in the milestone label).
+    const sweptDay = endDayByCategory[cat.key];
+    const rawIdx =
+      sweptDay !== undefined
+        ? t0MonOffsetForCheckpoints + sweptDay
+        : dayDiff(date, firstDay);
     const clippedIdx = Math.max(0, Math.min(totalDays - 1, rawIdx));
     const outOfWindow: 'before' | 'after' | null =
       rawIdx < 0 ? 'before' : rawIdx >= totalDays ? 'after' : null;
@@ -535,150 +727,32 @@ function GanttRowView({
   });
   const checkpoints = allCheckpoints.filter((cp) => cp.outOfWindow == null);
 
-  // T1/T2/T3 full-week bands anchored on T-0
-  const frameBands = computeFrameBands(row.t0At, firstDay, totalDays);
-
-  // Sub-stage pins — every EXPLICITLY recorded stepDate becomes a pin on its
-  // band. Pins reflect what the user typed under each step on the production
-  // page (or in the inline expanded panel). Auto-derived dates (editing =
-  // shoot+1) and T-0 (publishing) are NOT pinned: editing already has its
-  // milestone tick under T2, and the T3 band itself communicates the T-0 day.
-  const stagePins: {
-    stage: ProductionStatus;
-    label: string;
-    frame: WeekFrameCode;
-    dayIdx: number;
-    dateLabel: string;
-  }[] = [];
-  for (const cat of STAGE_CATEGORIES) {
-    for (const stage of cat.subStages) {
-      const isoDate = row.stepDates?.[stage];
-      if (!isoDate) continue;
-      const date = new Date(isoDate);
-      const idx = dayDiff(date, firstDay);
-      if (idx < 0 || idx >= totalDays) continue;
-      stagePins.push({
-        stage,
-        label: PROD_STATUS_LABEL[stage],
-        frame: cat.frame,
-        dayIdx: idx,
-        dateLabel: date.toLocaleDateString('pl-PL', { dateStyle: 'medium' }),
-      });
-    }
-  }
-
-  // Effective sub-step list — joint canonical + custom sequence per category,
-  // resolved via `resolveCategorySequence` so a category that has been touched
-  // by `moveStepInCategory` reads from its persisted `stepOrder` while
-  // untouched categories fall back to legacy positionAfter ordering.
-  const t0MonForSteps = startOfWeekFn(row.t0At);
-  const customStepsByCat = row.customSteps ?? {};
-  const stepOrderByCat = row.stepOrder ?? {};
-
-  type Draft = {
-    kind: 'canonical' | 'custom';
-    stage: ProductionStatus | null;
-    customId: string | null;
-    label: string;
-    positionAfter: ProductionStatus | null;
-    cat: StageCategory;
-    frame: WeekFrameCode;
-    day: number;
-    doneAt: string | null;
-  };
-  const draft: Draft[] = [];
-  for (const cat of STAGE_CATEGORIES) {
-    const allCustoms = (customStepsByCat[cat.key] ?? []) as CustomStep[];
-    const storedOrder = stepOrderByCat[cat.key];
-    const sequence = resolveCategorySequence(cat.key, allCustoms, storedOrder);
-    if (sequence.length === 0) continue;
-
-    // Day offsets per item in this category. Two modes:
-    //  - Reordered (storedOrder set): redistribute evenly across the band's
-    //    [first canonical, last canonical] TENTATIVE range so left-to-right in
-    //    the gantt matches the user's chosen sequence.
-    //  - Legacy: canonicals at TENTATIVE, customs interpolated between them.
-    const offsets = cat.subStages.map((s) => TENTATIVE_OFFSET_FROM_T0_MON[s] ?? 0);
-    const lo = Math.min(...offsets);
-    const hi = Math.max(...offsets);
-    const days = new Array<number>(sequence.length).fill(0);
-    if (storedOrder && storedOrder.length > 0) {
-      if (sequence.length === 1) {
-        days[0] = (lo + hi) / 2;
-      } else {
-        const span = hi - lo;
-        for (let k = 0; k < sequence.length; k++) {
-          days[k] = lo + (k / (sequence.length - 1)) * span;
-        }
-      }
-    } else {
-      // Pass 1: canonicals
-      sequence.forEach((it, k) => {
-        if (it.kind === 'canonical') days[k] = TENTATIVE_OFFSET_FROM_T0_MON[it.stage] ?? 0;
-      });
-      // Pass 2: customs interpolated between adjacent canonicals
-      let k = 0;
-      while (k < sequence.length) {
-        if (sequence[k].kind === 'custom') {
-          let beforeIdx = k - 1;
-          while (beforeIdx >= 0 && sequence[beforeIdx].kind !== 'canonical') beforeIdx--;
-          let afterIdx = k;
-          while (afterIdx < sequence.length && sequence[afterIdx].kind !== 'canonical') afterIdx++;
-          const beforeDay = beforeIdx >= 0 ? days[beforeIdx] : afterIdx < sequence.length ? days[afterIdx] : lo;
-          const afterDay = afterIdx < sequence.length ? days[afterIdx] : beforeDay + 1;
-          const customCount = afterIdx - beforeIdx - 1;
-          const gap = afterDay - beforeDay;
-          let n = 1;
-          for (let j = beforeIdx + 1; j < afterIdx; j++) {
-            days[j] = beforeDay + (n / (customCount + 1)) * gap;
-            n++;
-          }
-          k = afterIdx;
-        } else {
-          k++;
-        }
-      }
-    }
-
-    sequence.forEach((it, k) => {
-      if (it.kind === 'canonical') {
-        draft.push({
-          kind: 'canonical',
-          stage: it.stage,
-          customId: null,
-          label: PROD_STATUS_LABEL[it.stage],
-          positionAfter: null,
-          cat,
-          frame: cat.frame,
-          day: days[k],
-          doneAt: null,
-        });
-      } else {
-        draft.push({
-          kind: 'custom',
-          stage: null,
-          customId: it.step.id,
-          label: it.step.label,
-          positionAfter: it.step.positionAfter ?? null,
-          cat,
-          frame: cat.frame,
-          day: days[k],
-          doneAt: it.step.doneAt,
-        });
-      }
-    });
-  }
-
   // 3) Compute dayIdx, clipping, numbering. Out-of-window steps get filtered.
   // Day-to-x: t0Mon's offset from firstDay is integer days; add the (possibly
-  // fractional) `day` directly. Earlier we built a Date and used dayDiff +
-  // fracDays, which dropped half a day on negative fractions (e.g. day=-12.5
-  // resolved to rawIdx=0.5 when terms-accepted at day=-13 was rawIdx=1, so the
-  // custom rendered LEFT of the canonical it should sit between).
-  const t0MonOffset = dayDiff(t0MonForSteps, firstDay);
+  // fractional) `day` directly. Reuse the same offset that drove checkpoint
+  // positioning so trunk + tick + circle stay in lockstep.
+  //
+  // Per-step dates are resolved separately from per-step positions:
+  //   • POSITION drives the circle's x-coordinate and is uniformly distributed
+  //     inside the band (so steps stay neatly inside their week even before
+  //     the user records anything).
+  //   • DATE drives the small inline date chip under the circle and reflects
+  //     ONLY user-recorded / derived / t0 anchors. Tentative slots show no
+  //     date chip — the band already telegraphs "tygodnia X".
   const allSubSteps: SubStepInfo[] = draft.map((d, idx) => {
-    const rawIdx = t0MonOffset + d.day;
+    const rawIdx = t0MonOffsetForCheckpoints + d.day;
     const clippedIdx = Math.max(0, Math.min(totalDays - 1, rawIdx));
+
+    let date: Date | null = null;
+    let dateSource: 'recorded' | 'derived' | 't0' | null = null;
+    if (d.kind === 'canonical' && d.stage) {
+      const resolved = resolveSubStageDate(d.stage, row);
+      if (resolved.source !== 'tentative') {
+        date = resolved.date;
+        dateSource = resolved.source;
+      }
+    }
+
     return {
       kind: d.kind,
       stage: d.stage,
@@ -692,14 +766,67 @@ function GanttRowView({
       outOfWindow: rawIdx < 0 ? 'before' : rawIdx >= totalDays ? 'after' : null,
       doneAt: d.doneAt,
       positionAfter: d.positionAfter,
+      date,
+      dateSource,
+      withTime: d.cat.withTime,
     };
   });
   // Render only in-window steps. Stacking ticks at the same edge for past /
   // future productions is unreadable; skipping is cleaner.
   const subSteps = allSubSteps.filter((s) => s.outOfWindow == null);
 
-  // Right column dynamic height — flat now (no vertical custom stacking).
-  const rightColumnHeight = 16.5;
+  // Sub-step pins on the colored T1/T2/T3 bands — every step (canonical OR
+  // custom) whose user-entered `dateIso` falls inside the visible window
+  // becomes a numbered chip ON its category's band. The chip carries the
+  // global step number; hover surfaces label + date + description.
+  //
+  // Auto-derived dates (editing = shoot+1) and the production-level T-0 are
+  // intentionally NOT pinned — they don't represent a date the user typed
+  // *into a step row*, and the milestone tick / T3 band already telegraph
+  // those anchors.
+  const subStepById = new Map<string, SubStepInfo>();
+  for (const s of allSubSteps) {
+    const id = s.kind === 'canonical' && s.stage ? (s.stage as string) : s.customId;
+    if (id) subStepById.set(id, s);
+  }
+  const stagePins: {
+    stepId: string;
+    label: string;
+    description: string | null;
+    frame: WeekFrameCode;
+    dayIdx: number;
+    dateLabel: string;
+    n: number;
+  }[] = [];
+  for (const step of row.steps ?? []) {
+    if (!step.dateIso) continue;
+    const date = new Date(step.dateIso);
+    const idx = dayDiff(date, firstDay);
+    if (idx < 0 || idx >= totalDays) continue;
+    const sub = subStepById.get(step.id);
+    if (!sub) continue;
+    const dateLabel = sub.withTime
+      ? date.toLocaleString('pl-PL', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
+      : date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
+    stagePins.push({
+      stepId: step.id,
+      label: step.label,
+      description: step.description?.trim() ? step.description.trim() : null,
+      frame: sub.frame,
+      dayIdx: idx,
+      dateLabel,
+      n: sub.n,
+    });
+  }
+
+  // Right column dynamic height. After removing the per-step date chips and
+  // the floating active-step label, nothing extends below the sub-bar circle
+  // (last visual at ~14rem). Half a rem of breathing room keeps the bottom
+  // border tidy.
+  const rightColumnHeight = 14.75;
 
   const t0Days = Math.round((row.t0At.getTime() - Date.now()) / DAY_MS);
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
@@ -712,18 +839,35 @@ function GanttRowView({
       : 'solo';
   const cancelled = optimisticStatus === 'cancelled';
 
-  // Next step indicator — first step that is NOT yet DONE (i.e., not 'passed').
-  // With cascade semantics, status='editing' means steps 1..7 are done and step
-  // 8 is the active "next to mark done". So the indicator must surface the
-  // 'active' canonical, not skip it.
+  // Per-step state derived strictly from each step's own doneAt (the data
+  // truth-source) plus visual order. The first step in visual order whose
+  // doneAt is null is the active one; everything before it is passed
+  // (cascade-implied), everything after it is pending. We deliberately
+  // don't consult ProductionStatus or the legacy positionAfter rule: those
+  // produced phantom passed/active states that diverged from the actual
+  // doneAt and made click-to-unmark feel unresponsive.
+  // Effective doneAt — optimistic override (set by either the milestone
+  // click or the sub-step click) wins over the row.steps server value so
+  // both surfaces stay in lockstep during the optimistic window.
+  const stripIsDone = (s: SubStepInfo): boolean => {
+    const k = subStepKey(s);
+    if (k in optimisticDoneByKey) return optimisticDoneByKey[k];
+    return !!s.doneAt;
+  };
+  const stripFirstUndoneIdx = (() => {
+    if (cancelled) return -1;
+    for (let i = 0; i < allSubSteps.length; i++) {
+      if (!stripIsDone(allSubSteps[i])) return i;
+    }
+    return -1;
+  })();
   const stepStateOf = (s: SubStepInfo): 'passed' | 'active' | 'pending' => {
     if (cancelled) return 'pending';
-    if (s.kind === 'canonical' && s.stage) return subStageState(s.stage, optimisticStatus);
-    if (s.kind === 'custom') {
-      if (s.doneAt) return 'passed';
-      if (s.positionAfter && STAGE_INDEX[optimisticStatus] > STAGE_INDEX[s.positionAfter]) return 'passed';
-      return 'pending';
-    }
+    const i = allSubSteps.indexOf(s);
+    if (stripFirstUndoneIdx < 0) return 'passed';
+    if (i < 0) return stripIsDone(s) ? 'passed' : 'pending';
+    if (i < stripFirstUndoneIdx) return 'passed';
+    if (i === stripFirstUndoneIdx) return 'active';
     return 'pending';
   };
   // "All done" = production has reached publishing AND every custom step is
@@ -741,81 +885,108 @@ function GanttRowView({
   const totalStepCount = allSubSteps.length;
 
   return (
-    <div className="border-t border-border/40 hover:bg-muted/15 ui-transition group">
+    <div
+      className={`${
+        isFirstOfArtist ? 'border-t border-border/70' : ''
+      } ${showArtistGap ? 'mt-6 pt-2' : ''} hover:bg-muted/15 ui-transition group`}
+    >
       <div
         className="grid gap-0"
         style={{ gridTemplateColumns: `22rem 1fr` }}
       >
-        {/* LEFT: meta + progress bar */}
-        <div className="px-5 py-4 flex flex-col gap-3 border-r border-border/40">
-          <div className="flex items-start gap-3">
-            {row.artistName ? (
-              <PersonAvatar
-                name={row.artistName}
-                seed={row.artistHandle ?? row.artistName}
-                size="lg"
-                kind="artist"
-              />
-            ) : orphanWithArtist ? (
-              <OrphanArtistAvatar size="lg" />
-            ) : (
-              <SoloAvatar size="lg" />
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start gap-1">
-                <Link
-                  href={`/productions/${row.id}`}
-                  className="flex-1 block text-base font-bold tracking-tight truncate hover:text-[var(--accent-blue)] transition"
-                  title={`${displayName} — pełny widok produkcji`}
-                >
-                  {displayName}
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setExpanded((v) => !v)}
-                  className="shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
-                  aria-expanded={expanded}
-                  aria-label={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
-                  title={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
-                >
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
+        {/* LEFT: meta + progress bar — sticky-left so the artist name +
+            next-step indicator stay readable while the user scrolls the
+            timeline horizontally. z-30 so it sits above the gantt's step
+            buttons (z-20) but below the sticky header (z-40). */}
+        <div
+          className={`pl-5 pr-4 py-3.5 flex flex-col gap-2.5 border-r border-border/40 sticky left-0 z-30 bg-card shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] ${
+            isFirstOfArtist ? '' : 'justify-center'
+          }`}
+        >
+          {isFirstOfArtist ? (
+            <>
+              <div className="flex items-start gap-3">
+                {row.artistName ? (
+                  <PersonAvatar
+                    name={row.artistName}
+                    seed={row.artistHandle ?? row.artistName}
+                    size="lg"
+                    kind="artist"
                   />
-                </button>
+                ) : orphanWithArtist ? (
+                  <OrphanArtistAvatar size="lg" />
+                ) : (
+                  <SoloAvatar size="lg" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-1">
+                    <Link
+                      href={`/productions/${row.id}`}
+                      className="flex-1 block text-base font-bold tracking-tight truncate hover:text-[var(--accent-blue)] transition"
+                      title={`${displayName} — pełny widok produkcji`}
+                    >
+                      {displayName}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setExpanded((v) => !v)}
+                      className="shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
+                      aria-expanded={expanded}
+                      aria-label={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
+                      title={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                  </div>
+                  <div
+                    className={`text-xs truncate leading-tight mt-0.5 ${
+                      orphanWithArtist ? 'text-rose-600 font-semibold' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {subtitle}
+                  </div>
+                </div>
               </div>
-              <div
-                className={`text-xs truncate leading-tight mt-0.5 ${
-                  orphanWithArtist ? 'text-rose-600 font-semibold' : 'text-muted-foreground'
-                }`}
-              >
-                {subtitle}
-              </div>
-              {/* Next-step indicator — clean card that tells the user at a
-                  glance "what's the next thing to mark done, and which
-                  milestone does it live in?". Frame color is reduced to a thin
-                  left rail + small dot so the focal point is the step name,
-                  not the band. */}
+
+              {/* Next-step indicator — sibling of the account row (not nested
+                  beside the avatar) so it spans the full meta-column width,
+                  matching the standalone follow-up rows below. */}
               <NextStepIndicator
+                productionId={row.id}
                 cancelled={cancelled}
                 allDone={allDone}
                 nextStep={nextStep}
                 totalSteps={totalStepCount}
               />
-            </div>
-          </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] mt-auto">
-            <ProductionTypeBadge type={row.type} />
-            {row.videographerName ? (
-              <span
-                className="text-muted-foreground truncate"
-                title={`Kamerzysta: ${row.videographerName}`}
-              >
-                · kam:{' '}
-                <span className="font-semibold text-foreground/80">{row.videographerName}</span>
-              </span>
-            ) : null}
-          </div>
+              <div className="flex items-center gap-1.5 text-[11px] mt-auto">
+                <ProductionTypeBadge type={row.type} />
+                {row.videographerName ? (
+                  <span
+                    className="text-muted-foreground truncate"
+                    title={`Kamerzysta: ${row.videographerName}`}
+                  >
+                    · kam:{' '}
+                    <span className="font-semibold text-foreground/80">{row.videographerName}</span>
+                  </span>
+                ) : null}
+              </div>
+            </>
+          ) : (
+            // Same-artist follow-up row: only the next-step indicator. The
+            // account/badge/videographer block is suppressed and the row's top
+            // separator is dropped so the cluster reads as one artist with
+            // multiple parallel tracks.
+            <NextStepIndicator
+              productionId={row.id}
+              cancelled={cancelled}
+              allDone={allDone}
+              nextStep={nextStep}
+              totalSteps={totalStepCount}
+            />
+          )}
         </div>
 
       {/* RIGHT: timeline. Three vertically-stacked layers, all sharing the same
@@ -858,7 +1029,7 @@ function GanttRowView({
             return (
               <div
                 key={band.code}
-                className={`absolute top-0 bottom-0 ${tone.bg} pointer-events-none border-2 ${tone.border} rounded-md`}
+                className={`absolute top-0 bottom-0 ${tone.bg} pointer-events-none border ${tone.border} rounded-md`}
                 style={{ left: `${left}%`, width: `${width}%` }}
                 aria-hidden
               >
@@ -871,28 +1042,80 @@ function GanttRowView({
             );
           })}
 
-          {/* Sub-stage pins — every recorded stepDate becomes a pin on its band.
-              Positioned in the bands wrapper so they sit ON the colored area. */}
+          {/* Sub-step pins — every step with a user-entered `dateIso` becomes
+              a numbered chip on its category's band. The chip sits in the
+              middle of the band so it doesn't crowd the T1/T2/T3 corner tag.
+              Hover (or keyboard focus) reveals a styled card with: step
+              number, label, date, and the full description. */}
           {stagePins.map((pin) => {
             const tone = FRAME_TONE[pin.frame];
             const x = (pin.dayIdx + 0.5) * dayWidthPct;
+            const ariaLabel = [
+              `Krok ${pin.n}: ${pin.label}`,
+              pin.dateLabel,
+              pin.description,
+            ]
+              .filter(Boolean)
+              .join(' — ');
             return (
               <div
-                key={pin.stage}
-                className="absolute top-0 bottom-0 z-10 pointer-events-auto"
-                style={{ left: `${x}%`, transform: 'translateX(-50%)', width: '12px' }}
-                title={`${pin.label} — ${pin.dateLabel}`}
+                key={`pin-${pin.stepId}`}
+                className="group/pin absolute z-20 pointer-events-auto"
+                style={{
+                  left: `${x}%`,
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
               >
-                {/* vertical pin shaft */}
+                {/* vertical guide — thin tick connecting chip to the band edges
+                    so the eye can trace the chip back to its calendar day. */}
                 <span
-                  className={`absolute top-2 bottom-2 left-1/2 -translate-x-1/2 w-px ${tone.passed.split(' ')[0]} opacity-60`}
+                  className={`absolute left-1/2 -translate-x-1/2 -top-4 -bottom-4 w-px ${tone.passed.split(' ')[0]} opacity-40 group-hover/pin:opacity-80 transition`}
                   aria-hidden
                 />
-                {/* pin head */}
-                <span
-                  className={`absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-card shadow-sm ${tone.passed.split(' ')[0]}`}
-                  aria-hidden
-                />
+                <button
+                  type="button"
+                  aria-label={ariaLabel}
+                  tabIndex={0}
+                  className={`relative grid place-items-center w-7 h-7 rounded-full text-[11px] font-bold tabular-nums border-2 border-white shadow-md ring-1 ring-black/5 ${tone.passed} cursor-help group-hover/pin:scale-110 group-hover/pin:shadow-lg group-focus-within/pin:scale-110 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
+                >
+                  {pin.n}
+                </button>
+                {/* Hover/focus card — appears above the pin with full step
+                    context. Uses pointer-events-none so it never traps the
+                    cursor; the parent group keeps it visible while the user
+                    hovers anywhere within the pin container. */}
+                <div
+                  role="tooltip"
+                  className="opacity-0 group-hover/pin:opacity-100 group-focus-within/pin:opacity-100 transition-opacity duration-150 pointer-events-none absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-lg border border-border bg-popover text-popover-foreground shadow-xl px-3 py-2.5"
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span
+                      className={`grid place-items-center w-5 h-5 rounded-full text-[10px] font-bold tabular-nums shadow-sm ${tone.passed}`}
+                    >
+                      {pin.n}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground">
+                      Krok {pin.n}
+                    </span>
+                  </div>
+                  <div className="text-sm font-semibold leading-snug text-foreground">
+                    {pin.label}
+                  </div>
+                  <div className="mt-0.5 text-[11px] tabular-nums text-muted-foreground">
+                    {pin.dateLabel}
+                  </div>
+                  {pin.description ? (
+                    <div className="mt-2 pt-2 border-t border-border/70 text-[11.5px] italic text-muted-foreground leading-snug whitespace-pre-wrap">
+                      {pin.description}
+                    </div>
+                  ) : null}
+                  {/* Arrow tail pointing down to the chip */}
+                  <span
+                    aria-hidden
+                    className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 rotate-45 bg-popover border-r border-b border-border"
+                  />
+                </div>
               </div>
             );
           })}
@@ -909,12 +1132,21 @@ function GanttRowView({
           const endStep =
             inCat.find((s) => s.kind === 'canonical' && s.stage === cat.endStage) ?? inCat[inCat.length - 1];
           const endX = (endStep.dayIdx + 0.5) * dayWidthPct;
-          const colourBorder =
+          // Trunk (solid pionowy łącznik milestone→circle) — średnio widoczny.
+          // Branches (dashed) — wyraźnie cichsze, żeby gęstwina kreseł w
+          // kategoriach z wieloma krokami (np. 6+ w T1) nie zalewała wiersza.
+          const trunkBorder =
             cat.frame === 'T1'
-              ? 'border-amber-400/80'
+              ? 'border-amber-400/60'
               : cat.frame === 'T2'
-                ? 'border-violet-400/80'
-                : 'border-emerald-400/80';
+                ? 'border-violet-400/60'
+                : 'border-emerald-400/60';
+          const branchBorder =
+            cat.frame === 'T1'
+              ? 'border-amber-400/40'
+              : cat.frame === 'T2'
+                ? 'border-violet-400/40'
+                : 'border-emerald-400/40';
 
           // Vertical positions:
           //   - milestone tick bottom edge ≈ 8.25rem (main bar TRACK_TOP 7.5rem + tick 0.75rem)
@@ -929,7 +1161,7 @@ function GanttRowView({
             <div key={`tree-${cat.key}`} aria-hidden>
               {/* Trunk: solid vertical from milestone tick down to sub-bar at end-step x */}
               <div
-                className={`absolute pointer-events-none border-l-2 ${colourBorder}`}
+                className={`absolute pointer-events-none border-l-2 ${trunkBorder}`}
                 style={{
                   top: TRUNK_TOP,
                   height: '4.875rem', // 13.125 - 8.25
@@ -953,7 +1185,7 @@ function GanttRowView({
                     <div key={`branch-${branchKey}`}>
                       {/* tooth (vertical) — from circle up to junction */}
                       <div
-                        className={`absolute pointer-events-none border-l-2 border-dashed ${colourBorder}`}
+                        className={`absolute pointer-events-none border-l-2 border-dashed ${branchBorder}`}
                         style={{
                           top: JUNCTION_Y,
                           height: JUNCTION_TO_SUB_HEIGHT,
@@ -963,7 +1195,7 @@ function GanttRowView({
                       />
                       {/* connector (horizontal) — from this x to trunk x */}
                       <div
-                        className={`absolute pointer-events-none border-t-2 border-dashed ${colourBorder}`}
+                        className={`absolute pointer-events-none border-t-2 border-dashed ${branchBorder}`}
                         style={{
                           top: JUNCTION_Y,
                           left: `${horizLeft}%`,
@@ -988,6 +1220,8 @@ function GanttRowView({
           status={optimisticStatus}
           cancelled={cancelled}
           onChange={setStatus}
+          optimisticDoneByKey={optimisticDoneByKey}
+          setOptimisticDoneByKey={setOptimisticDoneByKey}
         />
 
         {/* Today vertical line — full height, passes through both regions */}
@@ -1020,6 +1254,8 @@ function GanttRowView({
           status={optimisticStatus}
           cancelled={cancelled}
           onChange={setStatus}
+          optimisticDoneByKey={optimisticDoneByKey}
+          setOptimisticDoneByKey={setOptimisticDoneByKey}
         />
       </div>
       </div>
@@ -1048,11 +1284,13 @@ function GanttRowView({
  * line caption to avoid the "label-over-label" feel of the prior pill stack.
  */
 function NextStepIndicator({
+  productionId,
   cancelled,
   allDone,
   nextStep,
   totalSteps,
 }: {
+  productionId: number;
   cancelled: boolean;
   allDone: boolean;
   nextStep: SubStepInfo | null;
@@ -1060,11 +1298,11 @@ function NextStepIndicator({
 }) {
   if (cancelled) {
     return (
-      <div className="mt-2.5 flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50/70 px-2.5 py-1.5 animate-fade-in">
-        <span className="grid place-items-center w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+      <div className="flex items-center gap-3 rounded-xl border-2 border-rose-200 bg-rose-50/70 px-3 py-2 animate-fade-in">
+        <span className="grid place-items-center w-9 h-9 rounded-full bg-rose-500 text-white text-base font-bold shadow-sm shrink-0">
           ×
         </span>
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-rose-700">
+        <span className="text-sm font-bold uppercase tracking-[0.14em] text-rose-700">
           Anulowane
         </span>
       </div>
@@ -1072,9 +1310,9 @@ function NextStepIndicator({
   }
   if (allDone) {
     return (
-      <div className="mt-2.5 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-2.5 py-1.5 animate-scale-in">
-        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={2.5} />
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-800">
+      <div className="flex items-center gap-3 rounded-xl border-2 border-emerald-200 bg-emerald-50/70 px-3 py-2 animate-scale-in">
+        <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" strokeWidth={2.5} />
+        <span className="text-sm font-bold uppercase tracking-[0.14em] text-emerald-800">
           Wszystkie kroki gotowe
         </span>
       </div>
@@ -1082,51 +1320,52 @@ function NextStepIndicator({
   }
   if (!nextStep) return null;
 
-  // Frame-keyed accents — lifted from FRAME_TONE but applied as a left rail +
-  // numbered dot rather than a full chip background. Keeps the indicator
-  // visually quiet while still telegraphing the current band.
+  // Frame-keyed accents — left rail + numbered dot tinted to T1/T2/T3 so the
+  // user can spot which band the upcoming step lives in without reading the
+  // caption.
   const frameAccent = {
-    T1: { rail: 'bg-amber-500', dot: 'bg-amber-500 text-white', ink: 'text-amber-950', faint: 'text-amber-700', glow: 'shadow-amber-200/60' },
-    T2: { rail: 'bg-violet-500', dot: 'bg-violet-500 text-white', ink: 'text-violet-950', faint: 'text-violet-700', glow: 'shadow-violet-200/60' },
-    T3: { rail: 'bg-emerald-500', dot: 'bg-emerald-500 text-white', ink: 'text-emerald-950', faint: 'text-emerald-700', glow: 'shadow-emerald-200/60' },
+    T1: { rail: 'bg-amber-500', dot: 'bg-amber-500 text-white', ink: 'text-amber-950', faint: 'text-amber-700', glow: 'shadow-amber-200/70' },
+    T2: { rail: 'bg-violet-500', dot: 'bg-violet-500 text-white', ink: 'text-violet-950', faint: 'text-violet-700', glow: 'shadow-violet-200/70' },
+    T3: { rail: 'bg-emerald-500', dot: 'bg-emerald-500 text-white', ink: 'text-emerald-950', faint: 'text-emerald-700', glow: 'shadow-emerald-200/70' },
   }[nextStep.frame];
 
   return (
-    <div
+    <Link
       key={`${nextStep.kind}:${nextStep.stage ?? nextStep.customId}`}
-      className="mt-2.5 relative rounded-lg border border-border bg-card pl-3 pr-2.5 py-2 flex items-center gap-2.5 hover:border-foreground/30 hover:shadow-md hover:-translate-y-px ui-transition group/next animate-fade-up"
+      href={`/productions/${productionId}`}
+      className="relative rounded-xl border-2 border-border bg-card pl-4 pr-3 py-2.5 flex items-center gap-3 hover:border-foreground/40 hover:shadow-lg hover:-translate-y-0.5 ui-transition group/next animate-fade-up no-underline"
       title={`${nextStep.cat.label} · krok ${nextStep.n}/${totalSteps}: ${nextStep.label}`}
     >
       <span
         aria-hidden
-        className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full ${frameAccent.rail} ui-transition group-hover/next:top-1 group-hover/next:bottom-1`}
+        className={`absolute left-0 top-1.5 bottom-1.5 w-[4px] rounded-full ${frameAccent.rail} ui-transition group-hover/next:top-1 group-hover/next:bottom-1`}
       />
       <span
-        className={`grid place-items-center w-7 h-7 rounded-full text-[11px] font-bold tabular-nums shrink-0 ${frameAccent.dot} shadow-sm ${frameAccent.glow} ui-transition group-hover/next:scale-105`}
+        className={`grid place-items-center w-10 h-10 rounded-full text-base font-bold tabular-nums shrink-0 ${frameAccent.dot} shadow-md ${frameAccent.glow} ui-transition group-hover/next:scale-105`}
       >
         {nextStep.n}
       </span>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="text-[9px] uppercase tracking-[0.14em] font-semibold text-muted-foreground">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground">
             Następny krok
           </span>
-          <span className="text-[9px] tabular-nums text-muted-foreground/70">
+          <span className="text-[10px] tabular-nums text-muted-foreground/70 font-semibold">
             {nextStep.n}/{totalSteps}
           </span>
         </div>
-        <div className={`text-[12.5px] font-semibold leading-tight truncate ${frameAccent.ink}`}>
+        <div className={`text-base font-bold leading-tight truncate ${frameAccent.ink}`}>
           {nextStep.label}
         </div>
-        <div className={`text-[10px] leading-tight mt-0.5 truncate ${frameAccent.faint}`}>
+        <div className={`text-xs leading-tight mt-1 truncate font-medium ${frameAccent.faint}`}>
           {nextStep.cat.label}
         </div>
       </div>
       <ArrowRight
-        className={`w-3.5 h-3.5 shrink-0 ${frameAccent.faint} ui-transition group-hover/next:translate-x-0.5`}
-        strokeWidth={2.25}
+        className={`w-5 h-5 shrink-0 ${frameAccent.faint} ui-transition group-hover/next:translate-x-0.5`}
+        strokeWidth={2.5}
       />
-    </div>
+    </Link>
   );
 }
 
@@ -1150,6 +1389,8 @@ function PipelineMilestones({
   status,
   cancelled,
   onChange,
+  optimisticDoneByKey,
+  setOptimisticDoneByKey,
 }: {
   productionId: number;
   checkpoints: CheckpointInfo[];
@@ -1158,9 +1399,44 @@ function PipelineMilestones({
   status: ProductionStatus;
   cancelled: boolean;
   onChange: (next: ProductionStatus) => void;
+  optimisticDoneByKey: Record<string, boolean>;
+  setOptimisticDoneByKey: (next: Record<string, boolean>) => void;
 }) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [, startMilestoneTransition] = useTransition();
+
+  // Cascade-aware effective doneAt for each sub-step — mirrors SubStepBar.
+  const isStepDone = (s: SubStepInfo): boolean => {
+    const k = subStepKey(s);
+    if (k in optimisticDoneByKey) return optimisticDoneByKey[k];
+    return !!s.doneAt;
+  };
+  const firstUndoneIdx = (() => {
+    if (cancelled) return -1;
+    for (let i = 0; i < allSubSteps.length; i++) {
+      if (!isStepDone(allSubSteps[i])) return i;
+    }
+    return -1;
+  })();
+  // Milestone state derived from sub-step cascade so the main tick and the
+  // numbered circle below it can never disagree. categoryState() (the legacy
+  // status-based comparison) reported "passed" for the terminal categories
+  // even when their only canonical was still active, because it compares
+  // STAGE_INDEX[status] >= STAGE_INDEX[endStage] — true at status=endStage.
+  // Anchoring on firstUndoneIdx removes that boundary inconsistency.
+  const milestoneState = (cat: (typeof STAGE_CATEGORIES)[number]): 'passed' | 'active' | 'pending' => {
+    if (cancelled) return 'pending';
+    const catIdxs = allSubSteps
+      .map((s, i) => (s.cat.key === cat.key ? i : -1))
+      .filter((i) => i >= 0);
+    if (catIdxs.length === 0) return 'pending';
+    const firstCatIdx = catIdxs[0];
+    const lastCatIdx = catIdxs[catIdxs.length - 1];
+    if (firstUndoneIdx < 0) return 'passed';
+    if (firstUndoneIdx > lastCatIdx) return 'passed';
+    if (firstUndoneIdx >= firstCatIdx) return 'active';
+    return 'pending';
+  };
 
   // Sequential cascade — clicking a milestone marks ALL canonical sub-stages
   // up to and including that milestone's endStage as DONE (and all customs in
@@ -1168,7 +1444,7 @@ function PipelineMilestones({
   // SubStepBar.onStepClick — single source of truth for "kroki po kolei".
   const onClickCategory = (cat: (typeof STAGE_CATEGORIES)[number]) => {
     if (cancelled) return;
-    const state = categoryState(cat, status);
+    const state = milestoneState(cat);
     const mode: 'mark' | 'unmark' = state === 'passed' ? 'unmark' : 'mark';
 
     // Target: the canonical step at the FIRST sub-stage of this category for
@@ -1181,6 +1457,18 @@ function PipelineMilestones({
     if (targetIdxInAll < 0) return;
 
     const lastDoneIdx = mode === 'mark' ? targetIdxInAll : targetIdxInAll - 1;
+
+    // Optimistic: write the same cascade-shape doneAt map the SubStepBar
+    // would write — every step at idx ≤ lastDoneIdx becomes done, the rest
+    // become not done. Without this, the sub-step circles wouldn't react
+    // to a milestone click until the server revalidate landed (because the
+    // sub-step rendering reads from optimisticDoneByKey + s.doneAt, never
+    // from the canonical-derived ProductionStatus).
+    const nextOverrides: Record<string, boolean> = {};
+    for (let i = 0; i < allSubSteps.length; i++) {
+      nextOverrides[subStepKey(allSubSteps[i])] = i <= lastDoneIdx;
+    }
+    setOptimisticDoneByKey(nextOverrides);
 
     let highestCanonicalIdx = -1;
     for (let i = 0; i <= lastDoneIdx; i++) {
@@ -1197,7 +1485,9 @@ function PipelineMilestones({
     onChange(nextStatus);
 
     startMilestoneTransition(() => {
-      cascadeStepsTo(productionId, { kind: 'canonical', stage: targetStage }, mode);
+      // New cascade signature: stepId is the canonical step's id, which —
+      // for migrated productions — equals its old ProductionStatus value.
+      cascadeStepsTo(productionId, targetStage, mode);
     });
   };
 
@@ -1211,7 +1501,7 @@ function PipelineMilestones({
   const trackWidth = Math.max(0, lastX - firstX);
 
   // Progress fill: stretch from first tick to the rightmost passed tick.
-  const passedTicksByX = sortedByX.filter((cp) => categoryState(cp.cat, status) === 'passed');
+  const passedTicksByX = sortedByX.filter((cp) => milestoneState(cp.cat) === 'passed');
   const lastPassedX = passedTicksByX.length > 0 ? tickX(passedTicksByX[passedTicksByX.length - 1]) : firstX;
   const progressWidth = Math.max(0, lastPassedX - firstX);
 
@@ -1242,7 +1532,7 @@ function PipelineMilestones({
 
       {/* 5 milestone ticks — positioned at calendar dates */}
       {checkpoints.map((cp) => {
-        const state = categoryState(cp.cat, status);
+        const state = milestoneState(cp.cat);
         const isHovered = hoveredKey === cp.cat.key;
         const tentative = cp.source === 'tentative';
         const x = tickX(cp);
@@ -1304,45 +1594,100 @@ function PipelineMilestones({
         );
       })}
 
-      {/* Labels under each tick — name + date (or "ustaw datę" if tentative).
-          Centered on tick x. Width caps prevent runaway in narrow zooms. */}
+      {/* Labels under each tick — name + weekday + date (or "ustaw datę" if
+          tentative). Centered on tick x. Width caps prevent runaway in narrow
+          zooms. Date is split into weekday badge + day.month so the calendar
+          context is scannable at a glance ("śr 14.05" beats "14.05" alone).
+          Time is appended only for stages whose checkpoint is a calendar slot
+          (nagrywanie/obrobka) AND a real date was recorded — tentative dates
+          deliberately skip the time noise. */}
       {checkpoints.map((cp) => {
-        const state = categoryState(cp.cat, status);
+        const state = milestoneState(cp.cat);
         const tentative = cp.source === 'tentative';
         const x = tickX(cp);
-        const dateText = tentative
-          ? 'ustaw datę'
-          : cp.date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+        const weekday = cp.date.toLocaleDateString('pl-PL', { weekday: 'short' });
+        const dayMonth = cp.date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+        const showTime = !tentative && cp.cat.withTime && cp.source !== 'tentative';
+        const time = showTime
+          ? cp.date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+          : null;
+        const sourceHint =
+          cp.source === 'derived' ? 'auto' : cp.source === 't0' ? 'T-0' : null;
         return (
           <div
             key={`label-${cp.cat.key}`}
-            className="absolute text-center pointer-events-none px-1"
+            className="absolute pointer-events-none"
             style={{
               top: LABEL_TOP,
               left: `${x}%`,
               transform: 'translateX(-50%)',
-              width: '6.5rem',
+              width: '7rem',
             }}
           >
             <div
-              className={`text-[10px] uppercase tracking-[0.1em] font-semibold leading-tight truncate ${
+              className={`text-[10px] uppercase tracking-[0.1em] font-semibold leading-tight truncate text-center ${
                 state === 'active'
                   ? 'text-foreground'
                   : state === 'passed'
                     ? 'text-[var(--accent-blue)]'
-                    : 'text-muted-foreground/70'
+                    : 'text-muted-foreground'
               }`}
               title={cp.cat.label}
             >
               {cp.cat.label}
             </div>
-            <div
-              className={`text-[10px] tabular-nums leading-tight mt-0.5 ${
-                tentative ? 'italic text-muted-foreground/60' : 'text-muted-foreground'
-              }`}
-            >
-              {dateText}
-            </div>
+            {tentative ? (
+              <div className="text-[10px] italic text-muted-foreground/60 text-center mt-0.5 leading-tight">
+                ustaw datę
+              </div>
+            ) : (
+              <div className="mt-0.5 flex items-baseline justify-center gap-1 leading-tight">
+                <span
+                  className={`text-[9px] uppercase tracking-[0.16em] font-semibold ${
+                    state === 'active' || state === 'passed'
+                      ? 'text-muted-foreground'
+                      : 'text-muted-foreground/60'
+                  }`}
+                  title={cp.date.toLocaleDateString('pl-PL', { weekday: 'long' })}
+                >
+                  {weekday}
+                </span>
+                <span
+                  className={`text-[11px] tabular-nums font-semibold ${
+                    state === 'active'
+                      ? 'text-foreground'
+                      : state === 'passed'
+                        ? 'text-[var(--accent-blue)]'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {dayMonth}
+                </span>
+                {time ? (
+                  <span className="text-[10px] tabular-nums text-muted-foreground/80">
+                    · {time}
+                  </span>
+                ) : null}
+              </div>
+            )}
+            {sourceHint && !tentative ? (
+              <div className="mt-0.5 flex justify-center">
+                <span
+                  className={`text-[8px] uppercase tracking-[0.16em] font-bold px-1 rounded ${
+                    sourceHint === 'T-0'
+                      ? 'bg-foreground text-background'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                  title={
+                    sourceHint === 'T-0'
+                      ? 'Dzień publikacji (T-0)'
+                      : 'Auto: dzień po nagrywce'
+                  }
+                >
+                  {sourceHint}
+                </span>
+              </div>
+            ) : null}
           </div>
         );
       })}
@@ -1394,6 +1739,20 @@ type SubStepInfo = {
   doneAt: string | null;
   /** For custom only: the canonical stage AFTER which it sits. */
   positionAfter: ProductionStatus | null;
+  /** Resolved scheduling date for the step — drives the inline date chip
+   *  rendered under the circle. Source is one of:
+   *    recorded   — user typed it under the step on the production page
+   *    derived    — auto-derived (editing = shooting + 1d)
+   *    t0         — publishing always = t0At
+   *    null       — no real date yet (don't render a date chip)
+   *  Tentative-positioned canonicals are intentionally null here: their
+   *  position alone communicates "default offset" and a fake DD.MM under
+   *  every unset step would look like real dates the user agreed to. */
+  date: Date | null;
+  dateSource: 'recorded' | 'derived' | 't0' | null;
+  /** Whether the parent stage carries time-of-day semantics (nagrywka,
+   *  obróbka, ustalenia) — controls whether HH:mm is appended to the chip. */
+  withTime: boolean;
 };
 
 function SubStepBar({
@@ -1404,6 +1763,8 @@ function SubStepBar({
   status,
   cancelled,
   onChange,
+  optimisticDoneByKey,
+  setOptimisticDoneByKey,
 }: {
   productionId: number;
   subSteps: SubStepInfo[];
@@ -1412,31 +1773,52 @@ function SubStepBar({
   status: ProductionStatus;
   cancelled: boolean;
   onChange: (next: ProductionStatus) => void;
+  optimisticDoneByKey: Record<string, boolean>;
+  setOptimisticDoneByKey: (next: Record<string, boolean>) => void;
 }) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
-  const [optimisticCustomDone, setOptimisticCustomDone] = useState<Record<string, boolean>>({});
   const [, startTransition] = useTransition();
 
   const stepX = (s: SubStepInfo) => (s.dayIdx + 0.5) * dayWidthPct;
 
-  // Effective done state for a custom step — local optimistic OR DB doneAt OR
-  // status has progressed past its insertion point.
-  const isCustomPassed = (s: SubStepInfo): boolean => {
-    if (s.kind !== 'custom' || !s.customId) return false;
-    const overrideKey = `${s.cat.key}:${s.customId}`;
-    if (overrideKey in optimisticCustomDone) return optimisticCustomDone[overrideKey];
-    if (s.doneAt) return true;
-    if (s.positionAfter && STAGE_INDEX[status] > STAGE_INDEX[s.positionAfter]) return true;
-    return false;
+  const keyOf = (s: SubStepInfo) => subStepKey(s);
+
+  // Single source of truth for "is this step done?" — optimistic override
+  // (shared with PipelineMilestones via the lifted state) wins, then the
+  // step's actual doneAt from row.steps. We deliberately do NOT consult the
+  // derived ProductionStatus or the legacy positionAfter rule here: those
+  // produced phantom-passed states (custom appears done because status
+  // moved past its anchor canonical, even though its own doneAt is null)
+  // which made unmark clicks invisible.
+  const isDone = (s: SubStepInfo): boolean => {
+    const k = keyOf(s);
+    if (k in optimisticDoneByKey) return optimisticDoneByKey[k];
+    return !!s.doneAt;
   };
+
+  // Visual state: cascade-invariant by construction. The first step in
+  // visual order whose isDone is false is the active one — everything
+  // before it is passed (cascade-implied), everything after it is pending.
+  // This guarantees we never render "step N+1 active while step N pending":
+  // by definition the active step is the first non-done one, so all earlier
+  // steps are done.
+  const firstUndoneIdx = (() => {
+    if (status === 'cancelled') return -1;
+    for (let i = 0; i < allSubSteps.length; i++) {
+      if (!isDone(allSubSteps[i])) return i;
+    }
+    return -1;
+  })();
 
   const stateOf = (s: SubStepInfo): 'passed' | 'active' | 'pending' => {
-    if (s.kind === 'canonical' && s.stage) return subStageState(s.stage, status);
-    if (s.kind === 'custom') return isCustomPassed(s) ? 'passed' : 'pending';
+    if (status === 'cancelled') return 'pending';
+    const i = allSubSteps.findIndex((x) => keyOf(x) === keyOf(s));
+    if (i < 0) return isDone(s) ? 'passed' : 'pending';
+    if (firstUndoneIdx < 0) return 'passed';
+    if (i < firstUndoneIdx) return 'passed';
+    if (i === firstUndoneIdx) return 'active';
     return 'pending';
   };
-
-  const keyOf = (s: SubStepInfo) => (s.kind === 'canonical' ? s.stage! : `c:${s.customId}`);
 
   // Sequential cascade — clicking a step propagates state to all earlier steps
   // (mark) or all later steps (unmark). Steps must be completed in order:
@@ -1455,17 +1837,16 @@ function SubStepBar({
     const isPassed = stateOf(s) === 'passed';
     const mode: 'mark' | 'unmark' = isPassed ? 'unmark' : 'mark';
 
-    // Optimistic: every custom in [0..lastDoneIdx] = done, rest = not.
+    // Optimistic: every step in [0..lastDoneIdx] = done, rest = not.
+    // Cover BOTH canonicals and customs so the cascade-invariant display
+    // matches the in-flight server cascade — server-side cascadeStepsTo
+    // operates on the same flat steps[] in the same visual order.
     const lastDoneIdx = mode === 'mark' ? idxInAll : idxInAll - 1;
     const nextOverrides: Record<string, boolean> = {};
     for (let i = 0; i < allSubSteps.length; i++) {
-      const step = allSubSteps[i];
-      if (step.kind === 'custom' && step.customId) {
-        const overrideKey = `${step.cat.key}:${step.customId}`;
-        nextOverrides[overrideKey] = i <= lastDoneIdx;
-      }
+      nextOverrides[keyOf(allSubSteps[i])] = i <= lastDoneIdx;
     }
-    setOptimisticCustomDone(nextOverrides);
+    setOptimisticDoneByKey(nextOverrides);
 
     // Optimistic: project new canonical status from cascade. Highest canonical
     // in [0..lastDoneIdx] determines status as one-past (next active), capped
@@ -1484,12 +1865,12 @@ function SubStepBar({
         : PRODUCTION_PROGRESSION[Math.min(highestCanonicalIdx + 1, PRODUCTION_PROGRESSION.length - 1)];
     onChange(nextStatus);
 
-    const target =
-      s.kind === 'canonical' && s.stage
-        ? { kind: 'canonical' as const, stage: s.stage }
-        : { kind: 'custom' as const, category: s.cat.key, stepId: s.customId! };
+    // New cascade signature: each step has a unique id. Canonical steps use
+    // their old ProductionStatus value as id; customs keep their original id.
+    const stepId =
+      s.kind === 'canonical' && s.stage ? (s.stage as string) : s.customId!;
     startTransition(() => {
-      cascadeStepsTo(productionId, target, mode);
+      cascadeStepsTo(productionId, stepId, mode);
     });
   };
 
@@ -1507,7 +1888,6 @@ function SubStepBar({
 
   // Sit below the main milestone labels — at the very bottom of the row.
   const TRACK_TOP = '13.5rem';
-  const LABEL_TOP = '14.5rem';
 
   return (
     <>
@@ -1529,6 +1909,10 @@ function SubStepBar({
         }}
         aria-hidden
       />
+
+      {/* Per-step date chips were intentionally removed — the user-entered
+          date now lives ONLY on the band-level pin (with full hover card).
+          Replicating it under each step circle was redundant noise. */}
 
       {/* Step circles — canonical (numbered, large) and custom (numbered, smaller
           dashed border to telegraph it's a user insert) all in one ordered list. */}
@@ -1599,25 +1983,10 @@ function SubStepBar({
         );
       })}
 
-      {/* Active-step floating label — shows the active canonical step OR the
-          hovered step (canonical or custom). */}
-      {(() => {
-        const hoveredStep = subSteps.find((s) => keyOf(s) === hoveredKey);
-        const activeStep = subSteps.find((s) => stateOf(s) === 'active');
-        const labelStep = hoveredStep ?? activeStep;
-        if (!labelStep) return null;
-        const x = stepX(labelStep);
-        return (
-          <div
-            className="absolute z-10 text-center pointer-events-none whitespace-nowrap"
-            style={{ top: LABEL_TOP, left: `${x}%`, transform: 'translateX(-50%)' }}
-          >
-            <span className="text-[10px] uppercase tracking-[0.1em] font-semibold text-foreground bg-card border border-border rounded-md px-2 py-0.5 shadow-sm">
-              {labelStep.n}. {labelStep.label}
-            </span>
-          </div>
-        );
-      })()}
+      {/* The bottom floating "active/hover step" label was intentionally
+          removed — the band-level pin's hover card now carries the full
+          step context (number, label, date, description). Keeping a parallel
+          label under the sub-bar duplicated information and crowded the row. */}
     </>
   );
 }
@@ -1728,11 +2097,10 @@ function ExpandedDetails({
                       <ExpandedCategorySection
                         key={cat.key}
                         productionId={row.id}
+                        productionT0At={row.t0At}
                         category={cat}
-                        currentStatus={currentStatus}
-                        stepDates={stepDates}
-                        customSteps={(row.customSteps ?? {})[cat.key] ?? []}
-                        storedOrder={(row.stepOrder ?? {})[cat.key]}
+                        steps={row.steps}
+                        cancelled={row.cancelled}
                         startNumber={(offsetsByCat.get(cat.key) ?? 0) + 1}
                       />
                     ))}
@@ -1754,29 +2122,34 @@ function ExpandedDetails({
 
 function ExpandedCategorySection({
   productionId,
+  productionT0At,
   category,
-  currentStatus,
-  stepDates,
-  customSteps,
-  storedOrder,
+  steps,
+  cancelled,
   startNumber,
 }: {
   productionId: number;
+  productionT0At: Date;
   category: StageCategory;
-  currentStatus: ProductionStatus;
-  stepDates: Partial<Record<ProductionStatus, string>>;
-  customSteps: CustomStep[];
-  storedOrder: string[] | undefined;
+  steps: ProductionStep[];
+  cancelled: boolean;
   /** 1-based global step number for the first item in this category — each
    *  subsequent item uses startNumber + seqIdx. Matches gantt sub-step n. */
   startNumber: number;
 }) {
-  const states = category.subStages.map((s) => subStageState(s, currentStatus));
-  const allPassed = states.every((s) => s === 'passed');
-  const anyActive = states.includes('active');
-  const groupTone = allPassed ? 'passed' : anyActive ? 'active' : 'pending';
-  const passedCount = states.filter((s) => s === 'passed').length;
-  const sequence = resolveCategorySequence(category.key, customSteps, storedOrder);
+  const stepsInCat = steps.filter((s) => s.category === category.key);
+  const passedCount = stepsInCat.filter((s) => !!s.doneAt).length;
+  // First non-done step in the WHOLE production is the "active" one — used for
+  // tone and the cascade indicator on the row.
+  const firstActiveId = steps.find((s) => !s.doneAt)?.id ?? null;
+  const groupTone =
+    stepsInCat.length === 0
+      ? 'pending'
+      : passedCount === stepsInCat.length
+        ? 'passed'
+        : stepsInCat.some((s) => s.id === firstActiveId)
+          ? 'active'
+          : 'pending';
 
   return (
     <div
@@ -1796,78 +2169,42 @@ function ExpandedCategorySection({
           {category.description}
         </span>
         <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums font-medium shrink-0">
-          {passedCount}/{category.subStages.length} kroków
+          {passedCount}/{stepsInCat.length} kroków
         </span>
       </div>
 
       <div className="p-4 space-y-3">
-        {sequence.map((item, seqIdx) => {
-          const canMoveUp = seqIdx > 0;
-          const canMoveDown = seqIdx < sequence.length - 1;
-          if (item.kind === 'canonical') {
-            const stage = item.stage;
-            const stageIdx = category.subStages.indexOf(stage);
-            const stepDateIso = stepDates[stage] ?? null;
-            const derivedIso =
-              stage === 'editing' && stepDates.shooting
-                ? deriveEditingIso(stepDates.shooting)
-                : null;
+        {stepsInCat.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-4 text-center text-[11px] text-muted-foreground">
+            Brak kroków w tej kategorii.
+          </div>
+        ) : (
+          stepsInCat.map((step, posInCat) => {
+            const canMoveUp = posInCat > 0;
+            const canMoveDown = posInCat < stepsInCat.length - 1;
+            const state =
+              step.doneAt
+                ? 'passed'
+                : step.id === firstActiveId
+                  ? 'active'
+                  : 'pending';
             return (
-              <div key={`c:${stage}`} className="group space-y-1.5">
-                <div className="flex items-start gap-2">
-                  <div className="flex-1 min-w-0">
-                    <SubStageButton
-                      productionId={productionId}
-                      stage={stage}
-                      label={STAGE_LABEL[stage]}
-                      state={stageIdx >= 0 ? states[stageIdx] : 'pending'}
-                      displayNumber={startNumber + seqIdx}
-                    />
-                  </div>
-                  <MoveArrows
-                    productionId={productionId}
-                    category={category.key}
-                    stepKey={stage}
-                    canMoveUp={canMoveUp}
-                    canMoveDown={canMoveDown}
-                    className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition pt-1.5"
-                  />
-                </div>
-                {STAGE_HINT[stage] ? (
-                  <p className="pl-7 text-[11px] text-muted-foreground/80 italic">
-                    {STAGE_HINT[stage]}
-                  </p>
-                ) : null}
-                <StageDatePicker
-                  productionId={productionId}
-                  stage={stage}
-                  mode={category.dateMode}
-                  currentIso={stepDateIso}
-                  derivedIso={derivedIso}
-                  withTime={category.withTime}
-                  label={category.dateLabel}
-                />
-              </div>
+              <ProductionStepRow
+                key={step.id}
+                productionId={productionId}
+                productionT0At={productionT0At}
+                step={step}
+                state={state as 'passed' | 'active' | 'pending'}
+                displayNumber={startNumber + posInCat}
+                canMoveUp={canMoveUp}
+                canMoveDown={canMoveDown}
+                productionCancelled={cancelled}
+              />
             );
-          }
-          return (
-            <CustomStepRow
-              key={`x:${item.step.id}`}
-              productionId={productionId}
-              category={category.key}
-              step={item.step}
-              canMoveUp={canMoveUp}
-              canMoveDown={canMoveDown}
-              displayNumber={startNumber + seqIdx}
-            />
-          );
-        })}
+          })
+        )}
         <div className="pt-1">
-          <CustomStepAddInline
-            productionId={productionId}
-            category={category.key}
-            canonicalStages={category.subStages}
-          />
+          <AddStepInline productionId={productionId} category={category.key} />
         </div>
       </div>
     </div>

@@ -1,9 +1,7 @@
 import Link from 'next/link';
 import { LayoutTemplate, Pencil, Plus } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
-import { CANONICAL_STAGES_BY_CATEGORY } from '@/lib/category-sequence';
 import { loadTemplates } from '@/lib/production-templates';
-import { STAGE_LABEL } from '@/lib/production-stages';
 import {
   CATEGORY_LABEL,
   FRAME_FOR_CATEGORY,
@@ -97,9 +95,7 @@ function SectionHeading({ title, count }: { title: string; count: number }) {
 }
 
 function TemplateCard({ template }: { template: ProductionTemplate }) {
-  const totalSteps =
-    Object.values(CANONICAL_STAGES_BY_CATEGORY).reduce((s, arr) => s + arr.length, 0) +
-    template.customSteps.length;
+  const totalSteps = template.steps.length;
 
   return (
     <article className="card-editorial p-6 flex flex-col gap-5">
@@ -118,25 +114,10 @@ function TemplateCard({ template }: { template: ProductionTemplate }) {
 
       <div className="space-y-3">
         {CATEGORY_ORDER.map((cat) => {
-          const canonicals = CANONICAL_STAGES_BY_CATEGORY[cat];
-          const customs = template.customSteps.filter((s) => s.category === cat);
+          const stepsInCat = template.steps.filter((s) => s.category === cat);
+          if (stepsInCat.length === 0) return null;
           const frame = FRAME_FOR_CATEGORY[cat];
           const tone = FRAME_STYLE[frame];
-
-          const sequence: { kind: 'canonical' | 'custom'; label: string }[] = [];
-          for (const stage of canonicals) {
-            sequence.push({ kind: 'canonical', label: STAGE_LABEL[stage] });
-            for (const c of customs) {
-              if (c.positionAfter === stage) {
-                sequence.push({ kind: 'custom', label: c.label });
-              }
-            }
-          }
-          for (const c of customs) {
-            if (!canonicals.includes(c.positionAfter)) {
-              sequence.push({ kind: 'custom', label: c.label });
-            }
-          }
 
           return (
             <div
@@ -155,21 +136,24 @@ function TemplateCard({ template }: { template: ProductionTemplate }) {
                   </span>
                 </div>
                 <span className="text-[10px] tabular-nums text-muted-foreground">
-                  {sequence.length} {sequence.length === 1 ? 'krok' : 'kroków'}
+                  {stepsInCat.length} {stepsInCat.length === 1 ? 'krok' : 'kroków'}
                 </span>
               </div>
               <ol className="flex flex-wrap gap-1.5">
-                {sequence.map((item, i) => (
+                {stepsInCat.map((step) => (
                   <li
-                    key={i}
-                    className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded border ${
-                      item.kind === 'custom'
-                        ? `${tone.chip} font-semibold`
-                        : 'bg-background border-border text-foreground/70'
-                    }`}
+                    key={step.id}
+                    className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded border bg-background border-border text-foreground/80"
                   >
-                    {item.kind === 'custom' ? <Plus className="w-2.5 h-2.5" strokeWidth={3} /> : null}
-                    {item.label}
+                    {step.label}
+                    {step.isT0Anchor ? (
+                      <span
+                        className={`ml-0.5 text-[9px] font-bold tabular-nums px-1 py-0 rounded ${tone.badge}`}
+                        title="Krok-kotwica T-0"
+                      >
+                        T0
+                      </span>
+                    ) : null}
                   </li>
                 ))}
               </ol>

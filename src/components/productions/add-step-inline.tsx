@@ -3,30 +3,25 @@
 import { useRef, useState } from 'react';
 import { FileUp, Paperclip, Plus, X } from 'lucide-react';
 import {
-  addCustomStep,
-  attachFileToCustomStep,
-} from '@/server/actions/production-custom-steps';
-import type {
-  ProductionStage,
-  ProductionStatus,
-} from '../../../drizzle/schema';
+  addStepToProduction,
+  attachFileToStep,
+} from '@/server/actions/production-steps';
+import type { ProductionStage } from '../../../drizzle/schema';
 
 /**
- * Inline "add step" form. Collapsed by default → "+ Dodaj krok" link.
- * Expanded form has: label input, optional description, optional file.
+ * Inline "add step" form for a category. Collapsed by default → "+ Dodaj krok"
+ * link. Expanded form has: label input, optional description, optional file.
  *
- * The new step is appended at the END of the category's joint sequence
- * (canonicals + existing customs). User reorders it afterwards using ↑/↓
- * arrows on the step row — no positionAfter picker, no "sub-step" framing.
+ * The new step is appended at the END of the category's sequence — user
+ * reorders it with ↑/↓ arrows on the row afterwards. Date mode defaults to
+ * 'none' (no calendar entry) — the user can promote it later by editing.
  */
-export function CustomStepAddInline({
+export function AddStepInline({
   productionId,
   category,
-  canonicalStages,
 }: {
   productionId: number;
   category: ProductionStage;
-  canonicalStages: ProductionStatus[];
 }) {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('');
@@ -51,13 +46,9 @@ export function CustomStepAddInline({
     }
     setBusy(true);
     setError(null);
-    // Default to last canonical so the new step lands at the end of the
-    // joint sequence (after every existing canonical and existing custom).
-    const positionAfter = canonicalStages[canonicalStages.length - 1];
-    const res = await addCustomStep(
+    const res = await addStepToProduction(
       productionId,
       category,
-      positionAfter,
       trimmed,
       description.trim() || undefined,
     );
@@ -69,7 +60,7 @@ export function CustomStepAddInline({
     if (file) {
       const fd = new FormData();
       fd.append('file', file);
-      const upload = await attachFileToCustomStep(productionId, category, res.stepId, fd);
+      const upload = await attachFileToStep(productionId, res.stepId, fd);
       if (!upload.ok) {
         setError(`Krok dodany, ale plik się nie wgrał: ${upload.error}`);
         setBusy(false);
@@ -132,7 +123,7 @@ export function CustomStepAddInline({
         />
 
         <p className="text-[10px] text-muted-foreground italic">
-          Krok pojawi się na końcu listy. Kolejność zmienisz strzałkami ↑/↓.
+          Krok pojawi się na końcu kategorii. Kolejność zmienisz strzałkami ↑/↓.
         </p>
 
         <div className="space-y-1">

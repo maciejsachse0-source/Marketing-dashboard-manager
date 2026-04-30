@@ -8,7 +8,7 @@ import { NewProductionButton } from '@/components/productions/new-production-but
 import { loadTemplates } from '@/lib/production-templates';
 import { PlatformPills } from '@/components/platforms-pills';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
-import { StageTracker } from '@/components/productions/stage-tracker';
+import { ProductionStepTracker } from '@/components/productions/production-step-tracker';
 import { Film } from 'lucide-react';
 import type { Artist, Production, Videographer } from '../../../drizzle/schema';
 
@@ -31,7 +31,14 @@ export default async function ProductionsListPage({
 
   const filtered = productions.filter((p) => {
     if (sp.type && p.type !== sp.type) return false;
-    if (sp.status && p.status !== sp.status) return false;
+    // Status filter — supports the 3 derived states (in-progress/done/cancelled)
+    // computed from steps + cancelledAt. Legacy enum values are accepted as
+    // a best-effort by mapping to the matching canonical step's done state.
+    if (sp.status === 'cancelled') return !!p.cancelledAt;
+    if (sp.status === 'done')
+      return !p.cancelledAt && (p.steps ?? []).length > 0 && (p.steps ?? []).every((s) => !!s.doneAt);
+    if (sp.status === 'in-progress')
+      return !p.cancelledAt && !((p.steps ?? []).length > 0 && (p.steps ?? []).every((s) => !!s.doneAt));
     return true;
   });
 
@@ -273,7 +280,7 @@ function ProductionCard({
         </div>
       ) : null}
 
-      <StageTracker productionId={p.id} status={p.status} />
+      <ProductionStepTracker steps={p.steps ?? []} cancelled={!!p.cancelledAt} />
     </Link>
   );
 }

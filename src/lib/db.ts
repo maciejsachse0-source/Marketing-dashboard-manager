@@ -22,7 +22,29 @@ function createDb() {
   return drizzle(sqlite, { schema });
 }
 
-export const db = globalThis.__db__ ?? createDb();
-if (env.NODE_ENV !== 'production') globalThis.__db__ = db;
+// Schema-version stamp — bump when schema.ts gains/loses columns so dev-server
+// HMR doesn't keep a stale Drizzle instance with the old column set cached.
+const SCHEMA_VERSION = 'flexible-steps-v2-dropped-legacy';
+declare global {
+  // eslint-disable-next-line no-var
+  var __dbSchemaVersion__: string | undefined;
+}
+
+function getDb() {
+  if (
+    globalThis.__db__ &&
+    globalThis.__dbSchemaVersion__ === SCHEMA_VERSION
+  ) {
+    return globalThis.__db__;
+  }
+  const fresh = createDb();
+  if (env.NODE_ENV !== 'production') {
+    globalThis.__db__ = fresh;
+    globalThis.__dbSchemaVersion__ = SCHEMA_VERSION;
+  }
+  return fresh;
+}
+
+export const db = getDb();
 
 export { schema };

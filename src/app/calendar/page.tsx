@@ -7,8 +7,84 @@ import { addDays, endOfDay, startOfWeek } from '@/lib/dates';
 import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
 import { loadTemplates } from '@/lib/production-templates';
-import type { Production, ProductionStatus, ProductionType } from '../../../drizzle/schema';
+import { isProductionDone } from '@/lib/production-steps';
+import type {
+  CustomStep,
+  Production,
+  ProductionStage,
+  ProductionStatus,
+  ProductionStep,
+  ProductionType,
+} from '../../../drizzle/schema';
+import { PRODUCTION_PROGRESSION } from '../../../drizzle/schema';
 import type { GanttRow } from '@/components/calendar/gantt-view';
+
+const CANONICAL_STAGE_SET = new Set<string>(PRODUCTION_PROGRESSION);
+
+/** Synthesize the legacy GanttRow shape from a production's `steps[]` so the
+ *  gantt — which still renders against that shape internally — keeps working
+ *  during the cleanup window. After Phase 6 the gantt switches to consuming
+ *  steps directly and this adapter goes away. */
+function buildLegacyShape(steps: ProductionStep[]): {
+  status: ProductionStatus;
+  stepDates: Partial<Record<ProductionStatus, string>>;
+  customSteps: Partial<Record<ProductionStage, CustomStep[]>>;
+  stepOrder: Partial<Record<ProductionStage, string[]>>;
+} {
+  // Status = id of the first canonical step that's not done. If every canonical
+  // is already done (regardless of customs), the pipeline has reached the
+  // terminal 'publishing' stage — falling back to 'email-sent' here would make
+  // a near-complete production look as if it were starting over and would
+  // break the visual cascade (later canonicals would render pending while
+  // their custom doneAts mark them as done).
+  const canonicalSteps = steps.filter((s) => CANONICAL_STAGE_SET.has(s.id));
+  const firstUndoneCanonical = canonicalSteps.find((s) => !s.doneAt);
+  let status: ProductionStatus;
+  if (firstUndoneCanonical) {
+    status = firstUndoneCanonical.id as ProductionStatus;
+  } else if (canonicalSteps.length > 0) {
+    status = 'publishing';
+  } else {
+    status = 'email-sent';
+  }
+
+  const stepDates: Partial<Record<ProductionStatus, string>> = {};
+  const customSteps: Partial<Record<ProductionStage, CustomStep[]>> = {};
+  const stepOrder: Partial<Record<ProductionStage, string[]>> = {};
+
+  for (const s of steps) {
+    const cat = s.category;
+    if (!stepOrder[cat]) stepOrder[cat] = [];
+    stepOrder[cat]!.push(s.id);
+
+    if (CANONICAL_STAGE_SET.has(s.id)) {
+      if (s.dateIso) stepDates[s.id as ProductionStatus] = s.dateIso;
+    } else {
+      if (!customSteps[cat]) customSteps[cat] = [];
+      const cs: CustomStep = {
+        id: s.id,
+        label: s.label,
+        doneAt: s.doneAt,
+      };
+      // Anchor every custom to the first canonical of its category so the
+      // legacy `positionAfter`-driven sequence falls back gracefully if the
+      // gantt ignores stepOrder.
+      const canonicalsInCat = steps.filter(
+        (x) => x.category === cat && CANONICAL_STAGE_SET.has(x.id),
+      );
+      if (canonicalsInCat[0]) {
+        cs.positionAfter = canonicalsInCat[0].id as ProductionStatus;
+      }
+      if (s.description) cs.description = s.description;
+      if (s.attachmentPath) cs.attachmentPath = s.attachmentPath;
+      if (s.attachmentName) cs.attachmentName = s.attachmentName;
+      if (s.attachmentSize !== undefined) cs.attachmentSize = s.attachmentSize;
+      customSteps[cat]!.push(cs);
+    }
+  }
+
+  return { status, stepDates, customSteps, stepOrder };
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -80,9 +156,11 @@ export default async function CalendarPage({
 
   const productionsList: Production[] = productionsRaw.filter((p) => {
     if (typeFilter !== 'all' && p.type !== typeFilter) return false;
-    if (statusFilter === 'cancelled') return p.status === 'cancelled';
-    if (statusFilter === 'done') return p.status === 'publishing';
-    if (statusFilter === 'in-progress') return p.status !== 'cancelled' && p.status !== 'publishing';
+    const isCancelled = !!p.cancelledAt;
+    const isDone = isProductionDone(p.steps ?? []);
+    if (statusFilter === 'cancelled') return isCancelled;
+    if (statusFilter === 'done') return !isCancelled && isDone;
+    if (statusFilter === 'in-progress') return !isCancelled && !isDone;
     return true;
   });
 
@@ -91,16 +169,23 @@ export default async function CalendarPage({
     const videographer = p.videographerId
       ? videographerById.get(p.videographerId) ?? null
       : null;
+    const steps = p.steps ?? [];
+    const isCancelled = !!p.cancelledAt;
+    const legacy = buildLegacyShape(steps);
     return {
       id: p.id,
       title: p.title,
       slug: p.slug,
       type: p.type as ProductionType,
-      status: p.status as ProductionStatus,
+      // Cancellation overrides synthesized status — gantt uses 'cancelled' as
+      // its terminal off-track state.
+      status: (isCancelled ? 'cancelled' : legacy.status) as ProductionStatus,
       t0At: p.t0At,
-      stepDates: p.stepDates ?? null,
-      customSteps: p.customSteps ?? null,
-      stepOrder: p.stepOrder ?? null,
+      stepDates: legacy.stepDates,
+      customSteps: legacy.customSteps,
+      stepOrder: legacy.stepOrder,
+      steps,
+      cancelled: isCancelled,
       artistName: artist?.name ?? null,
       artistHandle: artist?.handle ?? null,
       videographerName: videographer?.name ?? null,
@@ -134,24 +219,59 @@ export default async function CalendarPage({
   const weeks = Array.from({ length: zoom }, (_, i) => addDays(weekStart, i * 7));
   const totalCount = productionsRaw.length;
 
-  // Canvas stretch — every extra custom step adds horizontal pixels so circles
-  // don't overlap when many steps are inserted in a tight calendar window.
-  const maxCustomCount = rows.reduce((max, r) => {
-    const cs = (r as { customSteps?: Record<string, unknown[]> | null }).customSteps;
-    if (!cs) return max;
-    let count = 0;
-    for (const arr of Object.values(cs)) if (Array.isArray(arr)) count += arr.length;
-    return Math.max(max, count);
-  }, 0);
-  // Min-width scales with zoom — 5 weeks fits in ~1400px (most of it on common
-  // laptop viewports); 8 and 12 grow proportionally so each day column stays
-  // legible. The 1400 floor is set so milestone labels (Outreach, Ustalenia z
-  // kamerzystą, Nagrywanie, Obróbka, Publikacja) don't collide horizontally —
-  // adjacent ticks (e.g. NAGRYWANIE Wed and OBROBKA Fri of T2) need ≥6.5rem of
-  // breathing room each. Custom steps add extra pixels so sub-step circles
-  // don't overlap when many are inserted in a tight calendar window.
-  const baseMinWidth = zoom <= 5 ? 1400 : zoom <= 8 ? 1900 : 2500;
-  const canvasMinWidth = baseMinWidth + maxCustomCount * 80;
+  // Canvas stretch — placement model (gantt-view.tsx) packs every step in a
+  // category into its T-frame's 7-day band (T1 = outreach + ustalenia,
+  // T2 = nagrywanie + obróbka, T3 = publikacja). Items in a frame are spread
+  // uniformly across the band's inner 6 days, so adjacent items are
+  //   6 / max(1, N - 1)   days apart (N = item count in that frame).
+  //
+  // Canvas must be wide enough that this gap renders at MIN_PX_PER_STEP.
+  // Without that the densest frame collapses circles onto each other.
+  //
+  //   pixelsPerDay   = (canvasWidth - LEFT_COL_PX) / totalDays
+  //   pixelsPerDay × gapDays ≥ MIN_PX_PER_STEP
+  //   ⇒ canvasWidth ≥ MIN_PX_PER_STEP × totalDays / gapDays + LEFT_COL_PX
+  //
+  // We take the worst-case gap across all visible rows and frames. Capped so
+  // we don't push the strip into perf cliffs (~6000px+ widths).
+  const FRAME_OF_CATEGORY: Record<string, 'T1' | 'T2' | 'T3'> = {
+    outreach: 'T1',
+    ustalenia: 'T1',
+    nagrywanie: 'T2',
+    obrobka: 'T2',
+    publikacja: 'T3',
+  };
+  const FRAME_INNER_DAYS = 5; // 5-day inner window (frame ends - frame starts in gantt-view)
+  const LEFT_COL_PX = 352; // 22rem column for production meta on the left
+  const MIN_PX_PER_STEP = 40; // step circle (28px active) + 12px breathing
+  const totalDays = zoom * 7;
+
+  let worstGapDays = 1; // default — single-item frames need ≥1 day per step
+  for (const r of rows) {
+    const counts: Record<'T1' | 'T2' | 'T3', number> = { T1: 0, T2: 0, T3: 0 };
+    for (const s of r.steps ?? []) {
+      const f = FRAME_OF_CATEGORY[s.category];
+      if (f) counts[f] += 1;
+    }
+    for (const code of ['T1', 'T2', 'T3'] as const) {
+      const N = counts[code];
+      if (N <= 1) continue;
+      const gap = FRAME_INNER_DAYS / (N - 1);
+      if (gap < worstGapDays) worstGapDays = gap;
+    }
+  }
+
+  // Min-width scales with zoom. Floor sized so milestone labels (Outreach,
+  // Ustalenia z kamerzystą, Nagrywanie, Obróbka, Publikacja) get ≥6.5rem of
+  // breathing room at the chosen zoom.
+  const baseMinWidth = zoom <= 5 ? 1700 : zoom <= 8 ? 2600 : 3700;
+  const MAX_CANVAS = zoom <= 5 ? 4400 : zoom <= 8 ? 5400 : 7000;
+  const requiredForGap =
+    (MIN_PX_PER_STEP * totalDays) / worstGapDays + LEFT_COL_PX;
+  const canvasMinWidth = Math.min(
+    MAX_CANVAS,
+    Math.max(baseMinWidth, Math.ceil(requiredForGap)),
+  );
 
   const artistOptions = artists.map((a) => ({ id: a.id, name: a.name, handle: a.handle }));
   const videographerOptions = videographers.map((v) => ({
