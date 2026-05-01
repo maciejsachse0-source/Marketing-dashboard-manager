@@ -4,6 +4,11 @@ import type {
   StepDateMode,
 } from '../../drizzle/schema';
 import { startOfWeek, addDays, endOfDay } from './dates';
+import {
+  type PeriodCode,
+  periodsRelativeToT0Mon,
+  type TemplatePeriod,
+} from './production-periods';
 
 /**
  * Pure helpers for the flexible-steps model. Independent of DB / UI — just
@@ -79,7 +84,6 @@ export function cloneTemplateSteps(
     dateMode: t.dateMode,
     durationMinutes: t.durationMinutes,
     calendarType: t.calendarType,
-    isT0Anchor: t.isT0Anchor,
   }));
 }
 
@@ -91,33 +95,41 @@ export function newStepId(): string {
 }
 
 /**
- * Each step category lives in exactly one of the three T-frames anchored on
- * the production's T-0 week. The frame fully constrains the calendar week the
- * step's date may fall in:
+ * Each step category lives in exactly one of the three T-periods anchored on
+ * the production's T-0 Monday. The period's start/end day offsets fully
+ * constrain the date range the step may fall into.
  *
- *   T1 = the week 2 weeks before T-0     → outreach + ustalenia
- *   T2 = the week 1 week  before T-0     → nagrywanie + obrobka
- *   T3 = T-0's own week                  → publikacja
+ * Default mapping (categories → period code):
+ *   T1 → outreach + ustalenia
+ *   T2 → nagrywanie + obrobka
+ *   T3 → publikacja
  *
  * Used by both the server (to validate `setStepDate`) and the client (to
  * clamp the date input's min/max attributes).
  */
-const CATEGORY_FRAME_OFFSET_WEEKS: Record<ProductionStage, number> = {
-  outreach: -2,
-  ustalenia: -2,
-  nagrywanie: -1,
-  obrobka: -1,
-  publikacja: 0,
+export const CATEGORY_TO_PERIOD: Record<ProductionStage, PeriodCode> = {
+  outreach: 'T1',
+  ustalenia: 'T1',
+  nagrywanie: 'T2',
+  obrobka: 'T2',
+  publikacja: 'T3',
 };
 
 export function getStepWeekRange(
   t0At: Date,
   category: ProductionStage,
+  periods?: TemplatePeriod[] | null,
 ): { start: Date; end: Date } {
   const t0Mon = startOfWeek(t0At);
-  const offsetWeeks = CATEGORY_FRAME_OFFSET_WEEKS[category];
-  const start = addDays(t0Mon, offsetWeeks * 7); // Monday 00:00
-  const end = endOfDay(addDays(start, 6)); // Sunday 23:59:59.999
+  // Periods are 0-anchored at pipeline start; the gantt + the user think of
+  // dates as "weeks before/around publication". Shift so the publikacja
+  // period sits on t0Mon — then `period.startOffsetDays` is days from T-0
+  // and outreach lands ~2 weeks before publication, not 2 weeks after.
+  const resolved = periodsRelativeToT0Mon(periods);
+  const code = CATEGORY_TO_PERIOD[category];
+  const period = resolved.find((p) => p.code === code) ?? resolved[0];
+  const start = addDays(t0Mon, period.startOffsetDays); // 00:00 of start day
+  const end = endOfDay(addDays(t0Mon, period.endOffsetDays));
   return { start, end };
 }
 

@@ -4,6 +4,7 @@ import type {
   StepCalendarType,
   StepDateMode,
 } from '../../drizzle/schema';
+import type { TemplatePeriod } from './production-periods';
 
 /**
  * Single step inside a template. Template steps describe the SHAPE of a
@@ -19,9 +20,6 @@ export type TemplateStep = {
   dateMode?: StepDateMode;
   durationMinutes?: number;
   calendarType?: StepCalendarType;
-  /** Exactly 0 or 1 step per template carries this flag — gantt uses it to
-   *  anchor the production's T-0. Validation guarantees uniqueness. */
-  isT0Anchor?: boolean;
 };
 
 /**
@@ -36,6 +34,10 @@ export type ProductionTemplate = {
   summary: string;
   description: string;
   steps: TemplateStep[];
+  /** Optional T1/T2/T3 time-period overrides. When omitted, defaults to the
+   *  three Mon-Sun calendar weeks anchored on T-0. Cloned onto the production
+   *  at creation so later template edits don't shift existing productions. */
+  periods?: TemplatePeriod[];
 };
 
 /** Legacy alias — kept temporarily so existing imports compile during the

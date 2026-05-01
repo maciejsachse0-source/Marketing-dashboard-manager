@@ -3,7 +3,7 @@
   "name": "Solo (artysta nagrywa sam)",
   "type": "solo",
   "summary": "Tygodniowy cykl x2 — Ty robisz koncept i montaż, artysta nagrywa sam.",
-  "description": "Pipeline pod cykl 2 filmików tygodniowo, gdzie artysta nagrywa się sam (telefon / aparat), a Ty dostarczasz koncept, scenariusz i robisz całą obróbkę. Dwie produkcje biegnące równolegle (np. T-0 we wt. + pt.) zapewniają 2 publikacje na tydzień. Brak kamerzysty — etap 'ustalenia' to alignment scenariusza z artystą zamiast brief'a do ekipy filmowej.",
+  "description": "Pipeline pod cykl 2 filmików tygodniowo, gdzie artysta nagrywa się sam (telefon / aparat), a Ty dostarczasz koncept, scenariusz i robisz całą obróbkę. Dwie produkcje biegnące równolegle (np. publikacje we wt. + pt.) zapewniają 2 publikacje na tydzień. Brak kamerzysty — etap 'ustalenia' to alignment scenariusza z artystą zamiast brief'a do ekipy filmowej.",
   "steps": [
     {
       "id": "email-sent",
@@ -31,7 +31,7 @@
       "category": "outreach",
       "label": "deadline nagrań ustalony",
       "dateMode": "record",
-      "description": "Termin: kiedy artysta ma najpóźniej nagrać. Buforuj 2-3 dni przed T-0 na montaż + review."
+      "description": "Termin: kiedy artysta ma najpóźniej nagrać. Buforuj 2-3 dni przed publikacją na montaż + review."
     },
     {
       "id": "cam-date-shared",
@@ -74,7 +74,6 @@
       "dateMode": "calendar",
       "durationMinutes": 60,
       "calendarType": "shoot",
-      "isT0Anchor": true,
       "description": "Artysta nagrywa sam — telefonem / aparatem. Ty na pingu jeśli zacięcie. Nagraj 2-3 dubli każdej kwestii."
     },
     {
@@ -88,7 +87,7 @@
       "id": "editing",
       "category": "obrobka",
       "label": "montaż + grading",
-      "dateMode": "derived-from-shooting",
+      "dateMode": "record",
       "durationMinutes": 180,
       "calendarType": "edit",
       "description": "Selekcja, cięcie, napisy, color, audio mix, music. Target: V1 gotowy następnego dnia po nagrywkach."

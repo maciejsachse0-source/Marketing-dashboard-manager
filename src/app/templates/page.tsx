@@ -146,14 +146,6 @@ function TemplateCard({ template }: { template: ProductionTemplate }) {
                     className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded border bg-background border-border text-foreground/80"
                   >
                     {step.label}
-                    {step.isT0Anchor ? (
-                      <span
-                        className={`ml-0.5 text-[9px] font-bold tabular-nums px-1 py-0 rounded ${tone.badge}`}
-                        title="Krok-kotwica T-0"
-                      >
-                        T0
-                      </span>
-                    ) : null}
                   </li>
                 ))}
               </ol>

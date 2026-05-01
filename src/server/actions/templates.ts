@@ -7,6 +7,7 @@ import { safeRevalidatePath as revalidatePath } from './revalidate';
 import {
   getTemplate,
   loadTemplates,
+  productionTemplateBaseSchema,
   productionTemplateSchema,
   templateFilePath,
 } from '@/lib/production-templates';
@@ -26,7 +27,7 @@ function safeSlug(input: string): string {
     .slice(0, 60);
 }
 
-const formInputSchema = productionTemplateSchema.extend({
+const formInputSchema = productionTemplateBaseSchema.extend({
   // On create slug may be empty (server derives from name) — on update it must match.
   slug: z
     .string()

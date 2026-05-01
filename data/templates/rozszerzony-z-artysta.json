@@ -81,14 +81,13 @@
       "dateMode": "calendar",
       "durationMinutes": 240,
       "calendarType": "shoot",
-      "isT0Anchor": true,
       "description": "W studio / w terenie. Nagranie głównego materiału + BTS."
     },
     {
       "id": "editing",
       "category": "obrobka",
       "label": "obróbka",
-      "dateMode": "derived-from-shooting",
+      "dateMode": "record",
       "durationMinutes": 240,
       "calendarType": "edit",
       "description": "Selekcja ujęć, montaż, color grading, audio mix."

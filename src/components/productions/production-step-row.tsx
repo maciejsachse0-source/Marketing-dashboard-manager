@@ -27,7 +27,7 @@ import {
   updateStepDescription,
 } from '@/server/actions/production-steps';
 import { getStepWeekRange } from '@/lib/production-steps';
-import type { ProductionStep } from '../../../drizzle/schema';
+import type { ProductionPeriods, ProductionStep } from '../../../drizzle/schema';
 
 function formatBytes(b: number): string {
   if (b < 1024) return `${b} B`;
@@ -74,6 +74,7 @@ function formatDate(d: Date, withTime: boolean): string {
 export function ProductionStepRow({
   productionId,
   productionT0At,
+  productionPeriods,
   step,
   state,
   displayNumber,
@@ -85,6 +86,9 @@ export function ProductionStepRow({
   /** Production's T-0 timestamp — used to compute the calendar-week range
    *  the step's date is allowed to land in (T1/T2/T3 lock). */
   productionT0At: Date;
+  /** Persisted T-period overrides cloned from the template at creation. Null
+   *  for legacy productions — getStepWeekRange falls back to defaults. */
+  productionPeriods: ProductionPeriods | null;
   step: ProductionStep;
   state: 'passed' | 'active' | 'pending';
   displayNumber: number;
@@ -186,7 +190,7 @@ export function ProductionStepRow({
   // Step is locked to the calendar week of its T-frame. Surfaced both as
   // input min/max (browser blocks pick) AND as a server-side guard inside
   // setStepDate (covers paste / programmatic submits).
-  const weekRange = getStepWeekRange(productionT0At, step.category);
+  const weekRange = getStepWeekRange(productionT0At, step.category, productionPeriods);
   const inputMin = withTime
     ? toLocalInputValue(weekRange.start)
     : toLocalDateValue(weekRange.start);
@@ -269,15 +273,6 @@ export function ProductionStepRow({
             </button>
           )}
         </div>
-
-        {step.isT0Anchor ? (
-          <span
-            className="shrink-0 text-[9px] uppercase tracking-[0.14em] font-bold px-1.5 py-0.5 rounded bg-foreground text-background"
-            title="Krok-kotwica T-0 — oś czasu na gantcie"
-          >
-            T-0
-          </span>
-        ) : null}
 
         <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
           <button

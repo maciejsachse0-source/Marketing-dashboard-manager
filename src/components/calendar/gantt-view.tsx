@@ -19,11 +19,13 @@ import {
   PRODUCTION_PROGRESSION,
   type CustomStep,
   type Platform,
+  type ProductionPeriods,
   type ProductionStage,
   type ProductionStatus,
   type ProductionStep,
   type ProductionType,
 } from '../../../drizzle/schema';
+import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import { ProductionStepRow } from '@/components/productions/production-step-row';
 import { AddStepInline } from '@/components/productions/add-step-inline';
 
@@ -241,6 +243,9 @@ export type GanttRow = {
    *  full pipeline list. Synthesized legacy fields above stay for now to
    *  keep the strip's status/date math unchanged during the cleanup window. */
   steps: ProductionStep[];
+  /** Persisted T-period overrides cloned from the template at production
+   *  creation. Null for legacy rows; consumers fall back to defaults. */
+  periods: ProductionPeriods | null;
   cancelled: boolean;
   artistName: string | null;
   artistHandle: string | null;
@@ -294,13 +299,38 @@ function resolveStageDate(
     return { date: row.t0At, source: 't0' };
   }
   // Tentative: default offset relative to T-0 Monday — keeps the dot inside
-  // its T-band even before the user records a real date.
+  // its T-band even before the user records a real date. When the production
+  // has custom periods, clamp the offset to the matching period's bounds so
+  // narrow bands (e.g. Mon-Fri) don't push the dot outside.
   const t0Mon = startOfWeekFn(row.t0At);
-  const offset = TENTATIVE_OFFSET_FROM_T0_MON[stage] ?? 0;
+  let offset = TENTATIVE_OFFSET_FROM_T0_MON[stage] ?? 0;
+  const code = STAGE_TO_PERIOD[stage];
+  if (code) {
+    // Periods are stored 0-anchored at pipeline start; shift them so the
+    // publikacja period sits on t0Mon = 0, matching the gantt's frame model.
+    const period = periodsRelativeToT0Mon(row.periods).find((p) => p.code === code);
+    if (period) {
+      offset = Math.max(period.startOffsetDays, Math.min(period.endOffsetDays, offset));
+    }
+  }
   const def = new Date(t0Mon);
   def.setDate(def.getDate() + offset);
   return { date: def, source: 'tentative' };
 }
+
+/** Map of legacy canonical stages → their T-period code, used by tentative
+ *  placement to clamp default offsets to user-customised period bounds. */
+const STAGE_TO_PERIOD: Partial<Record<ProductionStatus, WeekFrameCode>> = {
+  'email-sent': 'T1',
+  'terms-accepted': 'T1',
+  'cam-meeting-set': 'T1',
+  'cam-date-shared': 'T1',
+  'script-discussed': 'T1',
+  'script-sent': 'T1',
+  shooting: 'T2',
+  editing: 'T2',
+  publishing: 'T3',
+};
 
 const resolveSubStageDate = resolveStageDate;
 
@@ -318,14 +348,19 @@ function computeFrameBands(
   t0: Date,
   firstDay: Date,
   totalDays: number,
+  periods: ProductionPeriods | null,
 ): { code: WeekFrameCode; startDay: number; endDay: number }[] {
   const t0Mon = startOfWeekFn(t0); // Monday of T-0's week
-  const t3Start = Math.round(dayDiff(t0Mon, firstDay));
-  const raw = [
-    { code: 'T1' as WeekFrameCode, startDay: t3Start - 14, endDay: t3Start - 8 },
-    { code: 'T2' as WeekFrameCode, startDay: t3Start - 7, endDay: t3Start - 1 },
-    { code: 'T3' as WeekFrameCode, startDay: t3Start, endDay: t3Start + 6 },
-  ];
+  const t0MonDay = Math.round(dayDiff(t0Mon, firstDay));
+  // Shift periods so the publikacja period sits on t0Mon — turns the
+  // 0-anchored "from pipeline start" offsets into negative-from-T0 offsets
+  // that the strip's T-frame model understands.
+  const resolved = periodsRelativeToT0Mon(periods);
+  const raw = resolved.map((p) => ({
+    code: p.code as WeekFrameCode,
+    startDay: t0MonDay + p.startOffsetDays,
+    endDay: t0MonDay + p.endOffsetDays,
+  }));
   return raw
     .map((b) => ({
       ...b,
@@ -557,8 +592,10 @@ function GanttRowView({
     });
   };
 
-  // T1/T2/T3 full-week bands anchored on T-0
-  const frameBands = computeFrameBands(row.t0At, firstDay, totalDays);
+  // T1/T2/T3 full-week bands anchored on T-0 — sourced from the production's
+  // own periods (cloned from its template) so two productions with different
+  // templates can render different bands on the same gantt.
+  const frameBands = computeFrameBands(row.t0At, firstDay, totalDays, row.periods);
 
   // Sub-step pins are computed FURTHER DOWN — after `allSubSteps` is built —
   // so each pin can carry the global step number `n` and the matching frame
@@ -599,11 +636,30 @@ function GanttRowView({
   // circle's x-coordinate (uniform distribution wins — that's what keeps
   // items inside their band). Those recorded dates remain visible as
   // `stagePins` on the colored band — separate visual layer, no overlap risk.
+  // Inner-placement window per frame: each band's full span minus a 1-day
+  // reserve at the trailing edge. The reserve keeps adjacent labels (e.g.
+  // OBR. at the end of T2 vs. PUB. at the start of T3) from colliding when
+  // both frames have items at their respective boundaries. For 1-day bands
+  // (where reserve would invert), we collapse to the start day.
+  // Frame bounds in t0Mon-relative coordinates: shift the 0-anchored periods
+  // so the publikacja band sits on t0Mon and earlier bands sweep backward.
+  // Without this shift, a row with the default periods would render every
+  // checkpoint in the publication week instead of cascading T-2 → T-1 → T-0.
+  const resolvedFramePeriods = periodsRelativeToT0Mon(row.periods);
   const FRAME_BOUNDS: Record<WeekFrameCode, { startDay: number; endDay: number }> = {
     T1: { startDay: -14, endDay: -9 },
     T2: { startDay: -7, endDay: -2 },
     T3: { startDay: 0, endDay: 5 },
   };
+  for (const p of resolvedFramePeriods) {
+    const code = p.code as WeekFrameCode;
+    const start = p.startOffsetDays;
+    const end = p.endOffsetDays;
+    FRAME_BOUNDS[code] = {
+      startDay: start,
+      endDay: end > start ? end - 1 : start,
+    };
+  }
 
   type WorkItem = {
     cat: StageCategory;
@@ -914,8 +970,12 @@ function GanttRowView({
   return (
     <div
       className={`${
-        isFirstOfArtist ? 'border-t border-border/70' : ''
-      } ${showArtistGap ? 'mt-6 pt-2' : ''} hover:bg-muted/15 ui-transition group`}
+        showArtistGap
+          ? 'mt-10 pt-4 border-t-[3px] border-double border-foreground/25'
+          : isFirstOfArtist
+            ? 'border-t border-border/70'
+            : ''
+      } hover:bg-muted/15 ui-transition group`}
     >
       <div
         className="grid gap-0"
@@ -926,9 +986,7 @@ function GanttRowView({
             timeline horizontally. z-30 so it sits above the gantt's step
             buttons (z-20) but below the sticky header (z-40). */}
         <div
-          className={`pl-5 pr-4 py-3.5 flex flex-col gap-2.5 border-r border-border/40 sticky left-0 z-30 bg-card shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] ${
-            isFirstOfArtist ? '' : 'justify-center'
-          }`}
+          className="pl-5 pr-4 py-3.5 flex flex-col gap-2.5 border-r border-border/40 sticky left-0 z-30 bg-card shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]"
         >
           {isFirstOfArtist ? (
             <>
@@ -1002,17 +1060,32 @@ function GanttRowView({
               </div>
             </>
           ) : (
-            // Same-artist follow-up row: only the next-step indicator. The
-            // account/badge/videographer block is suppressed and the row's top
-            // separator is dropped so the cluster reads as one artist with
-            // multiple parallel tracks.
-            <NextStepIndicator
-              productionId={row.id}
-              cancelled={cancelled}
-              allDone={allDone}
-              nextStep={nextStep}
-              totalSteps={totalStepCount}
-            />
+            // Same-artist follow-up row: account header is suppressed so the
+            // cluster reads as one artist with multiple parallel tracks, but
+            // the type badge ("solo" / "z artystą") stays visible under the
+            // next-step indicator — within an artist cluster solo and
+            // with-artist tracks need to be told apart at a glance.
+            <>
+              <NextStepIndicator
+                productionId={row.id}
+                cancelled={cancelled}
+                allDone={allDone}
+                nextStep={nextStep}
+                totalSteps={totalStepCount}
+              />
+              <div className="flex items-center gap-1.5 text-[11px] mt-auto">
+                <ProductionTypeBadge type={row.type} />
+                {row.videographerName ? (
+                  <span
+                    className="text-muted-foreground truncate"
+                    title={`Kamerzysta: ${row.videographerName}`}
+                  >
+                    · kam:{' '}
+                    <span className="font-semibold text-foreground/80">{row.videographerName}</span>
+                  </span>
+                ) : null}
+              </div>
+            </>
           )}
         </div>
 
@@ -2180,6 +2253,7 @@ function ExpandedDetails({
                         key={cat.key}
                         productionId={row.id}
                         productionT0At={row.t0At}
+                        productionPeriods={row.periods}
                         category={cat}
                         steps={row.steps}
                         cancelled={row.cancelled}
@@ -2205,6 +2279,7 @@ function ExpandedDetails({
 function ExpandedCategorySection({
   productionId,
   productionT0At,
+  productionPeriods,
   category,
   steps,
   cancelled,
@@ -2212,6 +2287,7 @@ function ExpandedCategorySection({
 }: {
   productionId: number;
   productionT0At: Date;
+  productionPeriods: import('../../../drizzle/schema').ProductionPeriods | null;
   category: StageCategory;
   steps: ProductionStep[];
   cancelled: boolean;
@@ -2275,6 +2351,7 @@ function ExpandedCategorySection({
                 key={step.id}
                 productionId={productionId}
                 productionT0At={productionT0At}
+                productionPeriods={productionPeriods}
                 step={step}
                 state={state as 'passed' | 'active' | 'pending'}
                 displayNumber={startNumber + posInCat}

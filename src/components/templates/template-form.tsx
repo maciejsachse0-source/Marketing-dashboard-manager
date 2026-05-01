@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -27,6 +27,15 @@ import type {
   ProductionTemplate,
   TemplateStep,
 } from '@/lib/production-templates-types';
+import {
+  DEFAULT_PERIODS,
+  MAX_PERIODS,
+  MIN_PERIODS,
+  PERIOD_OFFSET_MAX,
+  codeForIndex,
+  describeOffset,
+  type TemplatePeriod,
+} from '@/lib/production-periods';
 
 const TYPE_LABEL: Record<ProductionType, string> = {
   'with-artist': 'Z artystą',
@@ -45,8 +54,22 @@ const DATE_MODE_LABEL: Record<StepDateMode, string> = {
   none: 'brak daty',
   record: 'tylko data (bez kalendarza)',
   calendar: 'data + wpis w kalendarzu',
-  'derived-from-shooting': 'auto: dzień po nagrywce',
+  'derived-from-shooting': 'auto z innego kroku (wycofywane)',
 };
+
+/** Existing templates persisted before the 0-anchored period model used
+ *  negative offsets. We shift them into the new range on load so the editor
+ *  doesn't refuse to render them — the relative spacing is preserved. */
+function migrateLegacyPeriods(input: TemplatePeriod[] | undefined): TemplatePeriod[] {
+  if (!input || input.length === 0) return DEFAULT_PERIODS;
+  const min = Math.min(...input.map((p) => p.startOffsetDays));
+  const shift = min < 0 ? -min : 0;
+  return input.map((p, i) => ({
+    code: codeForIndex(i),
+    startOffsetDays: Math.max(0, p.startOffsetDays + shift),
+    endOffsetDays: Math.max(0, p.endOffsetDays + shift),
+  }));
+}
 
 const CALENDAR_TYPE_LABEL: Record<StepCalendarType, string> = {
   shoot: 'Nagrywka',
@@ -61,6 +84,50 @@ function newStepId(): string {
   return Math.random().toString(36).slice(2, 14);
 }
 
+const MONTH_PL = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'] as const;
+
+/** Date N days after `start` (preserves local-time hours/min so the picker
+ *  doesn't drift across DST). */
+function dateAt(start: Date, offsetDays: number): Date {
+  const d = new Date(start);
+  d.setDate(d.getDate() + offsetDays);
+  return d;
+}
+
+/** Compact pl-PL date — "12 maj" or "1 cze". Used as axis tick labels and
+ *  in period range chips so the user reads concrete days, not just offsets. */
+function fmtDayMonth(d: Date): string {
+  return `${d.getDate()} ${MONTH_PL[d.getMonth()]}`;
+}
+
+/** YYYY-MM-DD for `<input type="date">` round-tripping. Always local. */
+function isoDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function parseIsoDate(s: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** Default preview anchor: the next Monday from today (incl. today if it is
+ *  Monday). Matches the historical Mon-anchored grid so default 7-day periods
+ *  visually align with calendar weeks on first open. */
+function nextMonday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  // JS getDay: 0=Sun..6=Sat → re-base to 0=Mon..6=Sun.
+  const dowMon = (d.getDay() + 6) % 7;
+  const offset = dowMon === 0 ? 0 : 7 - dowMon;
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+
 export function TemplateForm({ mode, initial }: { mode: Mode; initial?: ProductionTemplate }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -72,8 +139,59 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
   const [summary, setSummary] = useState(initial?.summary ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [steps, setSteps] = useState<TemplateStep[]>(initial?.steps ?? []);
+  const [periods, setPeriods] = useState<TemplatePeriod[]>(() =>
+    migrateLegacyPeriods(initial?.periods),
+  );
+  // Preview-only anchor date: drives slider axis labels (months + day numbers
+  // + concrete dates per period). NOT persisted — templates are reusable, so
+  // the real start date is picked when a production is created from this
+  // template. Defaults to the next Monday for clean week-aligned visuals.
+  const [previewStart, setPreviewStart] = useState<Date>(() => nextMonday());
 
   const totalSteps = steps.length;
+
+  const updatePeriod = (idx: number, patch: Partial<TemplatePeriod>) => {
+    setPeriods((prev) => prev.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
+  };
+
+  const resetPeriods = () => setPeriods(DEFAULT_PERIODS);
+
+  /** Append a new period after the last one, defaulting to a 7-day band right
+   *  after the current end (or starting fresh at 0 if the list is empty). */
+  const addPeriod = () => {
+    setPeriods((prev) => {
+      if (prev.length >= MAX_PERIODS) return prev;
+      const last = prev[prev.length - 1];
+      const start = last ? last.endOffsetDays + 1 : 0;
+      const end = Math.min(PERIOD_OFFSET_MAX, start + 6);
+      return [
+        ...prev,
+        { code: codeForIndex(prev.length), startOffsetDays: start, endOffsetDays: end },
+      ];
+    });
+  };
+
+  const removePeriod = (idx: number) => {
+    setPeriods((prev) => {
+      if (prev.length <= MIN_PERIODS) return prev;
+      // Renumber codes so they stay contiguous T1..Tn after removal — order
+      // and code identity must match the array index (validation depends on it).
+      return prev
+        .filter((_, i) => i !== idx)
+        .map((p, i) => ({ ...p, code: codeForIndex(i) }));
+    });
+  };
+
+  // Inline overlap detection for the user's eye — server-side validation in
+  // periodsSchema is the source of truth, this just surfaces the issue early.
+  const periodErrors: (string | null)[] = periods.map((p, i) => {
+    if (p.startOffsetDays > p.endOffsetDays) return 'Początek po końcu';
+    const prev = periods[i - 1];
+    if (prev && prev.endOffsetDays >= p.startOffsetDays) {
+      return `Nakłada się z ${prev.code}`;
+    }
+    return null;
+  });
 
   const updateStep = (idx: number, patch: Partial<TemplateStep>) => {
     setSteps((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
@@ -90,7 +208,6 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
     setSteps((prev) => {
       const target = prev[idx];
       if (!target) return prev;
-      // Find the previous/next step in the SAME category.
       let neighborIdx = -1;
       if (direction === -1) {
         for (let i = idx - 1; i >= 0; i--) {
@@ -116,16 +233,12 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
 
   const addStepInCategory = (category: ProductionStage) => {
     setSteps((prev) => {
-      // Insert the new step at the END of its category — find the index of
-      // the last step in this category, or the start of the next category.
       const newStep: TemplateStep = {
         id: newStepId(),
         category,
         label: '',
         dateMode: 'none',
       };
-      // Strategy: find the boundary index = first index where step.category
-      // comes AFTER our category (in CATEGORY_ORDER). Insert before that.
       const myCatOrder = CATEGORY_ORDER.indexOf(category);
       let boundaryIdx = prev.length;
       for (let i = 0; i < prev.length; i++) {
@@ -137,18 +250,6 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
       }
       return [...prev.slice(0, boundaryIdx), newStep, ...prev.slice(boundaryIdx)];
     });
-  };
-
-  /** Toggle the unique T-0 anchor — exactly one step is allowed to carry
-   *  the flag. Setting it on one step clears all others. */
-  const setT0Anchor = (idx: number, value: boolean) => {
-    setSteps((prev) =>
-      prev.map((s, i) => {
-        if (i === idx) return { ...s, isT0Anchor: value || undefined };
-        if (value && s.isT0Anchor) return { ...s, isT0Anchor: undefined };
-        return s;
-      }),
-    );
   };
 
   const onSubmit = () => {
@@ -167,7 +268,6 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
         out.durationMinutes = s.durationMinutes;
       }
       if (s.calendarType) out.calendarType = s.calendarType;
-      if (s.isT0Anchor) out.isT0Anchor = true;
       return out;
     });
     if (cleanSteps.some((s) => !s.label)) {
@@ -182,12 +282,12 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
       }
       ids.add(s.id);
     }
-    if (cleanSteps.filter((s) => s.isT0Anchor).length > 1) {
-      setError('Tylko jeden krok może być oznaczony jako T-0.');
-      return;
-    }
     if (cleanSteps.length === 0) {
       setError('Szablon musi mieć co najmniej jeden krok.');
+      return;
+    }
+    if (periodErrors.some((e) => e !== null)) {
+      setError('Popraw nakładające się okresy zanim zapiszesz.');
       return;
     }
 
@@ -198,6 +298,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
       summary: summary.trim(),
       description: description.trim(),
       steps: cleanSteps,
+      periods,
     };
 
     startTransition(async () => {
@@ -334,8 +435,81 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
         </div>
       </section>
 
+      {/* Periods — arbitrary day-range bands measured from the production's
+          start day (offset 0). User picks how many: anywhere from MIN_PERIODS
+          to MAX_PERIODS. Order is array order; codes T1..Tn auto-derived.
+          Overlaps blocked. Used by gantt to render the colored backdrop. */}
+      <section className="card-editorial p-5 space-y-4">
+        <header className="flex items-baseline justify-between gap-3 flex-wrap">
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              Okresy czasowe
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Każdy okres to przedział dni od dnia startu produkcji (dzień 0).
+              Wybierasz ile chcesz mieć okresów ({MIN_PERIODS}–{MAX_PERIODS}) i
+              jak długo każdy trwa — slidery dowolnie skracasz, wydłużasz,
+              przesuwasz dzień po dniu. Warunek: kolejne okresy nie mogą się
+              nakładać.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={resetPeriods}
+            className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition shrink-0"
+          >
+            Przywróć domyślne
+          </button>
+        </header>
+
+        <div className="flex flex-wrap items-end gap-3 pb-2 border-b border-border/40">
+          <div className="grid gap-1">
+            <Label htmlFor="preview-start" className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              Data startu (podgląd na osi)
+            </Label>
+            <input
+              id="preview-start"
+              type="date"
+              value={isoDate(previewStart)}
+              onChange={(e) => {
+                const d = parseIsoDate(e.target.value);
+                if (d) setPreviewStart(d);
+              }}
+              className="h-8 rounded-md border border-input bg-card px-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground max-w-md leading-relaxed pb-1">
+            Tylko do podglądu — nie zapisuje się w szablonie. Realną datę
+            startu wybierasz przy tworzeniu produkcji z tego szablonu.
+          </p>
+        </div>
+
+        <PeriodsSlider
+          periods={periods}
+          errors={periodErrors}
+          previewStart={previewStart}
+          onChange={updatePeriod}
+          onRemove={removePeriod}
+          canRemove={periods.length > MIN_PERIODS}
+        />
+
+        <div className="pt-1">
+          <Button
+            size="sm"
+            variant="outline"
+            type="button"
+            onClick={addPeriod}
+            disabled={periods.length >= MAX_PERIODS}
+            className="bg-card"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1" /> Dodaj okres
+            {periods.length >= MAX_PERIODS ? ` (max ${MAX_PERIODS})` : ''}
+          </Button>
+        </div>
+      </section>
+
       {/* Pipeline — every step (no canonical/custom distinction). All editable,
-          movable in-category, removable. One step optionally flagged T-0. */}
+          movable in-category, removable. */}
       <section className="space-y-4">
         <header className="flex items-baseline justify-between gap-3 flex-wrap px-1">
           <div>
@@ -343,9 +517,8 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               Kroki szablonu
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Pełna definicja pipeline'u. Każdy krok jest edytowalny i można go usunąć.
-              Strzałki przesuwają w obrębie tej samej kategorii. Jeden krok można oznaczyć
-              jako „T-0" (oś czasu na gantcie — zwykle nagrywka).
+              Pełna definicja pipeline'u. Każdy krok jest edytowalny i można go
+              usunąć. Strzałki przesuwają w obrębie tej samej kategorii.
             </p>
           </div>
           <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0">
@@ -354,13 +527,8 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
         </header>
 
         {(() => {
-          // Walk steps once and emit per-category sections, computing global
-          // step numbers as we go. Strict O(n) pass — categories without
-          // any steps still render their header so the user can add into them.
           let runningOffset = 0;
           return CATEGORY_ORDER.map((cat) => {
-            // Indices (in `steps[]`) of steps belonging to this category, in
-            // their on-screen order.
             const indicesInCat: number[] = [];
             steps.forEach((s, i) => {
               if (s.category === cat) indicesInCat.push(i);
@@ -414,7 +582,6 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
                           onRemove={() => removeStep(stepsIdx)}
                           onMoveUp={() => moveStepInCategory(stepsIdx, -1)}
                           onMoveDown={() => moveStepInCategory(stepsIdx, 1)}
-                          onToggleT0={(v) => setT0Anchor(stepsIdx, v)}
                         />
                       );
                     })}
@@ -486,6 +653,428 @@ type Tone = {
   rail: string;
 };
 
+/**
+ * Slider editor for a variable number of periods on a shared horizontal axis.
+ * Each period is a colored bar with start/end thumbs (drag) plus a body that
+ * translates the whole period when dragged. Same axis = the user can VISUALLY
+ * check non-overlap and ordering without reading numbers.
+ *
+ * Axis: 0..sliderMax days from the production's start day. sliderMax adapts
+ * to the longest period so the strip always shows real estate beyond the
+ * last period (room to extend or add another). Snapping is per-day. Day-of-
+ * week initials sit under the cells so individual dates stay legible.
+ */
+const PERIOD_TONES: Array<{ bg: string; bar: string; thumb: string; ink: string }> = [
+  { bg: 'bg-amber-100', bar: 'bg-amber-300', thumb: 'bg-amber-600 border-amber-700', ink: 'text-amber-900' },
+  { bg: 'bg-violet-100', bar: 'bg-violet-300', thumb: 'bg-violet-600 border-violet-700', ink: 'text-violet-900' },
+  { bg: 'bg-emerald-100', bar: 'bg-emerald-300', thumb: 'bg-emerald-600 border-emerald-700', ink: 'text-emerald-900' },
+  { bg: 'bg-sky-100', bar: 'bg-sky-300', thumb: 'bg-sky-600 border-sky-700', ink: 'text-sky-900' },
+  { bg: 'bg-rose-100', bar: 'bg-rose-300', thumb: 'bg-rose-600 border-rose-700', ink: 'text-rose-900' },
+  { bg: 'bg-stone-100', bar: 'bg-stone-300', thumb: 'bg-stone-600 border-stone-700', ink: 'text-stone-900' },
+];
+
+function PeriodsSlider({
+  periods,
+  errors,
+  previewStart,
+  onChange,
+  onRemove,
+  canRemove,
+}: {
+  periods: TemplatePeriod[];
+  errors: (string | null)[];
+  /** Anchors the axis to a real calendar — labels become concrete dates
+   *  ("12 maj") and day-of-month numbers, plus month boundary markers. */
+  previewStart: Date;
+  onChange: (idx: number, patch: Partial<TemplatePeriod>) => void;
+  onRemove: (idx: number) => void;
+  canRemove: boolean;
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+
+  // Axis max scales with the longest period so the strip always has room
+  // beyond the last period for editing/extending. Floor at 28 so a fresh
+  // template doesn't render a tiny axis.
+  const maxEnd = periods.length > 0
+    ? Math.max(0, ...periods.map((p) => p.endOffsetDays))
+    : 0;
+  const sliderMin = 0;
+  const sliderMax = Math.min(
+    PERIOD_OFFSET_MAX,
+    Math.max(28, Math.ceil((maxEnd + 7) / 7) * 7),
+  );
+  const sliderDays = sliderMax - sliderMin + 1;
+
+  // While dragging we keep a ref instead of state so the global pointermove
+  // listener doesn't re-bind on every update — react re-renders are still
+  // driven through `onChange`.
+  const dragRef = useRef<{
+    periodIdx: number;
+    handle: 'start' | 'end' | 'span';
+    /** For 'span' drags: the original period and the day where the drag began,
+     *  so we translate by delta instead of pinning the period start to the
+     *  cursor (which would feel jumpy if the user grabs the middle). */
+    originStart?: number;
+    originEnd?: number;
+    originDay?: number;
+  } | null>(null);
+
+  const dayFromClientX = (clientX: number): number => {
+    const rail = railRef.current;
+    if (!rail) return sliderMin;
+    const rect = rail.getBoundingClientRect();
+    const pct = (clientX - rect.left) / rect.width;
+    const day = Math.round(pct * (sliderDays - 1)) + sliderMin;
+    return Math.max(sliderMin, Math.min(sliderMax, day));
+  };
+
+  // Global pointer listeners installed once — we read the active drag from
+  // dragRef so the closure stays stable for the listener's lifetime.
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      const day = dayFromClientX(e.clientX);
+      const cur = periods[drag.periodIdx];
+      if (!cur) return;
+
+      if (drag.handle === 'start') {
+        // Allow start to cross beyond end momentarily — the live error UI flags
+        // it; user resolves by dragging end. Hard-clamp keeps it ≤ end so the
+        // bar doesn't visually invert.
+        const clamped = Math.min(day, cur.endOffsetDays);
+        if (clamped !== cur.startOffsetDays) {
+          onChange(drag.periodIdx, { startOffsetDays: clamped });
+        }
+      } else if (drag.handle === 'end') {
+        const clamped = Math.max(day, cur.startOffsetDays);
+        if (clamped !== cur.endOffsetDays) {
+          onChange(drag.periodIdx, { endOffsetDays: clamped });
+        }
+      } else {
+        // Span drag = translate the whole period by the cursor delta.
+        const delta = day - (drag.originDay ?? day);
+        const length = (drag.originEnd ?? cur.endOffsetDays) - (drag.originStart ?? cur.startOffsetDays);
+        let newStart = (drag.originStart ?? cur.startOffsetDays) + delta;
+        // Clamp so the period stays inside the visible axis.
+        if (newStart < sliderMin) newStart = sliderMin;
+        if (newStart + length > sliderMax) newStart = sliderMax - length;
+        const newEnd = newStart + length;
+        if (newStart !== cur.startOffsetDays || newEnd !== cur.endOffsetDays) {
+          onChange(drag.periodIdx, {
+            startOffsetDays: newStart,
+            endOffsetDays: newEnd,
+          });
+        }
+      }
+    };
+    const onUp = () => {
+      dragRef.current = null;
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [periods, onChange, sliderMin, sliderMax, sliderDays]);
+
+  const startDrag = (
+    e: React.PointerEvent,
+    periodIdx: number,
+    handle: 'start' | 'end' | 'span',
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const cur = periods[periodIdx];
+    dragRef.current = {
+      periodIdx,
+      handle,
+      originStart: cur.startOffsetDays,
+      originEnd: cur.endOffsetDays,
+      originDay: dayFromClientX(e.clientX),
+    };
+    document.body.style.userSelect = 'none';
+  };
+
+  const dayToPercent = (d: number) =>
+    ((d - sliderMin) / (sliderDays - 1)) * 100;
+
+  // Major ticks every 7 days — labels become real dates anchored on
+  // `previewStart` ("5 maj", "12 maj", "19 maj"…). Day 0 also gets a "Start"
+  // ribbon below to underline that it's the production's anchor.
+  const majorTicks: { offset: number; date: Date; label: string }[] = [];
+  for (let d = sliderMin; d <= sliderMax; d++) {
+    if (d % 7 !== 0) continue;
+    const date = dateAt(previewStart, d);
+    majorTicks.push({ offset: d, date, label: fmtDayMonth(date) });
+  }
+
+  // Month boundary markers — vertical hairline + month label whenever the
+  // visible window crosses into a new month. Helps with longer pipelines that
+  // span multiple months. Skip the first day (would visually duplicate the
+  // axis edge).
+  const monthBoundaries: { offset: number; label: string }[] = [];
+  let prevMonth = -1;
+  for (let d = sliderMin; d <= sliderMax; d++) {
+    const date = dateAt(previewStart, d);
+    const m = date.getMonth();
+    if (d === sliderMin) {
+      prevMonth = m;
+      continue;
+    }
+    if (m !== prevMonth) {
+      monthBoundaries.push({ offset: d, label: MONTH_PL[m] });
+      prevMonth = m;
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Shared axis: month band + week-tick dates + day cells + day-of-month
+          numbers. Drawn once, sits behind all rails. Anchored on previewStart
+          so the user reads concrete calendar dates instead of raw offsets. */}
+      <div className="space-y-1">
+        {/* Month band — labels each month present in the visible window,
+            with a hairline at every month boundary so they read as ranges. */}
+        <div className="relative h-4 select-none">
+          {/* First-month label sits at the left edge */}
+          <span
+            className="absolute text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+            style={{ left: `0%` }}
+          >
+            {MONTH_PL[previewStart.getMonth()]} {previewStart.getFullYear()}
+          </span>
+          {monthBoundaries.map((m) => (
+            <span
+              key={m.offset}
+              className="absolute -translate-x-1/2 text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+              style={{ left: `${dayToPercent(m.offset)}%` }}
+            >
+              {m.label}
+            </span>
+          ))}
+        </div>
+        {/* Week-tick date labels (every 7 days) */}
+        <div className="relative h-5 select-none">
+          {majorTicks.map((t) => (
+            <span
+              key={t.offset}
+              className={`absolute -translate-x-1/2 text-[10px] tracking-tight tabular-nums ${
+                t.offset === 0
+                  ? 'font-bold text-foreground'
+                  : 'text-muted-foreground'
+              }`}
+              style={{ left: `${dayToPercent(t.offset)}%` }}
+            >
+              {t.label}
+            </span>
+          ))}
+        </div>
+        <div className="relative h-3 rounded bg-muted/40 select-none">
+          {/* Day cells — every day a thin vertical hair, weekend days slightly
+              darker so the user can see Sat/Sun without labels. */}
+          {Array.from({ length: sliderDays }).map((_, i) => {
+            const d = sliderMin + i;
+            const dow = ((d % 7) + 7) % 7;
+            const isWeekend = dow >= 5;
+            return (
+              <div
+                key={i}
+                className={`absolute top-0 bottom-0 ${isWeekend ? 'bg-muted-foreground/15' : ''}`}
+                style={{
+                  left: `${dayToPercent(d) - 0.5 / sliderDays * 100}%`,
+                  width: `${100 / sliderDays}%`,
+                }}
+              />
+            );
+          })}
+          {/* Month boundary hairlines on the cells row — strongest visual cue */}
+          {monthBoundaries.map((m) => (
+            <div
+              key={m.offset}
+              className="absolute top-0 bottom-0 w-px bg-foreground/30 pointer-events-none"
+              style={{ left: `${dayToPercent(m.offset)}%` }}
+            />
+          ))}
+        </div>
+        {/* Per-day day-of-month numbers — replaces the dow initials so the
+            user can pick out concrete days at a glance. Day 1 of each month
+            is emphasised. */}
+        <div className="relative h-3 select-none">
+          {Array.from({ length: sliderDays }).map((_, i) => {
+            const d = sliderMin + i;
+            const date = dateAt(previewStart, d);
+            const dow = ((d % 7) + 7) % 7;
+            const isWeekend = dow >= 5;
+            const isFirstOfMonth = date.getDate() === 1;
+            return (
+              <span
+                key={i}
+                className={`absolute -translate-x-1/2 text-[8px] tabular-nums ${
+                  isFirstOfMonth
+                    ? 'font-bold text-foreground'
+                    : isWeekend
+                      ? 'text-muted-foreground/55'
+                      : 'text-muted-foreground/80'
+                }`}
+                style={{ left: `${dayToPercent(d)}%` }}
+              >
+                {date.getDate()}
+              </span>
+            );
+          })}
+        </div>
+        <div className="flex justify-between text-[9px] text-muted-foreground tabular-nums px-0.5">
+          <span>{fmtDayMonth(dateAt(previewStart, sliderMin))} (start)</span>
+          <span>{fmtDayMonth(dateAt(previewStart, sliderMax))}</span>
+        </div>
+      </div>
+
+      {/* One rail per period — same axis, draggable colored span + 2 thumbs */}
+      {periods.map((p, idx) => (
+        <PeriodRail
+          key={`${p.code}-${idx}`}
+          period={p}
+          tone={PERIOD_TONES[idx % PERIOD_TONES.length]}
+          error={errors[idx]}
+          dayToPercent={dayToPercent}
+          previewStart={previewStart}
+          railRef={idx === 0 ? railRef : undefined}
+          onRemove={canRemove ? () => onRemove(idx) : undefined}
+          onPointerDownStart={(e) => startDrag(e, idx, 'start')}
+          onPointerDownEnd={(e) => startDrag(e, idx, 'end')}
+          onPointerDownSpan={(e) => startDrag(e, idx, 'span')}
+          onClickRail={(clientX) => {
+            // Click on empty rail = move nearest endpoint to clicked day.
+            const day = dayFromClientX(clientX);
+            const distStart = Math.abs(day - p.startOffsetDays);
+            const distEnd = Math.abs(day - p.endOffsetDays);
+            if (distStart <= distEnd) {
+              onChange(idx, { startOffsetDays: Math.min(day, p.endOffsetDays) });
+            } else {
+              onChange(idx, { endOffsetDays: Math.max(day, p.startOffsetDays) });
+            }
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PeriodRail({
+  period,
+  tone,
+  error,
+  dayToPercent,
+  previewStart,
+  railRef,
+  onRemove,
+  onPointerDownStart,
+  onPointerDownEnd,
+  onPointerDownSpan,
+  onClickRail,
+}: {
+  period: TemplatePeriod;
+  tone: { bg: string; bar: string; thumb: string; ink: string };
+  error: string | null;
+  dayToPercent: (d: number) => number;
+  /** Anchor for converting offsets to concrete dates in chip + tooltips. */
+  previewStart: Date;
+  /** Only the FIRST rail registers the shared ref — that's what the drag math
+   *  reads to convert clientX → day. All rails are the same width inside the
+   *  same flex container so one ref suffices. */
+  railRef?: React.Ref<HTMLDivElement>;
+  /** Trash button rendered next to the period chip when count > MIN_PERIODS. */
+  onRemove?: () => void;
+  onPointerDownStart: (e: React.PointerEvent) => void;
+  onPointerDownEnd: (e: React.PointerEvent) => void;
+  onPointerDownSpan: (e: React.PointerEvent) => void;
+  onClickRail: (clientX: number) => void;
+}) {
+  const startPct = dayToPercent(period.startOffsetDays);
+  const endPct = dayToPercent(period.endOffsetDays);
+  const widthPct = endPct - startPct;
+  const lengthDays = period.endOffsetDays - period.startOffsetDays + 1;
+  const startDate = dateAt(previewStart, period.startOffsetDays);
+  const endDate = dateAt(previewStart, period.endOffsetDays);
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2 text-[11px]">
+        <span
+          className={`inline-flex items-center justify-center min-w-[2rem] h-5 px-1.5 rounded text-[10px] font-bold tracking-[0.18em] tabular-nums ${tone.bar} ${tone.ink}`}
+        >
+          {period.code}
+        </span>
+        <span className={`tabular-nums ${tone.ink}`}>
+          {fmtDayMonth(startDate)} → {fmtDayMonth(endDate)}
+        </span>
+        <span className="text-[10px] tabular-nums text-muted-foreground">
+          ({describeOffset(period.startOffsetDays)} → {describeOffset(period.endOffsetDays)})
+        </span>
+        <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+          {lengthDays} {lengthDays === 1 ? 'dzień' : 'dni'}
+        </span>
+        {onRemove ? (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+            title={`Usuń ${period.code}`}
+            aria-label={`Usuń ${period.code}`}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        ) : null}
+      </div>
+
+      <div
+        ref={railRef}
+        className={`relative h-9 rounded-md ${tone.bg} ${error ? 'ring-2 ring-rose-400' : ''} touch-none cursor-pointer`}
+        onPointerDown={(e) => {
+          // Click directly on the rail (not on a thumb / span) — move nearest
+          // endpoint there. Pointer events bubble up; thumbs stop propagation.
+          onClickRail(e.clientX);
+        }}
+      >
+        {/* Filled span — drag to translate */}
+        <div
+          className={`absolute top-1 bottom-1 rounded ${tone.bar} cursor-grab active:cursor-grabbing`}
+          style={{ left: `${startPct}%`, width: `${widthPct}%` }}
+          onPointerDown={onPointerDownSpan}
+          title="Przeciągnij, by przesunąć cały okres"
+        />
+        {/* Start thumb */}
+        <button
+          type="button"
+          onPointerDown={onPointerDownStart}
+          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          style={{ left: `${startPct}%` }}
+          aria-label={`${period.code} początek`}
+          title={`Start: ${fmtDayMonth(startDate)} · ${describeOffset(period.startOffsetDays)}`}
+        />
+        {/* End thumb */}
+        <button
+          type="button"
+          onPointerDown={onPointerDownEnd}
+          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          style={{ left: `${endPct}%` }}
+          aria-label={`${period.code} koniec`}
+          title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
+        />
+      </div>
+
+      {error ? (
+        <p className="text-[11px] text-rose-700 font-medium">{error}</p>
+      ) : null}
+    </div>
+  );
+}
+
 function StepRow({
   step,
   displayNumber,
@@ -496,7 +1085,6 @@ function StepRow({
   onRemove,
   onMoveUp,
   onMoveDown,
-  onToggleT0,
 }: {
   step: TemplateStep;
   displayNumber: number;
@@ -507,7 +1095,6 @@ function StepRow({
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
-  onToggleT0: (v: boolean) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isCalendar = step.dateMode === 'calendar';
@@ -527,14 +1114,6 @@ function StepRow({
           maxLength={80}
           className="flex-1 bg-card h-8 text-sm"
         />
-        {step.isT0Anchor ? (
-          <span
-            className={`shrink-0 text-[9px] uppercase tracking-[0.14em] font-bold px-1.5 py-0.5 rounded border ${tone.chip}`}
-            title="Krok-kotwica T-0 — oś czasu na gantcie"
-          >
-            T-0
-          </span>
-        ) : null}
         <div className="flex items-center gap-0.5 shrink-0">
           <button
             type="button"
@@ -660,19 +1239,6 @@ function StepRow({
               </p>
             </div>
           ) : null}
-
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              type="checkbox"
-              id={`t0-${step.id}`}
-              checked={!!step.isT0Anchor}
-              onChange={(e) => onToggleT0(e.target.checked)}
-              className="h-3.5 w-3.5 rounded border-input"
-            />
-            <Label htmlFor={`t0-${step.id}`} className="text-[11px] cursor-pointer">
-              Oznacz jako kotwicę T-0 (oś czasu w gantcie)
-            </Label>
-          </div>
 
           <div className="text-[10px] text-muted-foreground">
             <span className="font-mono">id: {step.id}</span>
