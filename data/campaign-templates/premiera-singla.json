@@ -1,0 +1,120 @@
+{
+  "slug": "premiera-singla",
+  "name": "Premiera singla — narracja 4-fazowa",
+  "summary": "Łuk narracyjny od pierwszych zapowiedzi po afterglow — buduje napięcie, odkrywa, kulminuje, pielęgnuje społeczność.",
+  "description": "Klasyczny scenariusz wokół premiery singla / EP-ki, ale potraktowany jak opowieść, nie jak harmonogram premiery. T1 to delikatne build-up (zapowiedzi, nastrojowe posty, snippet audio) — widz jeszcze nie wie, co dokładnie się wydarzy. T2 to odkrywanie (teaser, reveal okładki, snippet wideo) — narracja przyspiesza, ciekawość rośnie. T3 to climax — sam moment premiery, koordynacja z artystami. T4 to afterglow (raport, livestream, reakcje) — utrzymuje energię tygodnie po premierze. Przeciągaj okresy sliderami żeby dopasować rytm do realiów projektu.",
+  "periods": [
+    { "code": "T1", "startOffsetDays": 0, "endOffsetDays": 13 },
+    { "code": "T2", "startOffsetDays": 14, "endOffsetDays": 20 },
+    { "code": "T3", "startOffsetDays": 21, "endOffsetDays": 23 },
+    { "code": "T4", "startOffsetDays": 24, "endOffsetDays": 37 }
+  ],
+  "milestones": [
+    {
+      "id": "buildup",
+      "period": "T1",
+      "label": "Build-up — niedopowiedzenie",
+      "description": "Zbuduj świadomość że coś się dzieje, ale nie zdradzaj jeszcze co. Kontent sugerujący, atmosferyczny, lifestyle artysty bez konkretu.",
+      "submilestones": [
+        {
+          "id": "buildup-brief",
+          "label": "Brief kreatywny + claim narracji",
+          "description": "Zdefiniuj key message, ton komunikacji, co chcesz, żeby widz POCZUŁ."
+        },
+        {
+          "id": "buildup-mood",
+          "label": "Seria 3-4 mood postów (BTS, lifestyle)",
+          "description": "Niech widz zacznie się zastanawiać, czy coś się szykuje."
+        },
+        {
+          "id": "buildup-snippet",
+          "label": "Snippet audio gotowy",
+          "description": "15-30s fragment, najmocniejszy hook utworu — ale jeszcze bez kontekstu."
+        }
+      ]
+    },
+    {
+      "id": "reveal",
+      "period": "T2",
+      "label": "Odkrywanie — pierwsze sygnały",
+      "description": "Tutaj zaczynasz zdradzać. Reveal okładki, zwiastun wideo, ogłoszenie daty premiery. Tempo komunikacji mocno rośnie.",
+      "submilestones": [
+        {
+          "id": "reveal-cover",
+          "label": "Reveal okładki na wszystkich kanałach"
+        },
+        {
+          "id": "reveal-trailer",
+          "label": "Zwiastun wideo (15-30s)",
+          "description": "Pionowy 9:16 + poziomy do YT."
+        },
+        {
+          "id": "reveal-presave",
+          "label": "Link pre-save / pre-add aktywny"
+        },
+        {
+          "id": "reveal-press",
+          "label": "Press kit wysłany do mediów / playlist curatorów"
+        },
+        {
+          "id": "reveal-countdown",
+          "label": "Story countdown ostatnie 48h"
+        }
+      ]
+    },
+    {
+      "id": "climax",
+      "period": "T3",
+      "label": "Climax — premiera",
+      "description": "Dzień i okolice premiery. Zsynchronizowana komunikacja, live z artystą, najmocniejsze formaty na każdej platformie.",
+      "submilestones": [
+        {
+          "id": "climax-drop",
+          "label": "Drop o 00:00 / 12:00 — link aktywny",
+          "description": "Synchroniczna publikacja na artystycznych kanałach."
+        },
+        {
+          "id": "climax-reels",
+          "label": "Reels / TikTok premiera (3 warianty)"
+        },
+        {
+          "id": "climax-live",
+          "label": "Live / Q&A z artystą",
+          "description": "30-45 min, w dniu premiery lub +1 dzień."
+        },
+        {
+          "id": "climax-collab",
+          "label": "Collab posty z featureami / labelem"
+        }
+      ]
+    },
+    {
+      "id": "afterglow",
+      "period": "T4",
+      "label": "Afterglow — pielęgnowanie",
+      "description": "Najbardziej zaniedbywana faza, a najbardziej buduje społeczność. Reakcje fanów, live'y wdzięczności, raport, kolejne formaty z premiery.",
+      "submilestones": [
+        {
+          "id": "afterglow-react",
+          "label": "Posty z reakcjami fanów / repost UGC"
+        },
+        {
+          "id": "afterglow-recut",
+          "label": "Re-cuty fragmentów na Reels / Shorts"
+        },
+        {
+          "id": "afterglow-thanks",
+          "label": "Live podziękowanie / behind the music"
+        },
+        {
+          "id": "afterglow-report",
+          "label": "Raport 7-14d: reach, ER, save/share, najlepsze formaty"
+        },
+        {
+          "id": "afterglow-learn",
+          "label": "Learning notes na następną kampanię"
+        }
+      ]
+    }
+  ]
+}

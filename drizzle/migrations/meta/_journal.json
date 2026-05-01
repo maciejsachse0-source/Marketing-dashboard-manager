@@ -85,6 +85,20 @@
       "when": 1777464917521,
       "tag": "0011_spicy_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1777464917522,
+      "tag": "0012_periods_per_production",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1777464917523,
+      "tag": "0013_campaign_milestones",
+      "breakpoints": true
     }
   ]
 }

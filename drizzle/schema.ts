@@ -104,6 +104,34 @@ export type ProductionStep = {
   attachmentSize?: number;
 };
 
+/** Persisted period overrides — same shape as `TemplatePeriod` from the lib
+ *  layer, redeclared here so the schema file stays dependency-free. Period
+ *  count is variable; codes follow the T<idx+1> pattern enforced by
+ *  `periodsSchema`. */
+export type ProductionPeriods = Array<{
+  code: string;
+  startOffsetDays: number;
+  endOffsetDays: number;
+}>;
+
+/** Persisted marketing-campaign milestones — cloned from a marketing template
+ *  on creation. Each main milestone has a T-period bucket (T1..Tn, variable
+ *  count to match the production model) + optional submilestones. doneAt is
+ *  null until checked off (parent or child). */
+export type CampaignMilestones = Array<{
+  id: string;
+  period: string;
+  label: string;
+  description?: string;
+  doneAt: string | null;
+  submilestones: Array<{
+    id: string;
+    label: string;
+    description?: string;
+    doneAt: string | null;
+  }>;
+}>;
+
 export const PRODUCTION_STATUSES = [
   // Outreach
   'email-sent',
@@ -156,6 +184,16 @@ export const campaigns = sqliteTable('campaigns', {
   phase: text('phase').$type<CampaignPhase>().notNull().default('build-up'),
   kpis: text('kpis', { mode: 'json' }).$type<Record<string, string | number>>(),
   notes: text('notes'),
+  /** Slug of the marketing template the campaign was instantiated from.
+   *  Recorded for audit only — milestones below are the source of truth. */
+  templateSlug: text('template_slug'),
+  /** T1/T2/T3 time-band offsets relative to T-0 — cloned from the marketing
+   *  template at creation. NULL = legacy campaign created before milestones
+   *  existed; consumers fall back to DEFAULT_PERIODS in that case. */
+  periods: text('periods', { mode: 'json' }).$type<ProductionPeriods>(),
+  /** Cloned milestones + submilestones with done state. NULL = legacy
+   *  campaign with no template — UI hides the milestone tracker. */
+  milestones: text('milestones', { mode: 'json' }).$type<CampaignMilestones>(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
 
@@ -181,6 +219,10 @@ export const productions = sqliteTable('productions', {
    *  template at creation. Replaces the legacy (status + stepDates +
    *  customSteps + stepOrder) quartet that was dropped in migration 0011. */
   steps: text('steps', { mode: 'json' }).$type<ProductionStep[]>().notNull().default(sql`'[]'`),
+  /** T1/T2/T3 time-band offsets relative to T-0 Monday — cloned from the
+   *  template at creation. NULL = legacy production created before flexible
+   *  periods existed; consumers fall back to DEFAULT_PERIODS in that case. */
+  periods: text('periods', { mode: 'json' }).$type<ProductionPeriods>(),
   /** Production cancellation timestamp — replaces `status: 'cancelled'`. */
   cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),

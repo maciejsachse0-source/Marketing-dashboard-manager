@@ -352,6 +352,7 @@ export default async function ProductionDetailPage({
                           key={cat.key}
                           productionId={production.id}
                           productionT0At={production.t0At}
+                          productionPeriods={production.periods ?? null}
                           category={cat}
                           steps={steps}
                           stepStates={stepStates}
@@ -492,6 +493,7 @@ function PersonHeader({
 function CategorySection({
   productionId,
   productionT0At,
+  productionPeriods,
   category,
   steps,
   stepStates,
@@ -503,6 +505,7 @@ function CategorySection({
 }: {
   productionId: number;
   productionT0At: Date;
+  productionPeriods: import('../../../../drizzle/schema').ProductionPeriods | null;
   category: CategoryMeta;
   steps: ProductionStep[];
   stepStates: Map<string, 'passed' | 'active' | 'pending'>;
@@ -561,6 +564,7 @@ function CategorySection({
                     key={step.id}
                     productionId={productionId}
                     productionT0At={productionT0At}
+                    productionPeriods={productionPeriods}
                     step={step}
                     state={stepStates.get(step.id) ?? 'pending'}
                     displayNumber={startNumber + posInCat}

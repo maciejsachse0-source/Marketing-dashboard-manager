@@ -15,6 +15,7 @@ import {
 } from '@/lib/production-steps';
 import { getTemplate } from '@/lib/production-templates';
 import { generateOutputFolder } from '@/lib/output-folder';
+import { resolvePeriods } from '@/lib/production-periods';
 import type {
   CalendarType,
   ProductionStage,
@@ -56,9 +57,11 @@ async function saveSteps(productionId: number, steps: ProductionStep[]) {
 }
 
 /**
- * Copy a template's `steps[]` onto a production at creation time. Resets
- * `doneAt`, `dateIso`, and attachments. Idempotent only when called once at
- * creation — calling on a production that already has steps replaces them.
+ * Copy a template's `steps[]` AND `periods` onto a production at creation
+ * time. Resets `doneAt`, `dateIso`, and attachments. Idempotent only when
+ * called once at creation — calling on a production that already has steps
+ * replaces them. Periods are resolved through the default-fallback so the
+ * persisted value is always a complete 3-period array.
  */
 export async function applyTemplateToProduction(
   productionId: number,
@@ -67,7 +70,12 @@ export async function applyTemplateToProduction(
   const tpl = getTemplate(templateSlug);
   if (!tpl) return { ok: false, error: `Szablon "${templateSlug}" nie istnieje` };
   const steps = cloneTemplateSteps(tpl.steps);
-  await saveSteps(productionId, steps);
+  const periods = resolvePeriods(tpl.periods);
+  await db
+    .update(schema.productions)
+    .set({ steps, periods })
+    .where(eq(schema.productions.id, productionId));
+  bumpRevalidate(productionId);
   return { ok: true };
 }
 
@@ -370,7 +378,7 @@ export async function setStepDate(
   // (outreach/ustalenia → T-2, nagrywanie/obrobka → T-1, publikacja → T-0).
   // 'derived-from-shooting' is system-set from the T-0 anchor and skipped.
   if (dateIso && step.dateMode !== 'derived-from-shooting') {
-    const { start, end } = getStepWeekRange(prod.t0At, step.category);
+    const { start, end } = getStepWeekRange(prod.t0At, step.category, prod.periods);
     const candidate = new Date(dateIso);
     if (candidate < start || candidate > end) {
       const fmt = (d: Date) =>

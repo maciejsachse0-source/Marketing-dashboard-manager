@@ -185,6 +185,7 @@ export default async function CalendarPage({
       customSteps: legacy.customSteps,
       stepOrder: legacy.stepOrder,
       steps,
+      periods: p.periods ?? null,
       cancelled: isCancelled,
       artistName: artist?.name ?? null,
       artistHandle: artist?.handle ?? null,

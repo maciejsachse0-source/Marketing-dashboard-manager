@@ -8,6 +8,7 @@ import {
   STEP_DATE_MODES,
 } from '../../drizzle/schema';
 import type { ProductionTemplate } from './production-templates-types';
+import { periodsSchema } from './production-periods';
 
 /**
  * Production template — a recipe that defines the complete step list for new
@@ -36,22 +37,25 @@ const templateStepSchema = z.object({
   dateMode: stepDateModeSchema.optional(),
   durationMinutes: z.number().int().min(0).max(60 * 24).optional(),
   calendarType: stepCalendarTypeSchema.optional(),
-  isT0Anchor: z.boolean().optional(),
 });
 
-export const productionTemplateSchema = z
-  .object({
-    slug: z
-      .string()
-      .min(1)
-      .max(60)
-      .regex(/^[a-z0-9-]+$/, 'slug: tylko małe litery, cyfry i myślnik'),
-    name: z.string().min(1).max(80),
-    type: productionTypeSchema,
-    summary: z.string().min(1).max(160),
-    description: z.string().min(1).max(1000),
-    steps: z.array(templateStepSchema).min(1).max(40),
-  })
+/** Plain object shape — kept un-refined so callers (e.g. CRUD form input)
+ *  can `.extend()` it without hitting the Zod `safeExtend`-on-effects error. */
+export const productionTemplateBaseSchema = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .max(60)
+    .regex(/^[a-z0-9-]+$/, 'slug: tylko małe litery, cyfry i myślnik'),
+  name: z.string().min(1).max(80),
+  type: productionTypeSchema,
+  summary: z.string().min(1).max(160),
+  description: z.string().min(1).max(1000),
+  steps: z.array(templateStepSchema).min(1).max(40),
+  periods: periodsSchema.optional(),
+});
+
+export const productionTemplateSchema = productionTemplateBaseSchema
   .superRefine((tpl, ctx) => {
     // Step ids must be unique within a template — they're used as React keys
     // and as anchors in `productions.steps[]`, so collisions would cause
@@ -66,15 +70,6 @@ export const productionTemplateSchema = z
         });
       }
       ids.add(s.id);
-    }
-    // At most one T0 anchor — gantt would otherwise jitter between dates.
-    const anchors = tpl.steps.filter((s) => s.isT0Anchor).length;
-    if (anchors > 1) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Tylko jeden krok może być oznaczony jako isT0Anchor',
-        path: ['steps'],
-      });
     }
   });
 
