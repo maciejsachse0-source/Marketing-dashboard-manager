@@ -11,6 +11,8 @@ import {
   CampaignGoalField,
   CampaignNotesField,
 } from '@/components/campaigns/campaign-inline-fields';
+import { MilestonesTracker } from '@/components/campaigns/milestones-tracker';
+import { CampaignPeriodsEditor } from '@/components/campaigns/campaign-periods-editor';
 import { PlatformPills, StatusPill } from '@/components/platforms-pills';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
 
@@ -76,6 +78,20 @@ export default async function CampaignDetailPage({
         </header>
 
         <PhaseButtons id={campaign.id} current={campaign.phase} />
+
+        <CampaignPeriodsEditor
+          campaignId={campaign.id}
+          initialPeriods={campaign.periods}
+          kickoffAt={campaign.releaseAt}
+        />
+
+        {campaign.milestones && campaign.milestones.length > 0 ? (
+          <MilestonesTracker
+            campaignId={campaign.id}
+            milestones={campaign.milestones}
+            periods={campaign.periods}
+          />
+        ) : null}
 
         <CampaignTimeline releaseAt={campaign.releaseAt} entries={entries} />
 
