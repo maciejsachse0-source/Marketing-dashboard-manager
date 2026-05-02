@@ -285,6 +285,59 @@ export const posts = pgTable('posts', {
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
+/**
+ * Agent definitions — replaces the per-file `data/agents/<slug>.json` store
+ * so the catalog can be edited at runtime on Vercel (read-only filesystem).
+ * `slug` is the natural primary key — it shows up in URLs and is referenced
+ * by the production templates that an agent might use.
+ *
+ * `dashboardWidget` mirrors the legacy JSON shape: `{ query, template }` or
+ * `null` when the agent has no widget. Keep as JSONB so the loader's Zod
+ * schema stays the source of truth.
+ */
+export const agents = pgTable('agents', {
+  slug: text('slug').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  systemPrompt: text('system_prompt').notNull(),
+  sidePanel: text('side_panel').notNull(),
+  dashboardWidget: jsonb('dashboard_widget').$type<{ query: string; template: string } | null>(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+});
+
+/**
+ * Production template — recipe for new productions. Was `data/templates/*.json`.
+ * `steps` and `periods` are large JSON blobs whose shape is enforced upstream
+ * by the Zod schema in lib/production-templates.ts.
+ */
+export const productionTemplates = pgTable('production_templates', {
+  slug: text('slug').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type').$type<ProductionType>().notNull(),
+  summary: text('summary').notNull(),
+  description: text('description').notNull(),
+  steps: jsonb('steps').notNull(),
+  periods: jsonb('periods'),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+});
+
+/**
+ * Marketing-campaign template — recipe for new campaigns.
+ * Was `data/campaign-templates/*.json`. Shape enforced upstream by Zod.
+ */
+export const marketingTemplates = pgTable('marketing_templates', {
+  slug: text('slug').primaryKey(),
+  name: text('name').notNull(),
+  summary: text('summary').notNull(),
+  description: text('description').notNull(),
+  periods: jsonb('periods'),
+  milestones: jsonb('milestones').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+});
+
 export const agentRuns = pgTable('agent_runs', {
   id: serial('id').primaryKey(),
   agentSlug: text('agent_slug').notNull(),

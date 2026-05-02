@@ -49,7 +49,7 @@ export default async function DashboardPage() {
     : null;
   const newFollowers = weekPosts.reduce((s, p) => s + (p.followersGained ?? 0), 0);
 
-  const agents = loadAgents();
+  const agents = await loadAgents();
   const agentHints = await Promise.all(
     agents.map((a) => (a.dashboardWidget ? runAgentWidget(a.dashboardWidget) : Promise.resolve(null))),
   );

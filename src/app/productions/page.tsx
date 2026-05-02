@@ -13,12 +13,12 @@ import { loadTemplates } from '@/lib/production-templates';
 export const dynamic = 'force-dynamic';
 
 export default async function ProductionsOverviewPage() {
-  const [productions, artists, videographers] = await Promise.all([
+  const [productions, artists, videographers, templates] = await Promise.all([
     listProductions(),
     listArtists(),
     listVideographers(),
+    loadTemplates(),
   ]);
-  const templates = loadTemplates();
 
   const artistOptions = artists.map((a) => ({ id: a.id, name: a.name, handle: a.handle }));
   const videographerOptions = videographers.map((v) => ({

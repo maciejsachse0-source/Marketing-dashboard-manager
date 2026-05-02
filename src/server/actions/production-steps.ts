@@ -13,7 +13,8 @@ import {
   newStepId,
 } from '@/lib/production-steps';
 import { getTemplate } from '@/lib/production-templates';
-import { resolvePeriods } from '@/lib/production-periods';
+import { periodsRelativeToT0Mon, resolvePeriods } from '@/lib/production-periods';
+import { startOfWeek } from '@/lib/dates';
 import type {
   CalendarType,
   ProductionStage,
@@ -65,7 +66,7 @@ export async function applyTemplateToProduction(
   productionId: number,
   templateSlug: string,
 ): Promise<Result> {
-  const tpl = getTemplate(templateSlug);
+  const tpl = await getTemplate(templateSlug);
   if (!tpl) return { ok: false, error: `Szablon "${templateSlug}" nie istnieje` };
   const steps = cloneTemplateSteps(tpl.steps);
   const periods = resolvePeriods(tpl.periods);
@@ -457,6 +458,76 @@ export async function removeStepAttachment(
   void _s;
   next[idx] = rest;
   await saveSteps(productionId, next);
+  return { ok: true };
+}
+
+/**
+ * Shift the entire production timeline by setting a new T1 (first-period)
+ * start date. Computes Δdays between the old and new T1 start, then applies
+ * that delta — preserving wall-clock time-of-day across DST — to:
+ *   - production.t0At
+ *   - every step.dateIso
+ *   - every linked calendar entry's startsAt/endsAt (tagged `[step:<id>]`)
+ *
+ * Δdays is integer-day-only because the user picks a date (no time). Step
+ * date-of-day and durations are preserved. Periods (offsets) don't change —
+ * they're already relative to t0At.
+ */
+export async function shiftProductionT1Start(
+  productionId: number,
+  newT1StartIso: string,
+): Promise<Result> {
+  const prod = await loadProduction(productionId);
+  if (!prod) return { ok: false, error: 'Brak produkcji' };
+
+  const newT1 = new Date(newT1StartIso);
+  if (Number.isNaN(newT1.getTime())) return { ok: false, error: 'Niepoprawna data' };
+  // Normalise to 00:00 local — the input is a date picker, time component
+  // (if any) is irrelevant. Otherwise tz-shifted ISOs would smuggle in a
+  // partial-day delta.
+  newT1.setHours(0, 0, 0, 0);
+
+  const resolved = periodsRelativeToT0Mon(prod.periods);
+  const t0Mon = startOfWeek(prod.t0At);
+  const oldT1 = new Date(t0Mon);
+  oldT1.setDate(oldT1.getDate() + resolved[0].startOffsetDays);
+  oldT1.setHours(0, 0, 0, 0);
+
+  const DAY_MS = 86_400_000;
+  // Round to integer days to absorb DST drift between old/new midnight.
+  const deltaDays = Math.round((newT1.getTime() - oldT1.getTime()) / DAY_MS);
+  if (deltaDays === 0) return { ok: true };
+
+  const shiftDate = (d: Date): Date => {
+    const r = new Date(d);
+    r.setDate(r.getDate() + deltaDays);
+    return r;
+  };
+  const shiftIso = (iso: string): string => shiftDate(new Date(iso)).toISOString();
+
+  // 1) Shift t0At + step.dateIso
+  const nextSteps = (prod.steps ?? []).map((s) =>
+    s.dateIso ? { ...s, dateIso: shiftIso(s.dateIso) } : s,
+  );
+  await db
+    .update(schema.productions)
+    .set({ t0At: shiftDate(prod.t0At), steps: nextSteps })
+    .where(eq(schema.productions.id, productionId));
+
+  // 2) Shift every linked calendar entry. Step-tagged entries follow
+  //    `[step:<id>]` in description; bulk update by productionId is fine —
+  //    every entry attached to the production should move together.
+  const entries = await db.query.calendarEntries.findMany({
+    where: eq(schema.calendarEntries.productionId, productionId),
+  });
+  for (const e of entries) {
+    await db
+      .update(schema.calendarEntries)
+      .set({ startsAt: shiftDate(e.startsAt), endsAt: shiftDate(e.endsAt) })
+      .where(eq(schema.calendarEntries.id, e.id));
+  }
+
+  bumpRevalidate(productionId);
   return { ok: true };
 }
 

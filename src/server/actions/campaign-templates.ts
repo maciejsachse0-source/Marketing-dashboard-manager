@@ -1,17 +1,15 @@
 'use server';
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import {
   getMarketingTemplate,
-  loadMarketingTemplates,
   marketingTemplateBaseSchema,
-  marketingTemplateFilePath,
   marketingTemplateSchema,
 } from '@/lib/campaign-templates';
 import type { MarketingTemplate } from '@/lib/campaign-templates-types';
+import { db, schema } from '@/lib/db';
 
 function safeSlug(input: string): string {
   return input
@@ -24,7 +22,6 @@ function safeSlug(input: string): string {
 }
 
 const formInputSchema = marketingTemplateBaseSchema.extend({
-  // On create slug may be empty (server derives from name) — on update it must match.
   slug: z
     .string()
     .max(60)
@@ -35,11 +32,29 @@ const formInputSchema = marketingTemplateBaseSchema.extend({
 
 export type MarketingTemplateFormInput = z.input<typeof formInputSchema>;
 
-function writeTemplate(t: MarketingTemplate) {
-  const file = marketingTemplateFilePath(t.slug);
-  const dir = path.dirname(file);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(t, null, 2) + '\n', 'utf8');
+async function upsertTemplate(t: MarketingTemplate) {
+  await db
+    .insert(schema.marketingTemplates)
+    .values({
+      slug: t.slug,
+      name: t.name,
+      summary: t.summary,
+      description: t.description,
+      periods: t.periods ?? null,
+      milestones: t.milestones,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: schema.marketingTemplates.slug,
+      set: {
+        name: t.name,
+        summary: t.summary,
+        description: t.description,
+        periods: t.periods ?? null,
+        milestones: t.milestones,
+        updatedAt: new Date(),
+      },
+    });
 }
 
 function bumpRevalidations(slug?: string) {
@@ -54,9 +69,9 @@ export async function createMarketingTemplate(
   const parsed = formInputSchema.parse(input);
   const slug = (parsed.slug && parsed.slug.length > 0 ? parsed.slug : safeSlug(parsed.name)).trim();
   if (!slug) throw new Error('Nie udało się wygenerować slug — uzupełnij ręcznie.');
-  if (getMarketingTemplate(slug)) throw new Error(`Szablon o slugu "${slug}" już istnieje.`);
+  if (await getMarketingTemplate(slug)) throw new Error(`Szablon o slugu "${slug}" już istnieje.`);
   const def = marketingTemplateSchema.parse({ ...parsed, slug });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }
@@ -65,18 +80,17 @@ export async function updateMarketingTemplate(
   slug: string,
   input: MarketingTemplateFormInput,
 ): Promise<MarketingTemplate> {
-  if (!getMarketingTemplate(slug)) throw new Error(`Szablon "${slug}" nie istnieje.`);
+  if (!(await getMarketingTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   const parsed = formInputSchema.parse(input);
   const def = marketingTemplateSchema.parse({ ...parsed, slug });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }
 
 export async function deleteMarketingTemplate(slug: string): Promise<void> {
-  const file = marketingTemplateFilePath(slug);
-  if (!fs.existsSync(file)) throw new Error(`Szablon "${slug}" nie istnieje.`);
-  fs.unlinkSync(file);
+  if (!(await getMarketingTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
+  await db.delete(schema.marketingTemplates).where(eq(schema.marketingTemplates.slug, slug));
   bumpRevalidations();
 }
 
@@ -85,12 +99,12 @@ export async function duplicateMarketingTemplate(
   newSlug?: string,
   newName?: string,
 ): Promise<MarketingTemplate> {
-  const source = getMarketingTemplate(sourceSlug);
+  const source = await getMarketingTemplate(sourceSlug);
   if (!source) throw new Error(`Szablon źródłowy "${sourceSlug}" nie istnieje.`);
   const baseSlug = newSlug?.trim() || `${sourceSlug}-kopia`;
   let slug = baseSlug;
   let n = 2;
-  while (getMarketingTemplate(slug)) {
+  while (await getMarketingTemplate(slug)) {
     slug = `${baseSlug}-${n++}`;
     if (n > 99) throw new Error('Nie udało się znaleźć wolnego slugu.');
   }
@@ -99,7 +113,7 @@ export async function duplicateMarketingTemplate(
     slug,
     name: newName?.trim() || `${source.name} (kopia)`,
   });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }

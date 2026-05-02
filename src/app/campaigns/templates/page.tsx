@@ -7,8 +7,8 @@ import { CampaignTemplatesList } from '@/components/campaigns/campaign-templates
 
 export const dynamic = 'force-dynamic';
 
-export default function CampaignTemplatesPage() {
-  const templates = loadMarketingTemplates();
+export default async function CampaignTemplatesPage() {
+  const templates = await loadMarketingTemplates();
 
   return (
     <PageShell

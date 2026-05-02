@@ -7,8 +7,8 @@ import { TemplatesList } from '@/components/templates/templates-list';
 
 export const dynamic = 'force-dynamic';
 
-export default function TemplatesPage() {
-  const templates = loadTemplates();
+export default async function TemplatesPage() {
+  const templates = await loadTemplates();
 
   return (
     <PageShell

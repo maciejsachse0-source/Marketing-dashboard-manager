@@ -15,7 +15,7 @@ export default async function AgentPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgent(slug);
+  const agent = await getAgent(slug);
   if (!agent) notFound();
 
   const promptFile = `agents/${agent.slug}.md`;

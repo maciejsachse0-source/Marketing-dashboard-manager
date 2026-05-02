@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export default async function CampaignsListPage() {
   const [campaigns, templates] = await Promise.all([
     db.query.campaigns.findMany({ orderBy: desc(schema.campaigns.releaseAt) }),
-    Promise.resolve(loadMarketingTemplates()),
+    loadMarketingTemplates(),
   ]);
 
   return (

@@ -23,12 +23,14 @@ export const metadata: Metadata = {
   description: 'Pulpit dla kampanii marketingowej w short-form video.',
 };
 
-export default function RootLayout({
+export const dynamic = 'force-dynamic';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const agents = loadAgentMeta();
+  const agents = await loadAgentMeta();
   return (
     <html
       lang="pl"

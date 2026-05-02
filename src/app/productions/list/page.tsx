@@ -15,10 +15,11 @@ export default async function ProductionsListPage({
   searchParams: Promise<{ type?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const [productions, artists, videographers] = await Promise.all([
+  const [productions, artists, videographers, templates] = await Promise.all([
     listProductions(),
     listArtists(),
     listVideographers(),
+    loadTemplates(),
   ]);
 
   const filtered = productions.filter((p) => {
@@ -57,7 +58,7 @@ export default async function ProductionsListPage({
         <NewProductionButton
           artists={artistOptions}
           videographers={videographerOptions}
-          templates={loadTemplates()}
+          templates={templates}
         />
       }
     >

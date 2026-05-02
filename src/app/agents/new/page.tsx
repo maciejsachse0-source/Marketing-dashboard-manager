@@ -13,9 +13,11 @@ export default async function NewAgentPage({
 }) {
   const sp = await searchParams;
   const cloneSlug = sp.clone;
-  const cloneFrom = cloneSlug ? getAgent(cloneSlug) : undefined;
+  const [cloneFrom, agents] = await Promise.all([
+    cloneSlug ? getAgent(cloneSlug) : Promise.resolve(undefined),
+    loadAgents(),
+  ]);
   if (cloneSlug && !cloneFrom) notFound();
-  const agents = loadAgents();
 
   return (
     <PageShell
