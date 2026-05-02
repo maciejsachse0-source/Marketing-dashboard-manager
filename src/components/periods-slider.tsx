@@ -446,14 +446,14 @@ function PeriodRail({
               onChange={(e) => onChangeDescription(e.target.value)}
               placeholder={`Opis okresu ${period.code} — co chcesz, żeby widz POCZUŁ w tej fazie`}
               maxLength={500}
-              rows={2}
+              rows={3}
               aria-label={`Opis okresu ${period.code}`}
-              className={`flex-1 text-[11px] leading-snug ${tone.ink} bg-transparent focus:outline-none resize-none placeholder:opacity-60 placeholder:italic`}
+              className={`flex-1 text-sm leading-relaxed ${tone.ink} bg-transparent focus:outline-none resize-y placeholder:opacity-60 placeholder:italic min-h-[3.5rem]`}
             />
           </div>
         </label>
       ) : period.description ? (
-        <p className={`text-[11px] leading-snug ${tone.ink} opacity-90 italic px-1`}>
+        <p className={`text-sm leading-relaxed ${tone.ink} opacity-90 italic px-1`}>
           {period.description}
         </p>
       ) : null}
