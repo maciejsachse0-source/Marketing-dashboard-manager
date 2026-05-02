@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, inArray } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { db, schema } from '@/lib/db';
-import { CampaignTimeline } from '@/components/campaigns/timeline';
+import { CampaignNarrativeSection } from '@/components/campaigns/narrative-section';
 import { PhasePill } from '@/components/campaigns/phase-pill';
 import { PhaseButtons } from '@/components/campaigns/phase-buttons';
 import {
@@ -11,9 +11,8 @@ import {
   CampaignGoalField,
   CampaignNotesField,
 } from '@/components/campaigns/campaign-inline-fields';
-import { MilestonesTracker } from '@/components/campaigns/milestones-tracker';
-import { CampaignPeriodsEditor } from '@/components/campaigns/campaign-periods-editor';
-import { PlatformPills, StatusPill } from '@/components/platforms-pills';
+import { ApplyTemplateButton } from '@/components/campaigns/apply-template-button';
+import { loadMarketingTemplates } from '@/lib/campaign-templates';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
 
 export const dynamic = 'force-dynamic';
@@ -32,20 +31,43 @@ export default async function CampaignDetailPage({
   });
   if (!campaign) notFound();
 
-  const [entries, packages, posts] = await Promise.all([
+  const [entries, posts, productions] = await Promise.all([
     db.query.calendarEntries.findMany({
       where: eq(schema.calendarEntries.campaignId, campaignId),
       orderBy: schema.calendarEntries.startsAt,
-    }),
-    db.query.packages.findMany({
-      where: eq(schema.packages.campaignId, campaignId),
-      orderBy: desc(schema.packages.createdAt),
     }),
     db.query.posts.findMany({
       where: eq(schema.posts.campaignId, campaignId),
       orderBy: desc(schema.posts.publishedAt),
     }),
+    db.query.productions.findMany({
+      where: eq(schema.productions.campaignId, campaignId),
+      orderBy: schema.productions.t0At,
+    }),
   ]);
+
+  // Bulk-load artists referenced by the productions so the timeline can show
+  // names without N+1 round trips. Productions without an artist (solo) get
+  // null — the row falls back to the production title.
+  const artistIds = Array.from(
+    new Set(productions.map((p) => p.artistId).filter((id): id is number => id != null)),
+  );
+  const artists =
+    artistIds.length > 0
+      ? await db.query.artists.findMany({
+          where: inArray(schema.artists.id, artistIds),
+        })
+      : [];
+  const artistById = new Map(artists.map((a) => [a.id, a]));
+  const productionsWithArtist = productions.map((p) => ({
+    ...p,
+    artist: p.artistId
+      ? (() => {
+          const a = artistById.get(p.artistId);
+          return a ? { id: a.id, name: a.name, handle: a.handle } : null;
+        })()
+      : null,
+  }));
 
   const totalReach = posts.reduce((sum, p) => sum + (p.reach ?? 0), 0);
   const avgER =
@@ -79,21 +101,20 @@ export default async function CampaignDetailPage({
 
         <PhaseButtons id={campaign.id} current={campaign.phase} />
 
-        <CampaignPeriodsEditor
-          campaignId={campaign.id}
-          initialPeriods={campaign.periods}
-          kickoffAt={campaign.releaseAt}
-        />
-
-        {campaign.milestones && campaign.milestones.length > 0 ? (
-          <MilestonesTracker
+        {!campaign.templateSlug ? (
+          <ApplyTemplateButton
             campaignId={campaign.id}
-            milestones={campaign.milestones}
-            periods={campaign.periods}
+            templates={loadMarketingTemplates()}
           />
         ) : null}
 
-        <CampaignTimeline releaseAt={campaign.releaseAt} entries={entries} />
+        <CampaignNarrativeSection
+          campaignId={campaign.id}
+          kickoffAt={campaign.releaseAt}
+          initialPeriods={campaign.periods}
+          productions={productionsWithArtist}
+          entries={entries}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <KpiCard
@@ -138,25 +159,6 @@ export default async function CampaignDetailPage({
                     {e.startsAt.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}
                   </span>
                   <span className="text-[10px] text-muted-foreground uppercase">{e.status}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section>
-          <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">
-            Pakiety ({packages.length})
-          </h2>
-          {packages.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Brak pakietów powiązanych z tą kampanią.</p>
-          ) : (
-            <ul className="rounded-lg border border-border divide-y divide-border">
-              {packages.map((p) => (
-                <li key={p.id} className="px-4 py-2.5 flex items-center gap-3 text-sm">
-                  <span className="flex-1 truncate font-medium">{p.title}</span>
-                  <PlatformPills platforms={p.platforms} />
-                  <StatusPill status={p.status} />
                 </li>
               ))}
             </ul>

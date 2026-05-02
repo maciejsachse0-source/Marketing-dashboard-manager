@@ -57,6 +57,7 @@ function migrateLegacyPeriods(input: TemplatePeriod[] | undefined): TemplatePeri
   const shift = min < 0 ? -min : 0;
   return input.map((p, i) => ({
     code: codeForIndex(i),
+    name: p.name,
     startOffsetDays: Math.max(0, p.startOffsetDays + shift),
     endOffsetDays: Math.max(0, p.endOffsetDays + shift),
   }));
@@ -473,6 +474,7 @@ export function CampaignTemplateForm({
           onChange={updatePeriod}
           onRemove={removePeriod}
           canRemove={periods.length > MIN_PERIODS}
+          editableNames
         />
       </section>
 
