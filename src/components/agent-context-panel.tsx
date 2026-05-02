@@ -4,7 +4,6 @@ import {
   getRecentPosts,
   getAllArtists,
   getActiveCampaigns,
-  getRecentPackages,
 } from '@/lib/context';
 import type { AgentSidePanel } from '@/lib/agents/types';
 import { TYPE_LABEL } from './calendar/type-color';
@@ -19,19 +18,6 @@ export async function AgentContextPanel({ kind }: { kind: AgentSidePanel }) {
       return <ArtistsPanel />;
     case 'active-campaigns':
       return <CampaignsPanel />;
-    case 'recent-packages':
-      return <PackagesPanel />;
-    case 'wrap-history':
-      return (
-        <PlaceholderPanel
-          title="Historia raportów"
-          hint="Po zapisaniu raportów weekly-wrap pojawią się tutaj."
-        />
-      );
-    case 'brief-templates':
-      return (
-        <PlaceholderPanel title="Szablony briefów" hint="Stałe szablony — będą tu w Fazie 2." />
-      );
     case 'trend-bookmarks':
       return (
         <PlaceholderPanel
@@ -194,24 +180,3 @@ async function CampaignsPanel() {
   );
 }
 
-async function PackagesPanel() {
-  const packages = await getRecentPackages(8);
-  return (
-    <PanelShell title="Ostatnie pakiety" count={packages.length}>
-      {packages.length === 0 ? (
-        <p className="text-xs text-muted-foreground">Brak pakietów.</p>
-      ) : (
-        <ul className="space-y-1.5">
-          {packages.map((p) => (
-            <li key={p.id} className="text-xs">
-              <div className="font-medium truncate">{p.title}</div>
-              <div className="text-muted-foreground">
-                {p.platforms.join(', ')} · {p.status}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </PanelShell>
-  );
-}

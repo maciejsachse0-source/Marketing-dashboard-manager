@@ -31,11 +31,8 @@ const SIDE_PANEL_LABELS: Record<AgentSidePanel, string> = {
   'calendar-14': 'Kalendarz · 14 dni',
   'recent-posts': 'Ostatnie posty',
   'artists-list': 'Lista artystów',
-  'brief-templates': 'Szablony briefów',
   'active-campaigns': 'Aktywne kampanie',
-  'wrap-history': 'Historia wrapów',
   'trend-bookmarks': 'Bookmarki trendów',
-  'recent-packages': 'Ostatnie pakiety',
 };
 
 type Mode = 'create' | 'edit';
@@ -248,7 +245,7 @@ export function AgentForm({
               onChange={(e) => set('widgetQuery', e.target.value)}
               rows={3}
               className="font-mono text-xs"
-              placeholder="SELECT count(*) AS count FROM packages WHERE status = 'draft'"
+              placeholder="SELECT count(*) AS count FROM artists WHERE last_contact_at < unixepoch() * 1000 - 14*86400000"
             />
           </div>
           <div className="grid gap-1.5">
@@ -257,7 +254,7 @@ export function AgentForm({
               id="widgetTemplate"
               value={state.widgetTemplate}
               onChange={(e) => set('widgetTemplate', e.target.value)}
-              placeholder="{{count}} pakietów do akceptacji"
+              placeholder="{{count}} artystów bez kontaktu >14d"
               className="font-mono text-xs"
             />
           </div>

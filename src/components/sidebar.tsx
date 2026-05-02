@@ -7,13 +7,11 @@ import {
   LayoutDashboard,
   ChartGantt,
   Bot,
-  PackageOpen,
   BarChart3,
   Users,
-  FileText,
+  UsersRound,
   Sparkles,
   Film,
-  FolderOpen,
   Camera,
   LayoutTemplate,
   Megaphone,
@@ -22,25 +20,57 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
+import { HelpDialog } from '@/components/help-dialog';
 
-const NAV: { href: string; label: string; icon: LucideIcon }[] = [
+type NavChild = { href: string; label: string; icon: LucideIcon };
+type NavItem = { href: string; label: string; icon: LucideIcon; children?: NavChild[] };
+
+const NAV: NavItem[] = [
   { href: '/', label: 'Pulpit', icon: LayoutDashboard },
   { href: '/calendar', label: 'Pipeline', icon: ChartGantt },
-  { href: '/productions', label: 'Produkcje', icon: Film },
-  { href: '/campaigns', label: 'Kampanie', icon: Megaphone },
-  { href: '/templates', label: 'Templaty', icon: LayoutTemplate },
+  {
+    href: '/campaigns',
+    label: 'Kampanie',
+    icon: Megaphone,
+    children: [
+      { href: '/campaigns/list', label: 'Lista kampanii', icon: Megaphone },
+      { href: '/campaigns/templates', label: 'Templaty kampanii', icon: LayoutTemplate },
+    ],
+  },
+  {
+    href: '/productions',
+    label: 'Produkcje',
+    icon: Film,
+    children: [
+      { href: '/productions/list', label: 'Lista produkcji', icon: Film },
+      { href: '/templates', label: 'Templaty produkcji', icon: LayoutTemplate },
+    ],
+  },
+  {
+    href: '/team',
+    label: 'Zespół',
+    icon: UsersRound,
+    children: [
+      { href: '/artists', label: 'Artyści', icon: Users },
+      { href: '/videographers', label: 'Kamerzyści', icon: Camera },
+    ],
+  },
   { href: '/agents', label: 'Agenci', icon: Bot },
-  { href: '/packages', label: 'Pakiety', icon: PackageOpen },
-  { href: '/output', label: 'Folder publikacji', icon: FolderOpen },
   { href: '/analytics', label: 'Analityka', icon: BarChart3 },
-  { href: '/artists', label: 'Artyści', icon: Users },
-  { href: '/videographers', label: 'Kamerzyści', icon: Camera },
-  { href: '/briefs', label: 'Briefy & wrapy', icon: FileText },
 ];
 
-function isActive(pathname: string, href: string): boolean {
+function isExact(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/';
   return pathname === href || pathname.startsWith(href + '/');
+}
+
+function isParentActive(pathname: string, item: NavItem): boolean {
+  if (isExact(pathname, item.href)) return true;
+  return (item.children ?? []).some((c) => isExact(pathname, c.href));
+}
+
+function isChildActive(pathname: string, child: NavChild): boolean {
+  return isExact(pathname, child.href);
 }
 
 export function Sidebar({ agents }: { agents: AgentMeta[] }) {
@@ -94,7 +124,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="px-5 py-5 border-b border-sidebar-border flex items-center justify-between relative overflow-hidden">
+        <div className="px-5 py-5 border-b border-sidebar-border relative overflow-hidden">
           <div
             aria-hidden
             className="absolute -top-12 -right-8 w-32 h-32 rounded-full pointer-events-none"
@@ -105,25 +135,30 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
               filter: 'blur(20px)',
             }}
           />
-          <Link href="/" className="relative flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform">
-              <Sparkles className="w-4 h-4 text-background" strokeWidth={2.5} />
-            </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-bold tracking-tight">Marketing Crew</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
-                dyspozytornia
-              </span>
-            </div>
-          </Link>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="lg:hidden p-1 rounded hover:bg-muted transition"
-            aria-label="Zamknij menu"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="relative flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2.5 group min-w-0">
+              <div className="w-9 h-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform shrink-0">
+                <Sparkles className="w-4 h-4 text-background" strokeWidth={2.5} />
+              </div>
+              <div className="flex flex-col leading-tight min-w-0">
+                <span className="text-sm font-bold tracking-tight truncate">Marketing Crew</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+                  dyspozytornia
+                </span>
+              </div>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden p-1 rounded hover:bg-muted transition"
+              aria-label="Zamknij menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="relative mt-2 ml-[2.875rem]">
+            <HelpDialog />
+          </div>
         </div>
 
         <nav className="flex flex-col gap-0.5 px-3 py-4">
@@ -131,24 +166,51 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
             Główne
           </div>
           {NAV.map((item) => {
-            const active = isActive(pathname, item.href);
             const Icon = item.icon;
+            const childActive = (item.children ?? []).some((c) => isChildActive(pathname, c));
+            const parentActive = isParentActive(pathname, item) && !childActive;
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-full text-sm transition ${
-                  active
-                    ? 'bg-foreground text-background font-medium'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
-                }`}
-              >
-                <Icon
-                  className={`w-4 h-4 shrink-0 ${active ? 'text-background' : ''}`}
-                  strokeWidth={active ? 2.25 : 1.75}
-                />
-                <span className="truncate">{item.label}</span>
-              </Link>
+              <div key={item.href} className="flex flex-col gap-0.5">
+                <Link
+                  href={item.href}
+                  className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-full text-sm transition ${
+                    parentActive
+                      ? 'bg-foreground text-background font-medium'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
+                  }`}
+                >
+                  <Icon
+                    className={`w-4 h-4 shrink-0 ${parentActive ? 'text-background' : ''}`}
+                    strokeWidth={parentActive ? 2.25 : 1.75}
+                  />
+                  <span className="truncate">{item.label}</span>
+                </Link>
+                {item.children ? (
+                  <div className="ml-6 pl-3 border-l border-sidebar-border/60 flex flex-col gap-0.5 my-1">
+                    {item.children.map((child) => {
+                      const ChildIcon = child.icon;
+                      const cActive = isChildActive(pathname, child);
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full text-[12.5px] transition ${
+                            cActive
+                              ? 'bg-foreground text-background font-medium'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
+                          }`}
+                        >
+                          <ChildIcon
+                            className={`w-3.5 h-3.5 shrink-0 ${cActive ? 'text-background' : ''}`}
+                            strokeWidth={cActive ? 2.25 : 1.75}
+                          />
+                          <span className="truncate">{child.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </nav>
