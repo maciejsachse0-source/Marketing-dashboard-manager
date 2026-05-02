@@ -1,8 +1,14 @@
+import 'server-only';
 import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { list } from '@vercel/blob';
+
+const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+const useBlob = Boolean(blobToken);
 
 export type OutreachFile = {
   filename: string;
+  /** Public CDN URL when using Vercel Blob, repo-relative path otherwise. */
   path: string;
   modifiedAt: Date;
   /** Sanitized prefix that should match an artist's safeName(name). */
@@ -19,7 +25,24 @@ function safeSlug(name: string): string {
     .toLowerCase();
 }
 
-export function listOutreachFiles(): OutreachFile[] {
+export async function listOutreachFiles(): Promise<OutreachFile[]> {
+  if (useBlob) {
+    const result = await list({ prefix: 'outreach/', token: blobToken });
+    return result.blobs
+      .filter((b) => b.pathname.endsWith('.md'))
+      .map((b) => {
+        const filename = b.pathname.slice('outreach/'.length);
+        const prefix = filename.replace(/\.md$/, '').split('-').slice(0, 2).join('-');
+        return {
+          filename,
+          path: b.url,
+          modifiedAt: new Date(b.uploadedAt),
+          prefix,
+        };
+      })
+      .sort((a, b) => b.modifiedAt.getTime() - a.modifiedAt.getTime());
+  }
+
   const dir = join(process.cwd(), 'data', 'files', 'outreach');
   if (!existsSync(dir)) return [];
   const entries = readdirSync(dir).filter((f) => f.endsWith('.md'));

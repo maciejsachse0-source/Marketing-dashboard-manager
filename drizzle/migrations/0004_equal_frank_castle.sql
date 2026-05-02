@@ -1,1 +1,0 @@
-ALTER TABLE `artists` ADD `avatar_url` text;

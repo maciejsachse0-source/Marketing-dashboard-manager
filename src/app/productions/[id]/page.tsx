@@ -15,6 +15,8 @@ import { DeleteProductionButton } from '@/components/productions/delete-producti
 import { CancelProductionButton } from '@/components/productions/cancel-production-button';
 import { VideographerPicker } from '@/components/productions/videographer-picker';
 import { ArtistPicker } from '@/components/productions/artist-picker';
+import { T1StartEditor } from '@/components/productions/t1-start-editor';
+import { getFirstPeriodStart } from '@/lib/production-steps';
 import type {
   ProductionStage,
   ProductionStep,
@@ -139,8 +141,8 @@ export default async function ProductionDetailPage({
   if (!data) notFound();
 
   const { production, posts, artist, videographer, campaign } = data;
-  const attachments = listProductionAttachments(production.slug);
-  const [allArtists, allVideographers] = await Promise.all([
+  const [attachments, allArtists, allVideographers] = await Promise.all([
+    listProductionAttachments(production.slug),
     listArtists(),
     listVideographers(),
   ]);
@@ -163,6 +165,7 @@ export default async function ProductionDetailPage({
 
   const t0Days = Math.round((production.t0At.getTime() - Date.now()) / 86400000);
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
+  const t1Start = getFirstPeriodStart(production.t0At, production.periods);
 
   const displayTitle = artist ? artist.name : production.title;
 
@@ -207,6 +210,22 @@ export default async function ProductionDetailPage({
           <span className="inline-block ui-transition group-hover:-translate-x-0.5">←</span>
           wszystkie produkcje
         </Link>
+
+        <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
+              Start produkcji {artist ? `· ${artist.name}` : ''}
+            </div>
+            <p className="text-sm text-foreground/80 mt-1.5 leading-relaxed">
+              Zmień datę startu — <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
+            </p>
+          </div>
+          <T1StartEditor
+            productionId={production.id}
+            t1Start={t1Start}
+            disabled={cancelled}
+          />
+        </section>
 
         {orphanWithArtist ? (
           <ArtistPicker
@@ -493,7 +512,7 @@ function CategorySection({
   steps: ProductionStep[];
   stepStates: Map<string, 'passed' | 'active' | 'pending'>;
   startNumber: number;
-  attachments: ReturnType<typeof listProductionAttachments>;
+  attachments: Awaited<ReturnType<typeof listProductionAttachments>>;
   extras: React.ReactNode[];
   bannerSlot?: React.ReactNode;
   cancelled: boolean;

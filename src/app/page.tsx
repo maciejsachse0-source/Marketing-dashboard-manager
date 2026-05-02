@@ -49,6 +49,11 @@ export default async function DashboardPage() {
     : null;
   const newFollowers = weekPosts.reduce((s, p) => s + (p.followersGained ?? 0), 0);
 
+  const agents = loadAgents();
+  const agentHints = await Promise.all(
+    agents.map((a) => (a.dashboardWidget ? runAgentWidget(a.dashboardWidget) : Promise.resolve(null))),
+  );
+
   const today = now.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
   const isoWeek = (() => {
     const tmp = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
@@ -105,8 +110,8 @@ export default async function DashboardPage() {
       <section className="mb-14">
         <SectionHeader icon={Sparkles} title="Agenci" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {loadAgents().map((agent) => {
-            const hint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
+          {agents.map((agent, i) => {
+            const hint = agentHints[i];
             return (
               <Link
                 key={agent.slug}

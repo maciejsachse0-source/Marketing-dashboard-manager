@@ -1,1 +1,0 @@
-ALTER TABLE `calendar_entries` ADD `stage` text;

@@ -1,11 +1,12 @@
+import 'dotenv/config';
 import type { Config } from 'drizzle-kit';
 
 export default {
   schema: './drizzle/schema.ts',
   out: './drizzle/migrations',
-  dialect: 'sqlite',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_PATH ?? './data/marketing-crew.db',
+    url: process.env.DATABASE_URL ?? '',
   },
   strict: true,
   verbose: true,

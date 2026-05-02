@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, integer, text, real, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const PLATFORMS = ['instagram', 'tiktok', 'youtube', 'facebook', 'x', 'linkedin'] as const;
@@ -162,27 +162,25 @@ export const PRODUCTION_PROGRESSION: ProductionStatus[] = [
   'publishing',
 ];
 
-const now = sql`(unixepoch() * 1000)`;
-
-export const artists = sqliteTable('artists', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const artists = pgTable('artists', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   handle: text('handle'),
   email: text('email'),
   phone: text('phone'),
   avatarUrl: text('avatar_url'),
   notes: text('notes'),
-  lastContactAt: integer('last_contact_at', { mode: 'timestamp_ms' }),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  lastContactAt: timestamp('last_contact_at', { withTimezone: true, mode: 'date' }),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const campaigns = sqliteTable('campaigns', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const campaigns = pgTable('campaigns', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   goal: text('goal').notNull(),
-  releaseAt: integer('release_at', { mode: 'timestamp_ms' }).notNull(),
+  releaseAt: timestamp('release_at', { withTimezone: true, mode: 'date' }).notNull(),
   phase: text('phase').$type<CampaignPhase>().notNull().default('build-up'),
-  kpis: text('kpis', { mode: 'json' }).$type<Record<string, string | number>>(),
+  kpis: jsonb('kpis').$type<Record<string, string | number>>(),
   notes: text('notes'),
   /** Slug of the marketing template the campaign was instantiated from.
    *  Recorded for audit only — milestones below are the source of truth. */
@@ -190,15 +188,15 @@ export const campaigns = sqliteTable('campaigns', {
   /** T1/T2/T3 time-band offsets relative to T-0 — cloned from the marketing
    *  template at creation. NULL = legacy campaign created before milestones
    *  existed; consumers fall back to DEFAULT_PERIODS in that case. */
-  periods: text('periods', { mode: 'json' }).$type<ProductionPeriods>(),
+  periods: jsonb('periods').$type<ProductionPeriods>(),
   /** Cloned milestones + submilestones with done state. NULL = legacy
    *  campaign with no template — UI hides the milestone tracker. */
-  milestones: text('milestones', { mode: 'json' }).$type<CampaignMilestones>(),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  milestones: jsonb('milestones').$type<CampaignMilestones>(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const videographers = sqliteTable('videographers', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const videographers = pgTable('videographers', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   contact: text('contact'),
   hourlyRate: real('hourly_rate'),
@@ -206,72 +204,72 @@ export const videographers = sqliteTable('videographers', {
   availabilityNotes: text('availability_notes'),
   avatarUrl: text('avatar_url'),
   notes: text('notes'),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const productions = sqliteTable('productions', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const productions = pgTable('productions', {
+  id: serial('id').primaryKey(),
   type: text('type').$type<ProductionType>().notNull(),
   title: text('title').notNull(),
   slug: text('slug').notNull(),
-  t0At: integer('t0_at', { mode: 'timestamp_ms' }).notNull(),
+  t0At: timestamp('t0_at', { withTimezone: true, mode: 'date' }).notNull(),
   /** Flexible-steps model — one ordered list per production, cloned from a
    *  template at creation. Replaces the legacy (status + stepDates +
    *  customSteps + stepOrder) quartet that was dropped in migration 0011. */
-  steps: text('steps', { mode: 'json' }).$type<ProductionStep[]>().notNull().default(sql`'[]'`),
+  steps: jsonb('steps').$type<ProductionStep[]>().notNull().default(sql`'[]'::jsonb`),
   /** T1/T2/T3 time-band offsets relative to T-0 Monday — cloned from the
    *  template at creation. NULL = legacy production created before flexible
    *  periods existed; consumers fall back to DEFAULT_PERIODS in that case. */
-  periods: text('periods', { mode: 'json' }).$type<ProductionPeriods>(),
+  periods: jsonb('periods').$type<ProductionPeriods>(),
   /** Production cancellation timestamp — replaces `status: 'cancelled'`. */
-  cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
+  cancelledAt: timestamp('cancelled_at', { withTimezone: true, mode: 'date' }),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   videographerId: integer('videographer_id').references(() => videographers.id, { onDelete: 'set null' }),
-  platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
+  platforms: jsonb('platforms').$type<Platform[]>(),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
   folderPath: text('folder_path'),
   notes: text('notes'),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const calendarEntries = sqliteTable('calendar_entries', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const calendarEntries = pgTable('calendar_entries', {
+  id: serial('id').primaryKey(),
   type: text('type').$type<CalendarType>().notNull(),
   title: text('title').notNull(),
   description: text('description'),
-  startsAt: integer('starts_at', { mode: 'timestamp_ms' }).notNull(),
-  endsAt: integer('ends_at', { mode: 'timestamp_ms' }).notNull(),
-  platforms: text('platforms', { mode: 'json' }).$type<Platform[]>(),
+  startsAt: timestamp('starts_at', { withTimezone: true, mode: 'date' }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true, mode: 'date' }).notNull(),
+  platforms: jsonb('platforms').$type<Platform[]>(),
   artistId: integer('artist_id').references(() => artists.id, { onDelete: 'set null' }),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
   productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
   stage: text('stage').$type<ProductionStage>(),
   briefPath: text('brief_path'),
   status: text('status').$type<CalendarStatus>().notNull().default('planned'),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const csvUploads = sqliteTable('csv_uploads', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const csvUploads = pgTable('csv_uploads', {
+  id: serial('id').primaryKey(),
   filename: text('filename').notNull(),
   source: text('source').$type<CsvSource>().notNull(),
-  uploadedAt: integer('uploaded_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  uploadedAt: timestamp('uploaded_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
   rowCount: integer('row_count').notNull().default(0),
 });
 
-export const csvRows = sqliteTable('csv_rows', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const csvRows = pgTable('csv_rows', {
+  id: serial('id').primaryKey(),
   uploadId: integer('upload_id').notNull().references(() => csvUploads.id, { onDelete: 'cascade' }),
-  data: text('data', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
+  data: jsonb('data').$type<Record<string, unknown>>().notNull(),
 });
 
-export const posts = sqliteTable('posts', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  publishedAt: integer('published_at', { mode: 'timestamp_ms' }).notNull(),
+export const posts = pgTable('posts', {
+  id: serial('id').primaryKey(),
+  publishedAt: timestamp('published_at', { withTimezone: true, mode: 'date' }).notNull(),
   platform: text('platform').$type<Platform>().notNull(),
   title: text('title').notNull(),
   caption: text('caption').notNull().default(''),
-  hashtags: text('hashtags', { mode: 'json' }).$type<string[]>(),
+  hashtags: jsonb('hashtags').$type<string[]>(),
   assetPath: text('asset_path'),
   campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
   productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
@@ -284,18 +282,18 @@ export const posts = sqliteTable('posts', {
   comments: integer('comments'),
   followersGained: integer('followers_gained'),
   rawCsvRowId: integer('raw_csv_row_id').references(() => csvRows.id, { onDelete: 'set null' }),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const agentRuns = sqliteTable('agent_runs', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const agentRuns = pgTable('agent_runs', {
+  id: serial('id').primaryKey(),
   agentSlug: text('agent_slug').notNull(),
-  inputJson: text('input_json', { mode: 'json' }).$type<unknown>().notNull(),
+  inputJson: jsonb('input_json').$type<unknown>().notNull(),
   outputText: text('output_text').notNull().default(''),
   tokensIn: integer('tokens_in').notNull().default(0),
   tokensOut: integer('tokens_out').notNull().default(0),
   costEstimateUsd: real('cost_estimate_usd').notNull().default(0),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
 export type Artist = typeof artists.$inferSelect;

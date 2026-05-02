@@ -1,14 +1,16 @@
 import 'dotenv/config';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { resolve } from 'node:path';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
 
-const dbPath = resolve(process.env.DATABASE_PATH ?? './data/marketing-crew.db');
-const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
-const db = drizzle(sqlite, { schema });
+const url = process.env.DATABASE_URL;
+if (!url) {
+  console.error('[seed] DATABASE_URL not set');
+  process.exit(1);
+}
+
+const sql = postgres(url, { max: 1, prepare: false });
+const db = drizzle(sql, { schema });
 
 const now = new Date();
 function daysFromNow(days: number, hour = 12, minute = 0) {
@@ -89,10 +91,11 @@ async function main() {
   ]);
 
   console.log('[seed] done');
-  sqlite.close();
+  await sql.end();
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err);
+  await sql.end({ timeout: 1 });
   process.exit(1);
 });

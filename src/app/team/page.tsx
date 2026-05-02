@@ -13,11 +13,11 @@ import { listOutreachFiles, outreachFilesForArtist } from '@/lib/outreach-files'
 export const dynamic = 'force-dynamic';
 
 export default async function TeamPage() {
-  const [artists, videographers] = await Promise.all([
+  const [artists, videographers, allOutreach] = await Promise.all([
     db.query.artists.findMany({ orderBy: schema.artists.name }),
     db.query.videographers.findMany({ orderBy: schema.videographers.name }),
+    listOutreachFiles(),
   ]);
-  const allOutreach = listOutreachFiles();
 
   const artistRows: ArtistRow[] = await Promise.all(
     artists.map(async (artist) => {

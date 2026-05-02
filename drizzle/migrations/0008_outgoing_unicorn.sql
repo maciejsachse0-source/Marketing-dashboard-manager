@@ -1,1 +1,0 @@
-ALTER TABLE `productions` ADD `step_order` text;

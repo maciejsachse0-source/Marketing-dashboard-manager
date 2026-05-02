@@ -20,7 +20,7 @@ export default async function AgentPage({
 
   const promptFile = `agents/${agent.slug}.md`;
   const invocation = `@${promptFile} ${agent.name} — działaj zgodnie z promptem.`;
-  const widgetHint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
+  const widgetHint = agent.dashboardWidget ? await runAgentWidget(agent.dashboardWidget) : null;
 
   return (
     <PageShell
