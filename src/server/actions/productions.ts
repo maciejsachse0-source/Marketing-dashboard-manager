@@ -1,5 +1,6 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq, desc } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
@@ -141,21 +142,27 @@ export async function deleteProduction(id: number): Promise<void> {
     throw err;
   }
 
-  // Revalidate in a separate try-block so a stale-route render error doesn't
-  // mask a successful DB delete. Without this, an exception thrown while
-  // re-rendering ANY of the revalidated routes bubbles up as
-  // "An error occurred in the Server Components render" and the user thinks
-  // delete failed even though the row is gone.
+  // Revalidate the LIST/overview routes only. Do NOT revalidate the deleted
+  // production's detail route (`/productions/${id}`) — Next would try to
+  // rerender it as part of the action response, the page would call
+  // notFound() because the row is gone, and the resulting error bubbles up
+  // to the client as "An error occurred in the Server Components render"
+  // even though the delete itself succeeded.
   try {
     revalidatePath('/productions');
     revalidatePath('/productions/list');
-    revalidatePath(`/productions/${id}`);
     revalidatePath('/calendar');
     revalidatePath('/');
     revalidatePath('/analytics');
   } catch (err) {
     console.warn('[deleteProduction] revalidatePath failed (delete itself succeeded):', err);
   }
+
+  // Force-navigate away from the (now-gone) detail page so Next doesn't try
+  // to re-render /productions/[id] as part of the action response. Calling
+  // redirect() throws a special signal that Next intercepts — must be the
+  // last statement (anything after is unreachable).
+  redirect('/productions/list');
 }
 
 export async function listProductions(filter?: {
