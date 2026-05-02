@@ -4,10 +4,8 @@ import Link from 'next/link';
 import { useOptimistic, useState, useTransition } from 'react';
 import { ArrowRight, Check, CheckCircle2, ChevronDown, ExternalLink, FolderOpen } from 'lucide-react';
 import { PersonAvatar, SoloAvatar, OrphanArtistAvatar } from '@/components/productions/artist-avatar';
-import {
-  ProductionTypeBadge,
-  STATUS_LABEL as PROD_STATUS_LABEL,
-} from '@/components/productions/status-pill';
+import { ProductionPeopleStack } from '@/components/productions/production-people-stack';
+import { STATUS_LABEL as PROD_STATUS_LABEL } from '@/components/productions/status-pill';
 import { DeleteProductionButton } from '@/components/productions/delete-production-button';
 import { cascadeStepsTo } from '@/server/actions/production-steps';
 import { openProductionFolder } from '@/server/actions/production-folder';
@@ -1047,24 +1045,19 @@ function GanttRowView({
               />
 
               <div className="flex items-center gap-1.5 text-[11px] mt-auto">
-                <ProductionTypeBadge type={row.type} />
-                {row.videographerName ? (
-                  <span
-                    className="text-muted-foreground truncate"
-                    title={`Kamerzysta: ${row.videographerName}`}
-                  >
-                    · kam:{' '}
-                    <span className="font-semibold text-foreground/80">{row.videographerName}</span>
-                  </span>
-                ) : null}
+                <ProductionPeopleStack
+                  type={row.type}
+                  artistName={row.artistName}
+                  artistHandle={row.artistHandle}
+                  videographerName={row.videographerName}
+                />
               </div>
             </>
           ) : (
             // Same-artist follow-up row: account header is suppressed so the
-            // cluster reads as one artist with multiple parallel tracks, but
-            // the type badge ("solo" / "z artystą") stays visible under the
-            // next-step indicator — within an artist cluster solo and
-            // with-artist tracks need to be told apart at a glance.
+            // cluster reads as one artist with multiple parallel tracks. The
+            // people-stack still renders so solo vs. with-artist (and which
+            // videographer) is visible at a glance per track.
             <>
               <NextStepIndicator
                 productionId={row.id}
@@ -1074,16 +1067,12 @@ function GanttRowView({
                 totalSteps={totalStepCount}
               />
               <div className="flex items-center gap-1.5 text-[11px] mt-auto">
-                <ProductionTypeBadge type={row.type} />
-                {row.videographerName ? (
-                  <span
-                    className="text-muted-foreground truncate"
-                    title={`Kamerzysta: ${row.videographerName}`}
-                  >
-                    · kam:{' '}
-                    <span className="font-semibold text-foreground/80">{row.videographerName}</span>
-                  </span>
-                ) : null}
+                <ProductionPeopleStack
+                  type={row.type}
+                  artistName={row.artistName}
+                  artistHandle={row.artistHandle}
+                  videographerName={row.videographerName}
+                />
               </div>
             </>
           )}
