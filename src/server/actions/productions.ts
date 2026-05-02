@@ -95,58 +95,67 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
 }
 
 export async function deleteProduction(id: number): Promise<void> {
-  // Snapshot the production + artist BEFORE the DB delete so we can rename
-  // the on-disk work folder afterwards (local-dev only). Failing to load it
-  // here is fine — the DB delete still runs, the rename is just skipped.
-  const prod = await db.query.productions.findFirst({
-    where: eq(schema.productions.id, id),
-    columns: { id: true, title: true, artistId: true },
-  });
-  if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
+  console.log(`[deleteProduction] starting for id=${id}`);
+  try {
+    const prod = await db.query.productions.findFirst({
+      where: eq(schema.productions.id, id),
+      columns: { id: true, title: true, artistId: true },
+    });
+    if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
 
-  const artist = prod.artistId
-    ? await db.query.artists.findFirst({
-        where: eq(schema.artists.id, prod.artistId),
-        columns: { name: true },
-      })
-    : null;
+    const artist = prod.artistId
+      ? await db.query.artists.findFirst({
+          where: eq(schema.artists.id, prod.artistId),
+          columns: { name: true },
+        })
+      : null;
 
-  // FKs from calendar_entries.production_id / posts.production_id are
-  // ON DELETE SET NULL in Postgres, so the children get nulled automatically.
-  // We do an explicit nullification first anyway so older Drizzle adapters
-  // that don't honour cascade semantics still work.
-  await db
-    .update(schema.calendarEntries)
-    .set({ productionId: null })
-    .where(eq(schema.calendarEntries.productionId, id));
-  await db
-    .update(schema.posts)
-    .set({ productionId: null })
-    .where(eq(schema.posts.productionId, id));
+    // FKs from calendar_entries.production_id / posts.production_id are
+    // ON DELETE SET NULL in Postgres. Explicit nullification first so we
+    // don't depend on the cascade semantic.
+    await db
+      .update(schema.calendarEntries)
+      .set({ productionId: null })
+      .where(eq(schema.calendarEntries.productionId, id));
+    await db
+      .update(schema.posts)
+      .set({ productionId: null })
+      .where(eq(schema.posts.productionId, id));
 
-  await db.delete(schema.productions).where(eq(schema.productions.id, id));
+    await db.delete(schema.productions).where(eq(schema.productions.id, id));
+    console.log(`[deleteProduction] DB delete done for id=${id}`);
 
-  // The work-folder rename only makes sense on the developer's local machine
-  // (it targets a Windows OneDrive path). Skip on Vercel where the FS is
-  // read-only and the path doesn't exist anyway — calling it just spams the
-  // logs with a try/catch'd error.
-  if (!process.env.VERCEL && artist) {
-    try {
-      const result = markProductionFolderObsolete(artist.name, prod.title);
-      if (!result.renamed) {
-        console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
+    // OneDrive folder rename — local-dev only.
+    if (!process.env.VERCEL && artist) {
+      try {
+        const result = markProductionFolderObsolete(artist.name, prod.title);
+        if (!result.renamed) {
+          console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
+        }
+      } catch (err) {
+        console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
       }
-    } catch (err) {
-      console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
     }
+  } catch (err) {
+    console.error('[deleteProduction] DB phase failed:', err);
+    throw err;
   }
 
-  revalidatePath('/productions');
-  revalidatePath('/productions/list');
-  revalidatePath(`/productions/${id}`);
-  revalidatePath('/calendar');
-  revalidatePath('/');
-  revalidatePath('/analytics');
+  // Revalidate in a separate try-block so a stale-route render error doesn't
+  // mask a successful DB delete. Without this, an exception thrown while
+  // re-rendering ANY of the revalidated routes bubbles up as
+  // "An error occurred in the Server Components render" and the user thinks
+  // delete failed even though the row is gone.
+  try {
+    revalidatePath('/productions');
+    revalidatePath('/productions/list');
+    revalidatePath(`/productions/${id}`);
+    revalidatePath('/calendar');
+    revalidatePath('/');
+    revalidatePath('/analytics');
+  } catch (err) {
+    console.warn('[deleteProduction] revalidatePath failed (delete itself succeeded):', err);
+  }
 }
 
 export async function listProductions(filter?: {
