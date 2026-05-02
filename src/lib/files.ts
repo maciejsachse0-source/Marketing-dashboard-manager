@@ -2,7 +2,7 @@ import { mkdirSync, existsSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { join, normalize, sep } from 'node:path';
 
-export type FileCategory = 'assets' | 'briefs' | 'packages' | 'csv' | 'outreach';
+export type FileCategory = 'assets' | 'briefs' | 'csv' | 'outreach';
 
 function rootDir(): string {
   return join(process.cwd(), 'data', 'files');

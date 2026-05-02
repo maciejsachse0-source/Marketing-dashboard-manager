@@ -2,7 +2,7 @@ import { desc } from 'drizzle-orm';
 import { db, schema } from './db';
 
 export type ActivityEvent = {
-  kind: 'calendar-entry' | 'post' | 'package' | 'artist' | 'campaign';
+  kind: 'calendar-entry' | 'post' | 'artist' | 'campaign';
   title: string;
   subtitle: string;
   at: Date;
@@ -10,17 +10,13 @@ export type ActivityEvent = {
 };
 
 export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
-  const [calendar, posts, packages, artists, campaigns] = await Promise.all([
+  const [calendar, posts, artists, campaigns] = await Promise.all([
     db.query.calendarEntries.findMany({
       orderBy: desc(schema.calendarEntries.createdAt),
       limit: 5,
     }),
     db.query.posts.findMany({
       orderBy: desc(schema.posts.createdAt),
-      limit: 5,
-    }),
-    db.query.packages.findMany({
-      orderBy: desc(schema.packages.createdAt),
       limit: 5,
     }),
     db.query.artists.findMany({
@@ -47,13 +43,6 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
       subtitle: `post · ${p.platform}${p.reach ? ` · ${p.reach.toLocaleString('pl-PL')} reach` : ''}`,
       at: p.createdAt,
       href: '/analytics',
-    })),
-    ...packages.map((p) => ({
-      kind: 'package' as const,
-      title: p.title,
-      subtitle: `pakiet · ${p.status}`,
-      at: p.createdAt,
-      href: '/packages',
     })),
     ...artists.map((a) => ({
       kind: 'artist' as const,
