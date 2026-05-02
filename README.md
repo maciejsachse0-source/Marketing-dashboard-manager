@@ -2,7 +2,7 @@
 
 Lokalna webapka — pulpit do zarządzania kampanią marketingową w short-form video (Reels, TikToki, Shorts).
 
-**Architektura: dashboard w przeglądarce + agenci w Claude Code.** Webapka wizualizuje dane (kalendarz, pakiety, analityka, baza artystów). Wszystkie 8 wirtualnych agentów żyją jako persony w Claude Code — każdy w pliku `agents/<slug>.md`. Mówisz do Claude Code „uruchom schedule-managera", on wczytuje persona prompt, czyta SQLite, działa.
+**Architektura: dashboard w przeglądarce + agenci w Claude Code.** Webapka wizualizuje dane (kalendarz, produkcje, analityka, baza artystów). Wszystkie 8 wirtualnych agentów żyją jako persony w Claude Code — każdy w pliku `agents/<slug>.md`. Mówisz do Claude Code „uruchom schedule-managera", on wczytuje persona prompt, czyta SQLite, działa.
 
 Bez Anthropic API key. Bez kosztów per-token. Korzystasz ze swojej istniejącej subskrypcji Claude Code.
 
@@ -31,7 +31,7 @@ Otwórz <http://localhost:3000>. Otwórz Claude Code w roocie projektu.
 │   localhost:3000         │         │                         │
 │                          │         │  @agents/schedule-      │
 │   • Kalendarz tygodnia   │◄────────│    manager.md           │
-│   • Pakiety              │  SQLite │                         │
+│   • Produkcje            │  SQLite │                         │
 │   • Analityka (CSV)      │  shared │  „zaplanuj nagranie     │
 │   • Baza artystów        │         │   z Anią w czwartek"    │
 │   • Reference cards 8    │         │                         │
@@ -58,9 +58,7 @@ marketing-crew/
 │   ├── artist-outreach.md
 │   ├── viral-analyzer.md
 │   ├── trend-scout.md
-│   ├── content-brief.md
-│   ├── campaign-strategist.md
-│   └── weekly-wrap.md
+│   └── campaign-strategist.md
 ├── src/
 │   ├── app/              # Next.js App Router (strony + API: upload, csv)
 │   ├── components/       # UI (shadcn/ui w components/ui/)
@@ -81,7 +79,7 @@ marketing-crew/
     ├── marketing-crew.db # SQLite (gitignore)
     ├── agents/           # JSON-y z metadanymi agentów + system prompty (edytowalne z UI)
     ├── templates/        # production templates + rytm tygodniowy
-    └── files/            # assety / briefy / pakiety / CSV / outreach / output (gitignore)
+    └── files/            # assety / CSV / outreach (gitignore)
 ```
 
 ## Komendy
@@ -105,9 +103,7 @@ marketing-crew/
 | `artist-outreach` | Maile do artystów: cold, briefy, follow-upy, podziękowania. |
 | `viral-analyzer` | Analizuje wyniki postów i daje rekomendacje na następny. |
 | `trend-scout` | Znajduje trending formaty / audio / tematy (używa WebSearch w Claude Code). |
-| `content-brief` | Briefy produkcyjne — header, hook, scenariusz, shotlist. |
 | `campaign-strategist` | Strategia kampanii: T-30 → T+30, fazy, KPI. |
-| `weekly-wrap` | Cotygodniowy raport: co było, co działa, co dalej. |
 
 Każdy ma stronę `/agents/<slug>` z pełnym promptem do skopiowania, gotowym wywołaniem `@agents/<slug>.md` i live kontekstem z bazy. Możesz też:
 
