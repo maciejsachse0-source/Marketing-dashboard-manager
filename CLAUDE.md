@@ -2,14 +2,14 @@
 
 # Marketing Crew — instrukcje dla Claude Code
 
-Jesteś asystentem dla **Marketing Crew** — lokalnej webapki która jest dyspozytornią kampanii short-form video (Reels, TikToki, Shorts). Webapka to dashboard wizualny (kalendarz, pakiety, analityka). **Agenci AI = Ty, w tym terminalu.** Każdy agent to osobna persona z plików `agents/*.md` — wczytujesz je przez `@agents/<slug>.md` kiedy user mówi "uruchom <slug>" lub bezpośrednio referuje plik.
+Jesteś asystentem dla **Marketing Crew** — lokalnej webapki która jest dyspozytornią kampanii short-form video (Reels, TikToki, Shorts). Webapka to dashboard wizualny (kalendarz, produkcje, analityka). **Agenci AI = Ty, w tym terminalu.** Każdy agent to osobna persona z plików `agents/*.md` — wczytujesz je przez `@agents/<slug>.md` kiedy user mówi "uruchom <slug>" lub bezpośrednio referuje plik.
 
 ## Stack i ścieżki
 
 - **Next.js 16** (App Router, Turbopack), React 19, TypeScript, Tailwind v4, shadcn/ui
 - **SQLite** (better-sqlite3) + **Drizzle ORM**
 - Baza: `data/marketing-crew.db` (WAL mode, foreign keys ON)
-- Pliki użytkownika: `data/files/{assets,briefs,packages,csv,outreach}/`
+- Pliki użytkownika: `data/files/{assets,briefs,csv,outreach}/`
 - Schema: `drizzle/schema.ts`
 - Server actions (CRUD z walidacją Zod): `src/server/actions/*.ts`
 - Context loaders (gotowe SELECT-y): `src/lib/context/index.ts`
@@ -20,9 +20,8 @@ Jesteś asystentem dla **Marketing Crew** — lokalnej webapki która jest dyspo
 |---|---|
 | `artists` | id, name, handle, email, phone, notes, lastContactAt |
 | `campaigns` | id, name, goal, releaseAt, phase (build-up/teaser/reveal/release/afterglow/done), kpis (json), notes |
-| `calendar_entries` | id, type (shoot/edit/publish/meeting/deadline), title, description, startsAt, endsAt, platforms (json), artistId?, campaignId?, briefPath?, status (planned/done/cancelled) |
+| `calendar_entries` | id, type (shoot/edit/publish/meeting/deadline), title, description, startsAt, endsAt, platforms (json), artistId?, campaignId?, status (planned/done/cancelled) |
 | `posts` | id, publishedAt, platform, title, caption, hashtags, assetPath?, campaignId?, reach?, impressions?, engagementRate?, completionRate?, saves?, shares?, comments?, followersGained? |
-| `packages` | id, title, assetPath?, platforms, captions (json), hashtags (json), cta?, status (draft/ready/published), campaignId?, scheduledFor? |
 | `csv_uploads` / `csv_rows` | parsed CSV z Meta/TikTok/YouTube |
 | `agent_runs` | (opcjonalny audit log — możesz zapisywać swoje uruchomienia) |
 
@@ -36,9 +35,7 @@ Enumy + typy: `import { PLATFORMS, CALENDAR_TYPES, ... } from './drizzle/schema'
 import { createCalendarEntry, updateCalendarEntry, deleteCalendarEntry, listCalendarEntries } from './src/server/actions/calendar';
 import { createArtist, touchLastContact } from './src/server/actions/artists';
 import { createCampaign } from './src/server/actions/campaigns';
-import { createPackage } from './src/server/actions/packages';
 import { createPost, updatePostMetrics } from './src/server/actions/posts';
-import { saveBrief } from './src/server/actions/briefs';
 import { saveOutreach } from './src/server/actions/outreach';
 ```
 
@@ -63,7 +60,7 @@ sqlite3 data/marketing-crew.db "SELECT id, type, title, datetime(starts_at/1000,
 - **Strefa czasowa**: Europe/Warsaw. Zapisuj UTC, formatuj lokalnie.
 - **Nazwy plików w `data/files/`**: konwencja `<slug>-<YYYY-MM-DD>.<ext>`. Sanityzacja w `src/lib/files.ts` (path traversal guard, NFKD, alphanum + `._-`).
 - **Walidacja**: zawsze przez Zod schemy z `src/server/actions/schemas.ts`.
-- **Pliki tekstowe** (briefy, outreach, wraps): markdown z frontmatter. Zapisuj przez `saveText('briefs', filename, md)` — zwraca relative path.
+- **Pliki tekstowe** (outreach itp.): markdown z frontmatter. Zapisuj przez `saveText('outreach', filename, md)` — zwraca relative path.
 
 ## Workflow agentów
 
@@ -85,9 +82,7 @@ Persony do `@agents/<slug>.md` (Claude Code czyta je tym znacznikiem):
 - `agents/artist-outreach.md` — maile do artystów
 - `agents/viral-analyzer.md` — analiza wyników postów
 - `agents/trend-scout.md` — trending formaty/audio (potrzebuje WebSearch)
-- `agents/content-brief.md` — briefy produkcyjne
 - `agents/campaign-strategist.md` — strategia kampanii (T-30 → T+30)
-- `agents/weekly-wrap.md` — cotygodniowe podsumowanie
 
 Te same agenty + ich metadane (sidePanel, dashboardWidget, system prompt do edycji w UI) żyją w `data/agents/<slug>.json`. Loader (`src/lib/agents/index.ts`, `loadAgents()`) czyta katalog na każdy request — hot-reload, bez restartu. UI: `/agents/new` (kreator + opcja klonowania), `/agents/<slug>/edit` (edycja + usuń + klonuj).
 

@@ -2,117 +2,152 @@
   "slug": "premiera-singla",
   "name": "Premiera singla — narracja 4-fazowa",
   "summary": "Łuk narracyjny od pierwszych zapowiedzi po afterglow — buduje napięcie, odkrywa, kulminuje, pielęgnuje społeczność.",
-  "description": "Klasyczny scenariusz wokół premiery singla / EP-ki, ale potraktowany jak opowieść, nie jak harmonogram premiery. T1 to delikatne build-up (zapowiedzi, nastrojowe posty, snippet audio) — widz jeszcze nie wie, co dokładnie się wydarzy. T2 to odkrywanie (teaser, reveal okładki, snippet wideo) — narracja przyspiesza, ciekawość rośnie. T3 to climax — sam moment premiery, koordynacja z artystami. T4 to afterglow (raport, livestream, reakcje) — utrzymuje energię tygodnie po premierze. Przeciągaj okresy sliderami żeby dopasować rytm do realiów projektu.",
+  "description": "Klasyczny scenariusz wokół premiery singla / EP-ki, ale potraktowany jak opowieść, nie jak harmonogram premiery. Build-up to delikatne sygnały — widz jeszcze nie wie, co dokładnie się wydarzy. Odkrywanie przyspiesza tempo: cover, trailer, pre-save, press kit, countdown. Premiera to climax — drop, day-of formats, live, collab posts. Afterglow utrzymuje energię tygodnie po premierze: reakcje fanów, recuty, thank-you live, raport. Każda faza ma kolejność kroków, które prowadzą widza przez emocję.",
   "periods": [
-    { "code": "T1", "startOffsetDays": 0, "endOffsetDays": 13 },
-    { "code": "T2", "startOffsetDays": 14, "endOffsetDays": 20 },
-    { "code": "T3", "startOffsetDays": 21, "endOffsetDays": 23 },
-    { "code": "T4", "startOffsetDays": 24, "endOffsetDays": 37 }
+    {
+      "code": "T1",
+      "name": "Build-up",
+      "description": "Delikatne sygnały — widz jeszcze nie wie, co dokładnie się szykuje. Nastrojowy lifestyle artysty, BTS, snippet bez kontekstu. Tempo: 1-2 posty tygodniowo, niech się zacznie zastanawiać.",
+      "startOffsetDays": 0,
+      "endOffsetDays": 13
+    },
+    {
+      "code": "T2",
+      "name": "Odkrywanie",
+      "description": "Zaczynasz zdradzać — cover, zwiastun wideo, ogłoszenie daty. Tempo komunikacji mocno rośnie, kilka publikacji tygodniowo. Press kit wychodzi, pre-save aktywny, story countdown w ostatnich 48h.",
+      "startOffsetDays": 14,
+      "endOffsetDays": 20
+    },
+    {
+      "code": "T3",
+      "name": "Premiera",
+      "description": "Drop day — climax narracji. Zsynchronizowana komunikacja na wszystkich kanałach, najmocniejsze formaty (Reels/TT × 3 warianty), live z artystą, collab posty z featureami i labelem.",
+      "startOffsetDays": 21,
+      "endOffsetDays": 23
+    },
+    {
+      "code": "T4",
+      "name": "Afterglow",
+      "description": "Najbardziej zaniedbywana faza, a najmocniej buduje społeczność. Posty z reakcjami fanów, repost UGC, re-cuty fragmentów, live podziękowanie, raport 7-14d, learning notes na następną kampanię.",
+      "startOffsetDays": 24,
+      "endOffsetDays": 37
+    }
   ],
   "milestones": [
     {
       "id": "buildup",
       "period": "T1",
-      "label": "Build-up — niedopowiedzenie",
-      "description": "Zbuduj świadomość że coś się dzieje, ale nie zdradzaj jeszcze co. Kontent sugerujący, atmosferyczny, lifestyle artysty bez konkretu.",
+      "label": "Niedopowiedzenie",
+      "description": "Buduj świadomość że coś się dzieje — bez zdradzania co. Nastrojowy lifestyle artysty + first-touch hook bez kontekstu.",
       "submilestones": [
         {
           "id": "buildup-brief",
           "label": "Brief kreatywny + claim narracji",
-          "description": "Zdefiniuj key message, ton komunikacji, co chcesz, żeby widz POCZUŁ."
+          "description": "Zdefiniuj key message, ton komunikacji, co chcesz, żeby widz POCZUŁ. To kotwica wszystkich późniejszych decyzji."
         },
         {
           "id": "buildup-mood",
           "label": "Seria 3-4 mood postów (BTS, lifestyle)",
-          "description": "Niech widz zacznie się zastanawiać, czy coś się szykuje."
+          "description": "Niech widz zacznie się zastanawiać, czy coś się szykuje. Tempo: 1-2 posty tygodniowo."
         },
         {
           "id": "buildup-snippet",
           "label": "Snippet audio gotowy",
-          "description": "15-30s fragment, najmocniejszy hook utworu — ale jeszcze bez kontekstu."
+          "description": "15-30s fragment, najmocniejszy hook utworu — bez kontekstu, bez nazwy. Tylko emocja."
         }
       ]
     },
     {
       "id": "reveal",
       "period": "T2",
-      "label": "Odkrywanie — pierwsze sygnały",
-      "description": "Tutaj zaczynasz zdradzać. Reveal okładki, zwiastun wideo, ogłoszenie daty premiery. Tempo komunikacji mocno rośnie.",
+      "label": "Pierwsze sygnały",
+      "description": "Tutaj zaczynasz zdradzać. Cover, zwiastun wideo, ogłoszenie daty premiery. Tempo komunikacji mocno rośnie — kilka publikacji tygodniowo.",
       "submilestones": [
         {
           "id": "reveal-cover",
-          "label": "Reveal okładki na wszystkich kanałach"
+          "label": "Reveal okładki na wszystkich kanałach",
+          "description": "Pierwszy moment — visual identity premiery wchodzi w obieg."
         },
         {
           "id": "reveal-trailer",
           "label": "Zwiastun wideo (15-30s)",
-          "description": "Pionowy 9:16 + poziomy do YT."
+          "description": "Pionowy 9:16 do Reels/TT + poziomy do YT. Zostawia niedosyt."
         },
         {
           "id": "reveal-presave",
-          "label": "Link pre-save / pre-add aktywny"
+          "label": "Link pre-save / pre-add aktywny",
+          "description": "Konwertuj zaangażowanie w streamingowy commitment przed dropem."
         },
         {
           "id": "reveal-press",
-          "label": "Press kit wysłany do mediów / playlist curatorów"
+          "label": "Press kit wysłany do mediów / playlist curatorów",
+          "description": "Materiały w jakości publikacyjnej — biogram, photo pack, audio embargo."
         },
         {
           "id": "reveal-countdown",
-          "label": "Story countdown ostatnie 48h"
+          "label": "Story countdown — ostatnie 48h",
+          "description": "Codzienny licznik na story, mocny push w ostatnich godzinach."
         }
       ]
     },
     {
       "id": "climax",
       "period": "T3",
-      "label": "Climax — premiera",
+      "label": "Drop day",
       "description": "Dzień i okolice premiery. Zsynchronizowana komunikacja, live z artystą, najmocniejsze formaty na każdej platformie.",
       "submilestones": [
         {
           "id": "climax-drop",
           "label": "Drop o 00:00 / 12:00 — link aktywny",
-          "description": "Synchroniczna publikacja na artystycznych kanałach."
+          "description": "Synchroniczna publikacja na artystycznych kanałach. Sprawdź wszystkie linki przed."
         },
         {
           "id": "climax-reels",
-          "label": "Reels / TikTok premiera (3 warianty)"
+          "label": "Reels / TikTok premiera (3 warianty)",
+          "description": "Każdy wariant tnie inny moment utworu — przetestuj który chwyta."
         },
         {
           "id": "climax-live",
           "label": "Live / Q&A z artystą",
-          "description": "30-45 min, w dniu premiery lub +1 dzień."
+          "description": "30-45 min, w dniu premiery lub +1 dzień. Behind the music + reakcje na bieżąco."
         },
         {
           "id": "climax-collab",
-          "label": "Collab posty z featureami / labelem"
+          "label": "Collab posty z featureami / labelem",
+          "description": "Wzajemne wzmocnienie zasięgów — daj featuringowi gotowy pakiet do udostępnienia."
         }
       ]
     },
     {
       "id": "afterglow",
       "period": "T4",
-      "label": "Afterglow — pielęgnowanie",
-      "description": "Najbardziej zaniedbywana faza, a najbardziej buduje społeczność. Reakcje fanów, live'y wdzięczności, raport, kolejne formaty z premiery.",
+      "label": "Pielęgnowanie",
+      "description": "Najbardziej zaniedbywana faza, a najmocniej buduje społeczność. Reakcje fanów, live'y wdzięczności, raport, kolejne formaty z premiery.",
       "submilestones": [
         {
           "id": "afterglow-react",
-          "label": "Posty z reakcjami fanów / repost UGC"
+          "label": "Posty z reakcjami fanów / repost UGC",
+          "description": "Pierwsze 3-5 dni — rozkręcaj UGC, każdy tag = potencjalny repost."
         },
         {
           "id": "afterglow-recut",
-          "label": "Re-cuty fragmentów na Reels / Shorts"
+          "label": "Re-cuty fragmentów na Reels / Shorts",
+          "description": "Inne ujęcia tego samego materiału — wykorzystaj content z dropu drugi raz."
         },
         {
           "id": "afterglow-thanks",
-          "label": "Live podziękowanie / behind the music"
+          "label": "Live podziękowanie / behind the music",
+          "description": "Mid-tygodnia — niech ludzie poczują że ich wsparcie zostało zauważone."
         },
         {
           "id": "afterglow-report",
-          "label": "Raport 7-14d: reach, ER, save/share, najlepsze formaty"
+          "label": "Raport 7-14d: reach, ER, save/share, najlepsze formaty",
+          "description": "Liczby + wnioski jakościowe. Co zaskoczyło, co podziałało lepiej niż się spodziewałeś."
         },
         {
           "id": "afterglow-learn",
-          "label": "Learning notes na następną kampanię"
+          "label": "Learning notes na następną kampanię",
+          "description": "Spisz 3-5 konkretnych decyzji, które przeniesiesz do kolejnej premiery."
         }
       ]
     }

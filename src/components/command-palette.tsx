@@ -6,14 +6,11 @@ import {
   LayoutDashboard,
   ChartGantt,
   Bot,
-  PackageOpen,
   BarChart3,
   Megaphone,
   Users,
-  FileText,
   Sparkles,
   Film,
-  FolderOpen,
   Camera,
   Plus,
   Upload,
@@ -71,13 +68,10 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
       { id: 'p:calendar', label: 'Pipeline (Gantt)', hint: '/calendar', group: 'Strony', icon: ChartGantt, action: go('/calendar') },
       { id: 'p:productions', label: 'Produkcje', hint: '/productions', group: 'Strony', icon: Film, action: go('/productions') },
       { id: 'p:agents', label: 'Agenci', hint: '/agents', group: 'Strony', icon: Bot, action: go('/agents') },
-      { id: 'p:packages', label: 'Pakiety', hint: '/packages', group: 'Strony', icon: PackageOpen, action: go('/packages') },
-      { id: 'p:output', label: 'Folder publikacji', hint: '/output', group: 'Strony', icon: FolderOpen, action: go('/output') },
       { id: 'p:analytics', label: 'Analityka', hint: '/analytics', group: 'Strony', icon: BarChart3, action: go('/analytics') },
       { id: 'p:campaigns', label: 'Kampanie', hint: '/campaigns', group: 'Strony', icon: Megaphone, action: go('/campaigns') },
       { id: 'p:artists', label: 'Artyści', hint: '/artists', group: 'Strony', icon: Users, action: go('/artists') },
       { id: 'p:videographers', label: 'Kamerzyści', hint: '/videographers', group: 'Strony', icon: Camera, action: go('/videographers') },
-      { id: 'p:briefs', label: 'Briefy & wrapy', hint: '/briefs', group: 'Strony', icon: FileText, action: go('/briefs') },
     ];
 
     const agentItems: CommandItem[] = agents.map((a) => ({

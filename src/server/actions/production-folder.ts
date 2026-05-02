@@ -18,6 +18,20 @@ function isValidStage(stage: string): stage is WorkStage {
   return (WORK_STAGES as readonly string[]).includes(stage);
 }
 
+async function loadProductionWithArtist(productionId: number) {
+  const production = await db.query.productions.findFirst({
+    where: eq(schema.productions.id, productionId),
+    columns: { id: true, title: true, artistId: true, periods: true },
+  });
+  if (!production) return null;
+  if (!production.artistId) return { production, artist: null as null };
+  const artist = await db.query.artists.findFirst({
+    where: eq(schema.artists.id, production.artistId),
+    columns: { name: true },
+  });
+  return { production, artist: artist ?? null };
+}
+
 /**
  * Open a production's work-folder stage (nagrywanie / obrobka / publikacja)
  * in the OS file manager. Server-side action because the dev/local-app model
@@ -36,18 +50,24 @@ export async function openProductionFolder(
 ): Promise<Result> {
   if (!isValidStage(stage)) return { ok: false, error: `Nieznana faza: ${stage}` };
 
-  const production = await db.query.productions.findFirst({
-    where: eq(schema.productions.id, productionId),
-    columns: { id: true, slug: true },
-  });
-  if (!production) return { ok: false, error: 'Brak produkcji' };
+  const ctx = await loadProductionWithArtist(productionId);
+  if (!ctx) return { ok: false, error: 'Brak produkcji' };
+  if (!ctx.artist) {
+    return {
+      ok: false,
+      error: 'Produkcja nie ma przypisanego artysty — przypisz artystę, by używać folderu roboczego',
+    };
+  }
 
   let target: string;
   try {
-    // Lazy-create on click — covers productions created before this feature
-    // shipped, and recovers folders that were manually deleted.
-    ensureWorkFolderStructure(production.slug);
-    target = resolveSafeStagePath(production.slug, stage);
+    const codes = (ctx.production.periods ?? []).map((p) => p.code);
+    ensureWorkFolderStructure(
+      ctx.artist.name,
+      ctx.production.title,
+      codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
+    );
+    target = resolveSafeStagePath(ctx.artist.name, ctx.production.title, stage);
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'Nie można utworzyć folderu' };
   }
@@ -74,10 +94,7 @@ export async function openProductionFolder(
 export async function getProductionFolderStats(
   productionId: number,
 ): Promise<{ stage: WorkStage; fileCount: number }[]> {
-  const production = await db.query.productions.findFirst({
-    where: eq(schema.productions.id, productionId),
-    columns: { slug: true },
-  });
-  if (!production) return WORK_STAGES.map((stage) => ({ stage, fileCount: 0 }));
-  return countWorkFolderFiles(production.slug);
+  const ctx = await loadProductionWithArtist(productionId);
+  if (!ctx || !ctx.artist) return WORK_STAGES.map((stage) => ({ stage, fileCount: 0 }));
+  return countWorkFolderFiles(ctx.artist.name, ctx.production.title);
 }

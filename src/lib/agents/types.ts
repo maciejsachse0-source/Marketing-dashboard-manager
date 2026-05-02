@@ -5,11 +5,8 @@ export const AGENT_SIDE_PANELS = [
   'calendar-14',
   'recent-posts',
   'artists-list',
-  'brief-templates',
   'active-campaigns',
-  'wrap-history',
   'trend-bookmarks',
-  'recent-packages',
 ] as const;
 
 export type AgentSidePanel = (typeof AGENT_SIDE_PANELS)[number];

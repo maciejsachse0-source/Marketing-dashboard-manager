@@ -1,122 +1,154 @@
 {
   "slug": "cykl-content-marketing",
   "name": "Cykl content marketing (3 miesiące)",
-  "summary": "Trzymiesięczny łuk: research, produkcja serii, dystrybucja, retencja — buduje stałą obecność.",
-  "description": "Pipeline pod cykl edukacyjny / lifestyle bez wyraźnego dnia premiery. To nie kampania jednego eventu, tylko narracja prowadząca widza przez 3 miesiące — od pierwszego kontaktu do regularnego oglądania. T1 to research + planning serii i pierwsze posty zapowiadające temat. T2 to batch produkcji — 5-7 odcinków zarejestrowanych za jednym razem. T3 to aktywna dystrybucja serii. T4 to retencja + analiza, planowanie kolejnego cyklu. Polecane gdy nie masz pojedynczego utworu/eventu, tylko prowadzisz regularny cykl tygodniowy.",
+  "summary": "Trzymiesięczny łuk: research, batch produkcji, dystrybucja serii, retencja — buduje stałą obecność.",
+  "description": "Pipeline pod cykl edukacyjny / lifestyle bez wyraźnego dnia premiery. To nie kampania jednego eventu, tylko narracja prowadząca widza przez 3 miesiące — od pierwszego kontaktu do regularnego oglądania. Research wyłania tematy i persona. Produkcja batch-uje 5-7 odcinków za jednym razem. Dystrybucja to 6 tygodni regularnych publikacji. Retencja zamyka cykl analizą, recyklingiem i zapowiedzią kolejnego. Polecane gdy nie masz pojedynczego utworu/eventu, tylko prowadzisz regularny cykl tygodniowy.",
   "periods": [
-    { "code": "T1", "startOffsetDays": 0, "endOffsetDays": 13 },
-    { "code": "T2", "startOffsetDays": 14, "endOffsetDays": 27 },
-    { "code": "T3", "startOffsetDays": 28, "endOffsetDays": 70 },
-    { "code": "T4", "startOffsetDays": 71, "endOffsetDays": 84 }
+    {
+      "code": "T1",
+      "name": "Research",
+      "startOffsetDays": 0,
+      "endOffsetDays": 13
+    },
+    {
+      "code": "T2",
+      "name": "Produkcja",
+      "startOffsetDays": 14,
+      "endOffsetDays": 27
+    },
+    {
+      "code": "T3",
+      "name": "Dystrybucja",
+      "startOffsetDays": 28,
+      "endOffsetDays": 70
+    },
+    {
+      "code": "T4",
+      "name": "Retencja",
+      "startOffsetDays": 71,
+      "endOffsetDays": 84
+    }
   ],
   "milestones": [
     {
       "id": "research",
       "period": "T1",
-      "label": "Research + planning serii",
-      "description": "Wyłoń tematy, zbadaj trendy, ułóż kalendarz publikacji, zacznij sygnalizować.",
+      "label": "Mapowanie i planowanie",
+      "description": "Wyłoń tematy, zbadaj trendy, ułóż kalendarz publikacji, zacznij sygnalizować — żeby T3 nie ruszał z zera.",
       "submilestones": [
         {
           "id": "research-trends",
-          "label": "Audyt trendów (TikTok + Reels + YouTube Shorts)"
+          "label": "Audyt trendów (TikTok + Reels + YouTube Shorts)",
+          "description": "Co rezonuje teraz w niszy — formaty, audio, hooki. Rób to ZAWSZE świeżo."
         },
         {
           "id": "research-personas",
           "label": "Persona audytorium odświeżona",
-          "description": "Top demografia, godziny aktywności, co rezonuje."
+          "description": "Top demografia, godziny aktywności, co rezonuje. Z analytics, nie z głowy."
         },
         {
           "id": "research-topics",
-          "label": "Lista 7-10 tematów odcinków zatwierdzona"
+          "label": "Lista 7-10 tematów odcinków zatwierdzona",
+          "description": "Wybierz tematy z największym potencjałem — uniwersalne hooki, evergreen value."
         },
         {
           "id": "research-calendar",
-          "label": "Kalendarz publikacji (T3)"
+          "label": "Kalendarz publikacji T3 ułożony",
+          "description": "Konkretne daty, slot per platforma, kto reaguje na komentarze pierwszych 2h."
         },
         {
           "id": "research-tease",
           "label": "1-2 posty zapowiadające temat serii",
-          "description": "Buduj oczekiwanie zanim zaczniesz publikować właściwy content."
+          "description": "Buduj oczekiwanie zanim zaczniesz publikować właściwy content — pierwsze sygnały dla algorytmu."
         }
       ]
     },
     {
       "id": "production",
       "period": "T2",
-      "label": "Produkcja serii",
-      "description": "Nagrania, montaż, packshoty, captions — wszystko gotowe do dystrybucji w T3.",
+      "label": "Batch produkcji",
+      "description": "Nagrania, montaż, packshoty, captions — wszystko gotowe do dystrybucji w T3. Batch-uj żeby wypaść jak największa wydajność z jednego setu.",
       "submilestones": [
         {
           "id": "production-batch-shoot",
-          "label": "Batch nagrań (5-7 odcinków za jednym razem)"
+          "label": "Batch nagrań (5-7 odcinków za jednym razem)",
+          "description": "Wszystko w jeden-dwa dni: setup, oświetlenie, ujęcia. Oszczędzasz pivoty."
         },
         {
           "id": "production-edits",
-          "label": "Wszystkie odcinki zmontowane i ocenione"
+          "label": "Wszystkie odcinki zmontowane i ocenione",
+          "description": "Self-review każdego odcinka — czy hook trzyma w pierwszych 3s?"
         },
         {
           "id": "production-thumbnails",
-          "label": "Cover frames / thumby do Shorts + Reels"
+          "label": "Cover frames / thumby do Shorts + Reels",
+          "description": "Pierwszy frame = thumb. Zaplanuj, nie wybieraj losowo."
         },
         {
           "id": "production-captions",
-          "label": "Captions per platforma (IG/TT/YT) gotowe"
+          "label": "Captions per platforma (IG/TT/YT) gotowe",
+          "description": "Każda platforma ma swój język — TikTok luzem, IG bardziej dopracowany."
         },
         {
           "id": "production-scheduled",
-          "label": "Posty zaplanowane w schedulerze"
+          "label": "Posty zaplanowane w schedulerze",
+          "description": "Zero ad-hoc publikacji w T3 — system robi swoje, ty reagujesz."
         }
       ]
     },
     {
       "id": "distribution",
       "period": "T3",
-      "label": "Dystrybucja — aktywna obecność",
-      "description": "Sześć tygodni regularnych publikacji. Każdy odcinek dostaje uwagę pierwszych 24-48h.",
+      "label": "Aktywna obecność",
+      "description": "Sześć tygodni regularnych publikacji. Każdy odcinek dostaje uwagę pierwszych 24-48h — algorytm premiuje wczesny engagement.",
       "submilestones": [
         {
           "id": "distribution-publish",
-          "label": "Publikacja wszystkich odcinków zgodnie z kalendarzem"
+          "label": "Publikacja wszystkich odcinków zgodnie z kalendarzem",
+          "description": "Trzymaj rytm. Jeden poślizg = utrata momentum."
         },
         {
           "id": "distribution-engage",
           "label": "Aktywna obecność w komentarzach pierwsze 2h",
-          "description": "Algorytm premiuje wczesny engagement — reaguj szybko."
+          "description": "Algorytm premiuje wczesny engagement — reaguj szybko, pisz pełne odpowiedzi, nie emoji."
         },
         {
           "id": "distribution-cross",
-          "label": "Cross-posting fragmentów (story, carousel)"
+          "label": "Cross-posting fragmentów (story, carousel)",
+          "description": "Każdy odcinek żyje 3-4 razy w innych formatach — story, carousel, repost na innym koncie."
         },
         {
           "id": "distribution-collab",
           "label": "Collab post z najmocniejszym odcinkiem",
-          "description": "W połowie T3 — wzmocnij momentum momentem maksymalnego zainteresowania."
+          "description": "W połowie T3 — wzmocnij momentum partnerem o podobnym zasięgu."
         }
       ]
     },
     {
       "id": "retention",
       "period": "T4",
-      "label": "Retencja + analiza",
-      "description": "Co dalej z widzami zdobytymi w T3? Raport, planowanie, recykling najlepszych formatów.",
+      "label": "Analiza i zamknięcie",
+      "description": "Co dalej z widzami zdobytymi w T3? Raport, planowanie, recykling najlepszych formatów. Niech ludzie nie zniknęli na ciszy.",
       "submilestones": [
         {
           "id": "retention-report",
           "label": "Raport ER per odcinek + retencja",
-          "description": "Wybierz top 2-3 — przerób na nowe formaty w kolejnym cyklu."
+          "description": "Wybierz top 2-3 — przerób na nowe formaty w kolejnym cyklu. Tu zaczynasz T1 następnego cyklu."
         },
         {
           "id": "retention-recut",
-          "label": "Recyklingu top 3 odcinków na nowe formaty"
+          "label": "Recykling top 3 odcinków na nowe formaty",
+          "description": "Najlepsze odcinki dostają drugie życie — inny kąt, inny hook, inna platforma."
         },
         {
           "id": "retention-learn",
-          "label": "Learning notes — co przenieść do następnego cyklu"
+          "label": "Learning notes — co przenieść do następnego cyklu",
+          "description": "3-5 decyzji konkretnych, nie ogólników. Np. — w następnym cyklu publikujemy w czwartki bo wtorki nie zadziałały."
         },
         {
           "id": "retention-tease-next",
           "label": "Zapowiedź kolejnego cyklu",
-          "description": "Płynnie przejdź w nową narrację, nie zostawiaj ciszy."
+          "description": "Płynnie przejdź w nową narrację, nie zostawiaj ciszy. Pierwsze sygnały dla algorytmu = ciągłość."
         }
       ]
     }

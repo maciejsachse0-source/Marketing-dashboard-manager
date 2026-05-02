@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Mail, Phone, Sparkles, Package, Megaphone, FileText } from 'lucide-react';
+import { Mail, Phone, Sparkles, Megaphone, FileText } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { getProduction, listProductions } from '@/server/actions/productions';
 import { listArtists } from '@/server/actions/artists';
@@ -15,7 +15,6 @@ import { DeleteProductionButton } from '@/components/productions/delete-producti
 import { CancelProductionButton } from '@/components/productions/cancel-production-button';
 import { VideographerPicker } from '@/components/productions/videographer-picker';
 import { ArtistPicker } from '@/components/productions/artist-picker';
-import { PlatformPills, StatusPill } from '@/components/platforms-pills';
 import type {
   ProductionStage,
   ProductionStep,
@@ -139,7 +138,7 @@ export default async function ProductionDetailPage({
   const data = await getProduction(productionId);
   if (!data) notFound();
 
-  const { production, packages, posts, artist, videographer, campaign } = data;
+  const { production, posts, artist, videographer, campaign } = data;
   const attachments = listProductionAttachments(production.slug);
   const [allArtists, allVideographers] = await Promise.all([
     listArtists(),
@@ -297,22 +296,6 @@ export default async function ProductionDetailPage({
 
                       const extras: React.ReactNode[] = [];
                       if (cat.key === 'publikacja') {
-                        if (packages.length > 0) {
-                          extras.push(
-                            <ItemList
-                              key="pkgs"
-                              icon={Package}
-                              title={`Pakiety (${packages.length})`}
-                              items={packages.map((p) => ({
-                                key: `pkg-${p.id}`,
-                                title: p.title,
-                                meta: <PlatformPills platforms={p.platforms} />,
-                                right: <StatusPill status={p.status} />,
-                                href: '/packages',
-                              }))}
-                            />,
-                          );
-                        }
                         if (posts.length > 0) {
                           extras.push(
                             <ItemList

@@ -10,11 +10,9 @@ import {
   deriveFromShootingIso,
   getActiveStepIndex,
   getStepWeekRange,
-  isProductionDone,
   newStepId,
 } from '@/lib/production-steps';
 import { getTemplate } from '@/lib/production-templates';
-import { generateOutputFolder } from '@/lib/output-folder';
 import { resolvePeriods } from '@/lib/production-periods';
 import type {
   CalendarType,
@@ -217,10 +215,7 @@ export async function moveStepInProduction(
 
 /**
  * Sequential cascade — clicking a step marks it + every previous step as done
- * (or unmarks it + every later step). Mirrors the legacy `cascadeStepsTo`
- * behavior but operates on the flat `steps[]` list. Side effect: when the
- * last step transitions to done for the first time, generates the output
- * folder (legacy `setProductionStatus(id, 'publishing')` trigger).
+ * (or unmarks it + every later step). Operates on the flat `steps[]` list.
  */
 export async function cascadeStepsTo(
   productionId: number,
@@ -234,8 +229,6 @@ export async function cascadeStepsTo(
   const targetIdx = steps.findIndex((s) => s.id === stepId);
   if (targetIdx < 0) return { ok: false, error: 'Brak kroku' };
 
-  const wasDone = isProductionDone(steps);
-
   const stamp = new Date().toISOString();
   const lastDoneIdx = mode === 'mark' ? targetIdx : targetIdx - 1;
   const next = steps.map((s, i) => {
@@ -245,19 +238,6 @@ export async function cascadeStepsTo(
     return s;
   });
   await saveSteps(productionId, next);
-
-  // Output-folder side effect: trigger when production transitions from
-  // not-done → done (last cascade marked everything). Folder generation is
-  // best-effort — failure doesn't roll back the cascade.
-  const isNowDone = isProductionDone(next);
-  if (!wasDone && isNowDone && !prod.folderPath) {
-    try {
-      await generateOutputFolder(productionId);
-      revalidatePath('/output');
-    } catch (e) {
-      console.error('[output-folder] generation failed for production', productionId, e);
-    }
-  }
 
   return { ok: true };
 }

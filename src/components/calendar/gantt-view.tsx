@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useOptimistic, useState, useTransition } from 'react';
 import { ArrowRight, Check, CheckCircle2, ChevronDown, ExternalLink, FolderOpen } from 'lucide-react';
+import { toast } from 'sonner';
 import { PersonAvatar, SoloAvatar, OrphanArtistAvatar } from '@/components/productions/artist-avatar';
 import { ProductionPeopleStack } from '@/components/productions/production-people-stack';
 import { STATUS_LABEL as PROD_STATUS_LABEL } from '@/components/productions/status-pill';
@@ -26,6 +27,7 @@ import {
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import { ProductionStepRow } from '@/components/productions/production-step-row';
 import { AddStepInline } from '@/components/productions/add-step-inline';
+import { CampaignGanttNarrativeRow } from '@/components/campaigns/gantt-narrative-row';
 
 type DateMode = 'record' | 'calendar' | 'derived' | 'none';
 
@@ -371,11 +373,23 @@ function computeFrameBands(
 export function GanttView({
   weeks,
   rows,
+  campaigns = [],
   minWidthPx = 1900,
+  headerDensity = 'days',
 }: {
   weeks: Date[];
   rows: GanttRow[];
+  /** Active campaigns whose narrative arc overlaps the visible window — each
+   *  rendered as a single-row strip directly under the days header so the
+   *  user reads the campaign-level narrative against the same time axis as
+   *  the production rows below. */
+  campaigns?: import('@/components/campaigns/gantt-narrative-row').GanttNarrativeCampaign[];
   minWidthPx?: number;
+  /** Header granularity. 'days' renders the full per-day strip (current
+   *  behavior, best for ≤12 weeks). 'weeks' hides the day strip — useful
+   *  when zooming to a few months. 'months' additionally renders a month
+   *  band above the week labels so the user gets a year-wide overview. */
+  headerDensity?: 'days' | 'weeks' | 'months';
 }) {
   if (weeks.length === 0) return null;
   const firstDay = startOfDay(weeks[0]);
@@ -408,6 +422,42 @@ export function GanttView({
   };
   const todayISO = isoWeek(new Date());
 
+  // Month bands — used in 'months' header density to give the year-scale
+  // overview a Google-Calendar-style month strip above the week markers.
+  // We compute spans in DAY units (the base grid is day-percent-wide), so a
+  // month that begins 3 days into the visible window gets a 3-day-wide
+  // sliver of December plus a multi-week January band.
+  type MonthSpan = { startDay: number; lengthDays: number; label: string; key: string };
+  const monthSpans: MonthSpan[] = (() => {
+    if (headerDensity !== 'months') return [];
+    const out: MonthSpan[] = [];
+    let cursor = new Date(firstDay);
+    let dayIdx = 0;
+    while (dayIdx < totalDays) {
+      const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+      const daysToMonthEnd = Math.round(
+        (monthEnd.getTime() - startOfDay(cursor).getTime()) / DAY_MS,
+      );
+      const remaining = totalDays - dayIdx;
+      const span = Math.min(daysToMonthEnd, remaining);
+      const label = cursor.toLocaleDateString('pl-PL', {
+        month: 'short',
+        year: cursor.getMonth() === 0 || dayIdx === 0 ? '2-digit' : undefined,
+      });
+      out.push({
+        startDay: dayIdx,
+        lengthDays: span,
+        label,
+        key: `${cursor.getFullYear()}-${cursor.getMonth()}`,
+      });
+      dayIdx += span;
+      cursor = monthEnd;
+    }
+    return out;
+  })();
+  const showDayStrip = headerDensity === 'days';
+  const showMonthBand = headerDensity === 'months';
+
   return (
     <div
       className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm"
@@ -434,6 +484,22 @@ export function GanttView({
             Produkcja · pipeline
           </div>
           <div>
+            {showMonthBand ? (
+              <div
+                className="grid border-b border-border/40"
+                style={{ gridTemplateColumns: `repeat(${totalDays}, 1fr)` }}
+              >
+                {monthSpans.map((m) => (
+                  <div
+                    key={m.key}
+                    className="px-3 py-2 border-l border-border/60 first:border-l-0 last:border-r-0 text-[11px] uppercase tracking-[0.14em] font-bold text-muted-foreground/80 truncate"
+                    style={{ gridColumn: `${m.startDay + 1} / span ${m.lengthDays}` }}
+                  >
+                    {m.label}
+                  </div>
+                ))}
+              </div>
+            ) : null}
             <div
               className="grid border-b border-border/40"
               style={{ gridTemplateColumns: `repeat(${totalWeeks}, 1fr)` }}
@@ -442,66 +508,95 @@ export function GanttView({
                 const wEnd = new Date(w);
                 wEnd.setDate(wEnd.getDate() + 6);
                 const isCurrent = isoWeek(w) === todayISO;
+                // At year scale we drop the date range under the week number
+                // and shrink padding so 52 columns don't crush the labels.
+                const compact = headerDensity === 'months';
                 return (
                   <div
                     key={i}
-                    className={`px-3 py-2 border-l border-border/60 ${
+                    className={`${compact ? 'px-1.5 py-1.5' : 'px-3 py-2'} border-l border-border/60 ${
                       i === totalWeeks - 1 ? 'border-r' : ''
                     } ${isCurrent ? 'bg-foreground/5' : ''}`}
                   >
                     <div
                       className={`text-[10px] uppercase tracking-[0.14em] font-bold ${
                         isCurrent ? 'text-foreground' : 'text-muted-foreground/70'
-                      }`}
+                      } truncate`}
                     >
-                      Tydz. {isoWeek(w)}
-                      {isCurrent ? ' · teraz' : ''}
+                      {compact ? `T${isoWeek(w)}` : `Tydz. ${isoWeek(w)}`}
+                      {isCurrent && !compact ? ' · teraz' : ''}
                     </div>
-                    <div
-                      className={`text-sm tabular-nums ${
-                        isCurrent ? 'font-bold text-foreground' : 'text-muted-foreground'
-                      }`}
-                    >
-                      {w.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
-                      {' – '}
-                      {wEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
-                    </div>
+                    {compact ? null : (
+                      <div
+                        className={`text-sm tabular-nums ${
+                          isCurrent ? 'font-bold text-foreground' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {w.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
+                        {' – '}
+                        {wEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
-            <div className="grid" style={{ gridTemplateColumns: `repeat(${totalDays}, 1fr)` }}>
-              {days.map((d, i) => {
-                const isToday = i === todayIdx;
-                return (
-                  <div
-                    key={i}
-                    className={`px-1 py-1 border-l text-center ${
-                      d.isMonday ? 'border-border/60' : 'border-border/20'
-                    } ${i === totalDays - 1 ? 'border-r border-border/60' : ''} ${
-                      d.isWeekend ? 'bg-muted/40' : ''
-                    } ${isToday ? 'bg-foreground/5' : ''}`}
-                  >
+            {showDayStrip ? (
+              <div className="grid" style={{ gridTemplateColumns: `repeat(${totalDays}, 1fr)` }}>
+                {days.map((d, i) => {
+                  const isToday = i === todayIdx;
+                  return (
                     <div
-                      className={`text-[11px] uppercase tracking-wider font-medium ${
-                        isToday ? 'text-foreground font-bold' : 'text-muted-foreground/70'
-                      }`}
+                      key={i}
+                      className={`px-1 py-1 border-l text-center ${
+                        d.isMonday ? 'border-border/60' : 'border-border/20'
+                      } ${i === totalDays - 1 ? 'border-r border-border/60' : ''} ${
+                        d.isWeekend ? 'bg-muted/40' : ''
+                      } ${isToday ? 'bg-foreground/5' : ''}`}
                     >
-                      {d.weekday.slice(0, 2)}
+                      <div
+                        className={`text-[11px] uppercase tracking-wider font-medium ${
+                          isToday ? 'text-foreground font-bold' : 'text-muted-foreground/70'
+                        }`}
+                      >
+                        {d.weekday.slice(0, 2)}
+                      </div>
+                      <div
+                        className={`text-sm tabular-nums ${
+                          isToday ? 'text-foreground font-bold' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {d.dom}
+                      </div>
                     </div>
-                    <div
-                      className={`text-sm tabular-nums ${
-                        isToday ? 'text-foreground font-bold' : 'text-muted-foreground'
-                      }`}
-                    >
-                      {d.dom}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         </div>
+
+        {/* Campaign narrative strips — sit directly under the days header so
+         *  the campaign-level T-bands (Build-up, Reveal, Premiera, Afterglow…)
+         *  align with the production rows below on the same day grid. The
+         *  left rail acts as the visual NARRACJA header — sticky, labeled,
+         *  with the campaign name and kickoff date below the bars. */}
+        {campaigns.length > 0 ? (
+          <div className="border-b-2 border-foreground/15">
+            <SectionHeaderRow
+              label="NARRACJA"
+              hint={`${campaigns.length} ${campaigns.length === 1 ? 'kampania' : campaigns.length < 5 ? 'kampanie' : 'kampanii'}`}
+            />
+            {campaigns.map((c) => (
+              <CampaignGanttNarrativeRow
+                key={c.id}
+                campaign={c}
+                firstDay={firstDay}
+                totalDays={totalDays}
+              />
+            ))}
+          </div>
+        ) : null}
 
         {rows.length === 0 ? (
           <div className="px-6 py-20 text-center">
@@ -1165,7 +1260,12 @@ function GanttRowView({
                     type="button"
                     onClick={() => {
                       void openProductionFolder(row.id, stage).then((res) => {
-                        if (!res.ok) console.warn('[gantt] open folder failed:', res.error);
+                        if (!res.ok) {
+                          console.warn('[gantt] open folder failed:', res.error);
+                          toast.error('Nie udało się otworzyć folderu', {
+                            description: res.error,
+                          });
+                        }
                       });
                     }}
                     aria-label={`Otwórz folder ${label} dla ${displayName}`}
@@ -2139,8 +2239,8 @@ function SubStepBar({
  * Expanded row panel — shown below the row when the user clicks the chevron.
  * Mirrors the structure of the /productions/[id] page (T1/T2/T3 framed cards
  * with category sections, sub-stage buttons and date pickers) so the user gets
- * the same editing surface inline. Files / packages / posts are deliberately
- * skipped — for those the user opens the full production page via the CTA.
+ * the same editing surface inline. Files and posts are deliberately skipped —
+ * for those the user opens the full production page via the CTA.
  */
 function ExpandedDetails({
   row,
@@ -2258,7 +2358,7 @@ function ExpandedDetails({
 
         {/* Footer hint — full editing surface lives on the production page */}
         <p className="text-[11px] text-muted-foreground italic px-1">
-          Pliki, pakiety, posty i metryki znajdziesz na pełnej karcie produkcji.
+          Pliki, posty i metryki znajdziesz na pełnej karcie produkcji.
         </p>
       </div>
     </div>
@@ -2355,6 +2455,45 @@ function ExpandedCategorySection({
           <AddStepInline productionId={productionId} category={category.key} />
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Group header row inside the gantt body. Spans the same `22rem | 1fr` grid
+ * the day-rows use, so the label sticks to the left rail and the divider on
+ * the right column lines up with the timeline grid behind every other row.
+ * Used to introduce the NARRACJA block (campaign storytelling layer) and the
+ * PRODUKCJE block (per-production pipelines) so the user reads the gantt as
+ * two distinct stacks instead of one undifferentiated wall of bars.
+ */
+function SectionHeaderRow({
+  label,
+  hint,
+  tone = 'narracja',
+}: {
+  label: string;
+  hint?: string;
+  tone?: 'narracja' | 'muted';
+}) {
+  const labelClasses =
+    tone === 'narracja'
+      ? 'pill-label pill-label-sm'
+      : 'inline-flex items-center px-2.5 py-1 rounded-full border border-border text-[11px] font-bold tracking-[0.18em] text-muted-foreground bg-background';
+  return (
+    <div
+      className="grid border-b border-border/60 bg-muted/30"
+      style={{ gridTemplateColumns: `22rem 1fr` }}
+    >
+      <div className="px-5 py-2 border-r border-border/40 sticky left-0 z-30 bg-muted/40 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] flex items-center gap-2">
+        <span className={labelClasses}>{label}</span>
+        {hint ? (
+          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+            {hint}
+          </span>
+        ) : null}
+      </div>
+      <div className="relative" />
     </div>
   );
 }

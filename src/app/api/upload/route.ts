@@ -5,7 +5,7 @@ import { saveBuffer, type FileCategory } from '@/lib/files';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const categorySchema = z.enum(['assets', 'briefs', 'packages', 'csv', 'outreach']);
+const categorySchema = z.enum(['assets', 'briefs', 'csv', 'outreach']);
 
 const MAX_BYTES = 100 * 1024 * 1024;
 

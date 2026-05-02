@@ -7,12 +7,11 @@ import { ProductionTypeBadge } from './status-pill';
 import { CancelProductionButton } from './cancel-production-button';
 import { deriveProductionState } from '@/lib/production-steps';
 import { TYPE_LABEL } from '../calendar/type-color';
-import { PlatformPills, StatusPill } from '@/components/platforms-pills';
+import { PlatformPills } from '@/components/platforms-pills';
 import { getProductionByEntryId } from '@/server/actions/productions';
 import type {
   CalendarEntry,
   Production,
-  Package,
   Post,
   Artist,
   Campaign,
@@ -21,7 +20,6 @@ import type {
 type Bundle = {
   production: Production;
   entries: CalendarEntry[];
-  packages: Package[];
   posts: Post[];
   artist: Artist | null | undefined;
   campaign: Campaign | null | undefined;
@@ -102,7 +100,7 @@ export function ProductionDrawer({
 }
 
 function DrawerContent({ data }: { data: Bundle }) {
-  const { production, entries, packages, posts, artist, campaign } = data;
+  const { production, entries, posts, artist, campaign } = data;
   const t0Days = Math.round((production.t0At.getTime() - Date.now()) / 86400000);
   const state = deriveProductionState(production.steps ?? [], production.cancelledAt);
   const STATE_LABEL = {
@@ -214,25 +212,6 @@ function DrawerContent({ data }: { data: Bundle }) {
           </ul>
         )}
       </section>
-
-      {packages.length > 0 ? (
-        <section>
-          <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-            Pakiety ({packages.length})
-          </h3>
-          <ul className="space-y-1">
-            {packages.map((p) => (
-              <li key={p.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded border border-border bg-card text-xs">
-                <Link href="/packages" className="flex-1 truncate hover:text-foreground">
-                  {p.title}
-                </Link>
-                <PlatformPills platforms={p.platforms} />
-                <StatusPill status={p.status} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       {posts.length > 0 ? (
         <section>

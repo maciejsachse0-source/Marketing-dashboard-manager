@@ -99,6 +99,13 @@
       "when": 1777464917523,
       "tag": "0013_campaign_milestones",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1777464917524,
+      "tag": "0014_drop_packages",
+      "breakpoints": true
     }
   ]
 }

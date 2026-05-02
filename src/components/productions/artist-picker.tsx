@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, Mic, Plus, X } from 'lucide-react';
+import { Check, ChevronDown, Mic, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateProduction } from '@/server/actions/productions';
 
@@ -29,7 +29,7 @@ export function ArtistPicker({
 
   const current = artists.find((a) => a.id === currentArtistId) ?? null;
 
-  const assign = (artistId: number | null) => {
+  const assign = (artistId: number) => {
     if (artistId === currentArtistId) {
       setOpen(false);
       return;
@@ -38,9 +38,7 @@ export function ArtistPicker({
       try {
         await updateProduction(productionId, { artistId });
         toast.success(
-          artistId
-            ? `Przypisano artystę: ${artists.find((a) => a.id === artistId)?.name ?? ''}`
-            : 'Usunięto przypisanie artysty',
+          `Przypisano artystę: ${artists.find((a) => a.id === artistId)?.name ?? ''}`,
         );
         setOpen(false);
       } catch (e) {
@@ -78,15 +76,6 @@ export function ArtistPicker({
             {current.handle ? (
               <span className="opacity-70">{current.handle}</span>
             ) : null}
-            <button
-              type="button"
-              onClick={() => assign(null)}
-              disabled={pending}
-              title="Usuń przypisanie"
-              className="opacity-60 hover:opacity-100 transition disabled:opacity-30"
-            >
-              <X className="w-3 h-3" strokeWidth={2.5} />
-            </button>
           </div>
         ) : (
           <span

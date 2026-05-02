@@ -49,13 +49,6 @@ export async function getArtistByName(name: string) {
   });
 }
 
-export async function getRecentPackages(limit = 10) {
-  return db.query.packages.findMany({
-    orderBy: desc(schema.packages.createdAt),
-    limit,
-  });
-}
-
 export async function getRecentAgentRuns(agentSlug: string, limit = 5) {
   return db.query.agentRuns.findMany({
     where: eq(schema.agentRuns.agentSlug, agentSlug),

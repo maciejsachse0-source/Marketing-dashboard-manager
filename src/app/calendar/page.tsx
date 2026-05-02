@@ -2,6 +2,8 @@ import { and, gte, lte } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { GanttView } from '@/components/calendar/gantt-view';
 import { GanttToolbar } from '@/components/calendar/gantt-toolbar';
+import type { GanttNarrativeCampaign } from '@/components/campaigns/gantt-narrative-row';
+import { resolvePeriods } from '@/lib/production-periods';
 import { db, schema } from '@/lib/db';
 import { addDays, endOfDay, startOfWeek } from '@/lib/dates';
 import { listArtists } from '@/server/actions/artists';
@@ -88,8 +90,31 @@ function buildLegacyShape(steps: ProductionStep[]): {
 
 export const dynamic = 'force-dynamic';
 
-const ZOOM_OPTIONS = [5, 8, 12] as const;
-type ZoomWeeks = (typeof ZOOM_OPTIONS)[number];
+// View mode determines how wide a window we render and what the header
+// granularity looks like. `week` keeps the day-level grid (current behavior);
+// `month` and `quarter` zoom out further and progressively collapse the
+// per-day strip into week/month-only headers so the gantt stays readable
+// at long horizons. Step placement still uses day-level percentages — only
+// the header chrome changes.
+const VIEW_MODES = ['week', 'month', 'quarter'] as const;
+type ViewMode = (typeof VIEW_MODES)[number];
+
+const ZOOM_OPTIONS_BY_VIEW: Record<ViewMode, readonly number[]> = {
+  week: [5, 8, 12],
+  month: [12, 16, 20],
+  quarter: [26, 39, 52],
+};
+const DEFAULT_ZOOM_BY_VIEW: Record<ViewMode, number> = {
+  week: 5,
+  month: 16,
+  quarter: 26,
+};
+type HeaderDensity = 'days' | 'weeks' | 'months';
+const DENSITY_BY_VIEW: Record<ViewMode, HeaderDensity> = {
+  week: 'days',
+  month: 'weeks',
+  quarter: 'months',
+};
 
 const STATUS_FILTERS = ['all', 'in-progress', 'done', 'cancelled'] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];
@@ -106,16 +131,23 @@ export default async function CalendarPage({
   searchParams: Promise<{
     week?: string;
     weeks?: string;
+    view?: string;
     status?: string;
     type?: string;
     sort?: string;
+    campaign?: string;
   }>;
 }) {
   const sp = await searchParams;
+  const view: ViewMode = (VIEW_MODES as readonly string[]).includes(sp.view ?? '')
+    ? (sp.view as ViewMode)
+    : 'week';
+  const zoomOptions = ZOOM_OPTIONS_BY_VIEW[view];
   const weeksRaw = Number(sp.weeks);
-  const zoom: ZoomWeeks = (ZOOM_OPTIONS as readonly number[]).includes(weeksRaw)
-    ? (weeksRaw as ZoomWeeks)
-    : 5;
+  const zoom: number = (zoomOptions as readonly number[]).includes(weeksRaw)
+    ? weeksRaw
+    : DEFAULT_ZOOM_BY_VIEW[view];
+  const headerDensity = DENSITY_BY_VIEW[view];
   // Default window: shift back 1 week so all 3 bands (T1+T2+T3) of productions
   // with T-0 in the next ~7 days are visible. With T-0 = today + 7d, T1 sits at
   // today - 7..-1d, T2 at today..+6d, T3 at today+7..+13d. Starting 1 week back
@@ -138,6 +170,70 @@ export default async function CalendarPage({
       lte(schema.productions.t0At, lookaheadEnd),
     ),
   });
+
+  // Campaigns whose narrative arc overlaps the wider lookbehind/lookahead
+  // window. We intentionally use the wider window (not the strict visible
+  // [rangeStart, rangeEnd]) so a campaign whose kickoff is just past the
+  // visible edge still surfaces — the gantt-narrative-row renders an
+  // off-window preview chip strip in that case so the user always sees
+  // Build-up / Reveal / Premiera / Afterglow plus the start date.
+  //
+  // Only ONE campaign is rendered in the gantt at a time — the narrative
+  // strip would otherwise stack into a wall of bands and crowd out the
+  // production rows. The user picks which one through the toolbar selector;
+  // selection is persisted in the `campaign` search param.
+  const campaignsAll = await db.query.campaigns.findMany({
+    orderBy: schema.campaigns.releaseAt,
+  });
+  const overlappingCampaigns = campaignsAll
+    .map((c) => {
+      const resolved = resolvePeriods(c.periods);
+      const lastEnd = Math.max(0, ...resolved.map((p) => p.endOffsetDays));
+      const arcEnd = new Date(c.releaseAt);
+      arcEnd.setDate(arcEnd.getDate() + lastEnd);
+      return { c, arcEnd };
+    })
+    .filter(({ c, arcEnd }) => arcEnd >= lookbehindStart && c.releaseAt <= lookaheadEnd)
+    .map(({ c }) => c);
+
+  const campaignOptions = campaignsAll.map((c) => ({
+    id: c.id,
+    name: c.name,
+    inWindow: overlappingCampaigns.some((o) => o.id === c.id),
+  }));
+
+  // Selection: explicit `none` hides the strip entirely; an explicit id picks
+  // that campaign even if it's outside the window (so the user can pin a
+  // campaign and scroll to it). Default = first overlapping campaign so the
+  // strip stays useful out-of-the-box.
+  const rawCampaignParam = sp.campaign ?? '';
+  let selectedCampaignId: number | null;
+  if (rawCampaignParam === 'none') {
+    selectedCampaignId = null;
+  } else if (rawCampaignParam && Number.isFinite(Number(rawCampaignParam))) {
+    selectedCampaignId = Number(rawCampaignParam);
+  } else {
+    selectedCampaignId = overlappingCampaigns[0]?.id ?? null;
+  }
+
+  const selectedCampaign =
+    selectedCampaignId != null
+      ? campaignsAll.find((c) => c.id === selectedCampaignId) ?? null
+      : null;
+
+  const narrativeCampaigns: GanttNarrativeCampaign[] = selectedCampaign
+    ? [
+        {
+          id: selectedCampaign.id,
+          name: selectedCampaign.name,
+          kickoffAt: selectedCampaign.releaseAt,
+          periods: selectedCampaign.periods,
+          goal: selectedCampaign.goal,
+          phase: selectedCampaign.phase,
+          notes: selectedCampaign.notes,
+        },
+      ]
+    : [];
 
   const statusFilter: StatusFilter = (STATUS_FILTERS as readonly string[]).includes(sp.status ?? '')
     ? (sp.status as StatusFilter)
@@ -265,8 +361,27 @@ export default async function CalendarPage({
   // Min-width scales with zoom. Floor sized so milestone labels (Outreach,
   // Ustalenia z kamerzystą, Nagrywanie, Obróbka, Publikacja) get ≥6.5rem of
   // breathing room at the chosen zoom.
-  const baseMinWidth = zoom <= 5 ? 1700 : zoom <= 8 ? 2600 : 3700;
-  const MAX_CANVAS = zoom <= 5 ? 4400 : zoom <= 8 ? 5400 : 7000;
+  // For wider views (month/quarter) the canvas can stretch — but capped so
+  // we don't push the strip into perf cliffs. Scales roughly linearly with
+  // visible weeks, with diminishing returns past ~26 weeks.
+  const baseMinWidth =
+    zoom <= 5 ? 1700
+      : zoom <= 8 ? 2600
+      : zoom <= 12 ? 3700
+      : zoom <= 16 ? 4500
+      : zoom <= 20 ? 5200
+      : zoom <= 26 ? 6000
+      : zoom <= 39 ? 7500
+      : 9500;
+  const MAX_CANVAS =
+    zoom <= 5 ? 4400
+      : zoom <= 8 ? 5400
+      : zoom <= 12 ? 7000
+      : zoom <= 16 ? 8000
+      : zoom <= 20 ? 9000
+      : zoom <= 26 ? 10000
+      : zoom <= 39 ? 12000
+      : 14000;
   const requiredForGap =
     (MIN_PX_PER_STEP * totalDays) / worstGapDays + LEFT_COL_PX;
   const canvasMinWidth = Math.min(
@@ -290,7 +405,9 @@ export default async function CalendarPage({
       <GanttToolbar
         weekStart={weekStart}
         zoom={zoom}
-        zoomOptions={ZOOM_OPTIONS as unknown as number[]}
+        zoomOptions={zoomOptions as unknown as number[]}
+        view={view}
+        viewOptions={VIEW_MODES as unknown as string[]}
         statusFilter={statusFilter}
         typeFilter={typeFilter}
         sortKey={sortKey}
@@ -299,8 +416,16 @@ export default async function CalendarPage({
         artists={artistOptions}
         videographers={videographerOptions}
         templates={templates}
+        campaignOptions={campaignOptions}
+        selectedCampaignId={selectedCampaignId}
       />
-      <GanttView weeks={weeks} rows={rows} minWidthPx={canvasMinWidth} />
+      <GanttView
+        weeks={weeks}
+        rows={rows}
+        campaigns={narrativeCampaigns}
+        minWidthPx={canvasMinWidth}
+        headerDensity={headerDensity}
+      />
     </PageShell>
   );
 }

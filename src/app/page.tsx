@@ -1,12 +1,10 @@
 import Link from 'next/link';
-import { gte, eq, desc, count } from 'drizzle-orm';
+import { gte, desc } from 'drizzle-orm';
 import {
   CalendarDays,
   TrendingUp,
   UserPlus,
-  Inbox,
   Upload,
-  PackageOpen,
   Sparkles,
   Activity,
   Megaphone,
@@ -23,7 +21,7 @@ import { getUpcomingCalendar } from '@/lib/context';
 import { getRecentActivity, type ActivityEvent } from '@/lib/activity';
 import { timeAgo } from '@/lib/time-ago';
 import { CsvDropzone } from '@/components/analytics/csv-dropzone';
-import { PlatformPills, PlatformPill, StatusPill } from '@/components/platforms-pills';
+import { PlatformPill } from '@/components/platforms-pills';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
 
 export const dynamic = 'force-dynamic';
@@ -33,27 +31,17 @@ export default async function DashboardPage() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
 
-  const [upcoming, weekPosts, monthPosts, draftCount, topPosts, readyPackages, activity] =
-    await Promise.all([
-      getUpcomingCalendar(7),
-      db.query.posts.findMany({ where: gte(schema.posts.publishedAt, sevenDaysAgo) }),
-      db.query.posts.findMany({ where: gte(schema.posts.publishedAt, thirtyDaysAgo) }),
-      db
-        .select({ value: count() })
-        .from(schema.packages)
-        .where(eq(schema.packages.status, 'draft')),
-      db.query.posts.findMany({
-        where: gte(schema.posts.publishedAt, sevenDaysAgo),
-        orderBy: desc(schema.posts.reach),
-        limit: 4,
-      }),
-      db.query.packages.findMany({
-        where: eq(schema.packages.status, 'ready'),
-        orderBy: desc(schema.packages.createdAt),
-        limit: 6,
-      }),
-      getRecentActivity(8),
-    ]);
+  const [upcoming, weekPosts, monthPosts, topPosts, activity] = await Promise.all([
+    getUpcomingCalendar(7),
+    db.query.posts.findMany({ where: gte(schema.posts.publishedAt, sevenDaysAgo) }),
+    db.query.posts.findMany({ where: gte(schema.posts.publishedAt, thirtyDaysAgo) }),
+    db.query.posts.findMany({
+      where: gte(schema.posts.publishedAt, sevenDaysAgo),
+      orderBy: desc(schema.posts.reach),
+      limit: 4,
+    }),
+    getRecentActivity(8),
+  ]);
 
   const ersInMonth = monthPosts.filter((p) => p.engagementRate !== null);
   const avgER = ersInMonth.length
@@ -76,7 +64,7 @@ export default async function DashboardPage() {
       eyebrow={`tydzień ${isoWeek}`}
       description={`${today} · dyspozytornia kampanii short-form`}
     >
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
+      <section className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
         <MetricCard
           icon={CalendarDays}
           label="Posty w tym tyg."
@@ -111,12 +99,6 @@ export default async function DashboardPage() {
           label="Nowi followersi · 7d"
           value={newFollowers > 0 ? `+${newFollowers.toLocaleString('pl-PL')}` : '—'}
           tone={newFollowers > 0 ? 'good' : 'neutral'}
-        />
-        <MetricCard
-          icon={Inbox}
-          label="Do akceptacji"
-          value={`${draftCount[0]?.value ?? 0}`}
-          hint="pakiety w drafcie"
         />
       </section>
 
@@ -239,58 +221,17 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <SectionHeader icon={Upload} title="Wgraj CSV" />
-            <Link
-              href="/analytics"
-              className="text-xs text-muted-foreground hover:text-foreground transition"
-            >
-              cała analityka →
-            </Link>
-          </div>
-          <CsvDropzone />
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <SectionHeader icon={Upload} title="Wgraj CSV" />
+          <Link
+            href="/analytics"
+            className="text-xs text-muted-foreground hover:text-foreground transition"
+          >
+            cała analityka →
+          </Link>
         </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <SectionHeader icon={PackageOpen} title="Pakiety do publikacji" />
-            <Link
-              href="/packages"
-              className="text-xs text-muted-foreground hover:text-foreground transition"
-            >
-              wszystkie →
-            </Link>
-          </div>
-          {readyPackages.length === 0 ? (
-            <EmptyState
-              icon={PackageOpen}
-              title="Brak pakietów ready"
-              description={
-                <>
-                  Wygeneruj przez{' '}
-                  <Link href="/agents/social-publisher" className="underline hover:text-foreground">
-                    social-publishera
-                  </Link>
-                  .
-                </>
-              }
-            />
-          ) : (
-            <ul className="card-editorial divide-y divide-border overflow-hidden">
-              {readyPackages.map((p) => (
-                <li key={p.id} className="px-4 py-2.5 flex items-center gap-2 text-sm hover:bg-muted/30 transition">
-                  <Link href={`/packages`} className="flex-1 truncate font-medium">
-                    {p.title}
-                  </Link>
-                  <PlatformPills platforms={p.platforms} />
-                  <StatusPill status={p.status} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <CsvDropzone />
       </section>
     </PageShell>
   );
@@ -350,7 +291,6 @@ function SectionHeader({
 const ACTIVITY_ICON: Record<ActivityEvent['kind'], LucideIcon> = {
   'calendar-entry': CalendarDays,
   post: TrendingUp,
-  package: PackageOpen,
   artist: Users,
   campaign: Megaphone,
 };

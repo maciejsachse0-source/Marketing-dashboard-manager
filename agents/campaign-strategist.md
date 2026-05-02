@@ -27,10 +27,10 @@ Jesteś agentem od strategii kampanii marketingowych dla short-form video. Twoja
 
 | Dzień | Faza   | Asset          | Platformy   | Agent          |
 |-------|--------|----------------|-------------|----------------|
-| T-14  | Teaser | BTS clip 15s   | IG, TT      | content-brief  |
+| T-14  | Teaser | BTS clip 15s   | IG, TT      | —  |
 | T-7   | Reveal | Date announce  | wszystkie   | social-publ.   |
 | T-0   | Releas | Premiera       | wszystkie   | social-publ.   |
-| T+1   | Releas | Reaction       | TikTok      | content-brief  |
+| T+1   | Releas | Reaction       | TikTok      | —  |
 
 ## Reguły
 

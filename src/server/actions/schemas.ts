@@ -4,7 +4,6 @@ import {
   CALENDAR_TYPES,
   CALENDAR_STATUSES,
   CAMPAIGN_PHASES,
-  PACKAGE_STATUSES,
   CSV_SOURCES,
   PRODUCTION_TYPES,
   PRODUCTION_STATUSES,
@@ -18,7 +17,6 @@ export const platformSchema = z.enum(PLATFORMS);
 export const calendarTypeSchema = z.enum(CALENDAR_TYPES);
 export const calendarStatusSchema = z.enum(CALENDAR_STATUSES);
 export const campaignPhaseSchema = z.enum(CAMPAIGN_PHASES);
-export const packageStatusSchema = z.enum(PACKAGE_STATUSES);
 export const csvSourceSchema = z.enum(CSV_SOURCES);
 export const productionTypeSchema = z.enum(PRODUCTION_TYPES);
 export const productionStatusSchema = z.enum(PRODUCTION_STATUSES);
@@ -61,29 +59,6 @@ export const campaignInputSchema = z.object({
 });
 export type CampaignInput = z.infer<typeof campaignInputSchema>;
 
-const partialPlatformMap = <T extends z.ZodTypeAny>(value: T) =>
-  z.object({
-    instagram: value.optional(),
-    tiktok: value.optional(),
-    youtube: value.optional(),
-    facebook: value.optional(),
-    x: value.optional(),
-    linkedin: value.optional(),
-  });
-
-export const packageInputSchema = z.object({
-  title: z.string().min(1).max(200),
-  assetPath: z.string().max(500).optional().nullable(),
-  platforms: z.array(platformSchema).min(1),
-  captions: partialPlatformMap(z.string()),
-  hashtags: partialPlatformMap(z.array(z.string())),
-  cta: z.string().max(500).optional().nullable(),
-  status: packageStatusSchema.optional(),
-  campaignId: z.number().int().positive().optional().nullable(),
-  scheduledFor: isoDate.optional().nullable(),
-});
-export type PackageInput = z.infer<typeof packageInputSchema>;
-
 export const postInputSchema = z.object({
   publishedAt: isoDate,
   platform: platformSchema,
@@ -94,15 +69,6 @@ export const postInputSchema = z.object({
   campaignId: z.number().int().positive().optional().nullable(),
 });
 export type PostInput = z.infer<typeof postInputSchema>;
-
-export const briefInputSchema = z.object({
-  title: z.string().min(1).max(200),
-  slug: z.string().min(1).max(120),
-  markdown: z.string().min(1),
-  filename: z.string().min(1).max(200),
-  calendarEntryId: z.number().int().positive().nullable().optional(),
-});
-export type BriefInput = z.infer<typeof briefInputSchema>;
 
 export const outreachInputSchema = z.object({
   artistId: z.number().int().positive(),
@@ -129,7 +95,11 @@ export const productionInputSchema = z.object({
   title: z.string().min(1).max(200),
   slug: z.string().min(1).max(120).optional(),
   t0At: isoDate,
-  artistId: z.number().int().positive().optional().nullable(),
+  // Required: every production maps to an artist folder on disk
+  // (`<ROOT>/<artist>/<production>/...`). `partial()` callers (e.g.
+  // updateProduction) still get an optional field thanks to Zod's partial
+  // semantics.
+  artistId: z.number().int().positive(),
   videographerId: z.number().int().positive().optional().nullable(),
   platforms: z.array(platformSchema).optional().nullable(),
   campaignId: z.number().int().positive().optional().nullable(),
