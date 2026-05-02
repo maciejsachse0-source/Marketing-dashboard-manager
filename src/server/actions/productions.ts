@@ -55,18 +55,21 @@ export async function createProduction(input: ProductionInput): Promise<Producti
       notes: parsed.notes ?? null,
     })
     .returning();
-  // Auto-create the per-artist work folder layout in OneDrive. Idempotent
-  // and side-effect-only — DB row is already persisted, so a transient
-  // mkdir failure (e.g. OneDrive offline) shouldn't block the production.
-  try {
-    const codes = (row.periods ?? []).map((p) => p.code);
-    ensureWorkFolderStructure(
-      artist.name,
-      row.title,
-      codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
-    );
-  } catch (err) {
-    console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
+  // Auto-create the per-artist work folder layout in OneDrive (local-dev
+  // only). DB row is already persisted, so a transient mkdir failure
+  // shouldn't block the production. Skipped on Vercel where the FS is
+  // read-only and the path doesn't exist.
+  if (!process.env.VERCEL) {
+    try {
+      const codes = (row.periods ?? []).map((p) => p.code);
+      ensureWorkFolderStructure(
+        artist.name,
+        row.title,
+        codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
+      );
+    } catch (err) {
+      console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
+    }
   }
   revalidatePath('/productions');
   revalidatePath('/calendar');
@@ -93,24 +96,25 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
 
 export async function deleteProduction(id: number): Promise<void> {
   // Snapshot the production + artist BEFORE the DB delete so we can rename
-  // the on-disk work folder afterwards. Failing to load it here is fine —
-  // the DB delete still runs, the rename is just skipped.
+  // the on-disk work folder afterwards (local-dev only). Failing to load it
+  // here is fine — the DB delete still runs, the rename is just skipped.
   const prod = await db.query.productions.findFirst({
     where: eq(schema.productions.id, id),
     columns: { id: true, title: true, artistId: true },
   });
-  const artist = prod?.artistId
+  if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
+
+  const artist = prod.artistId
     ? await db.query.artists.findFirst({
         where: eq(schema.artists.id, prod.artistId),
         columns: { name: true },
       })
     : null;
 
-  // Migration 0001 added back-references (calendar_entries.production_id,
-  // posts.production_id) without ON DELETE SET NULL, so SQLite blocks the
-  // production delete with a FK constraint. Manually null those references
-  // first — same end state as the cascade rule we wanted, just done in the
-  // app layer.
+  // FKs from calendar_entries.production_id / posts.production_id are
+  // ON DELETE SET NULL in Postgres, so the children get nulled automatically.
+  // We do an explicit nullification first anyway so older Drizzle adapters
+  // that don't honour cascade semantics still work.
   await db
     .update(schema.calendarEntries)
     .set({ productionId: null })
@@ -122,10 +126,11 @@ export async function deleteProduction(id: number): Promise<void> {
 
   await db.delete(schema.productions).where(eq(schema.productions.id, id));
 
-  // Rename "<Artist>/<Production>" → "<Artist>/<Production> (nieaktualne)".
-  // Best-effort — DB delete is already committed and a missing/locked
-  // folder shouldn't surface as a failure to the user.
-  if (prod && artist) {
+  // The work-folder rename only makes sense on the developer's local machine
+  // (it targets a Windows OneDrive path). Skip on Vercel where the FS is
+  // read-only and the path doesn't exist anyway — calling it just spams the
+  // logs with a try/catch'd error.
+  if (!process.env.VERCEL && artist) {
     try {
       const result = markProductionFolderObsolete(artist.name, prod.title);
       if (!result.renamed) {
@@ -137,6 +142,7 @@ export async function deleteProduction(id: number): Promise<void> {
   }
 
   revalidatePath('/productions');
+  revalidatePath('/productions/list');
   revalidatePath(`/productions/${id}`);
   revalidatePath('/calendar');
   revalidatePath('/');
