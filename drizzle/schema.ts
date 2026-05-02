@@ -13,9 +13,6 @@ export type CalendarStatus = (typeof CALENDAR_STATUSES)[number];
 export const CAMPAIGN_PHASES = ['build-up', 'teaser', 'reveal', 'release', 'afterglow', 'done'] as const;
 export type CampaignPhase = (typeof CAMPAIGN_PHASES)[number];
 
-export const PACKAGE_STATUSES = ['draft', 'ready', 'published'] as const;
-export type PackageStatus = (typeof PACKAGE_STATUSES)[number];
-
 export const CSV_SOURCES = ['meta', 'tiktok', 'youtube'] as const;
 export type CsvSource = (typeof CSV_SOURCES)[number];
 
@@ -107,9 +104,12 @@ export type ProductionStep = {
 /** Persisted period overrides — same shape as `TemplatePeriod` from the lib
  *  layer, redeclared here so the schema file stays dependency-free. Period
  *  count is variable; codes follow the T<idx+1> pattern enforced by
- *  `periodsSchema`. */
+ *  `periodsSchema`. `name` is the human-readable phase title cloned from the
+ *  template (e.g. "Build-up", "Reveal") — optional for backward compatibility
+ *  with legacy rows persisted before names existed. */
 export type ProductionPeriods = Array<{
   code: string;
+  name?: string;
   startOffsetDays: number;
   endOffsetDays: number;
 }>;
@@ -287,22 +287,6 @@ export const posts = sqliteTable('posts', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
 });
 
-export const packages = sqliteTable('packages', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  title: text('title').notNull(),
-  assetPath: text('asset_path'),
-  platforms: text('platforms', { mode: 'json' }).$type<Platform[]>().notNull(),
-  captions: text('captions', { mode: 'json' }).$type<Partial<Record<Platform, string>>>().notNull(),
-  hashtags: text('hashtags', { mode: 'json' }).$type<Partial<Record<Platform, string[]>>>().notNull(),
-  cta: text('cta'),
-  status: text('status').$type<PackageStatus>().notNull().default('draft'),
-  publishedPostIds: text('published_post_ids', { mode: 'json' }).$type<number[]>(),
-  campaignId: integer('campaign_id').references(() => campaigns.id, { onDelete: 'set null' }),
-  productionId: integer('production_id').references(() => productions.id, { onDelete: 'set null' }),
-  scheduledFor: integer('scheduled_for', { mode: 'timestamp_ms' }),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(now),
-});
-
 export const agentRuns = sqliteTable('agent_runs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   agentSlug: text('agent_slug').notNull(),
@@ -322,8 +306,6 @@ export type CalendarEntry = typeof calendarEntries.$inferSelect;
 export type NewCalendarEntry = typeof calendarEntries.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
-export type Package = typeof packages.$inferSelect;
-export type NewPackage = typeof packages.$inferInsert;
 export type CsvUpload = typeof csvUploads.$inferSelect;
 export type CsvRow = typeof csvRows.$inferSelect;
 export type AgentRun = typeof agentRuns.$inferSelect;
