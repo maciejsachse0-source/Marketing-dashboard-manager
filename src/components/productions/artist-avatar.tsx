@@ -1,4 +1,4 @@
-import { Camera, Mic, UserMinus } from 'lucide-react';
+import { Briefcase, Camera, Mic, UserMinus } from 'lucide-react';
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -32,7 +32,7 @@ export function PersonAvatar({
   name: string;
   seed?: string | null;
   size?: keyof typeof SIZE;
-  kind?: 'artist' | 'videographer';
+  kind?: 'artist' | 'videographer' | 'other';
   imageUrl?: string | null;
   showBadge?: boolean;
 }) {
@@ -42,10 +42,17 @@ export function PersonAvatar({
 
   // Artists get a wider hue range (vivid palette across the spectrum).
   // Videographers stay in cool blues/teals so they read as "crew, not talent".
-  const finalHue = kind === 'videographer' ? 180 + (hashHue(baseSeed) % 80) : hue;
+  // "Other" (internal team) lands in warm amber/orange so management/staff
+  // visually separate from the people they coordinate.
+  const finalHue =
+    kind === 'videographer'
+      ? 180 + (hue % 80)
+      : kind === 'other'
+        ? 30 + (hue % 30)
+        : hue;
   const bg = `linear-gradient(135deg, oklch(0.75 0.16 ${finalHue}) 0%, oklch(0.55 0.18 ${(finalHue + 30) % 360}) 100%)`;
 
-  const Icon = kind === 'videographer' ? Camera : Mic;
+  const Icon = kind === 'videographer' ? Camera : kind === 'other' ? Briefcase : Mic;
 
   return (
     <div className="relative shrink-0">
