@@ -8,8 +8,10 @@ import {
   type ProductionInput,
 } from './schemas';
 import type { Production, ProductionType } from '../../../drizzle/schema';
-import { generateOutputFolder } from '@/lib/output-folder';
-import { ensureWorkFolderStructure } from '@/lib/production-work-folder';
+import {
+  ensureWorkFolderStructure,
+  markProductionFolderObsolete,
+} from '@/lib/production-work-folder';
 
 function safeSlug(input: string, fallback: string): string {
   const s = input
@@ -29,6 +31,12 @@ export async function createProduction(input: ProductionInput): Promise<Producti
   const yyyymmdd = `${t0.getFullYear()}${String(t0.getMonth() + 1).padStart(2, '0')}${String(t0.getDate()).padStart(2, '0')}`;
   const slug = parsed.slug ?? `${safeSlug(parsed.title, 'production')}-${yyyymmdd}`;
 
+  const artist = await db.query.artists.findFirst({
+    where: eq(schema.artists.id, parsed.artistId),
+    columns: { id: true, name: true },
+  });
+  if (!artist) throw new Error('Artysta nie istnieje');
+
   const [row] = await db
     .insert(schema.productions)
     .values({
@@ -40,21 +48,25 @@ export async function createProduction(input: ProductionInput): Promise<Producti
       // creation — wizard handles that. Default empty so the row is valid.
       steps: [],
       cancelledAt: null,
-      artistId: parsed.artistId ?? null,
+      artistId: artist.id,
       videographerId: parsed.videographerId ?? null,
       platforms: parsed.platforms ?? null,
       campaignId: parsed.campaignId ?? null,
       notes: parsed.notes ?? null,
     })
     .returning();
-  // Auto-create the production work folder layout (nagrywanie/, obrobka/,
-  // publikacja/ + nested subfolders). Idempotent and side-effect-only on
-  // disk — DB row is already persisted, so a transient mkdir failure (e.g.
-  // permission issue) shouldn't block the production itself.
+  // Auto-create the per-artist work folder layout in OneDrive. Idempotent
+  // and side-effect-only — DB row is already persisted, so a transient
+  // mkdir failure (e.g. OneDrive offline) shouldn't block the production.
   try {
-    ensureWorkFolderStructure(row.slug);
+    const codes = (row.periods ?? []).map((p) => p.code);
+    ensureWorkFolderStructure(
+      artist.name,
+      row.title,
+      codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
+    );
   } catch (err) {
-    console.warn(`[createProduction] ensureWorkFolderStructure failed for ${row.slug}:`, err);
+    console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
   }
   revalidatePath('/productions');
   revalidatePath('/calendar');
@@ -79,38 +91,55 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
   return row;
 }
 
-export async function regenerateOutputFolder(id: number) {
-  const result = await generateOutputFolder(id);
-  revalidatePath(`/productions/${id}`);
-  revalidatePath('/output');
-  return result;
-}
-
 export async function deleteProduction(id: number): Promise<void> {
-  // Migration 0001 added the back-references (calendar_entries.production_id,
-  // packages.production_id, posts.production_id) without ON DELETE SET NULL,
-  // so SQLite blocks the production delete with a FK constraint. Manually
-  // null those references first — same end state as the cascade rule we
-  // wanted, just done in the app layer.
+  // Snapshot the production + artist BEFORE the DB delete so we can rename
+  // the on-disk work folder afterwards. Failing to load it here is fine —
+  // the DB delete still runs, the rename is just skipped.
+  const prod = await db.query.productions.findFirst({
+    where: eq(schema.productions.id, id),
+    columns: { id: true, title: true, artistId: true },
+  });
+  const artist = prod?.artistId
+    ? await db.query.artists.findFirst({
+        where: eq(schema.artists.id, prod.artistId),
+        columns: { name: true },
+      })
+    : null;
+
+  // Migration 0001 added back-references (calendar_entries.production_id,
+  // posts.production_id) without ON DELETE SET NULL, so SQLite blocks the
+  // production delete with a FK constraint. Manually null those references
+  // first — same end state as the cascade rule we wanted, just done in the
+  // app layer.
   await db
     .update(schema.calendarEntries)
     .set({ productionId: null })
     .where(eq(schema.calendarEntries.productionId, id));
-  await db
-    .update(schema.packages)
-    .set({ productionId: null })
-    .where(eq(schema.packages.productionId, id));
   await db
     .update(schema.posts)
     .set({ productionId: null })
     .where(eq(schema.posts.productionId, id));
 
   await db.delete(schema.productions).where(eq(schema.productions.id, id));
+
+  // Rename "<Artist>/<Production>" → "<Artist>/<Production> (nieaktualne)".
+  // Best-effort — DB delete is already committed and a missing/locked
+  // folder shouldn't surface as a failure to the user.
+  if (prod && artist) {
+    try {
+      const result = markProductionFolderObsolete(artist.name, prod.title);
+      if (!result.renamed) {
+        console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
+      }
+    } catch (err) {
+      console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
+    }
+  }
+
   revalidatePath('/productions');
   revalidatePath(`/productions/${id}`);
   revalidatePath('/calendar');
   revalidatePath('/');
-  revalidatePath('/output');
   revalidatePath('/analytics');
 }
 
@@ -131,14 +160,10 @@ export async function getProduction(id: number) {
     where: eq(schema.productions.id, id),
   });
   if (!production) return null;
-  const [entries, packages, posts, artist, videographer, campaign] = await Promise.all([
+  const [entries, posts, artist, videographer, campaign] = await Promise.all([
     db.query.calendarEntries.findMany({
       where: eq(schema.calendarEntries.productionId, id),
       orderBy: schema.calendarEntries.startsAt,
-    }),
-    db.query.packages.findMany({
-      where: eq(schema.packages.productionId, id),
-      orderBy: desc(schema.packages.createdAt),
     }),
     db.query.posts.findMany({
       where: eq(schema.posts.productionId, id),
@@ -156,7 +181,7 @@ export async function getProduction(id: number) {
       ? db.query.campaigns.findFirst({ where: eq(schema.campaigns.id, production.campaignId) })
       : Promise.resolve(null),
   ]);
-  return { production, entries, packages, posts, artist, videographer, campaign };
+  return { production, entries, posts, artist, videographer, campaign };
 }
 
 export async function getProductionByEntryId(entryId: number) {

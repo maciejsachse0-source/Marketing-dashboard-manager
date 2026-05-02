@@ -127,6 +127,11 @@ export function ProductionWizard({
       setStep(2);
       return;
     }
+    if (artistId == null) {
+      setError('Wybierz artystę — produkcja musi mieć przypisanego artystę');
+      setStep(2);
+      return;
+    }
     const t0 = deriveT0FromT1(t1Week);
     if (!t0) {
       setError('Wybierz tydzień startowy (T-1)');
@@ -143,7 +148,7 @@ export function ProductionWizard({
           type,
           title: title.trim(),
           t0At: t0Iso,
-          // Both solo and with-artist productions can be tied to an artist:
+          // Both solo and with-artist productions are tied to an artist:
           // a single artist can have a solo timeline (self-recorded content
           // we just supervise) AND a with-artist timeline (collab shoot)
           // running side-by-side. Videographer stays a with-artist concept

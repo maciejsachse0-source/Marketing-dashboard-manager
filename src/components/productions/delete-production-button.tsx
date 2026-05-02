@@ -20,7 +20,7 @@ export function DeleteProductionButton({
   const onClick = () => {
     if (pending) return;
     const ok = confirm(
-      `Usunąć produkcję "${productionName}"?\n\nTej operacji nie można cofnąć. Powiązane wpisy w kalendarzu, pakiety i posty zostaną odpięte (nie usunięte).`,
+      `Usunąć produkcję "${productionName}"?\n\nTej operacji nie można cofnąć. Powiązane wpisy w kalendarzu i posty zostaną odpięte (nie usunięte).`,
     );
     if (!ok) return;
     startTransition(async () => {
