@@ -1,6 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq, desc } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
@@ -158,11 +157,10 @@ export async function deleteProduction(id: number): Promise<void> {
     console.warn('[deleteProduction] revalidatePath failed (delete itself succeeded):', err);
   }
 
-  // Force-navigate away from the (now-gone) detail page so Next doesn't try
-  // to re-render /productions/[id] as part of the action response. Calling
-  // redirect() throws a special signal that Next intercepts — must be the
-  // last statement (anything after is unreachable).
-  redirect('/productions/list');
+  // Client (delete-production-button) navigates away with router.push after
+  // the action resolves; we deliberately skip server-side redirect() because
+  // its NEXT_REDIRECT exception bubbles up through Next 16's client RSC
+  // pipeline as "An error occurred in the Server Components render".
 }
 
 export async function listProductions(filter?: {
