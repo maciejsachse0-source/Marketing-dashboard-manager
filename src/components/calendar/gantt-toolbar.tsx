@@ -15,6 +15,7 @@ type VideographerOption = { id: number; name: string; hourlyRate: number | null 
 type StatusFilter = 'all' | 'in-progress' | 'done' | 'cancelled';
 type TypeFilter = 'all' | 'with-artist' | 'solo';
 type SortKey = 't0' | 'status' | 'name';
+type ViewMode = 'week' | 'month' | 'quarter';
 
 const STATUS_LABEL: Record<StatusFilter, string> = {
   all: 'Wszystkie',
@@ -33,11 +34,26 @@ const SORT_LABEL: Record<SortKey, string> = {
   name: 'Nazwa',
 };
 
-const ZOOM_LABEL: Record<number, string> = {
-  5: '5 tyg',
-  8: '8 tyg',
-  12: '12 tyg',
+const VIEW_LABEL: Record<ViewMode, string> = {
+  week: 'Tydzień',
+  month: 'Miesiąc',
+  quarter: 'Kwartał',
 };
+
+// Zoom labels swap units depending on view mode — at quarter scale "tygodni"
+// is awkward so we surface months/quarters instead.
+function zoomLabel(view: ViewMode, weeks: number): string {
+  if (view === 'quarter') {
+    if (weeks === 52) return '1 rok';
+    if (weeks === 39) return '9 mies';
+    if (weeks === 26) return '6 mies';
+  }
+  if (view === 'month') {
+    const months = Math.round(weeks / 4);
+    return `${months} mies`;
+  }
+  return `${weeks} tyg`;
+}
 
 function formatRange(weekStart: Date, weeks: number) {
   const end = addDays(weekStart, weeks * 7 - 1);
@@ -55,10 +71,14 @@ function formatRange(weekStart: Date, weeks: number) {
   return `${startLabel} – ${endLabel}`;
 }
 
+type CampaignOption = { id: number; name: string; inWindow: boolean };
+
 export function GanttToolbar({
   weekStart,
   zoom,
   zoomOptions,
+  view,
+  viewOptions,
   statusFilter,
   typeFilter,
   sortKey,
@@ -67,10 +87,14 @@ export function GanttToolbar({
   artists,
   videographers,
   templates,
+  campaignOptions,
+  selectedCampaignId,
 }: {
   weekStart: Date;
   zoom: number;
   zoomOptions: number[];
+  view: ViewMode;
+  viewOptions: string[];
   statusFilter: StatusFilter;
   typeFilter: TypeFilter;
   sortKey: SortKey;
@@ -79,6 +103,8 @@ export function GanttToolbar({
   artists: ArtistOption[];
   videographers: VideographerOption[];
   templates: ProductionTemplate[];
+  campaignOptions: CampaignOption[];
+  selectedCampaignId: number | null;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -92,8 +118,13 @@ export function GanttToolbar({
     router.push(`/calendar${qs ? `?${qs}` : ''}`);
   };
 
+  // Step size matches the visible window: in month/quarter views a 1-week
+  // jump feels lost in the canvas, so we paginate by ~1/4 of the window.
+  const stepWeeks = view === 'quarter' ? Math.max(4, Math.floor(zoom / 4))
+    : view === 'month' ? Math.max(2, Math.floor(zoom / 4))
+    : 1;
   const navigate = (delta: number) => {
-    const next = addDays(weekStart, delta * 7);
+    const next = addDays(weekStart, delta * stepWeeks * 7);
     // Use LOCAL Y-M-D, not toISOString(): toISOString returns UTC, so a Monday
     // 00:00 in CEST becomes "Sunday 22:00 UTC" → URL says yesterday → server
     // re-snaps to the same Monday → "next" button silently no-ops.
@@ -102,6 +133,17 @@ export function GanttToolbar({
     setParam('week', local);
   };
   const goToday = () => setParam('week', null);
+
+  // Switching view modes changes which zoom presets are valid — clearing
+  // `weeks` lets the server pick that view's default. Without this, switching
+  // from quarter (52) to week would land on an invalid 52-week week-view.
+  const setView = (next: ViewMode) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('view', next);
+    params.delete('weeks');
+    const qs = params.toString();
+    router.push(`/calendar${qs ? `?${qs}` : ''}`);
+  };
 
   useShortcut('p', () => setWizardOpen(true), []);
 
@@ -125,8 +167,8 @@ export function GanttToolbar({
             type="button"
             onClick={() => navigate(-1)}
             className="px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
-            aria-label="Poprzedni tydzień"
-            title="Poprzedni tydzień"
+            aria-label={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
+            title={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -142,8 +184,8 @@ export function GanttToolbar({
             type="button"
             onClick={() => navigate(1)}
             className="px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
-            aria-label="Następny tydzień"
-            title="Następny tydzień"
+            aria-label={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
+            title={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -172,14 +214,23 @@ export function GanttToolbar({
         </div>
       </div>
 
-      {/* Row 2 — View controls (zoom) + filters + sort */}
+      {/* Row 2 — View controls (mode + zoom) + filters + sort */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+        <SegmentedControl
+          label="Widok"
+          current={view}
+          options={viewOptions as ViewMode[]}
+          getKey={(v) => v}
+          getLabel={(v) => VIEW_LABEL[v]}
+          onChange={(v) => setView(v)}
+        />
+
         <SegmentedControl
           label="Zoom"
           current={zoom}
           options={zoomOptions}
           getKey={(z) => String(z)}
-          getLabel={(z) => ZOOM_LABEL[z] ?? `${z} tyg`}
+          getLabel={(z) => zoomLabel(view, z)}
           onChange={(z) => setParam('weeks', String(z))}
         />
 
@@ -208,6 +259,14 @@ export function GanttToolbar({
           getKey={(o) => o}
           getLabel={(o) => SORT_LABEL[o]}
           onChange={(v) => setParam('sort', v === 't0' ? null : v)}
+        />
+
+        <CampaignSelector
+          options={campaignOptions}
+          selectedId={selectedCampaignId}
+          onChange={(id) =>
+            setParam('campaign', id === null ? 'none' : String(id))
+          }
         />
 
         {filtersActive ? (
@@ -275,6 +334,50 @@ function SegmentedControl<T>({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Campaign picker — only ONE campaign renders in the gantt narrative strip
+ * at a time, so the user must explicitly choose which one. We use a native
+ * `<select>` instead of a segmented control because campaign names can be
+ * long and the number of campaigns grows linearly while T1/T2/T3 toolbar
+ * controls stay short. Campaigns outside the visible window get an annotation
+ * so the user knows why selecting them shows the off-window edge preview.
+ */
+function CampaignSelector({
+  options,
+  selectedId,
+  onChange,
+}: {
+  options: CampaignOption[];
+  selectedId: number | null;
+  onChange: (id: number | null) => void;
+}) {
+  const value = selectedId === null ? 'none' : String(selectedId);
+  return (
+    <div className="inline-flex items-center gap-2">
+      <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+        Kampania
+      </span>
+      <select
+        value={value}
+        onChange={(e) => {
+          const v = e.target.value;
+          onChange(v === 'none' ? null : Number(v));
+        }}
+        className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold shadow-sm hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring max-w-[16rem] truncate"
+        title="Wybierz kampanię, której narracja ma się wyświetlać w gancie"
+      >
+        <option value="none">— brak —</option>
+        {options.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+            {c.inWindow ? '' : ' (poza oknem)'}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

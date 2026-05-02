@@ -29,27 +29,44 @@ export type TemplatePeriod = {
   /** Auto-derived from index; persisted for readability + so existing
    *  consumers (gantt) keep working without re-deriving. */
   code: string;
+  /** Human-readable name for the period — drives the campaign timeline UI
+   *  ("T1 · Build-up"), milestones tracker headers, and template summaries.
+   *  Optional so legacy data without names still resolves; UI falls back to
+   *  the code alone when missing. Templates SHOULD set this. */
+  name?: string;
+  /** Free-text narrative for the period — what the user wants to communicate
+   *  during this band ("delikatne sygnały, widz jeszcze nie wie co"). Drives
+   *  the narration display where milestone pins used to live; the user reads
+   *  the description as the storytelling intent for the period. Optional —
+   *  UI hides the line entirely when missing. */
+  description?: string;
   startOffsetDays: number;
   endOffsetDays: number;
 };
 
 /** Hard limits on how far a period can sit from the start anchor. Wider than
  *  any realistic pipeline so user creativity isn't artificially clipped, but
- *  tight enough that arithmetic stays safe and the gantt strip can fit. */
+ *  tight enough that arithmetic stays safe and the gantt strip can fit.
+ *  Bumped to a full year so long-form campaigns (multi-quarter narratives,
+ *  yearly artist arcs) can sit on a single timeline without hitting a wall. */
 export const PERIOD_OFFSET_MIN = 0;
-export const PERIOD_OFFSET_MAX = 90;
+export const PERIOD_OFFSET_MAX = 365;
 
 /** Defaults: 3 contiguous 7-day periods starting at the anchor. Anyone using
  *  templates without an explicit `periods` field gets a sensible 3-week strip
- *  that maps cleanly onto the existing outreach/recording/publishing flow. */
+ *  with named phases that map onto the universal narrative arc — preparation,
+ *  active phase, wrap-up. Templates can override either the durations or the
+ *  names (or both) to fit a specific narrative. */
 export const DEFAULT_PERIODS: TemplatePeriod[] = [
-  { code: 'T1', startOffsetDays: 0, endOffsetDays: 6 },
-  { code: 'T2', startOffsetDays: 7, endOffsetDays: 13 },
-  { code: 'T3', startOffsetDays: 14, endOffsetDays: 20 },
+  { code: 'T1', name: 'Przygotowanie', startOffsetDays: 0, endOffsetDays: 6 },
+  { code: 'T2', name: 'Aktywność', startOffsetDays: 7, endOffsetDays: 13 },
+  { code: 'T3', name: 'Domknięcie', startOffsetDays: 14, endOffsetDays: 20 },
 ];
 
 const periodShape = z.object({
   code: z.string(),
+  name: z.string().min(1).max(40).optional(),
+  description: z.string().min(1).max(500).optional(),
   startOffsetDays: z.number().int().min(PERIOD_OFFSET_MIN).max(PERIOD_OFFSET_MAX),
   endOffsetDays: z.number().int().min(PERIOD_OFFSET_MIN).max(PERIOD_OFFSET_MAX),
 });
@@ -126,7 +143,7 @@ export function periodsRelativeToT0Mon(
   const shift = -last.startOffsetDays;
   if (shift === 0) return resolved;
   return resolved.map((p) => ({
-    code: p.code,
+    ...p,
     startOffsetDays: p.startOffsetDays + shift,
     endOffsetDays: p.endOffsetDays + shift,
   }));

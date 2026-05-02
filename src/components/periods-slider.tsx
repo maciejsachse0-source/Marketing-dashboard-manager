@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import {
   describeOffset,
   PERIOD_OFFSET_MAX,
@@ -33,6 +33,8 @@ export function PeriodsSlider({
   onChange,
   onRemove,
   canRemove,
+  editableNames,
+  horizonDays,
 }: {
   periods: TemplatePeriod[];
   errors: (string | null)[];
@@ -40,17 +42,34 @@ export function PeriodsSlider({
   onChange: (idx: number, patch: Partial<TemplatePeriod>) => void;
   onRemove: (idx: number) => void;
   canRemove: boolean;
+  /** When true, renders a name input on each period rail so the user can
+   *  set "Build-up", "Reveal" etc. straight from the slider UI. Falls back
+   *  to read-only display of the existing name when false. Defaults to
+   *  false so legacy callers (template-only viewers) stay unchanged. */
+  editableNames?: boolean;
+  /** Optional fixed visible window — overrides the auto-fit width so the
+   *  caller can let the user "zoom out" to grab a broader perspective of the
+   *  plan. Always clamped to ≥ what's needed to show every period and ≤
+   *  PERIOD_OFFSET_MAX. When omitted, the slider auto-fits to the periods
+   *  with a 28-day floor (legacy behavior). */
+  horizonDays?: number;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
 
   const maxEnd =
     periods.length > 0 ? Math.max(0, ...periods.map((p) => p.endOffsetDays)) : 0;
   const sliderMin = 0;
-  const sliderMax = Math.min(
-    PERIOD_OFFSET_MAX,
-    Math.max(28, Math.ceil((maxEnd + 7) / 7) * 7),
-  );
+  const autoFitMax = Math.max(28, Math.ceil((maxEnd + 7) / 7) * 7);
+  const requestedMax = horizonDays != null ? Math.max(autoFitMax, horizonDays) : autoFitMax;
+  const sliderMax = Math.min(PERIOD_OFFSET_MAX, requestedMax);
   const sliderDays = sliderMax - sliderMin + 1;
+
+  // Adaptive label density — at wider horizons the per-day grid would smear
+  // into a noise stripe, so we coarsen tick labels and hide daily numbers
+  // entirely past ~8 weeks. Thresholds align with common planning windows
+  // (4w, 8w, 12w, 24w, 52w) the horizon picker exposes.
+  const tickEveryDays = sliderDays <= 56 ? 7 : sliderDays <= 112 ? 14 : sliderDays <= 196 ? 28 : 56;
+  const showDailyNumbers = sliderDays <= 56;
 
   const dragRef = useRef<{
     periodIdx: number;
@@ -139,7 +158,7 @@ export function PeriodsSlider({
 
   const majorTicks: { offset: number; date: Date; label: string }[] = [];
   for (let d = sliderMin; d <= sliderMax; d++) {
-    if (d % 7 !== 0) continue;
+    if (d % tickEveryDays !== 0) continue;
     const date = dateAt(previewStart, d);
     majorTicks.push({ offset: d, date, label: fmtDayMonth(date) });
   }
@@ -218,30 +237,32 @@ export function PeriodsSlider({
             />
           ))}
         </div>
-        <div className="relative h-3 select-none">
-          {Array.from({ length: sliderDays }).map((_, i) => {
-            const d = sliderMin + i;
-            const date = dateAt(previewStart, d);
-            const dow = ((d % 7) + 7) % 7;
-            const isWeekend = dow >= 5;
-            const isFirstOfMonth = date.getDate() === 1;
-            return (
-              <span
-                key={i}
-                className={`absolute -translate-x-1/2 text-[8px] tabular-nums ${
-                  isFirstOfMonth
-                    ? 'font-bold text-foreground'
-                    : isWeekend
-                      ? 'text-muted-foreground/55'
-                      : 'text-muted-foreground/80'
-                }`}
-                style={{ left: `${dayToPercent(d)}%` }}
-              >
-                {date.getDate()}
-              </span>
-            );
-          })}
-        </div>
+        {showDailyNumbers ? (
+          <div className="relative h-3 select-none">
+            {Array.from({ length: sliderDays }).map((_, i) => {
+              const d = sliderMin + i;
+              const date = dateAt(previewStart, d);
+              const dow = ((d % 7) + 7) % 7;
+              const isWeekend = dow >= 5;
+              const isFirstOfMonth = date.getDate() === 1;
+              return (
+                <span
+                  key={i}
+                  className={`absolute -translate-x-1/2 text-[8px] tabular-nums ${
+                    isFirstOfMonth
+                      ? 'font-bold text-foreground'
+                      : isWeekend
+                        ? 'text-muted-foreground/55'
+                        : 'text-muted-foreground/80'
+                  }`}
+                  style={{ left: `${dayToPercent(d)}%` }}
+                >
+                  {date.getDate()}
+                </span>
+              );
+            })}
+          </div>
+        ) : null}
         <div className="flex justify-between text-[9px] text-muted-foreground tabular-nums px-0.5">
           <span>{fmtDayMonth(dateAt(previewStart, sliderMin))} (start)</span>
           <span>{fmtDayMonth(dateAt(previewStart, sliderMax))}</span>
@@ -258,6 +279,17 @@ export function PeriodsSlider({
           previewStart={previewStart}
           railRef={idx === 0 ? railRef : undefined}
           onRemove={canRemove ? () => onRemove(idx) : undefined}
+          onChangeName={
+            editableNames
+              ? (name) => onChange(idx, { name: name || undefined })
+              : undefined
+          }
+          onChangeDescription={
+            editableNames
+              ? (description) =>
+                  onChange(idx, { description: description || undefined })
+              : undefined
+          }
           onPointerDownStart={(e) => startDrag(e, idx, 'start')}
           onPointerDownEnd={(e) => startDrag(e, idx, 'end')}
           onPointerDownSpan={(e) => startDrag(e, idx, 'span')}
@@ -285,6 +317,8 @@ function PeriodRail({
   previewStart,
   railRef,
   onRemove,
+  onChangeName,
+  onChangeDescription,
   onPointerDownStart,
   onPointerDownEnd,
   onPointerDownSpan,
@@ -297,6 +331,13 @@ function PeriodRail({
   previewStart: Date;
   railRef?: React.Ref<HTMLDivElement>;
   onRemove?: () => void;
+  /** When provided, renders a small inline name input above the rail. The
+   *  parent owns the name (it's part of the period state) and persists
+   *  through `onChange({ name })` from the slider's overall API. */
+  onChangeName?: (name: string) => void;
+  /** When provided, renders an inline textarea for the period description
+   *  below the rail. Same lift-state-up pattern as `onChangeName`. */
+  onChangeDescription?: (description: string) => void;
   onPointerDownStart: (e: React.PointerEvent) => void;
   onPointerDownEnd: (e: React.PointerEvent) => void;
   onPointerDownSpan: (e: React.PointerEvent) => void;
@@ -317,7 +358,28 @@ function PeriodRail({
         >
           {period.code}
         </span>
-        <span className={`tabular-nums ${tone.ink}`}>
+        {onChangeName ? (
+          <label
+            className={`group/name inline-flex items-center gap-1 rounded border border-dashed ${tone.thumb.split(' ').find((c) => c.startsWith('border-')) ?? 'border-current/40'} bg-background/60 px-1.5 py-0.5 hover:bg-background/90 focus-within:bg-background focus-within:border-solid ui-transition`}
+            title="Klik, by zmienić nazwę okresu"
+          >
+            <Pencil className={`w-3 h-3 ${tone.ink} opacity-60 group-hover/name:opacity-100 group-focus-within/name:opacity-100 shrink-0`} />
+            <input
+              type="text"
+              value={period.name ?? ''}
+              onChange={(e) => onChangeName(e.target.value)}
+              placeholder={`Nazwa fazy ${period.code} (np. Build-up)`}
+              maxLength={40}
+              aria-label={`Nazwa okresu ${period.code}`}
+              className={`text-xs font-bold tracking-tight ${tone.ink} bg-transparent focus:outline-none placeholder:font-normal placeholder:opacity-60 min-w-[9rem]`}
+            />
+          </label>
+        ) : period.name ? (
+          <span className={`text-xs font-bold tracking-tight ${tone.ink}`}>
+            {period.name}
+          </span>
+        ) : null}
+        <span className={`tabular-nums ${tone.ink} text-[10px] opacity-80`}>
           {fmtDayMonth(startDate)} → {fmtDayMonth(endDate)}
         </span>
         <span className="text-[10px] tabular-nums text-muted-foreground">
@@ -369,6 +431,32 @@ function PeriodRail({
           title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
         />
       </div>
+
+      {onChangeDescription ? (
+        <label
+          className={`group/desc block rounded border border-dashed ${tone.thumb.split(' ').find((c) => c.startsWith('border-')) ?? 'border-current/40'} bg-background/40 hover:bg-background/80 focus-within:bg-background focus-within:border-solid ui-transition`}
+          title="Klik, by zmienić opis okresu"
+        >
+          <div className={`flex items-start gap-1.5 px-2 py-1.5`}>
+            <Pencil
+              className={`w-3 h-3 mt-0.5 ${tone.ink} opacity-50 group-hover/desc:opacity-100 group-focus-within/desc:opacity-100 shrink-0`}
+            />
+            <textarea
+              value={period.description ?? ''}
+              onChange={(e) => onChangeDescription(e.target.value)}
+              placeholder={`Opis okresu ${period.code} — co chcesz, żeby widz POCZUŁ w tej fazie`}
+              maxLength={500}
+              rows={2}
+              aria-label={`Opis okresu ${period.code}`}
+              className={`flex-1 text-[11px] leading-snug ${tone.ink} bg-transparent focus:outline-none resize-none placeholder:opacity-60 placeholder:italic`}
+            />
+          </div>
+        </label>
+      ) : period.description ? (
+        <p className={`text-[11px] leading-snug ${tone.ink} opacity-90 italic px-1`}>
+          {period.description}
+        </p>
+      ) : null}
 
       {error ? (
         <p className="text-[11px] text-rose-700 font-medium">{error}</p>

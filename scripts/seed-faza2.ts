@@ -1,27 +1,8 @@
 import 'dotenv/config';
-import { createPackage } from '../src/server/actions/packages';
 import { createPost, updatePostMetrics } from '../src/server/actions/posts';
 
 async function main() {
-  console.log('[seed-faza2] adding sample package + posts');
-
-  const pkg = await createPackage({
-    title: 'BTS sesja w studio — pakiet IG/TT',
-    platforms: ['instagram', 'tiktok'],
-    captions: {
-      instagram:
-        'POV: jesteś za szybą i widzisz jak powstaje "Świt" 👀\n\nKawałek leci 26.05.\nZapisz, jeśli chcesz pamiętać.',
-      tiktok: 'gdy słyszysz "Świt" zanim ktokolwiek inny 🌅 #fyp',
-    },
-    hashtags: {
-      instagram: ['#bts', '#muzyka', '#nagranie', '#singiel', '#świt'],
-      tiktok: ['#fyp', '#muzykaPL', '#studio', '#singiel'],
-    },
-    cta: 'Save jeśli chcesz pamiętać premierę 26.05',
-    status: 'ready',
-    campaignId: 1,
-  });
-  console.log('package #' + pkg.id);
+  console.log('[seed-faza2] adding sample posts');
 
   const post1 = await createPost({
     publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
@@ -78,7 +59,7 @@ async function main() {
     followersGained: 9,
   });
 
-  console.log('[seed-faza2] done — 1 package + 3 posts');
+  console.log('[seed-faza2] done — 3 posts');
   process.exit(0);
 }
 
