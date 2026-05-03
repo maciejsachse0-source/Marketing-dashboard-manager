@@ -26,8 +26,13 @@ export function verifySessionToken(token: string | undefined | null): string | n
   const b = Buffer.from(expected);
   if (a.length !== b.length) return null;
   if (!timingSafeEqual(a, b)) return null;
-  const [email, tsStr] = payload.split('.');
+  // Email may contain dots (admin@demo.pl) — split from the END so the
+  // timestamp is the segment after the last `.`, not split('.')[1].
+  const tsDot = payload.lastIndexOf('.');
+  if (tsDot < 0) return null;
+  const email = payload.slice(0, tsDot);
+  const tsStr = payload.slice(tsDot + 1);
   const ts = Number(tsStr);
   if (!Number.isFinite(ts) || Date.now() - ts > SESSION_MAX_MS) return null;
-  return email ?? null;
+  return email || null;
 }
