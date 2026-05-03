@@ -545,7 +545,4 @@ export async function setProductionCancelled(
   return { ok: true };
 }
 
-// Type-only re-exports for callers that need to avoid a separate lib import.
-export type { ProductionStep, StepDateMode };
-
 void getActiveStepIndex;
