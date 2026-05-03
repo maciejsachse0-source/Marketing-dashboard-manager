@@ -1,8 +1,10 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { env } from './env';
 
 export const AUTH_COOKIE = 'mc_session';
+export const SESSION_MAX_MS = 30 * 24 * 60 * 60 * 1000;
 
-const SESSION_SECRET = process.env.SESSION_SECRET ?? 'marketing-crew-dev-secret';
+const SESSION_SECRET = env.SESSION_SECRET;
 
 function sign(payload: string): string {
   return createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
@@ -24,6 +26,8 @@ export function verifySessionToken(token: string | undefined | null): string | n
   const b = Buffer.from(expected);
   if (a.length !== b.length) return null;
   if (!timingSafeEqual(a, b)) return null;
-  const [email] = payload.split('.');
+  const [email, tsStr] = payload.split('.');
+  const ts = Number(tsStr);
+  if (!Number.isFinite(ts) || Date.now() - ts > SESSION_MAX_MS) return null;
   return email ?? null;
 }
