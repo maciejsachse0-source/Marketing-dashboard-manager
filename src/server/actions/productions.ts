@@ -3,6 +3,7 @@
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq, desc } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import {
   productionInputSchema,
   type ProductionInput,
@@ -26,6 +27,7 @@ function safeSlug(input: string, fallback: string): string {
 }
 
 export async function createProduction(input: ProductionInput): Promise<Production> {
+  await requireSession();
   const parsed = productionInputSchema.parse(input);
   const t0 = new Date(parsed.t0At);
   const yyyymmdd = `${t0.getFullYear()}${String(t0.getMonth() + 1).padStart(2, '0')}${String(t0.getDate()).padStart(2, '0')}`;
@@ -78,6 +80,7 @@ export async function createProduction(input: ProductionInput): Promise<Producti
 }
 
 export async function updateProduction(id: number, input: Partial<ProductionInput>): Promise<Production> {
+  await requireSession();
   const parsed = productionInputSchema.partial().parse(input);
   const { t0At, ...rest } = parsed;
   const [row] = await db
@@ -95,45 +98,41 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
 }
 
 export async function deleteProduction(id: number): Promise<void> {
-  console.log(`[deleteProduction] starting for id=${id}`);
+  await requireSession();
+  let title: string | null = null;
+  let artistName: string | null = null;
   try {
-    const prod = await db.query.productions.findFirst({
-      where: eq(schema.productions.id, id),
-      columns: { id: true, title: true, artistId: true },
-    });
-    if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
+    await db.transaction(async (tx) => {
+      const prod = await tx.query.productions.findFirst({
+        where: eq(schema.productions.id, id),
+        columns: { id: true, title: true, artistId: true },
+      });
+      if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
+      title = prod.title;
 
-    const artist = prod.artistId
-      ? await db.query.artists.findFirst({
+      if (prod.artistId) {
+        const artist = await tx.query.artists.findFirst({
           where: eq(schema.artists.id, prod.artistId),
           columns: { name: true },
-        })
-      : null;
+        });
+        artistName = artist?.name ?? null;
+      }
 
-    // FKs from calendar_entries.production_id / posts.production_id are
-    // ON DELETE SET NULL in Postgres. Explicit nullification first so we
-    // don't depend on the cascade semantic.
-    await db
-      .update(schema.calendarEntries)
-      .set({ productionId: null })
-      .where(eq(schema.calendarEntries.productionId, id));
-    await db
-      .update(schema.posts)
-      .set({ productionId: null })
-      .where(eq(schema.posts.productionId, id));
+      // FKs from calendar_entries.production_id / posts.production_id are
+      // ON DELETE SET NULL in Postgres — DELETE alone handles the cascade.
+      await tx.delete(schema.productions).where(eq(schema.productions.id, id));
+    });
 
-    await db.delete(schema.productions).where(eq(schema.productions.id, id));
-    console.log(`[deleteProduction] DB delete done for id=${id}`);
-
-    // OneDrive folder rename — local-dev only.
-    if (!process.env.VERCEL && artist) {
+    // OneDrive folder rename — local-dev only. Outside the transaction
+    // because mkdir failure shouldn't roll back the DB delete.
+    if (!process.env.VERCEL && artistName && title) {
       try {
-        const result = markProductionFolderObsolete(artist.name, prod.title);
+        const result = markProductionFolderObsolete(artistName, title);
         if (!result.renamed) {
           console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
         }
       } catch (err) {
-        console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
+        console.warn(`[deleteProduction] folder rename failed for "${title}":`, err);
       }
     }
   } catch (err) {
@@ -166,6 +165,7 @@ export async function deleteProduction(id: number): Promise<void> {
 export async function listProductions(filter?: {
   type?: ProductionType;
 }): Promise<Production[]> {
+  await requireSession();
   if (filter?.type) {
     return db.query.productions.findMany({
       where: eq(schema.productions.type, filter.type),
@@ -176,6 +176,7 @@ export async function listProductions(filter?: {
 }
 
 export async function getProduction(id: number) {
+  await requireSession();
   const production = await db.query.productions.findFirst({
     where: eq(schema.productions.id, id),
   });
@@ -205,6 +206,7 @@ export async function getProduction(id: number) {
 }
 
 export async function getProductionByEntryId(entryId: number) {
+  await requireSession();
   const entry = await db.query.calendarEntries.findFirst({
     where: eq(schema.calendarEntries.id, entryId),
   });

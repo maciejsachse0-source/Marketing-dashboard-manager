@@ -2,10 +2,12 @@
 
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { saveText } from '@/lib/files';
+import { requireSession } from '@/lib/auth';
 import { outreachInputSchema, type OutreachInput } from './schemas';
 import { touchLastContact } from './artists';
 
 export async function saveOutreach(input: OutreachInput) {
+  await requireSession();
   const parsed = outreachInputSchema.parse(input);
   const md = `---
 artistId: ${parsed.artistId}

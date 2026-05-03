@@ -2,11 +2,14 @@ import { NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { saveBuffer } from '@/lib/files';
 import { db, schema } from '@/lib/db';
+import { getSessionEmail } from '@/lib/auth';
 import { detectCsvSource, parseCsvBuffer } from '@/lib/csv-parser';
 import { normalizeRow, isLikelyMatch, type NormalizedPost } from '@/lib/csv-mappers';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const MAX_BYTES = 50 * 1024 * 1024;
 
 type PreviewRow =
   | {
@@ -32,6 +35,9 @@ type PreviewRow =
     };
 
 export async function POST(req: NextRequest) {
+  const email = await getSessionEmail();
+  if (!email) return Response.json({ error: 'unauthorized' }, { status: 401 });
+
   const url = new URL(req.url);
   const dryRun = url.searchParams.get('dryRun') === 'true';
 
@@ -39,6 +45,9 @@ export async function POST(req: NextRequest) {
   const file = form.get('file');
   if (!(file instanceof File)) {
     return Response.json({ error: 'Missing file' }, { status: 400 });
+  }
+  if (file.size > MAX_BYTES) {
+    return Response.json({ error: 'File too large (>50MB)' }, { status: 413 });
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
@@ -148,65 +157,63 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Commit phase — persist file + upload + rows + posts
+  // Commit phase — file save outside the transaction (idempotent on retry,
+  // and FS writes can't be rolled back anyway). DB operations all-or-nothing
+  // inside a single transaction so a mid-loop failure doesn't leave
+  // csv_uploads.row_count saying 100 while only 50 posts were upserted.
   const path = await saveBuffer('csv', file.name, buf);
-  const [upload] = await db
-    .insert(schema.csvUploads)
-    .values({ filename: file.name, source: detected, rowCount: rows.length })
-    .returning();
 
-  if (rows.length === 0) {
-    return Response.json({
-      uploadId: upload.id,
-      source: detected,
-      rowCount: 0,
-      path,
-      created: 0,
-      updated: 0,
-      skipped: 0,
-    });
-  }
+  const uploadId = await db.transaction(async (tx) => {
+    const [upload] = await tx
+      .insert(schema.csvUploads)
+      .values({ filename: file.name, source: detected, rowCount: rows.length })
+      .returning();
 
-  const insertedRows = await db
-    .insert(schema.csvRows)
-    .values(rows.map((data) => ({ uploadId: upload.id, data: data as Record<string, unknown> })))
-    .returning({ id: schema.csvRows.id });
+    if (rows.length === 0) return upload.id;
 
-  for (let i = 0; i < plan.length; i++) {
-    const { normalized, matchId } = plan[i];
-    const csvRowId = insertedRows[i]?.id ?? null;
-    if (!normalized) continue;
-    const metrics = collectMetrics(normalized);
+    const insertedRows = await tx
+      .insert(schema.csvRows)
+      .values(rows.map((data) => ({ uploadId: upload.id, data: data as Record<string, unknown> })))
+      .returning({ id: schema.csvRows.id });
 
-    if (matchId !== null) {
-      const match = candidates.find((p) => p.id === matchId)!;
-      const updates: Record<string, unknown> = { rawCsvRowId: csvRowId };
-      for (const [k, v] of Object.entries(metrics)) {
-        if (v === null) continue;
-        const existing = (match as Record<string, unknown>)[k];
-        if (existing === null || existing === undefined) {
-          updates[k] = v;
-        } else if (typeof existing === 'number' && typeof v === 'number' && v > existing) {
-          updates[k] = v;
+    for (let i = 0; i < plan.length; i++) {
+      const { normalized, matchId } = plan[i];
+      const csvRowId = insertedRows[i]?.id ?? null;
+      if (!normalized) continue;
+      const metrics = collectMetrics(normalized);
+
+      if (matchId !== null) {
+        const match = candidates.find((p) => p.id === matchId)!;
+        const updates: Record<string, unknown> = { rawCsvRowId: csvRowId };
+        for (const [k, v] of Object.entries(metrics)) {
+          if (v === null) continue;
+          const existing = (match as Record<string, unknown>)[k];
+          if (existing === null || existing === undefined) {
+            updates[k] = v;
+          } else if (typeof existing === 'number' && typeof v === 'number' && v > existing) {
+            updates[k] = v;
+          }
         }
+        if (Object.keys(updates).length > 1) {
+          await tx.update(schema.posts).set(updates).where(eq(schema.posts.id, matchId));
+        }
+      } else {
+        await tx.insert(schema.posts).values({
+          title: normalized.title,
+          platform: normalized.platform,
+          publishedAt: normalized.publishedAt,
+          caption: '',
+          ...metrics,
+          rawCsvRowId: csvRowId,
+        });
       }
-      if (Object.keys(updates).length > 1) {
-        await db.update(schema.posts).set(updates).where(eq(schema.posts.id, matchId));
-      }
-    } else {
-      await db.insert(schema.posts).values({
-        title: normalized.title,
-        platform: normalized.platform,
-        publishedAt: normalized.publishedAt,
-        caption: '',
-        ...metrics,
-        rawCsvRowId: csvRowId,
-      });
     }
-  }
+
+    return upload.id;
+  });
 
   return Response.json({
-    uploadId: upload.id,
+    uploadId,
     source: detected,
     rowCount: rows.length,
     path,

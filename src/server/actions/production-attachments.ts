@@ -3,6 +3,7 @@
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import { saveProductionAttachment } from '@/lib/production-files';
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
@@ -12,6 +13,7 @@ export async function uploadProductionAttachment(
   stage: string,
   formData: FormData,
 ): Promise<{ ok: true; filename: string } | { ok: false; error: string }> {
+  await requireSession();
   const file = formData.get('file');
   if (!(file instanceof File)) return { ok: false, error: 'Brak pliku' };
   if (file.size === 0) return { ok: false, error: 'Plik jest pusty' };

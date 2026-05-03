@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import {
   WORK_STAGES,
   type WorkStage,
@@ -48,6 +49,7 @@ export async function openProductionFolder(
   productionId: number,
   stage: WorkStage,
 ): Promise<Result> {
+  await requireSession();
   if (!isValidStage(stage)) return { ok: false, error: `Nieznana faza: ${stage}` };
 
   const ctx = await loadProductionWithArtist(productionId);
@@ -94,6 +96,7 @@ export async function openProductionFolder(
 export async function getProductionFolderStats(
   productionId: number,
 ): Promise<{ stage: WorkStage; fileCount: number }[]> {
+  await requireSession();
   const ctx = await loadProductionWithArtist(productionId);
   if (!ctx || !ctx.artist) return WORK_STAGES.map((stage) => ({ stage, fileCount: 0 }));
   return countWorkFolderFiles(ctx.artist.name, ctx.production.title);

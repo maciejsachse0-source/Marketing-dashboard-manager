@@ -3,6 +3,7 @@
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import { campaignInputSchema, type CampaignInput } from './schemas';
 import { getMarketingTemplate } from '@/lib/campaign-templates';
 import type {
@@ -18,6 +19,7 @@ import {
 export async function createCampaign(
   input: CampaignInput & { templateSlug?: string | null },
 ) {
+  await requireSession();
   const { templateSlug, ...rest } = input;
   const parsed = campaignInputSchema.parse(rest);
 
@@ -75,6 +77,7 @@ export async function createCampaign(
 }
 
 export async function updateCampaign(id: number, input: Partial<CampaignInput>) {
+  await requireSession();
   const parsed = campaignInputSchema.partial().parse(input);
   const { releaseAt, ...rest } = parsed;
   const [row] = await db
@@ -88,11 +91,13 @@ export async function updateCampaign(id: number, input: Partial<CampaignInput>) 
 }
 
 export async function deleteCampaign(id: number) {
+  await requireSession();
   await db.delete(schema.campaigns).where(eq(schema.campaigns.id, id));
   revalidatePath('/campaigns');
 }
 
 export async function listCampaigns() {
+  await requireSession();
   return db.query.campaigns.findMany({ orderBy: schema.campaigns.releaseAt });
 }
 
@@ -106,6 +111,7 @@ export async function updateCampaignPeriods(
   campaignId: number,
   periods: TemplatePeriod[],
 ) {
+  await requireSession();
   const parsed = periodsSchema.parse(periods);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -144,6 +150,7 @@ export async function applyTemplateToCampaign(
   campaignId: number,
   templateSlug: string,
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -196,6 +203,7 @@ export async function toggleCampaignMilestone(
   milestoneId: string,
   submilestoneId?: string,
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -238,6 +246,7 @@ export async function cascadeCampaignMilestonesTo(
   milestoneId: string,
   mode: 'mark' | 'unmark',
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -314,6 +323,7 @@ export async function cascadeCampaignMilestone(
   milestoneId: string,
   mode: 'mark' | 'unmark',
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -349,6 +359,7 @@ export async function updateCampaignMilestone(
   milestoneId: string,
   patch: { label?: string; description?: string | null },
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -386,6 +397,7 @@ export async function updateCampaignSubmilestone(
   submilestoneId: string,
   patch: { label?: string; description?: string | null },
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -432,6 +444,7 @@ export async function addCampaignMilestone(
   period: string,
   label: string,
 ) {
+  await requireSession();
   if (!label.trim()) throw new Error('Nazwa milestone\'u nie może być pusta.');
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -462,6 +475,7 @@ export async function addCampaignSubmilestone(
   milestoneId: string,
   label: string,
 ) {
+  await requireSession();
   if (!label.trim()) throw new Error('Nazwa kroku nie może być pusta.');
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -493,6 +507,7 @@ export async function deleteCampaignMilestone(
   campaignId: number,
   milestoneId: string,
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -513,6 +528,7 @@ export async function deleteCampaignSubmilestone(
   milestoneId: string,
   submilestoneId: string,
 ) {
+  await requireSession();
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });

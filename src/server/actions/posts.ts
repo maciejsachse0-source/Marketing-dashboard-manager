@@ -3,9 +3,11 @@
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import { postInputSchema, type PostInput } from './schemas';
 
 export async function createPost(input: PostInput) {
+  await requireSession();
   const parsed = postInputSchema.parse(input);
   const [row] = await db
     .insert(schema.posts)
@@ -37,6 +39,7 @@ export async function updatePostMetrics(
     rawCsvRowId: number;
   }>,
 ) {
+  await requireSession();
   const [row] = await db
     .update(schema.posts)
     .set(metrics)
@@ -47,10 +50,12 @@ export async function updatePostMetrics(
 }
 
 export async function deletePost(id: number) {
+  await requireSession();
   await db.delete(schema.posts).where(eq(schema.posts.id, id));
   revalidatePath('/analytics');
 }
 
 export async function listPosts() {
+  await requireSession();
   return db.query.posts.findMany({ orderBy: schema.posts.publishedAt });
 }

@@ -32,3 +32,9 @@ export async function getSessionEmail(): Promise<string | null> {
   const token = store.get(AUTH_COOKIE)?.value;
   return verifySessionToken(token);
 }
+
+export async function requireSession(): Promise<string> {
+  const email = await getSessionEmail();
+  if (!email) throw new Error('UNAUTHORIZED');
+  return email;
+}

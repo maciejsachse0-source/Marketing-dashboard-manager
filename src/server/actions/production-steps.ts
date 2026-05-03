@@ -1,8 +1,9 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import { saveProductionAttachment } from '@/lib/production-files';
 import {
   cloneTemplateSteps,
@@ -66,6 +67,7 @@ export async function applyTemplateToProduction(
   productionId: number,
   templateSlug: string,
 ): Promise<Result> {
+  await requireSession();
   const tpl = await getTemplate(templateSlug);
   if (!tpl) return { ok: false, error: `Szablon "${templateSlug}" nie istnieje` };
   const steps = cloneTemplateSteps(tpl.steps);
@@ -86,6 +88,7 @@ export async function addStepToProduction(
   label: string,
   description?: string,
 ): Promise<{ ok: true; stepId: string } | { ok: false; error: string }> {
+  await requireSession();
   const trimmed = label.trim();
   if (!trimmed) return { ok: false, error: 'Etykieta nie może być pusta' };
   if (trimmed.length > 80) return { ok: false, error: 'Maks. 80 znaków' };
@@ -130,6 +133,7 @@ export async function removeStepFromProduction(
   productionId: number,
   stepId: string,
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -144,6 +148,7 @@ export async function renameStep(
   stepId: string,
   label: string,
 ): Promise<Result> {
+  await requireSession();
   const trimmed = label.trim();
   if (!trimmed) return { ok: false, error: 'Etykieta nie może być pusta' };
   if (trimmed.length > 80) return { ok: false, error: 'Maks. 80 znaków' };
@@ -163,6 +168,7 @@ export async function updateStepDescription(
   stepId: string,
   description: string,
 ): Promise<Result> {
+  await requireSession();
   const trimmed = description.trim();
   if (trimmed.length > 1000) return { ok: false, error: 'Maks. 1000 znaków' };
   const prod = await loadProduction(productionId);
@@ -183,6 +189,7 @@ export async function moveStepInProduction(
   stepId: string,
   direction: 'up' | 'down',
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -223,6 +230,7 @@ export async function cascadeStepsTo(
   stepId: string,
   mode: 'mark' | 'unmark',
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   if (prod.cancelledAt) return { ok: false, error: 'Produkcja anulowana' };
@@ -249,6 +257,7 @@ export async function toggleStepDone(
   productionId: number,
   stepId: string,
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   if (prod.cancelledAt) return { ok: false, error: 'Produkcja anulowana' };
@@ -345,6 +354,7 @@ export async function setStepDate(
   stepId: string,
   dateIso: string | null,
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -418,6 +428,7 @@ export async function attachFileToStep(
   stepId: string,
   formData: FormData,
 ): Promise<Result> {
+  await requireSession();
   const file = formData.get('file');
   if (!(file instanceof File)) return { ok: false, error: 'Brak pliku' };
   if (file.size === 0) return { ok: false, error: 'Pusty plik' };
@@ -446,6 +457,7 @@ export async function removeStepAttachment(
   productionId: number,
   stepId: string,
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -477,6 +489,7 @@ export async function shiftProductionT1Start(
   productionId: number,
   newT1StartIso: string,
 ): Promise<Result> {
+  await requireSession();
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
 
@@ -505,27 +518,29 @@ export async function shiftProductionT1Start(
   };
   const shiftIso = (iso: string): string => shiftDate(new Date(iso)).toISOString();
 
-  // 1) Shift t0At + step.dateIso
   const nextSteps = (prod.steps ?? []).map((s) =>
     s.dateIso ? { ...s, dateIso: shiftIso(s.dateIso) } : s,
   );
-  await db
-    .update(schema.productions)
-    .set({ t0At: shiftDate(prod.t0At), steps: nextSteps })
-    .where(eq(schema.productions.id, productionId));
 
-  // 2) Shift every linked calendar entry. Step-tagged entries follow
-  //    `[step:<id>]` in description; bulk update by productionId is fine —
-  //    every entry attached to the production should move together.
-  const entries = await db.query.calendarEntries.findMany({
-    where: eq(schema.calendarEntries.productionId, productionId),
-  });
-  for (const e of entries) {
-    await db
+  // Atomic shift: production t0At/steps + every linked calendar entry move
+  // together. Prior implementation looped per-row outside any transaction —
+  // a mid-loop failure would leave the production shifted but some calendar
+  // entries still on old dates. Single SQL with interval arithmetic keeps
+  // the entry shift O(1) round trips and atomic with the production update.
+  await db.transaction(async (tx) => {
+    await tx
+      .update(schema.productions)
+      .set({ t0At: shiftDate(prod.t0At), steps: nextSteps })
+      .where(eq(schema.productions.id, productionId));
+
+    await tx
       .update(schema.calendarEntries)
-      .set({ startsAt: shiftDate(e.startsAt), endsAt: shiftDate(e.endsAt) })
-      .where(eq(schema.calendarEntries.id, e.id));
-  }
+      .set({
+        startsAt: sql`${schema.calendarEntries.startsAt} + (${deltaDays} * interval '1 day')`,
+        endsAt: sql`${schema.calendarEntries.endsAt} + (${deltaDays} * interval '1 day')`,
+      })
+      .where(eq(schema.calendarEntries.productionId, productionId));
+  });
 
   bumpRevalidate(productionId);
   return { ok: true };
@@ -537,6 +552,7 @@ export async function setProductionCancelled(
   productionId: number,
   cancelled: boolean,
 ): Promise<Result> {
+  await requireSession();
   await db
     .update(schema.productions)
     .set({ cancelledAt: cancelled ? new Date() : null })

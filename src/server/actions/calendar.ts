@@ -3,6 +3,7 @@
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { requireSession } from '@/lib/auth';
 import {
   calendarEntryInputSchema,
   calendarEntryUpdateSchema,
@@ -14,6 +15,7 @@ function toDate(s: string): Date {
 }
 
 export async function createCalendarEntry(input: CalendarEntryInput) {
+  await requireSession();
   const parsed = calendarEntryInputSchema.parse(input);
   const [row] = await db
     .insert(schema.calendarEntries)
@@ -36,6 +38,7 @@ export async function createCalendarEntry(input: CalendarEntryInput) {
 }
 
 export async function updateCalendarEntry(input: unknown) {
+  await requireSession();
   const parsed = calendarEntryUpdateSchema.parse(input);
   const { id, startsAt, endsAt, ...rest } = parsed;
   const [row] = await db
@@ -53,12 +56,14 @@ export async function updateCalendarEntry(input: unknown) {
 }
 
 export async function deleteCalendarEntry(id: number) {
+  await requireSession();
   await db.delete(schema.calendarEntries).where(eq(schema.calendarEntries.id, id));
   revalidatePath('/calendar');
   revalidatePath('/');
 }
 
 export async function listCalendarEntries() {
+  await requireSession();
   return db.query.calendarEntries.findMany({
     orderBy: schema.calendarEntries.startsAt,
   });

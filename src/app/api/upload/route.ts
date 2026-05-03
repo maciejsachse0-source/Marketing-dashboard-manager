@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { saveBuffer, type FileCategory } from '@/lib/files';
+import { getSessionEmail } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,9 @@ const categorySchema = z.enum(['assets', 'briefs', 'csv', 'outreach']);
 const MAX_BYTES = 100 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
+  const email = await getSessionEmail();
+  if (!email) return Response.json({ error: 'unauthorized' }, { status: 401 });
+
   const form = await req.formData();
   const file = form.get('file');
   const categoryRaw = form.get('category');
