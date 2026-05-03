@@ -46,6 +46,7 @@ export function LoginForm() {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
+              key={state?.email ?? ''}
               id="email"
               name="email"
               type="email"

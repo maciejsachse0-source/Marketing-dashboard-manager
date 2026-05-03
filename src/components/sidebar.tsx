@@ -83,8 +83,6 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
     setMobileOpen(false);
   }, [pathname]);
 
-  if (pathname === '/login') return null;
-
   useEffect(() => {
     if (!mobileOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -93,6 +91,8 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileOpen]);
+
+  if (pathname === '/login') return null;
 
   return (
     <>
