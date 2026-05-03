@@ -9,7 +9,7 @@ import { loginAction, type LoginState } from '@/server/actions/auth';
 
 const initialState: LoginState = undefined;
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(loginAction, initialState);
 
   return (
@@ -43,10 +43,10 @@ export function LoginForm() {
         </p>
 
         <form action={action} className="relative flex flex-col gap-4">
+          {next ? <input type="hidden" name="next" value={next} /> : null}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
-              key={state?.email ?? ''}
               id="email"
               name="email"
               type="email"

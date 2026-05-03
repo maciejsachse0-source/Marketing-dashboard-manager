@@ -31,7 +31,16 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   }
 
   await createSession(email);
-  redirect('/');
+  // Honour ?next= so users who deep-linked into a gated page land back
+  // there. Strict relative-path check rejects open-redirect payloads
+  // (`//attacker.com`, `https://...`) and anything that doesn't start
+  // with a single slash.
+  const nextRaw = formData.get('next');
+  const safeNext =
+    typeof nextRaw === 'string' && nextRaw.startsWith('/') && !nextRaw.startsWith('//')
+      ? nextRaw
+      : '/';
+  redirect(safeNext);
 }
 
 export async function logoutAction(): Promise<void> {

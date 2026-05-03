@@ -16,6 +16,7 @@ function safeName(name: string): string {
     .replace(/[^a-zA-Z0-9._-]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
+    .replace(/^\.+$/, '')
     .toLowerCase()
     .slice(0, 120);
 }

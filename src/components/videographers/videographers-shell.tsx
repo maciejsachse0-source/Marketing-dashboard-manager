@@ -34,7 +34,7 @@ export function VideographersShell({ rows }: { rows: VideographerRow[] }) {
     setDialogOpen(true);
   };
 
-  useShortcut('n', () => openCreate(), []);
+  useShortcut('n', () => openCreate());
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

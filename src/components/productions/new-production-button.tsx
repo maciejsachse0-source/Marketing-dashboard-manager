@@ -22,7 +22,7 @@ export function NewProductionButton({
 }) {
   const [open, setOpen] = useState(false);
 
-  useShortcut('p', () => setOpen(true), []);
+  useShortcut('p', () => setOpen(true));
 
   return (
     <>

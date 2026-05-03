@@ -71,9 +71,11 @@ export default async function CampaignDetailPage({
   }));
 
   const totalReach = posts.reduce((sum, p) => sum + (p.reach ?? 0), 0);
+  const ersPosts = posts.filter((p) => p.engagementRate !== null);
   const avgER =
-    posts.filter((p) => p.engagementRate !== null).reduce((s, p) => s + (p.engagementRate ?? 0), 0) /
-    Math.max(1, posts.filter((p) => p.engagementRate !== null).length);
+    ersPosts.length > 0
+      ? ersPosts.reduce((s, p) => s + (p.engagementRate ?? 0), 0) / ersPosts.length
+      : null;
 
   const kpis = (campaign.kpis ?? {}) as Record<string, string | number>;
   const targetReach = Number(kpis.reach ?? 0);
@@ -126,9 +128,9 @@ export default async function CampaignDetailPage({
           />
           <KpiCard
             label="Średni ER"
-            value={posts.length === 0 ? '—' : `${avgER.toFixed(1)}%`}
+            value={avgER === null ? '—' : `${avgER.toFixed(1)}%`}
             target={targetER > 0 ? `${targetER}%` : undefined}
-            progress={targetER > 0 && posts.length > 0 ? Math.min(100, (avgER / targetER) * 100) : undefined}
+            progress={targetER > 0 && avgER !== null ? Math.min(100, (avgER / targetER) * 100) : undefined}
           />
           <KpiCard label="Posty kampanii" value={`${posts.length}`} target={undefined} />
         </div>

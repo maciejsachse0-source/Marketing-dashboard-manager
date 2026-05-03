@@ -1,4 +1,5 @@
 import 'server-only';
+import { timingSafeEqual } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { AUTH_COOKIE, buildSessionToken, verifySessionToken } from './auth-token';
 
@@ -7,7 +8,11 @@ const AUTH_PASSWORD = process.env.AUTH_PASSWORD ?? 'demo';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export function checkCredentials(email: string, password: string): boolean {
-  return email.trim().toLowerCase() === AUTH_EMAIL.toLowerCase() && password === AUTH_PASSWORD;
+  if (email.trim().toLowerCase() !== AUTH_EMAIL.trim().toLowerCase()) return false;
+  const a = Buffer.from(password);
+  const b = Buffer.from(AUTH_PASSWORD);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export async function createSession(email: string): Promise<void> {

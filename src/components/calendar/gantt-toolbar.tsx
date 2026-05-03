@@ -148,7 +148,7 @@ export function GanttToolbar({
     router.push(`/calendar${qs ? `?${qs}` : ''}`);
   };
 
-  useShortcut('p', () => setWizardOpen(true), []);
+  useShortcut('p', () => setWizardOpen(true));
 
   const filtersActive =
     statusFilter !== 'all' || typeFilter !== 'all' || sortKey !== 't0';

@@ -73,7 +73,10 @@ export type PostInput = z.infer<typeof postInputSchema>;
 export const outreachInputSchema = z.object({
   artistId: z.number().int().positive(),
   type: z.string().min(1).max(60),
-  subject: z.string().min(1).max(300),
+  // Reject newlines so the subject can be safely interpolated into the YAML
+  // frontmatter via JSON.stringify without producing a multi-line YAML scalar
+  // that consumers can't parse.
+  subject: z.string().min(1).max(300).regex(/^[^\n\r]+$/, 'Temat nie może zawierać nowej linii'),
   body: z.string().min(1),
   filename: z.string().min(1).max(200),
 });

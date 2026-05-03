@@ -1,4 +1,4 @@
-import { eq, count } from 'drizzle-orm';
+import { count, isNotNull } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { ArtistsShell, type ArtistRow } from '@/components/artists/artists-shell';
 import { db, schema } from '@/lib/db';
@@ -7,28 +7,28 @@ import { listOutreachFiles, outreachFilesForArtist } from '@/lib/outreach-files'
 export const dynamic = 'force-dynamic';
 
 export default async function ArtistsPage() {
-  const [artists, allOutreach] = await Promise.all([
+  // One groupBy beats N+1 SELECTs — was issuing one count() per artist.
+  const [artists, allOutreach, collabRows] = await Promise.all([
     db.query.artists.findMany({ orderBy: schema.artists.name }),
     listOutreachFiles(),
+    db
+      .select({ id: schema.calendarEntries.artistId, value: count() })
+      .from(schema.calendarEntries)
+      .where(isNotNull(schema.calendarEntries.artistId))
+      .groupBy(schema.calendarEntries.artistId),
   ]);
 
-  const rows: ArtistRow[] = await Promise.all(
-    artists.map(async (artist) => {
-      const collabs = await db
-        .select({ value: count() })
-        .from(schema.calendarEntries)
-        .where(eq(schema.calendarEntries.artistId, artist.id));
-      return {
-        artist,
-        collabCount: collabs[0]?.value ?? 0,
-        outreachFiles: outreachFilesForArtist(artist.name, allOutreach).map((f) => ({
-          filename: f.filename,
-          path: f.path,
-          modifiedAt: f.modifiedAt.toISOString(),
-        })),
-      };
-    }),
-  );
+  const collabsByArtist = new Map(collabRows.map((r) => [r.id, r.value]));
+
+  const rows: ArtistRow[] = artists.map((artist) => ({
+    artist,
+    collabCount: collabsByArtist.get(artist.id) ?? 0,
+    outreachFiles: outreachFilesForArtist(artist.name, allOutreach).map((f) => ({
+      filename: f.filename,
+      path: f.path,
+      modifiedAt: f.modifiedAt.toISOString(),
+    })),
+  }));
 
   return (
     <PageShell title="Artyści" description="Baza kolab + historia kontaktów.">

@@ -1,4 +1,4 @@
-import { eq, count } from 'drizzle-orm';
+import { count, isNotNull } from 'drizzle-orm';
 import { Users, Camera, Briefcase } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { ArtistsShell, type ArtistRow } from '@/components/artists/artists-shell';
@@ -13,42 +13,42 @@ import { listOutreachFiles, outreachFilesForArtist } from '@/lib/outreach-files'
 export const dynamic = 'force-dynamic';
 
 export default async function TeamPage() {
-  const [artists, videographers, allOutreach] = await Promise.all([
-    db.query.artists.findMany({ orderBy: schema.artists.name }),
-    db.query.videographers.findMany({ orderBy: schema.videographers.name }),
-    listOutreachFiles(),
-  ]);
-
-  const artistRows: ArtistRow[] = await Promise.all(
-    artists.map(async (artist) => {
-      const collabs = await db
-        .select({ value: count() })
+  // One groupBy per table beats N+1 SELECTs — replaces the previous
+  // per-artist + per-videographer count() round trips.
+  const [artists, videographers, allOutreach, artistCollabRows, videoProductionRows] =
+    await Promise.all([
+      db.query.artists.findMany({ orderBy: schema.artists.name }),
+      db.query.videographers.findMany({ orderBy: schema.videographers.name }),
+      listOutreachFiles(),
+      db
+        .select({ id: schema.calendarEntries.artistId, value: count() })
         .from(schema.calendarEntries)
-        .where(eq(schema.calendarEntries.artistId, artist.id));
-      return {
-        artist,
-        collabCount: collabs[0]?.value ?? 0,
-        outreachFiles: outreachFilesForArtist(artist.name, allOutreach).map((f) => ({
-          filename: f.filename,
-          path: f.path,
-          modifiedAt: f.modifiedAt.toISOString(),
-        })),
-      };
-    }),
-  );
-
-  const videographerRows: VideographerRow[] = await Promise.all(
-    videographers.map(async (videographer) => {
-      const productions = await db
-        .select({ value: count() })
+        .where(isNotNull(schema.calendarEntries.artistId))
+        .groupBy(schema.calendarEntries.artistId),
+      db
+        .select({ id: schema.productions.videographerId, value: count() })
         .from(schema.productions)
-        .where(eq(schema.productions.videographerId, videographer.id));
-      return {
-        videographer,
-        productionCount: productions[0]?.value ?? 0,
-      };
-    }),
-  );
+        .where(isNotNull(schema.productions.videographerId))
+        .groupBy(schema.productions.videographerId),
+    ]);
+
+  const collabsByArtist = new Map(artistCollabRows.map((r) => [r.id, r.value]));
+  const productionsByVideographer = new Map(videoProductionRows.map((r) => [r.id, r.value]));
+
+  const artistRows: ArtistRow[] = artists.map((artist) => ({
+    artist,
+    collabCount: collabsByArtist.get(artist.id) ?? 0,
+    outreachFiles: outreachFilesForArtist(artist.name, allOutreach).map((f) => ({
+      filename: f.filename,
+      path: f.path,
+      modifiedAt: f.modifiedAt.toISOString(),
+    })),
+  }));
+
+  const videographerRows: VideographerRow[] = videographers.map((videographer) => ({
+    videographer,
+    productionCount: productionsByVideographer.get(videographer.id) ?? 0,
+  }));
 
   return (
     <PageShell

@@ -24,6 +24,16 @@ import type { GanttRow } from '@/components/calendar/gantt-view';
 
 const CANONICAL_STAGE_SET = new Set<string>(PRODUCTION_PROGRESSION);
 
+/** Parse the ?week= search param, falling back to a sane default on invalid
+ *  input. Without this, `?week=garbage` produces an `Invalid Date` that
+ *  propagates into Drizzle as a runtime exception → 500 page. */
+function parseWeekParam(raw: string | undefined): Date {
+  const fallback = addDays(new Date(), -7);
+  if (!raw) return fallback;
+  const d = new Date(raw);
+  return Number.isFinite(d.getTime()) ? d : fallback;
+}
+
 /** Synthesize the legacy GanttRow shape from a production's `steps[]` so the
  *  gantt — which still renders against that shape internally — keeps working
  *  during the cleanup window. After Phase 6 the gantt switches to consuming
@@ -157,7 +167,7 @@ export default async function CalendarPage({
   // with T-0 in the next ~7 days are visible. With T-0 = today + 7d, T1 sits at
   // today - 7..-1d, T2 at today..+6d, T3 at today+7..+13d. Starting 1 week back
   // (last Monday) puts T1 at strip-week-1, T2 at strip-week-2, T3 at strip-week-3.
-  const baseDate = sp.week ? new Date(sp.week) : addDays(new Date(), -7);
+  const baseDate = parseWeekParam(sp.week);
   const weekStart = startOfWeek(baseDate);
   const rangeStart = weekStart;
   const rangeEnd = endOfDay(addDays(weekStart, zoom * 7 - 1));
