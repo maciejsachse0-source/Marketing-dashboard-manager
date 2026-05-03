@@ -259,13 +259,14 @@ export function HelpDialog() {
                 przypadek.
               </Tip>
               <Tip>
-                Domyślny korzeń to{' '}
-                <Code>
-                  C:\Users\&lt;user&gt;\OneDrive\Dokument\MARKETPLACE
-                  DOCS\Marketing Content
-                </Code>
-                . Można nadpisać zmienną środowiskową{' '}
-                <Code>MARKETING_CONTENT_ROOT</Code>.
+                Korzeń wykrywa się automatycznie z OneDrive zalogowanego
+                użytkownika Windows (zmienna <Code>OneDrive</Code>) i sklejany
+                jest z ogonem{' '}
+                <Code>\MARKETPLACE DOCS\Marketing Content</Code>. Każdy user
+                ma ten folder zsynchronizowany w korzeniu swojego OneDrive,
+                więc działa zero-config na różnych maszynach. W razie
+                niestandardowego setupu można nadpisać zmienną{' '}
+                <Code>MARKETING_CONTENT_ROOT</Code> w <Code>.env.local</Code>.
               </Tip>
             </Section>
           </div>

@@ -22,14 +22,44 @@ import { join, normalize, sep } from 'node:path';
  *
  * T1 is communication-only (outreach + ustalenia) so it gets no folder.
  *
- * Override the root via `MARKETING_CONTENT_ROOT` env var; default targets
- * the user's OneDrive Polish "Dokument" tree.
+ * Resolution order for the root:
+ *   1. `MARKETING_CONTENT_ROOT` env var (explicit override — wins always)
+ *   2. `<OneDrive>\MARKETPLACE DOCS\Marketing Content` — auto-detected from
+ *      the per-user OneDrive env vars Windows sets automatically. Works
+ *      across machines/accounts because the shared `MARKETPLACE DOCS`
+ *      folder is synced to each user's OneDrive root.
+ *   3. Hardcoded fallback (rarely hit) — keeps the app from crashing on
+ *      machines without OneDrive while still surfacing "folder missing"
+ *      errors at the call site.
  */
 
-const DEFAULT_ROOT = 'C:\\Users\\Hp omen\\OneDrive\\Dokument\\MARKETPLACE DOCS\\Marketing Content';
+const FOLDER_TAIL = ['MARKETPLACE DOCS', 'Marketing Content'] as const;
+const HARDCODED_FALLBACK = 'C:\\Users\\Hp omen\\OneDrive\\MARKETPLACE DOCS\\Marketing Content';
+
+function detectOneDriveRoot(): string | null {
+  // Windows sets one of these automatically per signed-in profile:
+  //   OneDrive            — primary OneDrive (consumer or business)
+  //   OneDriveConsumer    — personal OneDrive when both are present
+  //   OneDriveCommercial  — OneDrive for Business when both are present
+  const candidates = [
+    process.env.OneDrive,
+    process.env.OneDriveConsumer,
+    process.env.OneDriveCommercial,
+  ];
+  for (const c of candidates) {
+    if (c && c.trim().length > 0) return c;
+  }
+  return null;
+}
 
 function getRoot(): string {
-  return process.env.MARKETING_CONTENT_ROOT ?? DEFAULT_ROOT;
+  const override = process.env.MARKETING_CONTENT_ROOT;
+  if (override && override.trim().length > 0) return override;
+
+  const oneDrive = detectOneDriveRoot();
+  if (oneDrive) return join(oneDrive, ...FOLDER_TAIL);
+
+  return HARDCODED_FALLBACK;
 }
 
 export const WORK_STAGES = ['nagrywanie', 'obrobka', 'publikacja'] as const;
