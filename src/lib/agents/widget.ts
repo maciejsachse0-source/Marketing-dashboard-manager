@@ -1,34 +1,86 @@
 import 'server-only';
-import type { Sql } from 'postgres';
-import { db } from '../db';
+import { and, count, gte, isNull, lt, or, ne, sql } from 'drizzle-orm';
+import { db, schema } from '../db';
 import type { DashboardWidget } from './types';
 
 /**
- * Runs an agent's read-only widget query and renders the template.
- * Returns `null` if the query isn't a single SELECT (defense in depth — agent
- * JSONs can be edited by the user, so we refuse anything that could mutate
- * state). The query also runs inside a READ ONLY transaction as a belt-and-
- * suspenders measure.
+ * Runs an agent's dashboard widget. Replaces the previous tx.unsafe()
+ * approach (which executed agent-supplied SQL gated only by a regex —
+ * trivially evadable, escalated any authenticated user to read-only DB
+ * access against the postgres role). Each widget kind maps to a fixed
+ * Drizzle query here; the user controls only the template string and
+ * an optional days window.
+ *
+ * Returns `null` if the kind is unknown (silent fail keeps the dashboard
+ * rendering even with stale agent JSONs from before this refactor).
  */
 export async function runAgentWidget(widget: DashboardWidget): Promise<string | null> {
-  const trimmed = widget.query.trim().replace(/;\s*$/, '');
-  if (!/^select\s/i.test(trimmed)) return null;
-  if (/;/.test(trimmed)) return null; // refuse multi-statement strings
-
-  const sql = (db as unknown as { $client: Sql }).$client;
-  let row: Record<string, unknown> | undefined;
+  let value: number;
   try {
-    const rows = await sql.begin(async (tx) => {
-      await tx.unsafe('SET TRANSACTION READ ONLY');
-      return tx.unsafe(trimmed);
-    });
-    row = (rows as unknown as Record<string, unknown>[])[0];
+    value = await runQuery(widget);
   } catch {
     return null;
   }
-  return widget.template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    const v = row?.[key];
-    if (v === null || v === undefined) return '0';
-    return String(v);
-  });
+  return widget.template.replace(/\{\{count\}\}/g, String(value));
 }
+
+async function runQuery(widget: DashboardWidget): Promise<number> {
+  const days = widget.days ?? defaultDays(widget.kind);
+  switch (widget.kind) {
+    case 'stale-artists': {
+      const cutoff = new Date(Date.now() - days * 86_400_000);
+      const [row] = await db
+        .select({ c: count() })
+        .from(schema.artists)
+        .where(or(isNull(schema.artists.lastContactAt), lt(schema.artists.lastContactAt, cutoff)));
+      return Number(row?.c ?? 0);
+    }
+    case 'upcoming-campaigns': {
+      const [row] = await db
+        .select({ c: count() })
+        .from(schema.campaigns)
+        .where(and(ne(schema.campaigns.phase, 'done'), gte(schema.campaigns.releaseAt, new Date())));
+      return Number(row?.c ?? 0);
+    }
+    case 'overdue-calendar-entries': {
+      const [row] = await db
+        .select({ c: count() })
+        .from(schema.calendarEntries)
+        .where(
+          sql`${schema.calendarEntries.startsAt} < now() AND ${schema.calendarEntries.status} = 'planned'`,
+        );
+      return Number(row?.c ?? 0);
+    }
+    case 'recent-csv-uploads': {
+      const cutoff = new Date(Date.now() - days * 86_400_000);
+      const [row] = await db
+        .select({ c: count() })
+        .from(schema.csvUploads)
+        .where(gte(schema.csvUploads.uploadedAt, cutoff));
+      return Number(row?.c ?? 0);
+    }
+    default: {
+      const _exhaustive: never = widget.kind;
+      void _exhaustive;
+      return 0;
+    }
+  }
+}
+
+function defaultDays(kind: DashboardWidget['kind']): number {
+  switch (kind) {
+    case 'stale-artists':
+      return 14;
+    case 'recent-csv-uploads':
+      return 7;
+    default:
+      return 0;
+  }
+}
+
+export const WIDGET_KIND_LABELS: Record<DashboardWidget['kind'], string> = {
+  'stale-artists': 'Artyści bez kontaktu od N dni',
+  'upcoming-campaigns': 'Nadchodzące kampanie',
+  'overdue-calendar-entries': 'Zaległe wpisy kalendarza',
+  'recent-csv-uploads': 'CSV w ostatnich N dniach',
+};

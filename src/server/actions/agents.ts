@@ -6,8 +6,10 @@ import { safeRevalidatePath as revalidatePath } from './revalidate';
 import {
   agentDefSchema,
   AGENT_SIDE_PANELS,
+  WIDGET_KINDS,
   type AgentDef,
   type AgentSidePanel,
+  type WidgetKind,
 } from '@/lib/agents/types';
 import { getAgent, loadAgents } from '@/lib/agents';
 import { db, schema } from '@/lib/db';
@@ -19,7 +21,8 @@ export type AgentFormInput = {
   description: string;
   sidePanel: AgentSidePanel;
   systemPrompt: string;
-  dashboardWidgetQuery?: string;
+  dashboardWidgetKind?: WidgetKind | '';
+  dashboardWidgetDays?: number;
   dashboardWidgetTemplate?: string;
 };
 
@@ -29,15 +32,23 @@ const formSchema = z.object({
   description: z.string().min(1).max(280),
   sidePanel: z.enum(AGENT_SIDE_PANELS),
   systemPrompt: z.string().min(1),
-  dashboardWidgetQuery: z.string().optional(),
-  dashboardWidgetTemplate: z.string().optional(),
+  dashboardWidgetKind: z.enum(WIDGET_KINDS).or(z.literal('')).optional(),
+  dashboardWidgetDays: z.number().int().min(1).max(365).optional(),
+  dashboardWidgetTemplate: z.string().max(140).optional(),
 });
 
 function inputToDef(input: AgentFormInput, slug: string): AgentDef {
-  const widgetQuery = input.dashboardWidgetQuery?.trim();
+  const kind: WidgetKind | null =
+    input.dashboardWidgetKind && input.dashboardWidgetKind.length > 0 ? input.dashboardWidgetKind : null;
   const widgetTemplate = input.dashboardWidgetTemplate?.trim();
   const dashboardWidget =
-    widgetQuery && widgetTemplate ? { query: widgetQuery, template: widgetTemplate } : null;
+    kind && widgetTemplate
+      ? {
+          kind,
+          ...(input.dashboardWidgetDays ? { days: input.dashboardWidgetDays } : {}),
+          template: widgetTemplate,
+        }
+      : null;
   return agentDefSchema.parse({
     slug,
     name: input.name.trim(),

@@ -38,7 +38,7 @@ async function main() {
       description: string;
       systemPrompt: string;
       sidePanel: string;
-      dashboardWidget?: { query: string; template: string } | null;
+      dashboardWidget?: { kind: string; days?: number; template: string } | null;
     };
     await db
       .insert(schema.agents)

@@ -17,8 +17,10 @@ import {
 } from '@/components/ui/select';
 import {
   AGENT_SIDE_PANELS,
+  WIDGET_KINDS,
   type AgentDef,
   type AgentSidePanel,
+  type WidgetKind,
 } from '@/lib/agents/types';
 import {
   createAgent,
@@ -43,9 +45,21 @@ type State = {
   description: string;
   sidePanel: AgentSidePanel;
   systemPrompt: string;
-  widgetQuery: string;
+  widgetKind: WidgetKind | '';
+  widgetDays: string;
   widgetTemplate: string;
 };
+
+const WIDGET_KIND_LABELS: Record<WidgetKind, string> = {
+  'stale-artists': 'Artyści bez kontaktu od N dni',
+  'upcoming-campaigns': 'Nadchodzące kampanie (phase ≠ done)',
+  'overdue-calendar-entries': 'Zaległe wpisy kalendarza',
+  'recent-csv-uploads': 'CSV uploady w ostatnich N dniach',
+};
+
+function widgetTakesDays(kind: WidgetKind | ''): boolean {
+  return kind === 'stale-artists' || kind === 'recent-csv-uploads';
+}
 
 function fromAgent(agent: AgentDef | undefined, defaultSlug = ''): State {
   return {
@@ -54,7 +68,8 @@ function fromAgent(agent: AgentDef | undefined, defaultSlug = ''): State {
     description: agent?.description ?? '',
     sidePanel: agent?.sidePanel ?? 'calendar-14',
     systemPrompt: agent?.systemPrompt ?? '',
-    widgetQuery: agent?.dashboardWidget?.query ?? '',
+    widgetKind: agent?.dashboardWidget?.kind ?? '',
+    widgetDays: agent?.dashboardWidget?.days?.toString() ?? '',
     widgetTemplate: agent?.dashboardWidget?.template ?? '',
   };
 }
@@ -80,13 +95,15 @@ export function AgentForm({
 
   const submit = () => {
     setError(null);
+    const daysParsed = state.widgetDays.trim() ? Number(state.widgetDays.trim()) : undefined;
     const payload = {
       slug: state.slug.trim(),
       name: state.name.trim(),
       description: state.description.trim(),
       sidePanel: state.sidePanel,
       systemPrompt: state.systemPrompt,
-      dashboardWidgetQuery: state.widgetQuery.trim() || undefined,
+      dashboardWidgetKind: state.widgetKind || undefined,
+      dashboardWidgetDays: daysParsed && Number.isFinite(daysParsed) ? daysParsed : undefined,
       dashboardWidgetTemplate: state.widgetTemplate.trim() || undefined,
     };
     if (!payload.name) return setError('Nazwa wymagana.');
@@ -94,10 +111,10 @@ export function AgentForm({
     if (!payload.systemPrompt.trim()) return setError('System prompt wymagany.');
     if (mode === 'create' && !payload.slug) return setError('Slug wymagany.');
     if (
-      (payload.dashboardWidgetQuery && !payload.dashboardWidgetTemplate) ||
-      (!payload.dashboardWidgetQuery && payload.dashboardWidgetTemplate)
+      (payload.dashboardWidgetKind && !payload.dashboardWidgetTemplate) ||
+      (!payload.dashboardWidgetKind && payload.dashboardWidgetTemplate)
     ) {
-      return setError('Widget wymaga zarówno query jak i template (albo zostaw oba puste).');
+      return setError('Widget wymaga rodzaju i template (albo zostaw oba puste).');
     }
     startTransition(async () => {
       try {
@@ -238,28 +255,53 @@ export function AgentForm({
         </summary>
         <div className="mt-3 grid gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="widgetQuery">SQL query (read-only SELECT)</Label>
-            <Textarea
-              id="widgetQuery"
-              value={state.widgetQuery}
-              onChange={(e) => set('widgetQuery', e.target.value)}
-              rows={3}
-              className="font-mono text-xs"
-              placeholder="SELECT count(*) AS count FROM artists WHERE last_contact_at < unixepoch() * 1000 - 14*86400000"
-            />
+            <Label htmlFor="widgetKind">Rodzaj zapytania</Label>
+            <Select
+              value={state.widgetKind || '__none__'}
+              onValueChange={(v) => set('widgetKind', v === '__none__' ? '' : (v as WidgetKind))}
+            >
+              <SelectTrigger id="widgetKind">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">— brak widgetu —</SelectItem>
+                {WIDGET_KINDS.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {WIDGET_KIND_LABELS[k]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+          {widgetTakesDays(state.widgetKind) ? (
+            <div className="grid gap-1.5">
+              <Label htmlFor="widgetDays">Okno w dniach (1–365)</Label>
+              <Input
+                id="widgetDays"
+                type="number"
+                min={1}
+                max={365}
+                value={state.widgetDays}
+                onChange={(e) => set('widgetDays', e.target.value)}
+                placeholder={state.widgetKind === 'stale-artists' ? '14' : '7'}
+                className="font-mono text-xs"
+              />
+            </div>
+          ) : null}
           <div className="grid gap-1.5">
-            <Label htmlFor="widgetTemplate">Template (mustache: {'{{column}}'})</Label>
+            <Label htmlFor="widgetTemplate">Template (placeholder: {'{{count}}'})</Label>
             <Input
               id="widgetTemplate"
               value={state.widgetTemplate}
               onChange={(e) => set('widgetTemplate', e.target.value)}
               placeholder="{{count}} artystów bez kontaktu >14d"
+              maxLength={140}
               className="font-mono text-xs"
             />
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Hint pod nazwą agenta na pulpicie. Tylko SELECT — INSERT/UPDATE są blokowane.
+            Hint pod nazwą agenta na pulpicie. Wybierasz rodzaj — zapytanie do bazy jest gotowe;
+            zmieniasz tylko tekst i (gdzie ma sens) okno czasowe.
           </p>
         </div>
       </details>

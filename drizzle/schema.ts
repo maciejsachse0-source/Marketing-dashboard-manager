@@ -291,9 +291,13 @@ export const posts = pgTable('posts', {
  * `slug` is the natural primary key — it shows up in URLs and is referenced
  * by the production templates that an agent might use.
  *
- * `dashboardWidget` mirrors the legacy JSON shape: `{ query, template }` or
- * `null` when the agent has no widget. Keep as JSONB so the loader's Zod
- * schema stays the source of truth.
+ * `dashboardWidget` is `{ kind, days?, template }` or `null`. The kind is
+ * one of a fixed enum (see `src/lib/agents/types.ts` WIDGET_KINDS) — was
+ * previously a free-form `{ query, template }` SQL pair, which let any
+ * authenticated user run arbitrary SELECTs. Loader (`coerceWidget`) drops
+ * legacy rows silently so old persisted data renders as no-widget rather
+ * than crashing the dashboard. Keep as JSONB so the loader's Zod schema
+ * stays the source of truth.
  */
 export const agents = pgTable('agents', {
   slug: text('slug').primaryKey(),
@@ -301,7 +305,11 @@ export const agents = pgTable('agents', {
   description: text('description').notNull(),
   systemPrompt: text('system_prompt').notNull(),
   sidePanel: text('side_panel').notNull(),
-  dashboardWidget: jsonb('dashboard_widget').$type<{ query: string; template: string } | null>(),
+  dashboardWidget: jsonb('dashboard_widget').$type<{
+    kind: string;
+    days?: number;
+    template: string;
+  } | null>(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
