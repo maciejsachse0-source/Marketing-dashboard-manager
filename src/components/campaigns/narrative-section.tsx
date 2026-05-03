@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import type {
   CalendarEntry,
   Production,
@@ -8,6 +10,7 @@ import type {
   Artist,
 } from '../../../drizzle/schema';
 import type { TemplatePeriod } from '@/lib/production-periods';
+import { updateCampaign } from '@/server/actions/campaigns';
 import { CampaignTimeline } from './timeline';
 import { CampaignPeriodsEditor } from './campaign-periods-editor';
 
@@ -19,9 +22,9 @@ type ProductionWithArtist = Production & {
  * Glues the read-only timeline ("Wspólny plan kampanii") and the inline
  * periods editor below it via shared state. The slider mutations propagate
  * upward through `onPeriodsChange`, so the top narrative strip reflects each
- * drag in real time. The editor's "kotwica osi" date input is also lifted
- * here, so retargeting the kickoff anchor reflows the bands above without
- * a save round-trip.
+ * drag in real time. Changing the kickoff anchor in the editor below also
+ * persists `releaseAt` on the campaign — the date input used to be preview-
+ * only and silently discarded the new value on refresh, which was confusing.
  */
 export function CampaignNarrativeSection({
   campaignId,
@@ -40,6 +43,34 @@ export function CampaignNarrativeSection({
     (initialPeriods as TemplatePeriod[] | null | undefined) ?? null,
   );
   const [previewStart, setPreviewStart] = useState<Date>(kickoffAt);
+  const [savingKickoff, startKickoffSave] = useTransition();
+  const router = useRouter();
+
+  const handleKickoffChange = (next: Date) => {
+    // <input type="date"> only carries a date; preserve the existing
+    // hours/minutes so a kickoff originally set to 09:00 doesn't slip to 00:00
+    // just because the user retargeted the day.
+    const merged = new Date(next);
+    merged.setHours(
+      kickoffAt.getHours(),
+      kickoffAt.getMinutes(),
+      kickoffAt.getSeconds(),
+      kickoffAt.getMilliseconds(),
+    );
+    setPreviewStart(merged);
+    startKickoffSave(async () => {
+      try {
+        await updateCampaign(campaignId, { releaseAt: merged.toISOString() });
+        toast.success('Zaktualizowano datę startu kampanii');
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się zapisać daty', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+        setPreviewStart(kickoffAt);
+      }
+    });
+  };
 
   return (
     <>
@@ -55,7 +86,8 @@ export function CampaignNarrativeSection({
         kickoffAt={kickoffAt}
         onPeriodsChange={setLivePeriods}
         previewStart={previewStart}
-        onPreviewStartChange={setPreviewStart}
+        onPreviewStartChange={handleKickoffChange}
+        kickoffSaving={savingKickoff}
       />
     </>
   );

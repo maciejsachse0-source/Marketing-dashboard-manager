@@ -56,6 +56,7 @@ export function CampaignPeriodsEditor({
   onPeriodsChange,
   previewStart: previewStartProp,
   onPreviewStartChange,
+  kickoffSaving,
 }: {
   campaignId: number;
   initialPeriods: TemplatePeriod[] | null | undefined;
@@ -68,9 +69,14 @@ export function CampaignPeriodsEditor({
   onPeriodsChange?: (periods: TemplatePeriod[]) => void;
   /** Controlled preview anchor — when supplied, the date input is owned by
    *  the parent. Lets the timeline above react live when the user drags the
-   *  kickoff anchor in this editor. */
+   *  kickoff anchor in this editor. The parent also persists the new value
+   *  to the campaign (`releaseAt`), so this is no longer a preview-only
+   *  control. */
   previewStart?: Date;
   onPreviewStartChange?: (d: Date) => void;
+  /** True while the parent is persisting the kickoff date — drives a small
+   *  inline status next to the date input. */
+  kickoffSaving?: boolean;
 }) {
   const [periods, setPeriods] = useState<TemplatePeriod[]>(() =>
     migrateLegacy(initialPeriods),
@@ -210,7 +216,12 @@ export function CampaignPeriodsEditor({
             htmlFor="campaign-preview-start"
             className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
           >
-            Kotwica osi (podgląd dat — domyślnie data startu kampanii)
+            Data startu kampanii (kotwica osi){' '}
+            {kickoffSaving ? (
+              <span className="ml-1 text-foreground normal-case tracking-normal">
+                · zapisuję…
+              </span>
+            ) : null}
           </Label>
           <Input
             id="campaign-preview-start"
@@ -220,6 +231,7 @@ export function CampaignPeriodsEditor({
               const d = parseIsoDate(e.target.value);
               if (d) setPreviewStart(d);
             }}
+            disabled={kickoffSaving}
             className="w-fit"
           />
         </div>
