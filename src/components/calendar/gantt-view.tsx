@@ -27,6 +27,8 @@ import {
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import { ProductionStepRow } from '@/components/productions/production-step-row';
 import { AddStepInline } from '@/components/productions/add-step-inline';
+import { T1StartEditor } from '@/components/productions/t1-start-editor';
+import { getFirstPeriodStart } from '@/lib/production-steps';
 import { CampaignGanttNarrativeRow } from '@/components/campaigns/gantt-narrative-row';
 
 type DateMode = 'record' | 'calendar' | 'derived' | 'none';
@@ -2295,6 +2297,24 @@ function ExpandedDetails({
             </Link>
           </div>
         </div>
+
+        {/* Start produkcji — shifts t0At + every step + every linked calendar
+            entry by the chosen Δdays. Same component as /productions/[id]. */}
+        <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
+              Start produkcji {row.artistName ? `· ${row.artistName}` : ''}
+            </div>
+            <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed">
+              Zmień datę startu — <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
+            </p>
+          </div>
+          <T1StartEditor
+            productionId={row.id}
+            t1Start={getFirstPeriodStart(row.t0At, row.periods)}
+            disabled={row.cancelled}
+          />
+        </section>
 
         {/* T1 / T2 / T3 framed cards — same visual language as /productions/[id] */}
         <div className="space-y-5">

@@ -1,7 +1,6 @@
 'use server';
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import {
@@ -10,7 +9,8 @@ import {
   type AgentDef,
   type AgentSidePanel,
 } from '@/lib/agents/types';
-import { agentFilePath, getAgent, loadAgents } from '@/lib/agents';
+import { getAgent, loadAgents } from '@/lib/agents';
+import { db, schema } from '@/lib/db';
 
 export type AgentFormInput = {
   slug?: string;
@@ -47,11 +47,29 @@ function inputToDef(input: AgentFormInput, slug: string): AgentDef {
   });
 }
 
-function writeAgent(def: AgentDef) {
-  const file = agentFilePath(def.slug);
-  const dir = path.dirname(file);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(def, null, 2) + '\n', 'utf8');
+async function upsertAgent(def: AgentDef) {
+  await db
+    .insert(schema.agents)
+    .values({
+      slug: def.slug,
+      name: def.name,
+      description: def.description,
+      systemPrompt: def.systemPrompt,
+      sidePanel: def.sidePanel,
+      dashboardWidget: def.dashboardWidget ?? null,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: schema.agents.slug,
+      set: {
+        name: def.name,
+        description: def.description,
+        systemPrompt: def.systemPrompt,
+        sidePanel: def.sidePanel,
+        dashboardWidget: def.dashboardWidget ?? null,
+        updatedAt: new Date(),
+      },
+    });
 }
 
 function bumpRevalidations(slug?: string) {
@@ -64,9 +82,9 @@ export async function createAgent(rawInput: AgentFormInput): Promise<AgentDef> {
   const parsed = formSchema.parse(rawInput);
   const slug = parsed.slug?.trim();
   if (!slug) throw new Error('Slug jest wymagany.');
-  if (getAgent(slug)) throw new Error(`Agent o slugu "${slug}" już istnieje.`);
+  if (await getAgent(slug)) throw new Error(`Agent o slugu "${slug}" już istnieje.`);
   const def = inputToDef(parsed, slug);
-  writeAgent(def);
+  await upsertAgent(def);
   bumpRevalidations(slug);
   return def;
 }
@@ -76,20 +94,19 @@ export async function updateAgent(
   rawInput: AgentFormInput,
 ): Promise<AgentDef> {
   const parsed = formSchema.parse(rawInput);
-  if (!getAgent(slug)) throw new Error(`Agent "${slug}" nie istnieje.`);
+  if (!(await getAgent(slug))) throw new Error(`Agent "${slug}" nie istnieje.`);
   const def = inputToDef(parsed, slug);
-  writeAgent(def);
+  await upsertAgent(def);
   bumpRevalidations(slug);
   return def;
 }
 
 export async function deleteAgent(slug: string) {
-  const file = agentFilePath(slug);
-  if (!fs.existsSync(file)) throw new Error(`Agent "${slug}" nie istnieje.`);
-  if (loadAgents().length <= 1) {
+  if (!(await getAgent(slug))) throw new Error(`Agent "${slug}" nie istnieje.`);
+  if ((await loadAgents()).length <= 1) {
     throw new Error('Nie można usunąć ostatniego agenta.');
   }
-  fs.unlinkSync(file);
+  await db.delete(schema.agents).where(eq(schema.agents.slug, slug));
   bumpRevalidations();
 }
 
@@ -98,15 +115,15 @@ export async function cloneAgent(
   newSlug: string,
   newName?: string,
 ): Promise<AgentDef> {
-  const source = getAgent(sourceSlug);
+  const source = await getAgent(sourceSlug);
   if (!source) throw new Error(`Agent źródłowy "${sourceSlug}" nie istnieje.`);
-  if (getAgent(newSlug)) throw new Error(`Slug "${newSlug}" jest już zajęty.`);
+  if (await getAgent(newSlug)) throw new Error(`Slug "${newSlug}" jest już zajęty.`);
   const def = agentDefSchema.parse({
     ...source,
     slug: newSlug,
     name: newName?.trim() || `${source.name} (kopia)`,
   });
-  writeAgent(def);
+  await upsertAgent(def);
   bumpRevalidations(newSlug);
   return def;
 }

@@ -12,7 +12,7 @@ export default async function EditAgentPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgent(slug);
+  const agent = await getAgent(slug);
   if (!agent) notFound();
 
   return (

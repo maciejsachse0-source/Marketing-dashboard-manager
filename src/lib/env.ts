@@ -3,10 +3,8 @@ import { z } from 'zod';
 const emptyToUndef = (v: unknown) => (v === '' ? undefined : v);
 
 const schema = z.object({
-  DATABASE_PATH: z.preprocess(
-    emptyToUndef,
-    z.string().optional().default('./data/marketing-crew.db'),
-  ),
+  DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1, 'DATABASE_URL is required')),
+  BLOB_READ_WRITE_TOKEN: z.preprocess(emptyToUndef, z.string().optional()),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 

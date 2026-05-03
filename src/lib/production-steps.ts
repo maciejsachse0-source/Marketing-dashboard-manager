@@ -133,6 +133,19 @@ export function getStepWeekRange(
   return { start, end };
 }
 
+/** Day (00:00 local) on which the first period (T1) begins, derived from the
+ *  production's T-0 anchor + period offsets. Used by the "edit T1 start" UI as
+ *  the canonical handle for shifting the whole pipeline timeline. */
+export function getFirstPeriodStart(
+  t0At: Date,
+  periods?: TemplatePeriod[] | null,
+): Date {
+  const t0Mon = startOfWeek(t0At);
+  const resolved = periodsRelativeToT0Mon(periods);
+  const first = resolved[0];
+  return addDays(t0Mon, first.startOffsetDays);
+}
+
 /** Compute a coarse production state from `steps` + `cancelledAt`. Used by
  *  list views, pills, and filters that previously branched on `status`. */
 export type ProductionState = 'cancelled' | 'done' | 'in-progress';

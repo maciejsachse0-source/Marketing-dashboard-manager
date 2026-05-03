@@ -35,7 +35,7 @@ export async function createCampaign(
     | null = null;
   let recordedSlug: string | null = null;
   if (templateSlug) {
-    const tpl = getMarketingTemplate(templateSlug);
+    const tpl = await getMarketingTemplate(templateSlug);
     if (!tpl) throw new Error(`Szablon "${templateSlug}" nie istnieje.`);
     recordedSlug = tpl.slug;
     clonedPeriods = tpl.periods ?? null;
@@ -153,7 +153,7 @@ export async function applyTemplateToCampaign(
       `Kampania ma już szablon "${campaign.templateSlug}". Najpierw usuń szablon, potem zastosuj nowy.`,
     );
   }
-  const tpl = getMarketingTemplate(templateSlug);
+  const tpl = await getMarketingTemplate(templateSlug);
   if (!tpl) throw new Error(`Szablon "${templateSlug}" nie istnieje.`);
 
   const clonedMilestones: CampaignMilestone[] = tpl.milestones.map((m) => ({

@@ -1,26 +1,28 @@
-import 'dotenv/config';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { mkdirSync, existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+config(); // also fall through to .env if .env.local is absent
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import postgres from 'postgres';
 
-const dbPath = resolve(process.env.DATABASE_PATH ?? './data/marketing-crew.db');
-const dir = dirname(dbPath);
-if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+async function main() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    console.error('[migrate] DATABASE_URL not set');
+    process.exit(1);
+  }
 
-const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-// Turn FK OFF for migrations — Drizzle's "recreate table" pattern (used for SQLite
-// schema changes) drops/renames tables, which would otherwise violate FK pointing
-// to that table. Re-enable after.
-sqlite.pragma('foreign_keys = OFF');
+  const sql = postgres(url, { max: 1, prepare: false });
+  const db = drizzle(sql);
 
-const db = drizzle(sqlite);
+  console.log('[migrate] applying migrations');
+  await migrate(db, { migrationsFolder: './drizzle/migrations' });
+  console.log('[migrate] done');
 
-console.log(`[migrate] applying migrations to ${dbPath}`);
-migrate(db, { migrationsFolder: './drizzle/migrations' });
-console.log('[migrate] done');
+  await sql.end();
+}
 
-sqlite.pragma('foreign_keys = ON');
-sqlite.close();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

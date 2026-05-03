@@ -1,50 +1,35 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { mkdirSync, existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from '../../drizzle/schema';
 import { env } from './env';
 
 declare global {
   // eslint-disable-next-line no-var
-  var __db__: ReturnType<typeof createDb> | undefined;
+  var __dbClient__: ReturnType<typeof postgres> | undefined;
 }
 
-function createDb() {
-  const dbPath = resolve(env.DATABASE_PATH);
-  const dir = dirname(dbPath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-
-  const sqlite = new Database(dbPath);
-  sqlite.pragma('journal_mode = WAL');
-  sqlite.pragma('foreign_keys = ON');
-
-  return drizzle(sqlite, { schema });
-}
-
-// Schema-version stamp — bump when schema.ts gains/loses columns so dev-server
-// HMR doesn't keep a stale Drizzle instance with the old column set cached.
-const SCHEMA_VERSION = 'flexible-steps-v2-dropped-legacy';
-declare global {
-  // eslint-disable-next-line no-var
-  var __dbSchemaVersion__: string | undefined;
-}
-
-function getDb() {
-  if (
-    globalThis.__db__ &&
-    globalThis.__dbSchemaVersion__ === SCHEMA_VERSION
-  ) {
-    return globalThis.__db__;
-  }
-  const fresh = createDb();
+// Cache only the postgres client (TCP connection pool) on globalThis so HMR
+// reuses it instead of opening a new connection every reload. The drizzle
+// wrapper is always re-built with the freshly-imported schema — caching it
+// across HMR caused `db.query.<newTable>` to be undefined for tables added
+// to schema.ts after the dev server first started.
+function getClient() {
+  if (globalThis.__dbClient__) return globalThis.__dbClient__;
+  const client = postgres(env.DATABASE_URL, {
+    // Disable prepared statements for compatibility with serverless poolers
+    // (Neon pooled, Vercel Postgres pooled, Supabase pgbouncer in transaction mode).
+    prepare: false,
+    // Keep the pool tiny — serverless functions get short lifetimes; one
+    // active connection per warm instance is plenty.
+    max: 1,
+    idle_timeout: 20,
+  });
   if (env.NODE_ENV !== 'production') {
-    globalThis.__db__ = fresh;
-    globalThis.__dbSchemaVersion__ = SCHEMA_VERSION;
+    globalThis.__dbClient__ = client;
   }
-  return fresh;
+  return client;
 }
 
-export const db = getDb();
+export const db = drizzle(getClient(), { schema });
 
 export { schema };

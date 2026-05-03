@@ -31,7 +31,7 @@ export default async function CampaignDetailPage({
   });
   if (!campaign) notFound();
 
-  const [entries, posts, productions] = await Promise.all([
+  const [entries, posts, productions, marketingTemplates] = await Promise.all([
     db.query.calendarEntries.findMany({
       where: eq(schema.calendarEntries.campaignId, campaignId),
       orderBy: schema.calendarEntries.startsAt,
@@ -44,6 +44,7 @@ export default async function CampaignDetailPage({
       where: eq(schema.productions.campaignId, campaignId),
       orderBy: schema.productions.t0At,
     }),
+    loadMarketingTemplates(),
   ]);
 
   // Bulk-load artists referenced by the productions so the timeline can show
@@ -104,7 +105,7 @@ export default async function CampaignDetailPage({
         {!campaign.templateSlug ? (
           <ApplyTemplateButton
             campaignId={campaign.id}
-            templates={loadMarketingTemplates()}
+            templates={marketingTemplates}
           />
         ) : null}
 

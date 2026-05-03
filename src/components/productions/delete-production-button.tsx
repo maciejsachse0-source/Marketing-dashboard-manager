@@ -29,8 +29,9 @@ export function DeleteProductionButton({
         router.push(redirectTo);
         router.refresh();
       } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         console.error('[delete-production] failed', e);
-        alert('Nie udało się usunąć produkcji. Spróbuj ponownie.');
+        alert(`Nie udało się usunąć produkcji: ${msg}`);
       }
     });
   };

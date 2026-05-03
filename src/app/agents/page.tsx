@@ -5,8 +5,8 @@ import { loadAgents } from '@/lib/agents';
 
 export const dynamic = 'force-dynamic';
 
-export default function AgentsListPage() {
-  const agents = loadAgents();
+export default async function AgentsListPage() {
+  const agents = await loadAgents();
   return (
     <PageShell
       title="Agenci"

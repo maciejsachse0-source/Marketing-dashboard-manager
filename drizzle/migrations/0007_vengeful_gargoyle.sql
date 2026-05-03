@@ -1,1 +1,0 @@
-ALTER TABLE `productions` ADD `custom_steps` text;

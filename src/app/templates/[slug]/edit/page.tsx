@@ -11,7 +11,7 @@ export default async function EditTemplatePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const template = getTemplate(slug);
+  const template = await getTemplate(slug);
   if (!template) notFound();
 
   return (

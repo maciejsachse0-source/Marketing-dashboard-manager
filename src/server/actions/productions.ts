@@ -55,18 +55,21 @@ export async function createProduction(input: ProductionInput): Promise<Producti
       notes: parsed.notes ?? null,
     })
     .returning();
-  // Auto-create the per-artist work folder layout in OneDrive. Idempotent
-  // and side-effect-only — DB row is already persisted, so a transient
-  // mkdir failure (e.g. OneDrive offline) shouldn't block the production.
-  try {
-    const codes = (row.periods ?? []).map((p) => p.code);
-    ensureWorkFolderStructure(
-      artist.name,
-      row.title,
-      codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
-    );
-  } catch (err) {
-    console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
+  // Auto-create the per-artist work folder layout in OneDrive (local-dev
+  // only). DB row is already persisted, so a transient mkdir failure
+  // shouldn't block the production. Skipped on Vercel where the FS is
+  // read-only and the path doesn't exist.
+  if (!process.env.VERCEL) {
+    try {
+      const codes = (row.periods ?? []).map((p) => p.code);
+      ensureWorkFolderStructure(
+        artist.name,
+        row.title,
+        codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
+      );
+    } catch (err) {
+      console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
+    }
   }
   revalidatePath('/productions');
   revalidatePath('/calendar');
@@ -92,55 +95,72 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
 }
 
 export async function deleteProduction(id: number): Promise<void> {
-  // Snapshot the production + artist BEFORE the DB delete so we can rename
-  // the on-disk work folder afterwards. Failing to load it here is fine —
-  // the DB delete still runs, the rename is just skipped.
-  const prod = await db.query.productions.findFirst({
-    where: eq(schema.productions.id, id),
-    columns: { id: true, title: true, artistId: true },
-  });
-  const artist = prod?.artistId
-    ? await db.query.artists.findFirst({
-        where: eq(schema.artists.id, prod.artistId),
-        columns: { name: true },
-      })
-    : null;
+  console.log(`[deleteProduction] starting for id=${id}`);
+  try {
+    const prod = await db.query.productions.findFirst({
+      where: eq(schema.productions.id, id),
+      columns: { id: true, title: true, artistId: true },
+    });
+    if (!prod) throw new Error(`Produkcja #${id} nie istnieje`);
 
-  // Migration 0001 added back-references (calendar_entries.production_id,
-  // posts.production_id) without ON DELETE SET NULL, so SQLite blocks the
-  // production delete with a FK constraint. Manually null those references
-  // first — same end state as the cascade rule we wanted, just done in the
-  // app layer.
-  await db
-    .update(schema.calendarEntries)
-    .set({ productionId: null })
-    .where(eq(schema.calendarEntries.productionId, id));
-  await db
-    .update(schema.posts)
-    .set({ productionId: null })
-    .where(eq(schema.posts.productionId, id));
+    const artist = prod.artistId
+      ? await db.query.artists.findFirst({
+          where: eq(schema.artists.id, prod.artistId),
+          columns: { name: true },
+        })
+      : null;
 
-  await db.delete(schema.productions).where(eq(schema.productions.id, id));
+    // FKs from calendar_entries.production_id / posts.production_id are
+    // ON DELETE SET NULL in Postgres. Explicit nullification first so we
+    // don't depend on the cascade semantic.
+    await db
+      .update(schema.calendarEntries)
+      .set({ productionId: null })
+      .where(eq(schema.calendarEntries.productionId, id));
+    await db
+      .update(schema.posts)
+      .set({ productionId: null })
+      .where(eq(schema.posts.productionId, id));
 
-  // Rename "<Artist>/<Production>" → "<Artist>/<Production> (nieaktualne)".
-  // Best-effort — DB delete is already committed and a missing/locked
-  // folder shouldn't surface as a failure to the user.
-  if (prod && artist) {
-    try {
-      const result = markProductionFolderObsolete(artist.name, prod.title);
-      if (!result.renamed) {
-        console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
+    await db.delete(schema.productions).where(eq(schema.productions.id, id));
+    console.log(`[deleteProduction] DB delete done for id=${id}`);
+
+    // OneDrive folder rename — local-dev only.
+    if (!process.env.VERCEL && artist) {
+      try {
+        const result = markProductionFolderObsolete(artist.name, prod.title);
+        if (!result.renamed) {
+          console.info(`[deleteProduction] folder rename skipped: ${result.reason}`);
+        }
+      } catch (err) {
+        console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
       }
-    } catch (err) {
-      console.warn(`[deleteProduction] folder rename failed for "${prod.title}":`, err);
     }
+  } catch (err) {
+    console.error('[deleteProduction] DB phase failed:', err);
+    throw err;
   }
 
-  revalidatePath('/productions');
-  revalidatePath(`/productions/${id}`);
-  revalidatePath('/calendar');
-  revalidatePath('/');
-  revalidatePath('/analytics');
+  // Revalidate the LIST/overview routes only. Do NOT revalidate the deleted
+  // production's detail route (`/productions/${id}`) — Next would try to
+  // rerender it as part of the action response, the page would call
+  // notFound() because the row is gone, and the resulting error bubbles up
+  // to the client as "An error occurred in the Server Components render"
+  // even though the delete itself succeeded.
+  try {
+    revalidatePath('/productions');
+    revalidatePath('/productions/list');
+    revalidatePath('/calendar');
+    revalidatePath('/');
+    revalidatePath('/analytics');
+  } catch (err) {
+    console.warn('[deleteProduction] revalidatePath failed (delete itself succeeded):', err);
+  }
+
+  // Client (delete-production-button) navigates away with router.push after
+  // the action resolves; we deliberately skip server-side redirect() because
+  // its NEXT_REDIRECT exception bubbles up through Next 16's client RSC
+  // pipeline as "An error occurred in the Server Components render".
 }
 
 export async function listProductions(filter?: {

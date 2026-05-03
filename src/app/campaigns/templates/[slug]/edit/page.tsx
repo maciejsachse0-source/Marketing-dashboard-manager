@@ -11,7 +11,7 @@ export default async function EditCampaignTemplatePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const template = getMarketingTemplate(slug);
+  const template = await getMarketingTemplate(slug);
   if (!template) notFound();
 
   return (

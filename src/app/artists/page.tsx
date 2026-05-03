@@ -7,8 +7,10 @@ import { listOutreachFiles, outreachFilesForArtist } from '@/lib/outreach-files'
 export const dynamic = 'force-dynamic';
 
 export default async function ArtistsPage() {
-  const artists = await db.query.artists.findMany({ orderBy: schema.artists.name });
-  const allOutreach = listOutreachFiles();
+  const [artists, allOutreach] = await Promise.all([
+    db.query.artists.findMany({ orderBy: schema.artists.name }),
+    listOutreachFiles(),
+  ]);
 
   const rows: ArtistRow[] = await Promise.all(
     artists.map(async (artist) => {

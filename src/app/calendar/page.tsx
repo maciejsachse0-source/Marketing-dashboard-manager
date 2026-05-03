@@ -245,8 +245,11 @@ export default async function CalendarPage({
     ? (sp.sort as SortKey)
     : 't0';
 
-  const [artists, videographers] = await Promise.all([listArtists(), listVideographers()]);
-  const templates = loadTemplates();
+  const [artists, videographers, templates] = await Promise.all([
+    listArtists(),
+    listVideographers(),
+    loadTemplates(),
+  ]);
   const artistById = new Map(artists.map((a) => [a.id, a]));
   const videographerById = new Map(videographers.map((v) => [v.id, v]));
 

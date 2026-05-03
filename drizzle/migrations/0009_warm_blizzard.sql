@@ -1,1 +1,0 @@
-ALTER TABLE `productions` DROP COLUMN `template_slug`;

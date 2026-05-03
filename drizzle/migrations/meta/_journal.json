@@ -1,110 +1,19 @@
 {
   "version": "7",
-  "dialect": "sqlite",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1777201403388,
-      "tag": "0000_naive_kid_colt",
+      "version": "7",
+      "when": 1777745292187,
+      "tag": "0000_init",
       "breakpoints": true
     },
     {
       "idx": 1,
-      "version": "6",
-      "when": 1777211554707,
-      "tag": "0001_calm_adam_destine",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1777213021452,
-      "tag": "0002_odd_red_skull",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1777366778792,
-      "tag": "0003_spooky_black_widow",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1777369823296,
-      "tag": "0004_equal_frank_castle",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1777372481663,
-      "tag": "0005_steep_random",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1777379052310,
-      "tag": "0006_bitter_proteus",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1777410140034,
-      "tag": "0007_vengeful_gargoyle",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1777415007769,
-      "tag": "0008_outgoing_unicorn",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1777453271784,
-      "tag": "0009_warm_blizzard",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1777462464467,
-      "tag": "0010_nifty_lila_cheney",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "6",
-      "when": 1777464917521,
-      "tag": "0011_spicy_sugar_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "6",
-      "when": 1777464917522,
-      "tag": "0012_periods_per_production",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "6",
-      "when": 1777464917523,
-      "tag": "0013_campaign_milestones",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "6",
-      "when": 1777464917524,
-      "tag": "0014_drop_packages",
+      "version": "7",
+      "when": 1777748185825,
+      "tag": "0001_add_catalog_tables",
       "breakpoints": true
     }
   ]

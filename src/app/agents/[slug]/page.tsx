@@ -15,12 +15,12 @@ export default async function AgentPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const agent = getAgent(slug);
+  const agent = await getAgent(slug);
   if (!agent) notFound();
 
   const promptFile = `agents/${agent.slug}.md`;
   const invocation = `@${promptFile} ${agent.name} — działaj zgodnie z promptem.`;
-  const widgetHint = agent.dashboardWidget ? runAgentWidget(agent.dashboardWidget) : null;
+  const widgetHint = agent.dashboardWidget ? await runAgentWidget(agent.dashboardWidget) : null;
 
   return (
     <PageShell

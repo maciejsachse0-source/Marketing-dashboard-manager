@@ -1,7 +1,6 @@
 'use server';
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { safeRevalidatePath as revalidatePath } from './revalidate';
 import {
@@ -9,14 +8,10 @@ import {
   loadTemplates,
   productionTemplateBaseSchema,
   productionTemplateSchema,
-  templateFilePath,
 } from '@/lib/production-templates';
 import type { ProductionTemplate } from '@/lib/production-templates-types';
+import { db, schema } from '@/lib/db';
 
-/**
- * Slug rules: lowercase letters, digits, dashes only. Used as the filename.
- * Generated from `name` for new templates if not supplied.
- */
 function safeSlug(input: string): string {
   return input
     .normalize('NFKD')
@@ -28,7 +23,6 @@ function safeSlug(input: string): string {
 }
 
 const formInputSchema = productionTemplateBaseSchema.extend({
-  // On create slug may be empty (server derives from name) — on update it must match.
   slug: z
     .string()
     .max(60)
@@ -39,11 +33,31 @@ const formInputSchema = productionTemplateBaseSchema.extend({
 
 export type TemplateFormInput = z.input<typeof formInputSchema>;
 
-function writeTemplate(t: ProductionTemplate) {
-  const file = templateFilePath(t.slug);
-  const dir = path.dirname(file);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(t, null, 2) + '\n', 'utf8');
+async function upsertTemplate(t: ProductionTemplate) {
+  await db
+    .insert(schema.productionTemplates)
+    .values({
+      slug: t.slug,
+      name: t.name,
+      type: t.type,
+      summary: t.summary,
+      description: t.description,
+      steps: t.steps,
+      periods: t.periods ?? null,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: schema.productionTemplates.slug,
+      set: {
+        name: t.name,
+        type: t.type,
+        summary: t.summary,
+        description: t.description,
+        steps: t.steps,
+        periods: t.periods ?? null,
+        updatedAt: new Date(),
+      },
+    });
 }
 
 function bumpRevalidations(slug?: string) {
@@ -58,9 +72,9 @@ export async function createTemplate(input: TemplateFormInput): Promise<Producti
   const parsed = formInputSchema.parse(input);
   const slug = (parsed.slug && parsed.slug.length > 0 ? parsed.slug : safeSlug(parsed.name)).trim();
   if (!slug) throw new Error('Nie udało się wygenerować slug — uzupełnij ręcznie.');
-  if (getTemplate(slug)) throw new Error(`Szablon o slugu "${slug}" już istnieje.`);
+  if (await getTemplate(slug)) throw new Error(`Szablon o slugu "${slug}" już istnieje.`);
   const def = productionTemplateSchema.parse({ ...parsed, slug });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }
@@ -69,21 +83,20 @@ export async function updateTemplate(
   slug: string,
   input: TemplateFormInput,
 ): Promise<ProductionTemplate> {
-  if (!getTemplate(slug)) throw new Error(`Szablon "${slug}" nie istnieje.`);
+  if (!(await getTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   const parsed = formInputSchema.parse(input);
   const def = productionTemplateSchema.parse({ ...parsed, slug });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }
 
 export async function deleteTemplate(slug: string): Promise<void> {
-  const file = templateFilePath(slug);
-  if (!fs.existsSync(file)) throw new Error(`Szablon "${slug}" nie istnieje.`);
-  if (loadTemplates().length <= 1) {
+  if (!(await getTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
+  if ((await loadTemplates()).length <= 1) {
     throw new Error('Nie można usunąć ostatniego szablonu.');
   }
-  fs.unlinkSync(file);
+  await db.delete(schema.productionTemplates).where(eq(schema.productionTemplates.slug, slug));
   bumpRevalidations();
 }
 
@@ -92,13 +105,12 @@ export async function duplicateTemplate(
   newSlug?: string,
   newName?: string,
 ): Promise<ProductionTemplate> {
-  const source = getTemplate(sourceSlug);
+  const source = await getTemplate(sourceSlug);
   if (!source) throw new Error(`Szablon źródłowy "${sourceSlug}" nie istnieje.`);
   const baseSlug = newSlug?.trim() || `${sourceSlug}-kopia`;
   let slug = baseSlug;
-  // Avoid collision — append -2, -3, ... if needed.
   let n = 2;
-  while (getTemplate(slug)) {
+  while (await getTemplate(slug)) {
     slug = `${baseSlug}-${n++}`;
     if (n > 99) throw new Error('Nie udało się znaleźć wolnego slugu.');
   }
@@ -107,7 +119,7 @@ export async function duplicateTemplate(
     slug,
     name: newName?.trim() || `${source.name} (kopia)`,
   });
-  writeTemplate(def);
+  await upsertTemplate(def);
   bumpRevalidations(slug);
   return def;
 }
