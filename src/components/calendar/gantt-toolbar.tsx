@@ -252,22 +252,31 @@ export function GanttToolbar({
           getLabel={(o) => TYPE_LABEL[o]}
           onChange={(v) => setParam('type', v === 'all' ? null : v)}
         />
-        <SegmentedControl
-          label="Sortuj"
-          current={sortKey}
-          options={['t0', 'status', 'name'] as SortKey[]}
-          getKey={(o) => o}
-          getLabel={(o) => SORT_LABEL[o]}
-          onChange={(v) => setParam('sort', v === 't0' ? null : v)}
-        />
+        {/* Sortuj + Kampania grouped — both pick "what's shown", and the
+         *  campaign selector is wider than the segmented controls so without
+         *  this group it tends to wrap onto its own row, looking detached
+         *  from the rest of the filter strip. Inline-flex with no wrap
+         *  keeps them on the same visual line; the outer flex-wrap still
+         *  pushes the whole pair down together when the viewport is too
+         *  narrow. */}
+        <div className="inline-flex items-center gap-x-5 gap-y-2 flex-wrap">
+          <SegmentedControl
+            label="Sortuj"
+            current={sortKey}
+            options={['t0', 'status', 'name'] as SortKey[]}
+            getKey={(o) => o}
+            getLabel={(o) => SORT_LABEL[o]}
+            onChange={(v) => setParam('sort', v === 't0' ? null : v)}
+          />
 
-        <CampaignSelector
-          options={campaignOptions}
-          selectedId={selectedCampaignId}
-          onChange={(id) =>
-            setParam('campaign', id === null ? 'none' : String(id))
-          }
-        />
+          <CampaignSelector
+            options={campaignOptions}
+            selectedId={selectedCampaignId}
+            onChange={(id) =>
+              setParam('campaign', id === null ? 'none' : String(id))
+            }
+          />
+        </div>
 
         {filtersActive ? (
           <button
@@ -367,7 +376,7 @@ function CampaignSelector({
           const v = e.target.value;
           onChange(v === 'none' ? null : Number(v));
         }}
-        className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold shadow-sm hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring max-w-[16rem] truncate"
+        className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold shadow-sm hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring max-w-[12rem] truncate"
         title="Wybierz kampanię, której narracja ma się wyświetlać w gancie"
       >
         <option value="none">— brak —</option>

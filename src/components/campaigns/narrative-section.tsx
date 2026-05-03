@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   CalendarEntry,
   Production,
@@ -17,11 +17,11 @@ type ProductionWithArtist = Production & {
 
 /**
  * Glues the read-only timeline ("Wspólny plan kampanii") and the inline
- * periods editor below it via shared state. The slider mutations propagate
- * upward through `onPeriodsChange`, so the top narrative strip reflects each
- * drag in real time. The editor's "kotwica osi" date input is also lifted
- * here, so retargeting the kickoff anchor reflows the bands above without
- * a save round-trip.
+ * periods editor below it via shared state. Slider drags propagate through
+ * `onPeriodsChange` so the upper strip reflects each band edit live; the
+ * kickoff date input in the editor propagates through `onPreviewStartChange`
+ * so the upper strip's date axis re-anchors immediately, before the editor's
+ * own save round-trip finishes.
  */
 export function CampaignNarrativeSection({
   campaignId,
@@ -39,12 +39,16 @@ export function CampaignNarrativeSection({
   const [livePeriods, setLivePeriods] = useState<TemplatePeriod[] | null>(
     (initialPeriods as TemplatePeriod[] | null | undefined) ?? null,
   );
-  const [previewStart, setPreviewStart] = useState<Date>(kickoffAt);
+  const [livePreviewStart, setLivePreviewStart] = useState<Date>(kickoffAt);
+  // Resync after server-side updates (e.g. the editor's save → router.refresh).
+  useEffect(() => {
+    setLivePreviewStart(kickoffAt);
+  }, [kickoffAt.getTime()]);
 
   return (
     <>
       <CampaignTimeline
-        kickoffAt={previewStart}
+        kickoffAt={livePreviewStart}
         periods={livePeriods}
         productions={productions}
         entries={entries}
@@ -54,8 +58,7 @@ export function CampaignNarrativeSection({
         initialPeriods={initialPeriods as TemplatePeriod[] | null | undefined}
         kickoffAt={kickoffAt}
         onPeriodsChange={setLivePeriods}
-        previewStart={previewStart}
-        onPreviewStartChange={setPreviewStart}
+        onPreviewStartChange={setLivePreviewStart}
       />
     </>
   );

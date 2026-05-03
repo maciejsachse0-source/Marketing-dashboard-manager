@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Plus, RefreshCcw, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import {
   codeForIndex,
   type TemplatePeriod,
 } from '@/lib/production-periods';
-import { updateCampaignPeriods } from '@/server/actions/campaigns';
+import { updateCampaign, updateCampaignPeriods } from '@/server/actions/campaigns';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -54,32 +55,72 @@ export function CampaignPeriodsEditor({
   initialPeriods,
   kickoffAt,
   onPeriodsChange,
-  previewStart: previewStartProp,
   onPreviewStartChange,
 }: {
   campaignId: number;
   initialPeriods: TemplatePeriod[] | null | undefined;
   /** Anchor date — the campaign's kickoff. Drives the slider's date axis so
-   *  the user reads concrete days instead of raw offsets. */
+   *  the user reads concrete days instead of raw offsets. The editor also
+   *  persists changes to this date back to `campaign.releaseAt`. */
   kickoffAt: Date;
   /** Optional live-preview hook: fires on every period mutation so a parent
    *  can mirror the in-progress edits in another part of the UI (e.g. the
    *  campaign timeline above this editor). */
   onPeriodsChange?: (periods: TemplatePeriod[]) => void;
-  /** Controlled preview anchor — when supplied, the date input is owned by
-   *  the parent. Lets the timeline above react live when the user drags the
-   *  kickoff anchor in this editor. */
-  previewStart?: Date;
+  /** Optional live-preview hook for the kickoff anchor — fires immediately
+   *  when the user picks a new date in the input, BEFORE the persistence
+   *  round-trip completes. Used by the campaign-detail page so the upper
+   *  CampaignTimeline reflects the new anchor without waiting for refresh.
+   *  Editor still owns the actual save — the parent only mirrors. */
   onPreviewStartChange?: (d: Date) => void;
 }) {
+  const router = useRouter();
   const [periods, setPeriods] = useState<TemplatePeriod[]>(() =>
     migrateLegacy(initialPeriods),
   );
-  const [previewStartLocal, setPreviewStartLocal] = useState<Date>(kickoffAt);
-  const previewStart = previewStartProp ?? previewStartLocal;
+  // Local optimistic mirror of `kickoffAt`. Stays in sync with the prop when
+  // the server resends a fresh value (after our own save → router.refresh,
+  // OR after an external edit). The .getTime() dep keeps the comparison
+  // stable across new Date() instances representing the same moment.
+  const [previewStart, setPreviewStartState] = useState<Date>(kickoffAt);
+  useEffect(() => {
+    setPreviewStartState(kickoffAt);
+  }, [kickoffAt.getTime()]);
+  const [kickoffSaving, startKickoffSave] = useTransition();
   const setPreviewStart = (d: Date) => {
-    if (onPreviewStartChange) onPreviewStartChange(d);
-    else setPreviewStartLocal(d);
+    setPreviewStartState(d);
+    onPreviewStartChange?.(d);
+  };
+
+  /**
+   * Persist a new kickoff date. The HTML date input only carries the date
+   * portion, so we splice in the existing hours/minutes — a campaign created
+   * with a 09:00 kickoff doesn't suddenly slip to 00:00 because the user
+   * retargeted the day. The slider geometry stays put: periods are stored as
+   * day offsets, so changing the anchor only relabels the date axis without
+   * shifting the bands' relative positions.
+   */
+  const handleKickoffChange = (next: Date) => {
+    const merged = new Date(next);
+    merged.setHours(
+      kickoffAt.getHours(),
+      kickoffAt.getMinutes(),
+      kickoffAt.getSeconds(),
+      kickoffAt.getMilliseconds(),
+    );
+    setPreviewStart(merged);
+    startKickoffSave(async () => {
+      try {
+        await updateCampaign(campaignId, { releaseAt: merged.toISOString() });
+        toast.success('Zaktualizowano datę startu kampanii');
+        router.refresh();
+      } catch (e) {
+        toast.error('Nie udało się zapisać daty', {
+          description: e instanceof Error ? e.message : String(e),
+        });
+        setPreviewStart(kickoffAt);
+      }
+    });
   };
   // 0 = auto-fit (current behavior); positive = explicit visible window in
   // days. Lets the user "zoom out" to see the broader plan or "zoom in" to
@@ -210,7 +251,12 @@ export function CampaignPeriodsEditor({
             htmlFor="campaign-preview-start"
             className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
           >
-            Kotwica osi (podgląd dat — domyślnie data startu kampanii)
+            Data startu kampanii (kotwica osi){' '}
+            {kickoffSaving ? (
+              <span className="ml-1 text-foreground normal-case tracking-normal">
+                · zapisuję…
+              </span>
+            ) : null}
           </Label>
           <Input
             id="campaign-preview-start"
@@ -218,8 +264,9 @@ export function CampaignPeriodsEditor({
             value={isoDate(previewStart)}
             onChange={(e) => {
               const d = parseIsoDate(e.target.value);
-              if (d) setPreviewStart(d);
+              if (d) handleKickoffChange(d);
             }}
+            disabled={kickoffSaving}
             className="w-fit"
           />
         </div>
