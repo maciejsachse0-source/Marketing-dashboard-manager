@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import type { GanttRow } from './gantt-view';
-import { ProductionStatusPill } from '@/components/productions/status-pill';
+import { ProductionStatusPill, STATUS_LABEL } from '@/components/productions/status-pill';
+import { STAGE_HINT } from '@/lib/production-stages';
 import type { ProductionStatus, ProductionStage } from '../../../drizzle/schema';
+import { PRODUCTION_PROGRESSION } from '../../../drizzle/schema';
 
 /**
  * Excel-style alternative to the visual <GanttView />. Renders the same
@@ -41,6 +43,44 @@ function formatDate(iso: string | undefined | null): string {
 
 function formatDateOnly(d: Date): string {
   return d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+/** Each canonical sub-stage rolls up to one of the 5 main milestones — same
+ *  mapping the visual gantt uses, kept local so this view stays decoupled. */
+const STAGE_TO_CATEGORY: Record<ProductionStatus, ProductionStage | null> = {
+  'email-sent': 'outreach',
+  'terms-accepted': 'outreach',
+  'cam-meeting-set': 'outreach',
+  'cam-date-shared': 'ustalenia',
+  'script-discussed': 'ustalenia',
+  'script-sent': 'ustalenia',
+  shooting: 'nagrywanie',
+  editing: 'obrobka',
+  publishing: 'publikacja',
+  cancelled: null,
+};
+
+const CATEGORY_LABEL: Record<ProductionStage, string> = {
+  outreach: 'Outreach',
+  ustalenia: 'Ustalenia',
+  nagrywanie: 'Nagrywanie',
+  obrobka: 'Obróbka',
+  publikacja: 'Publikacja',
+};
+
+const CATEGORY_TONE: Record<ProductionStage, string> = {
+  outreach: 'text-amber-700',
+  ustalenia: 'text-amber-700',
+  nagrywanie: 'text-blue-700',
+  obrobka: 'text-emerald-700',
+  publikacja: 'text-cyan-700',
+};
+
+const CANONICAL_TOTAL = PRODUCTION_PROGRESSION.length; // 9 canonical steps
+
+function countDoneCanonical(row: GanttRow): number {
+  const set = new Set<string>(PRODUCTION_PROGRESSION);
+  return (row.steps ?? []).filter((s) => set.has(s.id) && s.doneAt).length;
 }
 
 function resolveStageDateIso(row: GanttRow, stage: ProductionStatus): string | null {
@@ -82,7 +122,7 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
             <th className="px-3 py-3 border-b border-border font-semibold text-xs uppercase tracking-[0.12em] text-muted-foreground">
               T-0
             </th>
-            <th className="px-3 py-3 border-b border-border font-semibold text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <th className="px-3 py-3 border-b border-border font-semibold text-xs uppercase tracking-[0.12em] text-muted-foreground min-w-[14rem]">
               Status
             </th>
             <th className="px-3 py-3 border-b border-border font-semibold text-xs uppercase tracking-[0.12em] text-muted-foreground">
@@ -135,8 +175,8 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
                 <td className="px-3 py-2.5 border-b border-border/60 tabular-nums whitespace-nowrap font-medium">
                   {formatDateOnly(row.t0At)}
                 </td>
-                <td className="px-3 py-2.5 border-b border-border/60 whitespace-nowrap">
-                  <ProductionStatusPill status={row.status} />
+                <td className="px-3 py-2.5 border-b border-border/60 align-top">
+                  <StatusCell row={row} />
                 </td>
                 <td className="px-3 py-2.5 border-b border-border/60 whitespace-nowrap">
                   {platforms.length === 0 ? (
@@ -173,6 +213,62 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/**
+ * Status column body — three layers of context:
+ *   1. Main milestone label (category) tinted with the same family color used
+ *      by the visual gantt's T-bands, so users carry a mental map between
+ *      views.
+ *   2. Status pill — same component the rest of the app uses, surfaces the
+ *      current sub-stage label.
+ *   3. STAGE_HINT description — one-line "what does this stage mean" copy.
+ *   4. Tiny progress hint "X/9 kroków" so the cell answers both "where am I"
+ *      and "how far along".
+ *
+ * Cancelled productions short-circuit to a single rose-tinted line — the
+ * milestone hierarchy doesn't apply once the production is killed.
+ */
+function StatusCell({ row }: { row: GanttRow }) {
+  if (row.cancelled || row.status === 'cancelled') {
+    return (
+      <div className="space-y-1">
+        <div className="text-[10px] uppercase tracking-[0.12em] font-bold text-rose-700">
+          Anulowane
+        </div>
+        <ProductionStatusPill status="cancelled" />
+      </div>
+    );
+  }
+
+  const category = STAGE_TO_CATEGORY[row.status];
+  const categoryLabel = category ? CATEGORY_LABEL[category] : '—';
+  const categoryTone = category ? CATEGORY_TONE[category] : 'text-muted-foreground';
+  const hint = STAGE_HINT[row.status];
+  const subLabel = STATUS_LABEL[row.status];
+  const done = countDoneCanonical(row);
+
+  return (
+    <div className="space-y-1 leading-snug">
+      <div className={`text-[10px] uppercase tracking-[0.12em] font-bold ${categoryTone}`}>
+        {categoryLabel}
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <ProductionStatusPill status={row.status} />
+        <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
+          {done}/{CANONICAL_TOTAL} kroków
+        </span>
+      </div>
+      {hint ? (
+        <div
+          className="text-[11px] text-muted-foreground max-w-[18rem] line-clamp-2"
+          title={`${subLabel} — ${hint}`}
+        >
+          {hint}
+        </div>
+      ) : null}
     </div>
   );
 }
