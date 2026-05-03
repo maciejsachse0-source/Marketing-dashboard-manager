@@ -17,10 +17,12 @@ import {
   Megaphone,
   Menu,
   X,
+  LogOut,
   type LucideIcon,
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
 import { HelpDialog } from '@/components/help-dialog';
+import { logoutAction } from '@/server/actions/auth';
 
 type NavChild = { href: string; label: string; icon: LucideIcon };
 type NavItem = { href: string; label: string; icon: LucideIcon; children?: NavChild[] };
@@ -80,6 +82,8 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  if (pathname === '/login') return null;
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -244,6 +248,15 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
               ?
             </kbd>
           </div>
+          <form action={logoutAction} className="mt-1">
+            <button
+              type="submit"
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60 transition"
+            >
+              <LogOut className="w-3.5 h-3.5" strokeWidth={1.75} />
+              <span>Wyloguj</span>
+            </button>
+          </form>
         </div>
       </aside>
     </>
