@@ -1,6 +1,7 @@
 import { and, gte, lte } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { GanttView } from '@/components/calendar/gantt-view';
+import { GanttTableView } from '@/components/calendar/gantt-table-view';
 import { GanttToolbar } from '@/components/calendar/gantt-toolbar';
 import type { GanttNarrativeCampaign } from '@/components/campaigns/gantt-narrative-row';
 import { resolvePeriods } from '@/lib/production-periods';
@@ -125,6 +126,9 @@ type TypeFilter = (typeof TYPE_FILTERS)[number];
 const SORT_OPTIONS = ['t0', 'status', 'name'] as const;
 type SortKey = (typeof SORT_OPTIONS)[number];
 
+const DISPLAY_MODES = ['gantt', 'table'] as const;
+type DisplayMode = (typeof DISPLAY_MODES)[number];
+
 export default async function CalendarPage({
   searchParams,
 }: {
@@ -132,6 +136,7 @@ export default async function CalendarPage({
     week?: string;
     weeks?: string;
     view?: string;
+    mode?: string;
     status?: string;
     type?: string;
     sort?: string;
@@ -244,6 +249,9 @@ export default async function CalendarPage({
   const sortKey: SortKey = (SORT_OPTIONS as readonly string[]).includes(sp.sort ?? '')
     ? (sp.sort as SortKey)
     : 't0';
+  const displayMode: DisplayMode = (DISPLAY_MODES as readonly string[]).includes(sp.mode ?? '')
+    ? (sp.mode as DisplayMode)
+    : 'gantt';
 
   const [artists, videographers, templates] = await Promise.all([
     listArtists(),
@@ -411,6 +419,7 @@ export default async function CalendarPage({
         zoomOptions={zoomOptions as unknown as number[]}
         view={view}
         viewOptions={VIEW_MODES as unknown as string[]}
+        displayMode={displayMode}
         statusFilter={statusFilter}
         typeFilter={typeFilter}
         sortKey={sortKey}
@@ -422,13 +431,17 @@ export default async function CalendarPage({
         campaignOptions={campaignOptions}
         selectedCampaignId={selectedCampaignId}
       />
-      <GanttView
-        weeks={weeks}
-        rows={rows}
-        campaigns={narrativeCampaigns}
-        minWidthPx={canvasMinWidth}
-        headerDensity={headerDensity}
-      />
+      {displayMode === 'table' ? (
+        <GanttTableView rows={rows} />
+      ) : (
+        <GanttView
+          weeks={weeks}
+          rows={rows}
+          campaigns={narrativeCampaigns}
+          minWidthPx={canvasMinWidth}
+          headerDensity={headerDensity}
+        />
+      )}
     </PageShell>
   );
 }
