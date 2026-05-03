@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Plus, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, GanttChartSquare, Plus, RotateCcw, Table2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { addDays } from '@/lib/dates';
 import { ProductionWizard } from '@/components/productions/production-wizard';
@@ -16,6 +16,7 @@ type StatusFilter = 'all' | 'in-progress' | 'done' | 'cancelled';
 type TypeFilter = 'all' | 'with-artist' | 'solo';
 type SortKey = 't0' | 'status' | 'name';
 type ViewMode = 'week' | 'month' | 'quarter';
+type DisplayMode = 'gantt' | 'table';
 
 const STATUS_LABEL: Record<StatusFilter, string> = {
   all: 'Wszystkie',
@@ -79,6 +80,7 @@ export function GanttToolbar({
   zoomOptions,
   view,
   viewOptions,
+  displayMode,
   statusFilter,
   typeFilter,
   sortKey,
@@ -95,6 +97,7 @@ export function GanttToolbar({
   zoomOptions: number[];
   view: ViewMode;
   viewOptions: string[];
+  displayMode: DisplayMode;
   statusFilter: StatusFilter;
   typeFilter: TypeFilter;
   sortKey: SortKey;
@@ -201,6 +204,10 @@ export function GanttToolbar({
         </div>
 
         <div className="ml-auto flex items-center gap-3">
+          <DisplayModeToggle
+            current={displayMode}
+            onChange={(m) => setParam('mode', m === 'gantt' ? null : m)}
+          />
           <span className="text-sm text-muted-foreground tabular-nums font-medium hidden sm:inline">
             <span className="font-bold text-foreground">{visibleCount}</span>
             {visibleCount !== totalCount ? (
@@ -343,6 +350,49 @@ function SegmentedControl<T>({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Gantt vs. spreadsheet toggle. Sits on the action row next to the
+ * "Nowa produkcja" button so it's always reachable. Two icon-buttons —
+ * pressed state matches the segmented control look on row 2 so the toolbar
+ * feels coherent even though this toggle has its own row position.
+ */
+function DisplayModeToggle({
+  current,
+  onChange,
+}: {
+  current: DisplayMode;
+  onChange: (v: DisplayMode) => void;
+}) {
+  const options: { key: DisplayMode; label: string; Icon: typeof Table2 }[] = [
+    { key: 'gantt', label: 'Wykres', Icon: GanttChartSquare },
+    { key: 'table', label: 'Tabela', Icon: Table2 },
+  ];
+  return (
+    <div className="inline-flex rounded-md border border-border bg-card overflow-hidden shadow-sm">
+      {options.map(({ key, label, Icon }) => {
+        const selected = key === current;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(key)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold ui-transition active:scale-[0.96] ${
+              selected
+                ? 'bg-foreground text-background shadow-inner'
+                : 'hover:bg-muted/60 text-muted-foreground hover:text-foreground'
+            }`}
+            aria-pressed={selected}
+            title={`Widok: ${label}`}
+          >
+            <Icon className="w-3.5 h-3.5" />
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }
