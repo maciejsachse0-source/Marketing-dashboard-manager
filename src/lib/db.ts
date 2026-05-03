@@ -6,45 +6,30 @@ import { env } from './env';
 declare global {
   // eslint-disable-next-line no-var
   var __dbClient__: ReturnType<typeof postgres> | undefined;
-  // eslint-disable-next-line no-var
-  var __db__: ReturnType<typeof createDb> | undefined;
-  // eslint-disable-next-line no-var
-  var __dbSchemaVersion__: string | undefined;
 }
 
-function createDb() {
-  const client =
-    globalThis.__dbClient__ ??
-    postgres(env.DATABASE_URL, {
-      // Disable prepared statements for compatibility with serverless poolers
-      // (Neon pooled, Vercel Postgres pooled, Supabase pgbouncer in transaction mode).
-      prepare: false,
-      // Keep the pool tiny — serverless functions get short lifetimes; one
-      // active connection per warm instance is plenty.
-      max: 1,
-      idle_timeout: 20,
-    });
-  globalThis.__dbClient__ = client;
-  return drizzle(client, { schema });
-}
-
-const SCHEMA_VERSION = 'pg-v1';
-
-function getDb() {
-  if (
-    globalThis.__db__ &&
-    globalThis.__dbSchemaVersion__ === SCHEMA_VERSION
-  ) {
-    return globalThis.__db__;
-  }
-  const fresh = createDb();
+// Cache only the postgres client (TCP connection pool) on globalThis so HMR
+// reuses it instead of opening a new connection every reload. The drizzle
+// wrapper is always re-built with the freshly-imported schema — caching it
+// across HMR caused `db.query.<newTable>` to be undefined for tables added
+// to schema.ts after the dev server first started.
+function getClient() {
+  if (globalThis.__dbClient__) return globalThis.__dbClient__;
+  const client = postgres(env.DATABASE_URL, {
+    // Disable prepared statements for compatibility with serverless poolers
+    // (Neon pooled, Vercel Postgres pooled, Supabase pgbouncer in transaction mode).
+    prepare: false,
+    // Keep the pool tiny — serverless functions get short lifetimes; one
+    // active connection per warm instance is plenty.
+    max: 1,
+    idle_timeout: 20,
+  });
   if (env.NODE_ENV !== 'production') {
-    globalThis.__db__ = fresh;
-    globalThis.__dbSchemaVersion__ = SCHEMA_VERSION;
+    globalThis.__dbClient__ = client;
   }
-  return fresh;
+  return client;
 }
 
-export const db = getDb();
+export const db = drizzle(getClient(), { schema });
 
 export { schema };
