@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 import type {
   CalendarEntry,
   Production,
@@ -10,7 +8,6 @@ import type {
   Artist,
 } from '../../../drizzle/schema';
 import type { TemplatePeriod } from '@/lib/production-periods';
-import { updateCampaign } from '@/server/actions/campaigns';
 import { CampaignTimeline } from './timeline';
 import { CampaignPeriodsEditor } from './campaign-periods-editor';
 
@@ -20,11 +17,11 @@ type ProductionWithArtist = Production & {
 
 /**
  * Glues the read-only timeline ("Wspólny plan kampanii") and the inline
- * periods editor below it via shared state. The slider mutations propagate
- * upward through `onPeriodsChange`, so the top narrative strip reflects each
- * drag in real time. Changing the kickoff anchor in the editor below also
- * persists `releaseAt` on the campaign — the date input used to be preview-
- * only and silently discarded the new value on refresh, which was confusing.
+ * periods editor below it via shared state. Slider drags propagate through
+ * `onPeriodsChange` so the upper strip reflects each band edit live; the
+ * kickoff date input in the editor propagates through `onPreviewStartChange`
+ * so the upper strip's date axis re-anchors immediately, before the editor's
+ * own save round-trip finishes.
  */
 export function CampaignNarrativeSection({
   campaignId,
@@ -42,40 +39,16 @@ export function CampaignNarrativeSection({
   const [livePeriods, setLivePeriods] = useState<TemplatePeriod[] | null>(
     (initialPeriods as TemplatePeriod[] | null | undefined) ?? null,
   );
-  const [previewStart, setPreviewStart] = useState<Date>(kickoffAt);
-  const [savingKickoff, startKickoffSave] = useTransition();
-  const router = useRouter();
-
-  const handleKickoffChange = (next: Date) => {
-    // <input type="date"> only carries a date; preserve the existing
-    // hours/minutes so a kickoff originally set to 09:00 doesn't slip to 00:00
-    // just because the user retargeted the day.
-    const merged = new Date(next);
-    merged.setHours(
-      kickoffAt.getHours(),
-      kickoffAt.getMinutes(),
-      kickoffAt.getSeconds(),
-      kickoffAt.getMilliseconds(),
-    );
-    setPreviewStart(merged);
-    startKickoffSave(async () => {
-      try {
-        await updateCampaign(campaignId, { releaseAt: merged.toISOString() });
-        toast.success('Zaktualizowano datę startu kampanii');
-        router.refresh();
-      } catch (e) {
-        toast.error('Nie udało się zapisać daty', {
-          description: e instanceof Error ? e.message : String(e),
-        });
-        setPreviewStart(kickoffAt);
-      }
-    });
-  };
+  const [livePreviewStart, setLivePreviewStart] = useState<Date>(kickoffAt);
+  // Resync after server-side updates (e.g. the editor's save → router.refresh).
+  useEffect(() => {
+    setLivePreviewStart(kickoffAt);
+  }, [kickoffAt.getTime()]);
 
   return (
     <>
       <CampaignTimeline
-        kickoffAt={previewStart}
+        kickoffAt={livePreviewStart}
         periods={livePeriods}
         productions={productions}
         entries={entries}
@@ -85,9 +58,7 @@ export function CampaignNarrativeSection({
         initialPeriods={initialPeriods as TemplatePeriod[] | null | undefined}
         kickoffAt={kickoffAt}
         onPeriodsChange={setLivePeriods}
-        previewStart={previewStart}
-        onPreviewStartChange={handleKickoffChange}
-        kickoffSaving={savingKickoff}
+        onPreviewStartChange={setLivePreviewStart}
       />
     </>
   );
