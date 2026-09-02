@@ -1,152 +1,106 @@
 # NEXT-TASKS — przekazanie do kolejnego workera
 
-Stan na 2026-09-02, po zamknięciu **całej fazy F2** (F2-01 do F2-06).
-Definition of Done F2 sprawdzone punkt po punkcie: `DECISIONS.md`, sekcja
-„F2 — raport fazy". Wszystkie punkty spełnione.
+Stan na 2026-09-02, po zamknięciu **F3-01 do F3-05** (migracja guzików skończona).
+Faza F3 ma jeszcze trzy issues: F3-06, F3-07, F3-08.
 
 ## Następne issue
 
-**F3-01** `ui` Inwentaryzacja i uzupełnienie wzorca guzika.
-CZYTAJ: `plan/05-ui-system.md` sekcje 1, 2, 3 i 4. Kolejność w
-`plan/08-BACKLOG.md` jest prawem.
+**F3-06** `ui` Kanon typografii i ikon.
+CZYTAJ: `plan/01` zasady Z4 do Z8. Kolejność w `plan/08-BACKLOG.md` jest prawem.
 
 Bramka z F0 (`docs/ARCHITEKTURA.md` potwierdzony przez usera) nadal otwarta
 i nadal nie blokuje niczego poza wdrożeniem.
 
-## Co zastajesz po F2
+## Co zastajesz po F3-01 do F3-05
 
-**Główny cel fazy osiągnięty.** JS pierwszego ładowania `/calendar`: **292,0 kB
-po gzip wobec progu 301,6 kB** (start: 355,5 kB). `npm run perf` kończy się
-**kodem 0** — pierwszy raz od F0. Wcześniejsza instrukcja „perf kończy się
-kodem 1 i to jest stan oczekiwany" jest już nieaktualna: od teraz kod 1 znaczy
-regresję.
+**Zero surowych `<button>` w `src/`.** Licznik: 89 → 0, `<Button>`: 55 → 146.
+Reguła `no-restricted-syntax` w `eslint.config.mjs` jest **błędem, bez listy
+wyjątków** (zniknął też wyjątek na `src/components/ui/**`). Nowy surowy `<button>`
+wywali `npm run lint`. Sprawdzone na żywym pliku probującym, nie z konfiguracji.
 
-Skąd wzięło się 63 kB: `src/lib/production-periods.ts` importował zoda dla
-`periodsSchema`, a ten plik czyta gant, więc cała biblioteka (61,4 kB po gzip)
-siedziała w bundlu klienckim. Schematy wyprowadzone do
-`src/lib/production-periods-schema.ts` — **nie importuj go z komponentu
-klienckiego**, bo zod wróci do bundla. Usunięcie ośmiu dyrektyw `'use client'`
-dołożyło tylko 1,7 kB.
+`<Button>` ma nowy prop **`loading`** (F3-01): wirująca ikona przed tekstem,
+`aria-busy="true"`, `disabled`, `motion-reduce:animate-none` na ikonie. Szerokość
+guzika rośnie o ikonę i odstęp — świadomie, uzasadnienie w `DECISIONS.md`.
+Używa go dziś jeden guzik: „Usuń kampanię" w `gantt-narrative-row.tsx`.
 
-Kształt legacy ganta (`buildLegacyShape`, `customSteps`, `stepOrder`) **nie
-istnieje**. Gant i widok tabeli czytają `steps[]` wprost:
-- sekwencja kroków kategorii: `resolveStepSequence(steps, category)`
-  w `src/lib/category-sequence.ts`,
-- status i indeks dat: `deriveProductionStage`, `recordedStageDates`
-  w `src/lib/production-steps.ts`.
+`prefers-reduced-motion` był już obsłużony globalnie w `globals.css`
+(`transition-duration: 1ms !important` dla `*`) — nie dopisuj tego drugi raz.
 
-Pole `stepDates` zostało w typie `GanttRow` jako indeks dat liczony z `steps[]`
-przy każdym renderze — nie jest drugim źródłem prawdy, ale testy przypinające
-z F2-01 adresują przez nie `resolveStageDate`, więc jego usunięcie łamałoby
-zakaz zmiany treści tych testów.
+**`plan/05-ui-system.md` przepisany**: sekcja 1 to zmierzony inwentarz z licznikami,
+sekcja 6 niesie tabelę pięciu pułapek migracji guzika. Czytaj ją, zanim ruszysz
+jakikolwiek `className` guzika.
 
-`npm run dev` to teraz **webpack bez flagi pamięci**, `npm run dev:alt` to
-turbopack. Flaga `--max-old-space-size=4096` usunięta: szczytowy RSS bez niej
-to 1556 MB przy progu 2500.
+## Pułapki, na które wdepnąłem w F3 (poza tymi z poprzedniego przekazania)
 
-## Pułapki, na które wdepnąłem w F2
-
-1. **Próg szumu porównania zrzutów z F2-01 (1050 pikseli) jest zaniżony.**
-   Cztery zrzuty tego samego, niezmienionego kodu `/calendar?view=week` różnią
-   się między sobą o 1155 do 1680 pikseli z 7 823 808 (antyaliasing
-   przerywanych prowadnic). Jedna liczba powyżej 1100 nie jest dowodem
-   regresji — rozstrzygaj powtórką, dwa zrzuty potrafią wyjść identyczne (0).
-   Sprawdzaj też, CO się różni: wycinek obrazu obok siebie mówi więcej niż
-   licznik.
-2. **Tryb deweloperski na turbopacku renderuje `/calendar` inaczej niż
-   produkcja** — w pasach T1/T2/T3 znika siatka dni. Zrzut produkcyjny wobec
-   dev-webpacka: 6 306 pikseli różnicy, wobec dev-turbopacka: 82 921. To jest
-   issue **F7-14** i to jest powód, dla którego `dev` został na webpacku mimo
-   trzynastokrotnie szybszego HMR turbopacka.
-3. **`npm run perf` nie mierzył rozmiaru bundla, tylko czytał go z
-   `perf/baseline.json`** (liczba z F0-05). Naprawione w F2-06: `report.mjs`
-   bierze rozmiar z najnowszego przebiegu `page-*`. Gdyby liczba w raporcie
-   przestała się ruszać po zmianie kodu — sprawdź to miejsce najpierw.
-4. **`measure-dev.mjs` rozpoznawał przebudowę po wolniejszej odpowiedzi.**
-   Dla turbopacka próg nigdy nie padał i pomiar wywalał się błędem. Teraz
-   harness podmienia w gancie napis widoczny w HTML-u (`Outreach + ustalenia`)
-   i czeka na stronę z markerem. Gdy zmienisz ten napis w `gantt-view.tsx`,
-   `npm run perf:dev` powie o tym wprost.
-5. **Porównywanie całych odpowiedzi HTTP nie działa jako detektor zmiany** —
-   dwa identyczne żądania do `/calendar` różnią się między sobą.
-6. **`npm run perf:dev` przyjmuje nazwę skryptu npm**:
-   `npm run perf:dev -- dev:alt`. Wynik ląduje w `perf/runs/dev-<bundler>-*.json`
-   z polami `script`, `bundler`, `maxOldSpace`.
-7. **`git stash push -- src scripts/nowy-plik.ts` wywala się**, gdy plik jest
-   nieśledzony („Did you forget to 'git add'?"), i NIC nie chowa — a wygląda to
-   jak udany stash. Przy porównaniu przed/po sprawdź, czy stash naprawdę
-   zadziałał, inaczej zmierzysz dwa razy to samo.
-8. Pułapki z poprzedniego przekazania nadal obowiązują: nie da się
-   zaimportować `gantt-view.tsx` w vitest (łańcuch importów prowadzi do
-   `src/lib/env.ts`); lista grandfather w `eslint.config.mjs` zjeżdża
-   `complexity` do ostrzeżenia tylko dla wyliczonych ścieżek; `git stash -u`
-   kasuje puste katalogi; kreator produkcji wymaga artysty także dla „Solo";
-   kroki produkcji to `<button>` z `aria-label`, nie `checkbox`.
+1. **Klasa bazowa `<Button>` zmienia wygląd, choć w kodzie nic nie widać.** Pięć
+   mechanizmów, tabela w `plan/05` sekcja 6: wymuszony rozmiar ikony
+   (`[&_svg:not([class*='size-'])]:size-4` — opisuj ikony `size-4`, nie `w-4 h-4`),
+   `border border-transparent` plus `bg-clip-padding`, `px-2.5` rozpychające okrągłe
+   znaczniki w kontenerze `grid`, `h-8`/`text-sm`/`font-medium`/`justify-center`,
+   oraz `disabled:opacity-50` i `hover:bg-muted`.
+2. **`display: block` skraca wiersz o 4 px** (znika miejsce na wydłużenia dolne).
+   Guzik, który był `inline-block`, ma zostać `inline-block`.
+3. **`disabled:opacity-100` wolno dopisać tylko tam, gdzie oryginał nie miał
+   `opacity-*`.** Gdzie miał (stan pusty, produkcja anulowana), trzeba dopisać jawny
+   `disabled:opacity-50`, inaczej przygaszone elementy robią się pełne.
+4. **Reszta różnicy pikseli na gancie to faza `animate-pulse`**, nie regresja.
+   Skupiska po 82 do 85 pikseli na aktywny znacznik. Geometria zmierzona
+   w przeglądarce jest identyczna. Licznik rośnie z liczbą produkcji w bazie.
+5. **`npx playwright test` dosiewa dane** (nowe produkcje, kampanie, osoby), więc
+   po każdym przebiegu e2e stary zrzut odniesienia przestaje pasować rozmiarem
+   („ROZNE WYMIARY"). Bierz zrzut „przed" **bezpośrednio** przed zmianą kodu,
+   a e2e uruchamiaj dopiero po zrobieniu obu zrzutów.
+6. **Do porównania „przed" trzeba wrócić do starego kodu**: `git stash push -- <ścieżki>`
+   dla niezacommitowanych zmian, `git checkout <sha> -- <ścieżki>` dla zacommitowanych
+   (przed tym drugim skopiuj bieżące pliki na bok, bo `checkout` je nadpisze i wrzuci
+   stare do indeksu).
+7. Skrypt `scripts/perf/pngdiff.mjs` mówi tylko „ile pikseli". Do znalezienia „gdzie"
+   pisałem trzy jednorazowe skrypty (mapa różnic w kafelkach, wycinek w powiększeniu,
+   pierwszy różniący się wiersz) — skasowane po fazie, bo to była praca dochodzeniowa,
+   nie narzędzie. Gdy znów będą potrzebne, napisz je od nowa: dekodowanie PNG idzie
+   przez `chromium` z playwrighta, tak jak w `pngdiff.mjs`.
 
 ## Liczby, do których porównujesz
 
-p95 z trzech przebiegów na zestawie L, serwer produkcyjny (mediana, ms):
-home 17,6; calendar 60,3; calendar-table 31,7; productions 124,5;
-production-detail 24,0; campaign-detail 31,0; analytics 26,4. Progi: 600 ms
-dla home, productions i analytics, 900 ms dla reszty. Zapas jest duży.
+`npm run perf` kod **0**. Bundel `/calendar`: **292,3 kB** po gzip przy progu 301,6 kB
+(wirująca ikona z F3-01 kosztowała 0,3 kB). p95 stron mieszczą się w progach z zapasem;
+dryf p95 między przebiegami sięga 40%, więc raportowany „dryf +43%" nie jest regresją.
 
-Bundel `/calendar`: 292,0 kB po gzip, próg 301,6 kB, cel długoterminowy 350 kB
-(już spełniony). Pomiar deterministyczny: trzy przebiegi dały 292 / 292 / 292.
+`npm run lint`: kod 0, 111 ostrzeżeń (grandfather: complexity i react-hooks), 0 błędów.
+`npm run test`: 21 zielonych. `npx playwright test`: 8 zielonych.
 
-Tryb deweloperski, mediany z trzech przebiegów: webpack 493 / 2777 / 135 /
-2017 / 1556 (ready / firstCompile / warmP50 / hmr / peakRss), turbopack
-468 / 1187 / 74 / 157 / 1469.
-
-Interakcja „zmiana filtra kampanii → przemalowanie ganta": mediana 78 ms przy
-progu 300 ms (`e2e/gantt-filter.spec.ts`, zapis w `perf/runs/gantt-filter-*.json`).
-
-**Szum pomiarowy czasów sięga 40%.** Mediana z trzech przebiegów, zawsze.
+Próg szumu porównania zrzutów: 1 155 do 1 680 pikseli z 7 823 808 na tym samym kodzie.
 
 ## Jak uruchomić
 
 ```
 docker start mc-pg
 npm run dev                 # webpack, port 3000
-npm run dev:alt             # turbopack, uwaga na F7-14
-npm run perf:serve          # terminal 1: next build + next start na bazie pomiarowej
-npm run perf                # terminal 2: measure-db + measure-page + report; oczekiwany kod 0
-npm run perf:dev [skrypt]   # osobno, wymaga zimnego .next
-npx playwright test         # 8 scenariuszy, wszystkie zielone
+npm run perf:serve          # terminal 1 (zatrzymaj wcześniej dev, port 3000 zajęty)
+npm run perf                # terminal 2, oczekiwany kod 0
+node scripts/perf/shot.mjs <tag> /sciezka [...]   # zrzuty do screenshots/
+node scripts/perf/pngdiff.mjs <a> <b>
 ```
-
-Pięć przypadków statusu produkcji do zrzutów porównawczych sieje
-`npx tsx scripts/seed-gantt-cases.ts` (produkcje `F2-03 …`, idempotentne,
-T-0 w drugim tygodniu domyślnego okna).
 
 ## Stan środowiska
 
-- Baza: kontener Docker `mc-pg`, `postgres:17`, port hosta **5433**, user
-  `postgres`, hasło `mc`. Bazy: `marketing` (robocza), `marketing_perf`
-  (pomiarowa, zestaw L), `marketing_test`. Przed pracą: `docker start mc-pg`.
-- Baza robocza niesie katalogi z `db:seed:catalog`, produkcje z e2e i pięć
-  produkcji `F2-03 …`. Testy nie sprzątają po sobie i nie muszą.
-- `psql` nie istnieje na hoście: `docker exec mc-pg psql -U postgres -d <baza>`.
-  Liczbę zapytań na render da się zmierzyć przez `ALTER SYSTEM SET
-  log_statement='all'` plus `docker logs mc-pg` (pamiętaj o `RESET` po pomiarze).
-- Nie ma `magick` ani `compare` ani `PIL`. Do obrazków: `scripts/perf/pngdiff.mjs`.
-- `.env.local` istnieje, poza gitem, niesie komplet zmiennych.
-- `perf/runs/` jest w `.gitignore`; `perf/baseline.json` i `perf/budget.json` nie.
+Bez zmian wobec poprzedniego przekazania: baza w kontenerze `mc-pg` (port 5433,
+bazy `marketing`, `marketing_perf`, `marketing_test`), `psql` tylko przez
+`docker exec`, brak `magick`/`compare`/`PIL`, `.env.local` poza gitem,
+tryb deweloperski na webpacku (decyzja orkiestratora, do czasu zamknięcia F7-14).
 
 ## Decyzje w toku
 
-- `DATABASE_URL` do prawdziwej bazy nadal nie dostarczony.
-- Hosting: decyzja „naprawiamy Vercela czy porzucamy" należy do usera.
-- Plik `.xlsx` z osobami (F4-06) nadal nie dostarczony.
-- `docs/ARCHITEKTURA.md` czeka na potwierdzenie przez usera (bramka DoD F0).
-- Do rozważenia przez orkiestratora: F2-05 wybrał webpacka wbrew wynikowi
-  pomiaru czasu. Gdyby priorytetem był czas przebudowy, a nie zgodność
-  z produkcją, przełączenie to jedna linijka w `package.json`.
+Bez zmian: `DATABASE_URL` do prawdziwej bazy, hosting (Vercel), plik `.xlsx`
+z osobami (F4-06), potwierdzenie `docs/ARCHITEKTURA.md` przez usera.
 
 ## Znaleziska w F7
 
-**F7-01** do **F7-14**, żadne nie blokuje. Nowe w tej paczce: **F7-14**
-(turbopack w trybie deweloperskim gubi siatkę dni w pasach T; waga ważne, bo
-blokuje trzynastokrotnie szybszy HMR).
+**F7-01** do **F7-16**, żadne nie blokuje. Nowe w tej paczce:
+- **F7-15** — mikro-etykieta sekcji powielona 90 razy w pięciu wariantach; naturalne
+  miejsce naprawy to F3-06, więc zajrzyj tam, zanim zaczniesz.
+- **F7-16** — `ui/card.tsx`, `ui/badge.tsx` i `ui/table.tsx` bez ani jednego użycia,
+  przy 11 ręcznie składanych kartach i 4 surowych `<table>`.
 
-Commity fazy: `628bcac` (F2-01), `d4035dc` (F2-02), `4706d32` (F2-03),
-`55a064e` (F2-04), `5e1043e` (F2-05), `a7174c0` (F2-06).
+Commity fazy: `8360b94` (F3-01), `0e025de` (F3-02), `d834628` (F3-03),
+`f4dadad` (F3-04), `92055e6` (F3-05).
