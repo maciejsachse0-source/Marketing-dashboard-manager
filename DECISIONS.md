@@ -438,3 +438,48 @@ w gancie napis, który trafia do HTML-a, i czeka na stronę z markerem. To jedyn
 sygnał znaczący dokładnie „serwer oddaje już przekompilowany moduł" i znaczący
 to samo dla obu bundlerów.
 
+## F2 — raport fazy
+
+Cel fazy był jeden i mierzalny: zbić JS pierwszego ładowania `/calendar` poniżej
+egzekwowanego progu 301,6 kB po gzip. **Zbity: 355,5 kB → 292,0 kB.** `npm run perf`
+kończy się kodem 0, po raz pierwszy od F0.
+
+| kryterium DoD F2 | wynik |
+|---|---|
+| `npm run typecheck` | kod 0 |
+| `npm run lint` | kod 0 (201 ostrzeżeń, 0 błędów) |
+| `npm run test` | kod 0, 20 testów w 3 plikach |
+| `npm run perf` | kod 0, wszystkie progi trzymają |
+| zrzut głównego efektu fazy | `screenshots/F2/` — `przed-F2-03-*`, `po-F2-03-*`, `po-F2-04-*`, `po-F2-05-*`, `po-F2-06-*`, `prod-check-week.png` |
+| raport fazy w `DECISIONS.md` | ten wpis |
+| zero znalezisk bez issue w F7 | jedno nowe znalezisko, ma issue: **F7-14** |
+| budżety stron z `plan/03` sekcja 4 | spełnione, tabela niżej |
+
+p95 z trzech przebiegów `measure-page.mjs` na zestawie L, serwer produkcyjny
+(mediana, ms), wobec progów z `perf/budget.json`:
+
+| strona | p95 mediana | próg |
+|---|---|---|
+| home | 17,6 | 600 |
+| calendar | 60,3 | 900 |
+| calendar-table | 31,7 | 900 |
+| productions | 124,5 | 600 |
+| production-detail | 24,0 | 900 |
+| campaign-detail | 31,0 | 900 |
+| analytics | 26,4 | 600 |
+
+Żaden budżet nie jest przekroczony, więc nie ma czego przenosić na bramkę F8.
+
+**Co naprawdę kosztowało rozmiar.** Nie liczba komponentów klienckich, jak zakładał
+krok P8, tylko jeden import: `src/lib/production-periods.ts` ciągnął zoda dla
+`periodsSchema`, a ten plik czyta gant. Sześćdziesiąt jeden z sześćdziesięciu trzech
+zaoszczędzonych kilobajtów to ta jedna linijka. Usunięcie ośmiu dyrektyw
+`'use client'` dołożyło 1,7 kB. Wniosek na przyszłość: zanim policzysz komponenty
+klienckie, sprawdź, co one importują — biblioteka walidacji w gałęzi klienckiej waży
+więcej niż wszystkie komponenty razem.
+
+**Czego faza nie dała.** Memoizacja ganta (F2-04) nie poprawiła żadnego zmierzonego
+czasu; powód opisany wyżej we wpisie F2-04. Turbopack, trzynaście razy szybszy w HMR,
+nie stał się domyślnym trybem deweloperskim, bo renderuje `/calendar` inaczej niż
+produkcja (F2-05, issue F7-14). Oba wnioski są zmierzone, nie wydedukowane.
+
