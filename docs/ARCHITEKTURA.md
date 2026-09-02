@@ -74,6 +74,15 @@ Co z tego wynika, a czego nie:
 2. Kto ma dostęp do panelu Vercela.
 3. Czy padnięte wdrożenie z 2026-05-03 ma być naprawione, czy porzucone.
 
+**Sprawdzone po stronie orkiestratora, 2026-09-02, i to zawęża pytanie 2.** Konto
+Vercela podłączone do tego środowiska (`enkidu-png's projects`, plan hobby, team
+`team_rYasmVV2hjScAFCS0lxqVHoQ`) ma 22 projekty i nie ma wśród nich tego repozytorium.
+Wdrożenia z sekcji wyżej należą do konta `maciejsachse0-sources-projects`, czyli innego
+właściciela. Wniosek: bez dostępu do tamtego konta domeny produkcyjnej nie odczytamy
+żadnym narzędziem, i tylko user może powiedzieć, czyje to konto i kto się do niego loguje.
+Dopóki to nie padnie, wszystkie trzy pytania zostają jako dług, oznaczony
+`BLOCKED-ASK-USER` w `HANDOFF.md`.
+
 Odpowiedź usera: **jeszcze nie udzielona**. Dopóki jej nie ma, przyjmujemy, że
 środowiskiem docelowym jest Vercel, a jedyną bazą, do której mamy dostęp, jest
 lokalny kontener z sekcji 3.

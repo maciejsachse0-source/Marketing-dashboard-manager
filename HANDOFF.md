@@ -44,4 +44,8 @@ z wklejonym dowodem, commit per issue.
 - `STOP-GATE:` — pętla zatrzymana, czeka na decyzję usera
 - `BLOCKED-ASK-USER:` — brakuje danych wejściowych od usera
 
-*(brak aktywnych znaczników)*
+`BLOCKED-ASK-USER:` trzy pytania o produkcję z `docs/ARCHITEKTURA.md` sekcja 2
+(aktywna domena, dostęp do panelu Vercela, los padniętego wdrożenia z 2026-05-03).
+To jedyny niespełniony punkt Definition of Done fazy F0. Nie blokuje fazy F1, bo indeksy
+i zapytania nie zależą od faktów o produkcji, więc pętla jedzie dalej, a punkt zostaje
+otwarty do czasu odpowiedzi usera.
