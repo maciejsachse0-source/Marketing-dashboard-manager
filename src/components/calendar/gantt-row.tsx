@@ -1,6 +1,6 @@
 'use client';
 
-import { useOptimistic, useState, useTransition } from 'react';
+import { memo, useCallback, useMemo, useOptimistic, useState, useTransition } from 'react';
 import type { ProductionStatus } from '../../../drizzle/schema';
 import { DAY_MS, STAGE_INDEX, subStepKey, type GanttRow } from './gantt-geometry';
 import { buildRowModel } from './gantt-row-model';
@@ -16,7 +16,7 @@ import { ExpandedDetails } from './gantt-expanded';
  * wiersza z `gantt-row-model.ts` i złożenie czterech warstw (szyna, pasma,
  * prowadnice, kamienie milowe). Wydzielony z `gantt-view.tsx` w F2-02.
  */
-export function GanttRowView({
+export const GanttRowView = memo(function GanttRowView({
   row,
   firstDay,
   totalDays,
@@ -49,19 +49,21 @@ export function GanttRowView({
   // stayed stale until the server revalidate landed.
   const [optimisticDoneByKey, setOptimisticDoneByKey] = useState<Record<string, boolean>>({});
 
-  const setStatus = (next: ProductionStatus) => {
+  // Stabilna referencja: `setStatus` leci w dół do dwóch pasków, a te są
+  // przerysowywane przy każdym kliknięciu w krok.
+  const setStatus = useCallback((next: ProductionStatus) => {
     // Optimistic-only update — the children (PipelineMilestones, SubStepBar)
     // call `cascadeStepsTo` themselves to persist; this just keeps the UI
     // mirror in sync until the cascade revalidates.
     startTransition(() => {
       setOptimisticStatus(next);
     });
-  };
-  const { frameBands, checkpoints, allSubSteps, subSteps, stagePins } = buildRowModel(
-    row,
-    firstDay,
-    totalDays,
-    optimisticStatus,
+  }, [setOptimisticStatus, startTransition]);
+  // Cała geometria wiersza (pasma, kamienie, podkroki, pinezki) w jednym
+  // wyliczeniu — zależy tylko od danych wiersza, okna i statusu.
+  const { frameBands, checkpoints, allSubSteps, subSteps, stagePins } = useMemo(
+    () => buildRowModel(row, firstDay, totalDays, optimisticStatus),
+    [row, firstDay, totalDays, optimisticStatus],
   );
 
   // Right column dynamic height. After removing the per-step date chips and
@@ -247,4 +249,4 @@ export function GanttRowView({
       ) : null}
     </div>
   );
-}
+});

@@ -362,3 +362,35 @@ kodu, wykonane po restarcie kompilacji serwera deweloperskiego; różnica siedzi
 pionowym pasie szerokości 18 pikseli, na kresce „dziś". Dwa zrzuty pod rząd bez restartu
 dają 0. Wniosek praktyczny na kolejne issues: różnica poniżej ~1100 pikseli to szum,
 nie regresja, i dopiero powyżej warto szukać przyczyny.
+
+## F2-04 — memoizacja ganta nie dała mierzalnego zysku
+
+Kryterium P5 zakładało, że `memo` na wierszu, `useMemo` na osi i `useCallback`
+na uchwytach usuną zawieszki przy filtrowaniu i przewijaniu. Zmierzone na
+zestawie L (serwer produkcyjny, baza `marketing_perf`, 56 wierszy w oknie):
+
+| Interakcja | przed | po |
+|---|---|---|
+| zmiana filtra kampanii, mediana z 3 | 80 ms | 78 ms |
+| rozwinięcie wiersza, 5 powtórzeń | 28-33 ms | 22-35 ms |
+
+Zero różnicy poza szumem. Powód jest strukturalny, nie pomiarowy: zmiana filtra
+kampanii to nawigacja, czyli nowy render po stronie serwera i nowe referencje
+propsów — `memo` z definicji nie ma czego pominąć. A stan, który zmienia się
+po stronie klienta (rozwinięcie wiersza, klik w krok), siedzi WEWNĄTRZ wiersza,
+więc kontener i pozostałe wiersze i tak się nie przerysowywały.
+
+Zmiana zostaje, bo jest tania i nic nie psuje, ale bez złudzeń co do jej wagi:
+zaczyna cokolwiek dawać dopiero, gdy kontener ganta dostanie własny stan
+(np. filtrowanie po stronie klienta). Gdyby przy F2-06 albo później okazała się
+przeszkodą, wolno ją cofnąć bez straty — pomiar jest tutaj.
+
+**Pułapka pomiarowa dla następnych issues.** Próg szumu porównania zrzutów
+z F2-01 (1050 pikseli) zaniża dzisiejszy rozrzut. Cztery zrzuty tego samego,
+niezmienionego kodu `/calendar?view=week` różnią się między sobą o 1155 do 1680
+pikseli z 7 823 808; różnica siedzi w antyaliasingu przerywanych prowadnic
+i kółek podkroków, a wycinek 560x420 pikseli obejrzany obok siebie jest
+nieodróżnialny. Rozstrzygać należy powtórką: dwa zrzuty potrafią wyjść
+identyczne (0 pikseli), więc jedna liczba powyżej 1100 nie jest jeszcze
+dowodem regresji.
+

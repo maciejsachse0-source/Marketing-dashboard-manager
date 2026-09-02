@@ -570,7 +570,7 @@ tabela przed i po w raporcie fazy.
     dwa, o których mówi kryterium; pozostałe cztery (agenci z layoutu,
     szablony, artyści, kamerzyści) stały bez zmian już przed F2-03.
 
-- [ ] **F2-04** `perf` Memoizacja ganta (P5)
+- [x] **F2-04** `perf` Memoizacja ganta (P5)
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P5
   AC:
   - wiersz produkcji opakowany w `memo`, wyliczenia osi w `useMemo`, funkcje
@@ -581,6 +581,38 @@ tabela przed i po w raporcie fazy.
     poniżej 300 ms na zestawie L, zapisany w `perf/runs/`
   - testy z F2-01 zielone
   - negatywne: liczba zapytań na render `/calendar` nadal 2; brak nowej zależności
+
+  DOWÓD (2026-09-02):
+  - `grep -r 'useMemo\|useCallback\|memo(' src/components/calendar/ | wc -l`
+    zwraca **6** (dziś było 0): `memo` na `GanttRowView`, `useMemo` na osi
+    w `gantt-view.tsx` (dzień po dniu, do 364 obiektów przy kwartale) i na
+    `buildRowModel` w wierszu, `useCallback` na `setStatus` idącym w dół
+    do paska kamieni i paska podkroków.
+  - Nowy scenariusz `e2e/gantt-filter.spec.ts` zmienia kampanię w pasku
+    narzędzi i mierzy w przeglądarce czas od zdarzenia `change` do klatki,
+    w której gant pokazuje narrację nowej kampanii (dwa `requestAnimationFrame`
+    po commicie, więc liczy się faktyczne przemalowanie). Zestaw L, serwer
+    produkcyjny (`npm run perf:serve` na `marketing_perf`), 56 wierszy
+    w oknie: próbki **170, 78, 78 ms, mediana 78 ms** wobec progu 300 ms.
+    Zapis: `perf/runs/gantt-filter-2026-09-02T20-*.json`.
+  - Pomiar przed i po (zasada Z z `plan/01`): ten sam scenariusz na kodzie
+    sprzed memoizacji dał **136, 80, 79 ms, mediana 80 ms**. Różnica 80 → 78 ms
+    to szum. Druga próba, tym razem na interakcji czysto klienckiej
+    (rozwinięcie wiersza, pięć powtórzeń): **28, 28, 29, 30, 33 ms przed**
+    i **29, 22, 34, 30, 28 ms po**. Wniosek zapisany w `DECISIONS.md`:
+    memoizacja nie dała mierzalnego zysku przy 56 wierszach, bo kontener ganta
+    nie ma dziś własnego stanu i nie przerysowuje wierszy.
+  - `npx vitest run`: 20 testów zielonych (14 z F2-01 bez zmian).
+    `npm run typecheck` kod 0, `npm run lint` kod 0.
+  - Zapytania na render `/calendar`: **6, 6, 6** (te same dwa na dane wiersza),
+    zmierzone przy `log_statement=all` na uruchomionym serwerze produkcyjnym.
+  - Wygląd: `po-F2-03-week.png` wobec `po-F2-04-week.png` różni się na **1533**
+    pikselach, ale dziś pasmo szumu jest szersze niż zapisane 1050 — cztery
+    zrzuty tego samego kodu różnią się między sobą o 1155 do 1680 pikseli
+    (antyaliasing kresek prowadnic). Rozstrzygające jest to, że powtórka
+    zrzutu na kodzie po zmianie (`po-F2-04-week-powtorka.png`) różni się od
+    `po-F2-03-week.png` o **0 pikseli**.
+  - Brak nowej zależności: `package.json` bez zmian.
 
 - [ ] **F2-05** `perf` `tooling` Decyzja o bundlerze deweloperskim (P7)
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.3, 4 i 5 wiersz P7, `plan/01` zasada Z2

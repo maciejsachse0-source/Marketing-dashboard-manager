@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { startOfDay, dayDiff, type GanttRow } from './gantt-geometry';
 import { CampaignGanttNarrativeRow } from '@/components/campaigns/gantt-narrative-row';
 import { FRAME_TONE } from './gantt-frames';
@@ -32,26 +33,41 @@ export function GanttView({
    *  band above the week labels so the user gets a year-wide overview. */
   headerDensity?: 'days' | 'weeks' | 'months';
 }) {
-  if (weeks.length === 0) return null;
-  const firstDay = startOfDay(weeks[0]);
-  const totalWeeks = weeks.length;
-  const totalDays = totalWeeks * 7;
-  const dayWidthPct = 100 / totalDays;
-  const todayIdx = Math.round(dayDiff(new Date(), firstDay));
-  const todayInWindow = todayIdx >= 0 && todayIdx < totalDays;
+  // Oś liczona raz na zestaw tygodni. `days` bywa listą 364 obiektów przy
+  // widoku kwartału i jest przekazywane KAŻDEMU wierszowi — bez memoizacji
+  // każdy stan (rozwinięcie wiersza, klik w krok) budował ją od nowa
+  // i unieważniał `memo` na wszystkich wierszach naraz.
+  const axis = useMemo(() => {
+    if (weeks.length === 0) return null;
+    const firstDay = startOfDay(weeks[0]);
+    const totalWeeks = weeks.length;
+    const totalDays = totalWeeks * 7;
+    const todayIdx = Math.round(dayDiff(new Date(), firstDay));
+    const days: { date: Date; weekday: string; dom: string; isMonday: boolean; isWeekend: boolean }[] = [];
+    for (let i = 0; i < totalDays; i++) {
+      const d = new Date(firstDay);
+      d.setDate(d.getDate() + i);
+      days.push({
+        date: d,
+        weekday: d.toLocaleDateString('pl-PL', { weekday: 'short' }),
+        dom: String(d.getDate()),
+        isMonday: d.getDay() === 1,
+        isWeekend: d.getDay() === 0 || d.getDay() === 6,
+      });
+    }
+    return {
+      firstDay,
+      totalWeeks,
+      totalDays,
+      dayWidthPct: 100 / totalDays,
+      todayIdx,
+      todayInWindow: todayIdx >= 0 && todayIdx < totalDays,
+      days,
+    };
+  }, [weeks]);
 
-  const days: { date: Date; weekday: string; dom: string; isMonday: boolean; isWeekend: boolean }[] = [];
-  for (let i = 0; i < totalDays; i++) {
-    const d = new Date(firstDay);
-    d.setDate(d.getDate() + i);
-    days.push({
-      date: d,
-      weekday: d.toLocaleDateString('pl-PL', { weekday: 'short' }),
-      dom: String(d.getDate()),
-      isMonday: d.getDay() === 1,
-      isWeekend: d.getDay() === 0 || d.getDay() === 6,
-    });
-  }
+  if (!axis) return null;
+  const { firstDay, totalWeeks, totalDays, dayWidthPct, todayIdx, todayInWindow, days } = axis;
 
   return (
     <div
