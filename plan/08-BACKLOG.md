@@ -1859,6 +1859,24 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     prawdziwych danych, na przykład sprawdzeniem, że `scripts/import-people.ts` nie istnieje
   - negatywne: żadne inne kryterium w `plan/08-BACKLOG.md` nie zmienia treści
 
+- [ ] **F7-24** `znalezisko` `ui` Tytułu produkcji nie widać nigdzie na jej stronie
+  Znalezione przy F5-03. `src/app/productions/[id]/page.tsx` liczy
+  `displayTitle = artist ? artist.name : production.title`, więc produkcja przypisana
+  do artysty (a każda musi mieć artystę, `createProduction` odrzuca brak) pokazuje
+  w nagłówku nazwę artysty, a własny tytuł nigdzie. Na liście produkcji tytuł też widać
+  tylko w nagłówku grupy (`ProductionCard` z `showHeader`), czyli dla wiersza „Solo,
+  po kamerzyście". Skutek: user wpisuje tytuł w kreatorze („Kolaba z Anią - singiel
+  Świt") i już nigdy go nie zobaczy; przy dwóch produkcjach tego samego artysty nie ma
+  ich czym rozróżnić. Test e2e dodania produkcji musiał z tego powodu szukać produkcji
+  po odnośniku `/productions/<id>`, nie po tytule.
+  Waga: **ważne**. Szacunek: godzina.
+  AC:
+  - strona `/productions/<id>` pokazuje tytuł produkcji, a nazwa artysty zostaje przy nim
+    (dowód: zrzut ekranu produkcji z tytułem innym niż nazwa artysty)
+  - lista produkcji pokazuje tytuł każdej produkcji, nie tylko w nagłówku grupy
+    (dowód: zrzut listy z dwiema produkcjami tego samego artysty, obie rozróżnialne)
+  - negatywne: `npm run perf` kod 0, bundel `/calendar` bez wzrostu powyżej progu
+
 ---
 
 ## F8 — Bramka decyzyjna (pętla STAJE przed tą fazą i pyta usera)
