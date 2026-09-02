@@ -947,13 +947,42 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   Zrzuty: `screenshots/F3/przed-F3-07-templates-after-save.png` i `po-F3-07-...` (lista
   szablonów po zapisie).
 
-- [ ] **F3-08** `ui` `test` Rozbicie `campaign-template-form.tsx` i `timeline.tsx`
+- [x] **F3-08** `ui` `test` Rozbicie `campaign-template-form.tsx` i `timeline.tsx`
   CZYTAJ: `plan/01` zasada Z11, `plan/06-testy.md` sekcja 2
   AC:
   - testy przypinające dla obu, zielone przed zmianą
   - oba pliki (792 i 737 linii) rozbite tak, że żaden NOWY plik nie przekracza 300 linii
   - `npm run lint` kod 0
   - negatywne: wygląd niezmieniony (zrzuty przed i po dla obu ekranów)
+  DOWÓD (2026-09-02): dwa testy przypinające napisane PRZED rozbiciem i zielone na kodzie
+  sprzed niego: `src/components/campaigns/__tests__/campaign-template-form.test.tsx`
+  (3 przypadki: zapis poprawny woła `createMarketingTemplate` dokładnie raz i wraca
+  na `/campaigns/templates`, zapis bez milestone'ów pokazuje „Szablon musi zawierać
+  co najmniej jeden milestone." i nie woła serwera, wyjście z formularza nic nie zapisuje)
+  oraz `.../timeline.test.tsx` (2 przypadki: pełny render pinuje kody okresów, nagłówek
+  „Wspólny plan kampanii", wiersz produkcji z artystą i pinezkę luźnego wpisu czytaną
+  z atrybutu `title`; drugi przypadek pinuje wariant bez produkcji i bez wpisów).
+  Po rozbiciu te same testy przechodzą bez zmiany choćby jednej asercji.
+  Podział `timeline.tsx`: 735 → **228** linii, cztery NOWE pliki: `timeline-shared.tsx` 138
+  (stała doby, typy wiersza i pasa, oś dat, cieniowanie weekendów, legenda),
+  `timeline-periods-strip.tsx` 138, `timeline-production-row.tsx` 171,
+  `timeline-lanes.tsx` 118.
+  Podział `campaign-template-form.tsx`: 792 → **580** linii, dwa NOWE pliki:
+  `campaign-milestone-row.tsx` 202 i `campaign-template-form-utils.ts` 38. Świadomie NIE
+  wydzielono tu sekcji kamieni milowych: przeniesienie jej wymagałoby przepchnięcia dziesięciu
+  uchwytów zdarzeń przez granicę komponentu, czyli więcej kodu niż zostaje w środku,
+  a kryterium mówi o NOWYCH plikach, nie o pliku zastanym. Największy nowy plik w obu
+  rozbiciach ma 202 linie, czyli blisko sto zapasu do progu Z11.
+  Lint: `npm run lint` kod **0**, 108 ostrzeżeń (przed fazą 111), zero błędów, zero dopisków
+  do listy grandfathera. Nowy kod znów wyszedł spod niej i wymusił dwie naprawy u źródła:
+  `ProductionRow` miał złożoność 16, więc lewa komórka wiersza poszła do `ProductionRowLabel`,
+  a pasek postępu kroków do `StepsProgress` (samo `?.` i `??` liczy się do złożoności,
+  stąd dwa cięcia zamiast jednego). `npm run typecheck` kod 0, `npm run test` **29 zielonych**
+  (21 na starcie fazy, 3 z F3-07, 5 z tego issue).
+  Negatywne, wygląd: `node scripts/perf/pngdiff.mjs` dla obu ekranów, zrzuty
+  `screenshots/F3/przed-F3-08-*` wobec `po-F3-08-*`: edytor szablonu kampanii
+  (`/campaigns/templates/premiera-singla/edit`) **0 pikseli**, karta kampanii z osią czasu
+  (`/campaigns/1`) **0 pikseli** z 7 823 808. Zero, nie „poniżej progu szumu".
 
 **DoD F3:** `grep -r '<button' src/ | wc -l` zwraca `0`; lint z regułą guzika jako błąd
 przechodzi; zrzuty przed i po dla czterech ekranów.
