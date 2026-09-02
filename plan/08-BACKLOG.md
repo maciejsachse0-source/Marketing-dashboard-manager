@@ -232,7 +232,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   `/productions/1` -> 404, kod 1, brak zapisu.
   Zrzut: `screenshots/F0/`.
 
-- [ ] **F0-06** `arch` `docs` Dokument architektury
+- [x] **F0-06** `arch` `docs` Dokument architektury
   CZYTAJ: `plan/02-architektura.md` sekcje 1, 2 i 3
   AC:
   - `docs/ARCHITEKTURA.md` istnieje i ma wszystkie 9 sekcji z tabeli w `plan/02`
@@ -247,6 +247,27 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     które da się otworzyć
   - negatywne: `awk '/^## 9\./{exit} /[Ss]qlite/{n++} END{print n+0}' docs/ARCHITEKTURA.md`
     zwraca `0` (SQLite wolno wspomnieć wyłącznie w sekcji 9 o długach)
+  DOWÓD (2026-09-02): `grep -n '^## ' docs/ARCHITEKTURA.md` zwraca 9 linii, sekcje 1 do 9
+  z tabeli w `plan/02` sekcja 3, każda z treścią.
+  Sekcja 2: `gh api repos/maciejsachse0-source/Marketing-dashboard-manager/deployments`
+  zwraca **29 wdrożeń**, wszystkie od `vercel[bot]`, więc hosting to Vercel i jest
+  potwierdzony przez GitHuba, nie przez domysł. Wynik (id, środowisko, data, commit,
+  autor) wklejony do dokumentu razem ze statusami: ostatnie wdrożenie produkcyjne
+  `4564105017` z 2026-05-03 ma stan `failure`, ostatnie zielone to `4563418238`.
+  Odpowiedź usera o domenie i dostępach jeszcze nie przyszła i dokument mówi to wprost.
+  Sekcja 3: wersja i provider z `npm run pg:info` (PostgreSQL 17.11 Debian, kontener
+  Docker `mc-pg` na `127.0.0.1:5433`, `max_connections` 100, pula aplikacji `max: 1`,
+  `prepare: false`).
+  Sekcja 4: `node scripts/perf/table-counts.mjs --work --json` na bazie roboczej zwraca
+  same zera i taka jest treść dokumentu, z datą 2026-09-02 i wyjaśnieniem, skąd pustka;
+  dla kontrastu wklejony też zestaw L z bazy pomiarowej.
+  Sekcja 6: przepływ dodania wpisu kalendarza rozpisany na `src/proxy.ts:4` i `:10`,
+  `src/lib/auth-token.ts:18`, `src/app/calendar/page.tsx:142`, `src/lib/db.ts:17`,
+  `:20`, `:23`, `:32`, `src/server/actions/calendar.ts:13`, `:17`, `:18`, `:19`,
+  `:20-34`, `:35`, `:36`, `src/lib/auth.ts:41`; każdy numer sprawdzony komendą `sed -n`.
+  NEGATYWNE: `awk '/^## 9\./{exit} /[Ss]qlite/{n++} END{print n+0}' docs/ARCHITEKTURA.md`
+  zwraca `0`. Kontrolnie: `grep -c '—' docs/ARCHITEKTURA.md` zwraca `0` (zasada Z7).
+  Znalezisko przy okazji: **F7-09**, `createCalendarEntry` nie ma wywołania z interfejsu.
 
 - [ ] **F0-07** `docs` `tooling` Naprawa dokumentów, które kłamią, i porządki
   CZYTAJ: `plan/01` sekcja 1 punkt A9, `plan/02` sekcja 4, `plan/07` sekcja START
@@ -812,6 +833,27 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - kolory brane z tokenów, nie z klas `amber-500`, `violet-500`, `emerald-500` wprost
     (zasada Z4)
   - negatywne: `npm run e2e` kod 0, czyli usunięcie paska nie zbiło żadnego selektora
+
+- [ ] **F7-09** `znalezisko` `arch` Server action `createCalendarEntry` bez wywołania z UI
+  Waga: **ważne**. Szacunek: pół dnia albo 15 minut, zależnie od dyspozycji.
+  Znalezione przy pisaniu sekcji 6 dokumentu architektury w F0-06.
+  `grep -rn 'createCalendarEntry' src/ | wc -l` zwraca `1`, czyli samą definicję
+  w `src/server/actions/calendar.ts:17`. Akcja jest kompletna (sesja, walidacja Zod,
+  `INSERT`, `revalidatePath`), ale żaden komponent jej nie woła. Wpis kalendarza da
+  się dziś dodać wyłącznie skryptem `tsx` z terminala. To samo dotyczy
+  `updateCalendarEntry` i `deleteCalendarEntry` z tego samego pliku.
+  Do decyzji usera: czy oś czasu ma dostać ręczne dodawanie wpisów z interfejsu,
+  czy `calendar_entries` zostają kanałem wyłącznie agentowym.
+  AC:
+  - decyzja zapisana w `DECISIONS.md` z datą i uzasadnieniem
+  - wariant „dodajemy UI": w widoku `/calendar` jest przycisk otwierający formularz
+    nowego wpisu, zapis idzie przez `createCalendarEntry`, po zapisie wpis widać bez
+    ręcznego odświeżenia strony; dowód: zrzut ekranu przed i po oraz test e2e
+    kończący się kodem 0
+  - wariant „kanał agentowy": trzy akcje zostają, ale plik dostaje komentarz nagłówkowy
+    mówiący wprost, że wywołuje je Claude Code, nie interfejs, a `docs/ARCHITEKTURA.md`
+    sekcja 6 zmienia zdanie o brakującym przycisku na opis świadomego wyboru
+  - negatywne: `npm run typecheck` i `npm run lint` kończą się kodem 0 w obu wariantach
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
