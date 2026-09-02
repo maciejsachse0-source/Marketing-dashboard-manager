@@ -100,4 +100,4 @@ z osobami (F4-06), potwierdzenie `docs/ARCHITEKTURA.md` przez usera.
 - **F7-19** - przeniesienie danych z `videographers.contact` do `handle` i `email`
   (36 niepustych `contact` na 60 kamerzystów w bazie pomiarowej).
 
-Commity paczki: `e977ffa` (F4-00) i dwa kolejne (F4-01, F4-02, F4-03).
+Commity paczki: `e977ffa` (F4-00), `552f504` (F4-01), `4d8c25b` (F4-02), `9a77ab2` (F4-03).
