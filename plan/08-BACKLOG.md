@@ -1286,7 +1286,7 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   BRAMKI: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 108 ostrzeżeń),
   `node scripts/check-typography.mjs` kod 0.
 
-- [ ] **F5-02** `test` `perf` Bramka wydajnościowa i wykrywanie dryfu
+- [x] **F5-02** `test` `perf` Bramka wydajnościowa i wykrywanie dryfu
   CZYTAJ: `plan/06-testy.md` sekcja 4, `plan/03` sekcja 4
   AC:
   - `report.mjs` kończy się kodem 1 przy przekroczeniu dowolnego progu z `budget.json`
@@ -1296,6 +1296,39 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   - `npm run perf` opisane w `CLAUDE.md` i `AGENTS.md` jako obowiązkowe po zmianach
     w warstwie danych i w gancie
   - negatywne: uruchomienie na pustym `perf/runs/` kończy się kodem 1, nie sukcesem
+  DOWÓD (2026-09-03): wszystkie cztery kryteria sprawdzone na kopii `perf/` w katalogu
+  tymczasowym, żeby spreparowane przebiegi nie zabrudziły historii pomiarów.
+  1. PRÓG: `perf/budget.json` z `page.calendar.p95Ms` zaniżonym do 10 ms —
+     `node scripts/perf/report.mjs` wypisuje „PRZEKROCZONE PROGI: p95 calendar: 70.3
+     wobec 10 (+603%)" i kończy się **kodem 1**. Ten sam raport na oryginalnym budżecie:
+     **kod 0**.
+  2. DRYF: spreparowany `page-2026-09-03T00-00-00-000Z.json` z `calendar` 70,3 -> 800 ms
+     (nadal poniżej limitu 900 ms, więc próg twardy tego nie łapie) daje
+     „BLOKUJE p95 calendar: 70.3 -> 800 (+1038%)" i **kod 1**. Ten sam plik z wartością
+     84 ms (+19%) daje „ostrzeżenie p95 calendar: 70.3 -> 84 (+19%)" i **kod 0**.
+  3. DOKUMENTACJA: `CLAUDE.md` (akapit pod blokiem komend) i `AGENTS.md` (wiersz
+     „Wydajność") mówią wprost, że `npm run perf` jest obowiązkowy po zmianie w warstwie
+     danych (`drizzle/`, `src/lib/db.ts`, `src/lib/context/`, `src/server/actions/`)
+     i w gancie (`src/components/calendar/`).
+  4. NEGATYWNE: pusty `perf/runs/` — „[report] brak przebiegu page-*.json w perf/runs"
+     i **kod 1**, nie sukces.
+  SZUM, CZYLI DLACZEGO BLOKADA MA DRUGI WARUNEK: sam procent dryfu łapie szum maszyny.
+  Zmierzone na 280 parach kolejnych przebiegów z `perf/runs`: największe odchylenie
+  **242%** (`p95 productions-list` 0,76 -> 2,84 ms), na stronach **77%**
+  (`p95 home` 17,6 -> 31,2 ms). Blokada wymaga więc jednocześnie ≥30% ORAZ pogorszenia
+  większego niż 10% limitu budżetowego tej metryki (`driftAbsFloorPct` w `budget.json`).
+  Dowód, że reguła nie łapie szumu i łapie regresję: `node scripts/perf/drift-selftest.mjs`
+  — „par kolejnych przebiegów: 280, fałszywe alarmy na szumie: 0, regresje pod limit
+  przepuszczone bez blokady: 0", kod 0. Potwierdzone też na żywym pomiarze: przebieg
+  z 2026-09-03 pokazał `p95 calendar-table` 31,8 -> 46,3 ms (+46%) jako **ostrzeżenie**,
+  bo 14,5 ms to mniej niż 10% z limitu 900 ms; `npm run perf` skończył się kodem 0.
+  ZMIENIONE PLIKI: `scripts/perf/drift.mjs` (nowy, sama reguła), `scripts/perf/report.mjs`
+  (blokujący dryf dopisywany do przekroczonych progów), `scripts/perf/drift-selftest.mjs`
+  (nowy, sprawdzenie reguły na zastanych przebiegach), `perf/budget.json`
+  (`driftFailPct` 30, `driftAbsFloorPct` 10), `CLAUDE.md`, `AGENTS.md`.
+  BRAMKI: `npm run typecheck` kod 0, `npm run lint` kod 0, `node scripts/check-typography.mjs`
+  kod 0, `npm run test` 193 zielone, `npm run perf` kod 0 (bundel `/calendar` 292,5 kB
+  przy progu 301,6 kB).
 
 - [ ] **F5-03** `test` Domknięcie scenariuszy end-to-end
   CZYTAJ: `plan/06-testy.md` sekcje 1 i 3

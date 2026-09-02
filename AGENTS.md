@@ -11,7 +11,7 @@ i otwórz to, co stoi w kolumnie obok. Nie czytaj wszystkiego.
 
 | Zadanie | Gdzie zajrzeć |
 |---|---|
-| Wydajność: pomiar, budżety, progi | `plan/03-wydajnosc.md`, `scripts/perf/*`, `perf/budget.json`, `perf/baseline.json`. Pomiar: `npm run perf`, wcześniej `npm run perf:serve` w drugim terminalu; tryb deweloperski osobno: `npm run perf:dev` |
+| Wydajność: pomiar, budżety, progi | `plan/03-wydajnosc.md`, `scripts/perf/*`, `perf/budget.json`, `perf/baseline.json`. Pomiar: `npm run perf`, wcześniej `npm run perf:serve` w drugim terminalu; tryb deweloperski osobno: `npm run perf:dev`. **Obowiązkowy po każdej zmianie w warstwie danych (`drizzle/`, `src/lib/db.ts`, `src/lib/context/`, `src/server/actions/`) i w gancie (`src/components/calendar/`)** — kod 1 daje przekroczony próg albo dryf powyżej 30% wobec poprzedniego przebiegu |
 | Baza i migracje | `drizzle/schema.ts`, `drizzle/migrations/`, `docs/ARCHITEKTURA.md` sekcja 5. Migracje generuje `npm run db:generate`, stosuje `npm run db:migrate`. W `migrations/` nie grzeb ręcznie |
 | Komponenty i wygląd | `plan/05-ui-system.md`, `src/components/ui/`. Klikalny element akcji wyłącznie przez `src/components/ui/button.tsx`, kolory wyłącznie przez tokeny |
 | Import osób z arkusza | `plan/04-import-excel.md`, `src/lib/import/`, ekran `/import/osoby` |

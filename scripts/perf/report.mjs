@@ -8,6 +8,7 @@
  * Kod wyjścia: 0 gdy wszystkie progi trzymają, 1 gdy którykolwiek przekroczony.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { driftVerdict } from './drift.mjs';
 
 const budget = JSON.parse(readFileSync('perf/budget.json', 'utf8'));
 
@@ -34,12 +35,14 @@ function check(label, value, limit, unit = 'ms') {
   );
 }
 
-function drift(label, now, before) {
-  if (before === undefined || before === null || before === 0) return;
-  const pct = Math.round(((now - before) / before) * 100);
-  if (Math.abs(pct) >= budget.driftPct) {
-    drifts.push({ label, before, now, pct });
-  }
+/**
+ * Dryf względem POPRZEDNIEGO przebiegu tego samego rodzaju. Sama reguła siedzi
+ * w `drift.mjs`, bo przepuszcza ją przez zastane przebiegi
+ * `node scripts/perf/drift-selftest.mjs` (dowód, że bramka nie łapie szumu).
+ */
+function drift(label, now, before, limit) {
+  const verdict = driftVerdict(now, before, limit, budget);
+  if (verdict) drifts.push({ label, ...verdict });
 }
 
 // --- strony -----------------------------------------------------------------
@@ -55,7 +58,7 @@ for (const [key, r] of Object.entries(page.pages)) {
   const limit = budget.page[key]?.p95Ms;
   if (limit === undefined) continue;
   check(`p95 ${key}`, r.p95Ms, limit);
-  drift(`p95 ${key}`, r.p95Ms, pagePrev?.pages?.[key]?.p95Ms);
+  drift(`p95 ${key}`, r.p95Ms, pagePrev?.pages?.[key]?.p95Ms, limit);
 }
 
 // --- baza -------------------------------------------------------------------
@@ -69,7 +72,7 @@ const dbPrev = dbRuns.at(-2);
 lines.push(`\nBAZA  (${db.at}, ${db.dbUrlHost})`);
 for (const [name, r] of Object.entries(db.queries)) {
   check(`p95 ${name}`, r.p95Ms, budget.db._kazdeZapytanie.p95Ms);
-  drift(`p95 ${name}`, r.p95Ms, dbPrev?.queries?.[name]?.p95Ms);
+  drift(`p95 ${name}`, r.p95Ms, dbPrev?.queries?.[name]?.p95Ms, budget.db._kazdeZapytanie.p95Ms);
   if (r.seqScan) {
     const tables = r.seqScanTables.map((s) => `${s.table}:${s.tableRows}`).join(', ');
     breaches.push({
@@ -90,7 +93,7 @@ if (devRuns.length > 0) {
   lines.push(`\nDEV  (${dev.at})`);
   for (const k of ['readyMs', 'firstCompileMs', 'warmP50Ms', 'hmrMs', 'peakRssMb']) {
     check(k, dev[k], budget.dev[k], k === 'peakRssMb' ? 'MB' : 'ms');
-    drift(k, dev[k], devPrev?.[k]);
+    drift(k, dev[k], devPrev?.[k], budget.dev[k]);
   }
 }
 
@@ -106,16 +109,37 @@ const bundleKb = bundleRun?.calendarFirstLoadKb ?? baselineBundle?.calendarFirst
 if (typeof bundleKb === 'number') {
   lines.push('\nBUNDLE');
   check('JS /calendar (gzip)', bundleKb, budget.bundle.calendarFirstLoadKb, 'kB');
-  drift('JS /calendar (gzip)', bundleKb, pageRuns.at(-2)?.bundle?.calendarFirstLoadKb);
+  drift(
+    'JS /calendar (gzip)',
+    bundleKb,
+    pageRuns.at(-2)?.bundle?.calendarFirstLoadKb,
+    budget.bundle.calendarFirstLoadKb,
+  );
 }
 
 console.log(lines.join('\n'));
 
+const blockingDrifts = drifts.filter((d) => d.blocking);
 if (drifts.length > 0) {
-  console.log(`\nDRYF względem poprzedniego przebiegu (próg ${budget.driftPct}%):`);
-  for (const d of drifts) console.log(`  ${d.label}: ${d.before} -> ${d.now} (${d.pct > 0 ? '+' : ''}${d.pct}%)`);
+  console.log(
+    `\nDRYF względem poprzedniego przebiegu (ostrzeżenie ${budget.driftPct}%, blokada ${budget.driftFailPct}% razem z ${budget.driftAbsFloorPct}% limitu):`,
+  );
+  for (const d of drifts) {
+    console.log(
+      `  ${d.blocking ? 'BLOKUJE' : 'ostrzeżenie'} ${d.label}: ${d.before} -> ${d.now} (${d.pct > 0 ? '+' : ''}${d.pct}%)`,
+    );
+  }
 } else {
   console.log(`\nDRYF: brak zmian powyżej ${budget.driftPct}% względem poprzedniego przebiegu.`);
+}
+
+for (const d of blockingDrifts) {
+  breaches.push({
+    label: `dryf ${d.label} (poprzednio ${d.before})`,
+    value: d.now,
+    limit: `+${budget.driftFailPct}%`,
+    overPct: d.pct,
+  });
 }
 
 if (breaches.length > 0) {

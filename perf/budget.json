@@ -25,5 +25,8 @@
     "hmrMs": 3000,
     "peakRssMb": 2500
   },
-  "driftPct": 15
+  "driftPct": 15,
+  "driftFailPct": 30,
+  "_driftAbsFloorPct": "Dryf blokuje fazę dopiero, gdy pogorszenie przekracza driftFailPct ORAZ jest większe niż ten procent limitu budżetowego metryki. Powód zmierzony: szum między przebiegami sięga 77% na szybkich stronach (p95 home 17,6 -> 31,2 ms), co przy limicie 600 ms jest niczym. Bez progu bezwzględnego bramka padałaby na szumie i zostałaby wyłączona.",
+  "driftAbsFloorPct": 10
 }

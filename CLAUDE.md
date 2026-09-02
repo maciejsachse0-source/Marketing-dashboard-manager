@@ -115,4 +115,12 @@ npm run perf         # pomiar bazy i stron plus raport progów
 w osobnym terminalu: `npm run perf:serve`. Pomiar trybu deweloperskiego stoi osobno,
 bo wymaga zimnego `.next`: `npm run perf:dev`.
 
+**`npm run perf` jest obowiązkowy po każdej zmianie w warstwie danych i w gancie** —
+czyli po dotknięciu `drizzle/schema.ts`, `drizzle/migrations/`, `src/lib/db.ts`,
+`src/lib/context/`, `src/server/actions/` albo `src/components/calendar/`. Raport
+kończy się kodem 1 nie tylko przy przekroczeniu progu z `perf/budget.json`, ale też
+przy dryfie powyżej 30% względem poprzedniego przebiegu (ostrzeżenie od 15%).
+Dryf blokuje dopiero, gdy pogorszenie przekracza także 10% limitu tej metryki —
+inaczej bramka padałaby na szumie maszyny, który sięga tu kilkudziesięciu procent.
+
 Domyślnie odpowiadasz po polsku, naturalnie, konkretnie.
