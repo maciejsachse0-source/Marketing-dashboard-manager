@@ -1330,7 +1330,7 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   kod 0, `npm run test` 193 zielone, `npm run perf` kod 0 (bundel `/calendar` 292,5 kB
   przy progu 301,6 kB).
 
-- [ ] **F5-03** `test` Domknięcie scenariuszy end-to-end
+- [x] **F5-03** `test` Domknięcie scenariuszy end-to-end
   CZYTAJ: `plan/06-testy.md` sekcje 1 i 3
   AC:
   - 4 scenariusze z `plan/06` sekcja 3: logowanie (istnieje od F0-02), kalendarz
@@ -1338,6 +1338,31 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   - każdy zostawia zrzut w `screenshots/F5/`
   - negatywne: scenariusze nie używają prawdziwych danych osobowych ani prawdziwych
     poświadczeń produkcyjnych
+  DOWÓD (2026-09-03): `npx playwright test` **22 zielone** (było 20), przebieg 1,6 min,
+  serwer deweloperski na porcie 3000 na bazie roboczej `marketing` (port 3000 sprawdzony
+  przed startem, `reuseExistingServer` nie podpiął się pod obcy serwer).
+  CZTERY SCENARIUSZE: logowanie — `e2e/login.spec.ts` (zastane od F0-02, dopisany zrzut);
+  kalendarz z przewijaniem i filtrem — `e2e/f5-scenariusze.spec.ts`, przewinięcie
+  sprawdzone na `scrollLeft` pasa ganta (`scrollWidth` większy od `clientWidth`,
+  `scrollLeft` po przewinięciu większy od zera), filtr przez `select` kampanii
+  z asercją na narrację wybranej kampanii; pełny import z fixture —
+  `e2e/import-osoby.spec.ts` (zastane od F4-05, „Dodano 975", dopisany zrzut);
+  dodanie produkcji — `e2e/f5-scenariusze.spec.ts`, kreator w trzech krokach, produkcja
+  potwierdzona w bazie (`select ... from productions where title = ...`) i odnośnikiem
+  na liście produkcji.
+  ZRZUTY: `screenshots/F5/F5-01-logowanie.png`, `F5-02-import-podsumowanie.png`,
+  `F5-03-kalendarz-filtr.png`, `F5-04-produkcja-dodana.png` (widok okna, nie `fullPage`
+  — pełna strona kalendarza to 16 854 px wysokości i nie da się jej przeczytać).
+  SPRZĄTANIE (pułapka z F7-21): test dodania produkcji kasuje swój wiersz w `afterAll`
+  i przed samym scenariuszem; po pełnym przebiegu
+  `select count(*) from productions where title like 'E2E%'` zwraca **0**.
+  NEGATYWNE: żadnych prawdziwych danych osobowych ani poświadczeń produkcyjnych.
+  Poświadczenia biorą się wyłącznie z `AUTH_EMAIL` i `AUTH_PASSWORD` w `.env.local`
+  (konto lokalne, plik poza gitem), w plikach `e2e/` nie ma wpisanego na sztywno adresu
+  ani hasła. Baza robocza zawiera same nazwy syntetyczne — sprawdzone zapytaniem
+  `select name, handle from artists where name !~ '^(Test|Osoba|Artysta|Ala|Ola|Import)'`,
+  które zwraca **0 wierszy**, a `videographers` jest pusta. Zrzuty obejrzane: widać na
+  nich wyłącznie nazwy w rodzaju „Artysta F1-04 1788377111132".
 
 - [ ] **F5-04** `docs` Środowisko do klikania dla zespołu
   CZYTAJ: `plan/06-testy.md` sekcja 5

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
@@ -233,6 +233,15 @@ test.describe('import osób, kroki 5 do 7', () => {
     expect(linie).toContain('{"batch":1,"of":10}');
     expect(linie).toContain('{"batch":10,"of":10}');
     expect(linie.at(-1)).toContain('"done":true');
+
+    // Zrzut scenariusza F5-03 (plan/06 sekcja 3, scenariusz „pełny import
+    // z fixture"). Fixture jest syntetyczny, na zrzucie nie ma prawdziwych osób.
+    const shots = path.join(process.cwd(), 'screenshots', 'F5');
+    mkdirSync(shots, { recursive: true });
+    await page.screenshot({
+      path: path.join(shots, 'F5-02-import-podsumowanie.png'),
+      fullPage: false,
+    });
 
     const pobranie = page.waitForEvent('download');
     await page.getByTestId('import-pobierz-bledy').click();

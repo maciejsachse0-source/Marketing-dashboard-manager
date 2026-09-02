@@ -1,3 +1,5 @@
+import { mkdirSync } from 'node:fs';
+import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 const EMAIL = process.env.AUTH_EMAIL;
@@ -21,4 +23,9 @@ test('logowanie parą z env otwiera /calendar', async ({ page }) => {
   expect(response?.status()).toBe(200);
   expect(new URL(page.url()).pathname).toBe('/calendar');
   await expect(page.getByRole('heading', { name: 'Pipeline', level: 1 })).toBeVisible();
+
+  // Zrzut scenariusza F5-03 (plan/06 sekcja 3, scenariusz „logowanie").
+  const shots = path.join(process.cwd(), 'screenshots', 'F5');
+  mkdirSync(shots, { recursive: true });
+  await page.screenshot({ path: path.join(shots, 'F5-01-logowanie.png'), fullPage: false });
 });
