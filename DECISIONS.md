@@ -91,3 +91,62 @@ do Opusa 5 w tym środowisku. Wyliczenie z sesji głównej: 120 664 tokenów prz
 raportowanych przez statusline daje okno ~1 005 000. Wniosek operacyjny: worker musi
 wołać `bash ~/.claude/agent-context.sh 1000000`. Bez argumentu dostaje liczbę pięć razy
 zawyżoną (worker paczki F0-00..F0-04 wyszedłby na 107% zamiast realnych ~21%).
+
+---
+
+## F0-05: rozmiar bundla mierzony na wydanej stronie, nie z logu builda
+
+`plan/03-wydajnosc.md` sekcja 4 każe wziąć rozmiar JavaScriptu pierwszego ładowania
+`/calendar` „z wyjścia `next build`". W Next 16.2.4 tego wyjścia nie ma: build na
+Turbopacku drukuje samą listę tras, bez kolumn `Size` i `First Load JS`, a
+`npx next build --help` nie ma flagi, która by je przywróciła.
+
+**Decyzja.** Liczbę wyznacza `scripts/perf/measure-page.mjs`: pobiera `/calendar`
+z uruchomionego serwera produkcyjnego, zbiera wszystkie skrypty ładowane z
+`/_next/static` i sumuje ich rozmiar po gzip. To ta sama definicja, tylko mierzona
+na działającej aplikacji zamiast czytana z logu, więc jest bliżej doktryny „weryfikuj
+na uruchomionej aplikacji".
+
+**Wynik startowy: 354.8 kB w 20 plikach**, czyli powyżej celu 350 kB. Zgodnie z regułą
+z tej samej sekcji progiem egzekwowanym staje się wartość startowa minus 15%, czyli
+**301.6 kB**; 350 kB zostaje celem długoterminowym. Oba progi siedzą w `perf/budget.json`.
+
+## F0-05: pomiar HMR czeka na dowód przebudowy, a nie na pierwszą odpowiedź
+
+Pierwsza wersja `measure-dev.mjs` mierzyła HMR tak: zapisz komentarz w
+`gantt-view.tsx`, zrób `GET /calendar`, zmierz czas. Wynik: **54 ms**, czyli mniej
+niż czas rozgrzanego wejścia. Powód: obserwator plików nie zdążył zauważyć zmiany
+i serwer oddał starą, już skompilowaną wersję. Pomiar mierzył nic i wyglądał świetnie.
+
+**Naprawa.** Po zapisie skrypt odpytuje stronę w pętli i uznaje za HMR dopiero
+odpowiedź wyraźnie wolniejszą od rozgrzanej (próg: trzykrotność `warmP50Ms`, nie mniej
+niż 150 ms). Gdy w 30 sekund taka nie przyjdzie, pomiar kończy się wyjątkiem, bo lepszy
+brak liczby niż liczba bez pokrycia. Po naprawie: **2079 ms**, przy progu 3000 ms.
+
+## F0-05: logowanie harnessu idzie przez formularz, nie przez podrobienie ciasteczka
+
+Kryterium mówiło „POST /login parą AUTH_EMAIL i AUTH_PASSWORD". Formularz logowania
+jest server action, więc samo `POST` z dwoma polami nie wystarcza: Next wymaga jeszcze
+pól `$ACTION_REF_*`, `$ACTION_*` i `$ACTION_KEY`.
+
+Rozważona alternatywa: podpisać ciasteczko w skrypcie tym samym HMAC-iem co
+`src/lib/auth-token.ts`. Odrzucona, bo duplikowałaby logikę bezpieczeństwa w drugim
+miejscu i pomiar przestałby przechodzić ścieżką użytkownika.
+
+**Decyzja.** Skrypt czyta pola `$ACTION_*` z HTML formularza i odsyła je razem z parą
+email plus hasło, czyli robi dokładnie to, co przeglądarka z wyłączonym JavaScriptem.
+Koszt: gdy Next zmieni kształt progressive enhancement, skrypt padnie z jasnym
+komunikatem „w HTML /login nie ma pól $ACTION_*", a nie po cichu.
+
+## F0-07: dwa pliki `*.bak.db` usunięte z repozytorium
+
+`data/marketing-crew.pre-drop.bak.db` i `data/marketing-crew.pre-flexible.bak.db` to
+kopie bazy sprzed migracji na PostgreSQL (pozycja A12 w `plan/01-analiza-i-zasady.md`).
+Silnika, który je czytał, w projekcie nie ma. Ich jedyny efekt to mylenie każdego, kto
+otwiera `data/` i wnioskuje, że dane aplikacji leżą w pliku.
+
+**Decyzja.** Usunięte z indeksu i z dysku (`git rm --cached` plus `rm`). Historia
+gita nadal je zna, więc gdyby kiedyś okazały się potrzebne, wyciąga je
+`git show <commit>:data/marketing-crew.pre-drop.bak.db`. Wzorzec w `.gitignore`
+rozszerzony z konkretnej nazwy na `/data/*.db`, żeby żaden plik bazy nie wjechał
+tam ponownie przez przypadek.

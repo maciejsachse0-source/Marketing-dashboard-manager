@@ -269,7 +269,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   zwraca `0`. Kontrolnie: `grep -c '—' docs/ARCHITEKTURA.md` zwraca `0` (zasada Z7).
   Znalezisko przy okazji: **F7-09**, `createCalendarEntry` nie ma wywołania z interfejsu.
 
-- [ ] **F0-07** `docs` `tooling` Naprawa dokumentów, które kłamią, i porządki
+- [x] **F0-07** `docs` `tooling` Naprawa dokumentów, które kłamią, i porządki
   CZYTAJ: `plan/01` sekcja 1 punkt A9, `plan/02` sekcja 4, `plan/07` sekcja START
   AC:
   - `grep -r 'better-sqlite3' README.md CLAUDE.md | wc -l` zwraca `0`; oba pliki linkują
@@ -285,6 +285,27 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     albo `NO-AGENT-TRANSCRIPT`; `cat ~/.claude/context-usage.txt` zwraca liczbę
   - negatywne: `grep -r 'artists\|videographers\|calendar_entries' README.md CLAUDE.md | wc -l`
     zwraca `0` — lista tabel żyje wyłącznie w `docs/ARCHITEKTURA.md`
+  DOWÓD (2026-09-02): `grep -r 'better-sqlite3' README.md CLAUDE.md | wc -l` zwraca `0`;
+  kontrolnie `grep -rn 'SQLite\|sqlite' README.md` też nie ma trafień. Oba pliki mają
+  teraz odesłanie `docs/ARCHITEKTURA.md` zamiast własnego opisu bazy (README sekcja
+  „Gdzie stoi serwer i jak wygląda baza", CLAUDE.md sekcja „Gdzie szukać opisu systemu”).
+  Ostrzeżenie tymczasowe z nagłówka `CLAUDE.md` usunięte w całości.
+  `CLAUDE.md` ma blok „Zestaw walidacyjny" z `typecheck`, `lint`, `test`, `e2e`, `perf`
+  plus notatkę, że `perf` wymaga wcześniejszego `perf:serve`.
+  `AGENTS.md` ma tabelę „Zadanie, a gdzie zajrzeć" z **12 wierszami**, w tym wszystkie
+  osiem wymaganych: wydajność, baza i migracje, komponenty, import, testy, architektura,
+  uruchomienie, znaleziska.
+  `git ls-files | grep -c '\.db$'` zwraca `0`; oba pliki `*.bak.db` usunięte z indeksu
+  i z dysku, powód i sposób odzyskania w `DECISIONS.md`, wpis F0-07.
+  `.gitignore` zawiera `.data-import/` (linia 49) oraz rozszerzony wzorzec `/data/*.db`.
+  `bash ~/.claude/agent-context.sh` zwraca liczbę (`84`; z obowiązkowym argumentem
+  `1000000` zwraca `15`), `cat ~/.claude/context-usage.txt` zwraca `13`.
+  NEGATYWNE: `grep -r 'artists\|videographers\|calendar_entries' README.md CLAUDE.md | wc -l`
+  zwraca `0`. Dwa trafienia, które zostały po pierwszym podejściu (import
+  `actions/artists` i przykład surowego SQL na `calendar_entries` w `CLAUDE.md`),
+  zniknęły: przykład SQL operuje teraz na jednej tabeli podanej jako ilustracja
+  i odsyła po nazwy do sekcji 5 dokumentu architektury.
+  Po zmianach `npm run typecheck`, `npm run lint` i `npm run test` kończą się kodem 0.
 
 **DoD F0:** `docs/ARCHITEKTURA.md` potwierdzony przez usera jako zgodny z jego wiedzą
 o hostingu; `perf/baseline.json` commitowany; `typecheck`, `lint`, `test`, `e2e`, `perf`

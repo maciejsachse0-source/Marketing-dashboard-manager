@@ -2,9 +2,16 @@
 
 Lokalna webapka — pulpit do zarządzania kampanią marketingową w short-form video (Reels, TikToki, Shorts).
 
-**Architektura: dashboard w przeglądarce + agenci w Claude Code.** Webapka wizualizuje dane (kalendarz, produkcje, analityka, baza artystów). Wszystkie 8 wirtualnych agentów żyją jako persony w Claude Code — każdy w pliku `agents/<slug>.md`. Mówisz do Claude Code „uruchom schedule-managera", on wczytuje persona prompt, czyta SQLite, działa.
+**Architektura: dashboard w przeglądarce + agenci w Claude Code.** Webapka wizualizuje dane (kalendarz, produkcje, analityka, baza artystów). Wszystkie 8 wirtualnych agentów żyją jako persony w Claude Code — każdy w pliku `agents/<slug>.md`. Mówisz do Claude Code „uruchom schedule-managera", on wczytuje persona prompt, czyta bazę, działa.
 
 Bez Anthropic API key. Bez kosztów per-token. Korzystasz ze swojej istniejącej subskrypcji Claude Code.
+
+## Gdzie stoi serwer i jak wygląda baza
+
+**[`docs/ARCHITEKTURA.md`](docs/ARCHITEKTURA.md)** i tylko tam. Dziewięć sekcji,
+każda z komendą, którą da się sprawdzić: hosting, provider i wersja bazy, schemat,
+rozmiar danych, przepływ żądania, zmienne środowiskowe, uruchomienie lokalne, długi.
+Ten plik świadomie tego nie powtarza, żeby oba nie mogły się rozjechać.
 
 ## Wymagania
 
@@ -31,8 +38,8 @@ Otwórz <http://localhost:3000>. Otwórz Claude Code w roocie projektu.
 │   localhost:3000         │         │                         │
 │                          │         │  @agents/schedule-      │
 │   • Kalendarz tygodnia   │◄────────│    manager.md           │
-│   • Produkcje            │  SQLite │                         │
-│   • Analityka (CSV)      │  shared │  „zaplanuj nagranie     │
+│   • Produkcje            │  baza   │                         │
+│   • Analityka (CSV)      │  wspólna│  „zaplanuj nagranie     │
 │   • Baza artystów        │         │   z Anią w czwartek"    │
 │   • Reference cards 8    │         │                         │
 │     agentów              │         │  → Server actions       │
@@ -65,7 +72,7 @@ marketing-crew/
 │   ├── lib/
 │   │   ├── agents/       # rejestr person + ich system prompty (do wyświetlania w UI)
 │   │   ├── context/      # helpery do dociągania kontekstu z bazy
-│   │   ├── db.ts         # singleton Drizzle + better-sqlite3
+│   │   ├── db.ts         # singleton Drizzle + klient bazy
 │   │   ├── env.ts        # walidacja env vars (Zod)
 │   │   ├── files.ts      # zapisy do data/files/ z path-traversal guard
 │   │   └── csv-parser.ts # detekcja formatu Meta/TikTok/YT
@@ -76,7 +83,6 @@ marketing-crew/
 │   ├── migrate.ts        # apply migrations
 │   └── seed.ts           # dane testowe
 └── data/
-    ├── marketing-crew.db # SQLite (gitignore)
     ├── agents/           # JSON-y z metadanymi agentów + system prompty (edytowalne z UI)
     ├── templates/        # production templates + rytm tygodniowy
     └── files/            # assety / CSV / outreach (gitignore)
@@ -86,13 +92,18 @@ marketing-crew/
 
 | Komenda | Co robi |
 |---|---|
-| `npm run dev` | dev server (Turbopack) |
+| `npm run dev` | dev server (webpack; wariant na Turbopacku: `npm run dev:turbo`) |
 | `npm run build` | build produkcyjny |
 | `npm run start` | start z buildu |
 | `npm run db:generate` | generuj migracje po zmianie `drizzle/schema.ts` |
 | `npm run db:migrate` | apply migracji |
 | `npm run db:studio` | przeglądarka bazy (drizzle-kit studio) |
 | `npm run db:seed` | dane testowe |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm run test` | testy jednostkowe (Vitest) |
+| `npm run e2e` | testy przeglądarkowe (Playwright) |
+| `npm run perf` | pomiar bazy i stron plus raport progów |
 
 ## Agenci
 
@@ -115,5 +126,5 @@ Każdy ma stronę `/agents/<slug>` z pełnym promptem do skopiowania, gotowym wy
 
 - Brak auto-publikacji na socialki — agent pisze copy, upload robi człowiek.
 - Brak auto-pobierania metryk — wgrywasz CSV z Meta Business Suite / TikTok Analytics / YouTube Studio przez `/analytics`.
-- Aplikacja lokalna — brak multi-user, brak hostingu cloud.
+- Jeden użytkownik, jedna para logowania ze zmiennych środowiskowych. Brak kont, ról i zespołów.
 - Agenci wymagają Claude Code (CLI lub IDE extension) — webapka sama nie ma wbudowanego LLM.

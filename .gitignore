@@ -39,9 +39,14 @@ dev.log
 .vercel
 
 # local data — sqlite + user files
-/data/marketing-crew.db
-/data/marketing-crew.db-shm
-/data/marketing-crew.db-wal
+# Pozostalosci po wersji na SQLite. Silnika juz nie ma, wpisy zostaja jako
+# bezpiecznik: gdyby ktos odpalil stary skrypt, plik bazy nie wjedzie do repo.
+/data/*.db
+/data/*.db-shm
+/data/*.db-wal
+
+# Katalog roboczy importu osob z arkusza (plan/04). Dane osobowe, nie do repo.
+.data-import/
 /data/files/
 
 # typescript
