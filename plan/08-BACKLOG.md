@@ -441,7 +441,29 @@ tabela przed i po w raporcie fazy.
 
 ## F2 — Wydajność interfejsu (kroki P5 do P8)
 
-- [ ] **F2-01** `test` Testy przypinające zachowanie ganta przed refaktorem
+- [x] **F2-01** `test` Testy przypinające zachowanie ganta przed refaktorem
+  DOWÓD (2026-09-02): `src/components/calendar/__tests__/gantt-geometry.test.ts`,
+  **14 testów w 6 grupach**, wszystkie zielone (`npx vitest run`: „Test Files 3 passed,
+  Tests 20 passed"). Pokrycie wiersza „Oś czasu ganta" z `plan/06` sekcja 3: pozycja
+  kroku wewnątrz okna, krok przed oknem (`outOfWindow: 'before'`), krok po oknie
+  (`outOfWindow: 'after'`), granica ostatniego dnia okna, produkcja bez zapisanej
+  kotwicy T0 (`source: 'tentative'`, pozycja liczona od poniedziałku tygodnia T-0),
+  okno tygodnia (7 dni) i okno kwartału (13 tygodni). Żadnej migawki drzewa —
+  `grep -c 'toMatchSnapshot' src/components/calendar/__tests__/gantt-geometry.test.ts`
+  zwraca 0.
+  Żeby dało się to w ogóle uruchomić, czysta arytmetyka została **przeniesiona bez
+  zmiany treści** z `gantt-view.tsx` do nowego `src/components/calendar/gantt-geometry.ts`:
+  import samego `gantt-view.tsx` w vitest kończy się wyjątkiem `Invalid environment
+  variables` z `src/lib/env.ts` (przez łańcuch server action → `src/lib/db.ts`), więc
+  testowanie przez komponent było niewykonalne. Jedyna nowa funkcja to `clipToWindow`,
+  która zastępuje trzy identyczne kopie przycinania w miejscu.
+  Wygląd bez zmian: `screenshots/F2/przed-calendar-week.png` wobec
+  `screenshots/F2/po-F2-01-calendar-week.png` różni się na **1050 pikselach z 7 823 808**
+  (0,013 procent), ale dwa przebiegi tego samego, niezmienionego kodu dają dokładnie
+  tę samą liczbę 1050 — czyli to szum renderowania, nie skutek zmiany. Narzędzie:
+  `node scripts/perf/pngdiff.mjs <a> <b>` (powstało tutaj). `npm run typecheck` kod 0,
+  `npm run lint` bez nowych ostrzeżeń (dwa dotychczasowe o martwych funkcjach zniknęły,
+  bo funkcje wyjechały do geometrii; trafiły do F7-12).
   CZYTAJ: `plan/06-testy.md` sekcje 2 i 3, `src/components/calendar/gantt-view.tsx`
   AC:
   - `src/components/calendar/__tests__/gantt-geometry.test.ts` z co najmniej
@@ -964,6 +986,23 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - pomiar przed i po na `/templates` i `/agents`; poprawa co najmniej 10% p95
     na dwóch ścieżkach albo ponowne cofnięcie z wpisem w `DECISIONS.md`
   - negatywne: `e2e/stale-data.spec.ts` zielony
+
+- [ ] **F7-12** `znalezisko` `ui` Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy
+  Waga: **drobne**. Szacunek: 15 minut. Znalezione przy F2-01.
+  `deriveEditingIso` i `subStageState` nie są wołane z żadnego miejsca (ESLint zgłaszał
+  to jeszcze przed refaktorem F2-01, w `gantt-view.tsx` linie 139 i 146). Po wydzieleniu
+  geometrii leżą w `src/components/calendar/gantt-geometry.ts` i nadal nie mają odbiorcy.
+  Tak samo importy `STAGE_LABEL` i `STAGE_HINT` w `gantt-view.tsx`. Nie skasowałem ich
+  przy F2-01, bo kryterium tego issue wymaga podziału czysto mechanicznego: przeniesienia
+  kodu bez zmiany zawartości. Kasowanie to osobna decyzja.
+  AC:
+  - `npm run lint 2>&1 | grep -c "gantt-view.tsx\|gantt-geometry.ts"` nie pokazuje już
+    ostrzeżeń `no-unused-vars` dla `deriveEditingIso`, `subStageState`, `STAGE_LABEL`
+    ani `STAGE_HINT`
+  - każda z tych czterech rzeczy albo znika, albo dostaje odbiorcę; wybór opisany
+    w komentarzu przy kodzie
+  - negatywne: `npm run test` kod 0, wygląd `/calendar` bez zmian (dowód: `pngdiff`
+    przed i po, poniżej 0,02 procent pikseli)
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
