@@ -35,7 +35,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
 
 ## F0 — Fundament: środowisko, przyrządy, pomiar bazowy
 
-- [ ] **F0-00** `tooling` Zależności i sprawdzenie, czy zastany kod w ogóle się buduje
+- [x] **F0-00** `tooling` Zależności i sprawdzenie, czy zastany kod w ogóle się buduje
   CZYTAJ: `package.json`, `plan/01-analiza-i-zasady.md` sekcja 1
   AC:
   - `npm install` kończy się kodem 0; `node_modules` istnieje
@@ -46,6 +46,13 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     w Next 16.2.4; gdy nie, F2-05 traci sens i zostaje zamknięte z tym uzasadnieniem
   - negatywne: `npm install` nie aktualizuje wersji istniejących zależności
     (dowód: `git diff --stat package.json` pokazuje 0 zmian)
+  DOWÓD (2026-09-02): `npm install` kod 0, `node_modules` istnieje, `git diff --stat package.json`
+  zwraca 0 linii. `npm run build` kod 0 (pierwszy przebieg padał wyłącznie na braku
+  `DATABASE_URL` i `SESSION_SECRET`, czyli na luce, którą domyka F0-01, nie na błędzie kodu;
+  TypeScript przeszedł: „Finished TypeScript in 4.7s"). `npm run dev` (webpack) Ready in 378ms,
+  `curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/login` zwraca `200`.
+  `next dev --webpack` JEST wspierany w Next 16.2.4 (`npx next dev --help` wypisuje
+  `--webpack  Starts development mode using webpack.`), więc F2-05 zachowuje sens.
 
 - [ ] **F0-01** `db` `tooling` Bazy i zmienne środowiskowe
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 2, `src/lib/env.ts`, `.env.example`
