@@ -1,0 +1,7 @@
+{
+  "seed": 1337,
+  "generatedFrom": "scripts/perf/seed-large.ts",
+  "productionId": 1,
+  "campaignId": 1,
+  "artistId": 1
+}

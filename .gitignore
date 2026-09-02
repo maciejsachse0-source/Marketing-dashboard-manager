@@ -55,3 +55,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
+
+# perf: wyniki przebiegow sa lokalne, baseline i budzet ida do repo
+/perf/runs/

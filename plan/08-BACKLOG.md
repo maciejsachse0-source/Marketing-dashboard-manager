@@ -123,7 +123,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   `grep -rn 'eslint-disable' src/ | wc -l` zwraca `0` (jedyna dyrektywa, `no-var`
   w `src/lib/db.ts`, była martwa i bez powodu, więc została usunięta zamiast opisana).
 
-- [ ] **F0-03** `perf` `db` Zestaw L
+- [x] **F0-03** `perf` `db` Zestaw L
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 2
   AC:
   - `scripts/perf/seed-large.ts` wypełnia bazę z `PERF_DATABASE_URL` liczbami wierszy
@@ -135,6 +135,22 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     z `plan/03` sekcja 3 dało się złożyć
   - negatywne: generator odmawia startu, gdy `PERF_DATABASE_URL` równa się
     `DATABASE_URL` (dowód: uruchomienie z równymi URL kończy się kodem 1 bez zapisu)
+  DOWÓD (2026-09-02): `npx tsx scripts/perf/seed-large.ts` kod 0.
+  `node scripts/perf/table-counts.mjs --json` zwraca dokładnie tabelę z `plan/03`
+  sekcja 2: artists 200, videographers 60, campaigns 40, productions 500,
+  calendar_entries 3000, posts 5000, csv_uploads 20, csv_rows 12000.
+  Determinizm: dwa przebiegi pod rząd, `diff` liczb, `diff` pierwszych 10 nazw osób
+  i `diff` `perf/fixtures-ids.json` — wszystkie trzy puste. Pierwsza dziesiątka to
+  Ewa Wójcik, Norbert Dąbrowski, Zofia Jankowski, Ewa Wiśniewska, Norbert Szymańska,
+  Norbert Szymańska, Damian Wiśniewska, Małgorzata Kozłowska, Olga Kozłowska,
+  Urszula Król. Ziarno 1337 przez `mulberry32`, zero `Math.random()`, oś czasu
+  zakotwiczona na stałej dacie zamiast `new Date()`.
+  `perf/fixtures-ids.json` zawiera `productionId: 1` i `campaignId: 1`, więc URL-e
+  `/productions/1` i `/campaigns/1` dla F0-05 dają się złożyć.
+  Negatywne: uruchomienie z `PERF_DATABASE_URL` równym `DATABASE_URL` kończy się
+  kodem **1**, baza robocza ma po nim `select count(*) from productions` = 0,
+  a `perf/fixtures-ids.json` jest bajt w bajt ten sam co przed próbą. Pusty
+  `PERF_DATABASE_URL` też kończy się kodem 1.
 
 - [ ] **F0-04** `perf` `tooling` Harness, część pierwsza: baza
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.2 i 4, `plan/02-architektura.md` sekcja 3
