@@ -1049,7 +1049,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   miała złożoność 15, rozbita na `normalizeChecked` i `toPerson`).
   `node scripts/check-typography.mjs` kod 0.
 
-- [ ] **F4-02** `import` `test` Wykrywanie duplikatów
+- [x] **F4-02** `import` `test` Wykrywanie duplikatów
   CZYTAJ: `plan/04-import-excel.md` sekcja 5
   AC:
   - `src/lib/import/dedup.ts` rozpoznaje trzy poziomy w kolejności z `plan/04` sekcja 5;
@@ -1059,6 +1059,22 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   - duplikat prawdopodobny (nazwa plus lokalizacja) domyślnie NIE jest aktualizowany
   - negatywne: dwie osoby o tej samej nazwie i różnych lokalizacjach nie są duplikatem;
     porównanie nigdy nie przekracza granicy tabeli (twórca nie jest duplikatem kamerzysty)
+
+  DOWÓD: `src/lib/import/dedup.ts` plus `src/lib/import/dedup.test.ts`, **13 testów**
+  (wymagane 6), pierwszy przebieg czerwony (`Failed to resolve import "./dedup"`).
+  Mutacja kontrolna (poziom `handle` szuka po emailu) daje **6 czerwonych**, po cofnięciu
+  znów 13 zielonych, więc testy trzymają kolejność poziomów, a nie tylko kształt wyniku.
+  Kolejność z `plan/04` sekcja 5 sprawdzona osobnym testem: gdy handle pasuje do jednego
+  wiersza, a email do innego, wygrywa handle.
+  Aktualizacja nie kasuje danych: test na wszystkich sześciu polach opcjonalnych naraz
+  daje `changes: {}` (`buildChanges` bierze tylko pola niepuste w arkuszu i różne od bazy).
+  Duplikat prawdopodobny (nazwa plus lokalizacja) zwraca `action: 'skip'` nawet przy
+  polityce `update`.
+  Negatywne: ta sama nazwa i różne lokalizacje dają `level: 'none'`; wiersz o roli
+  `videographer` z identycznym handle i lokalizacją nie jest duplikatem dla roli
+  `artist` (`findDuplicate` filtruje po roli przed jakimkolwiek porównaniem).
+  `npm run test` **71 zielonych**, `npm run lint` kod 0 z 0 błędami,
+  `node scripts/check-typography.mjs` kod 0.
 
 - [ ] **F4-03** `import` Parser arkusza, fixture i mapowanie kolumn
   CZYTAJ: `plan/04-import-excel.md` sekcje 1, 4 i 8
