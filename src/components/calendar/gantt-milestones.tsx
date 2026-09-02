@@ -7,6 +7,7 @@ import { PRODUCTION_PROGRESSION, type ProductionStatus } from '../../../drizzle/
 import { STAGE_CATEGORIES, STAGE_INDEX, subStepKey, type MilestoneSource } from './gantt-geometry';
 import { type SubStepInfo } from './gantt-substep-bar';
 import { MilestoneLabels } from './gantt-milestone-labels';
+import { Button } from '@/components/ui/button';
 
 
 /**
@@ -189,9 +190,9 @@ export function PipelineMilestones({
         const tooltip = `${cp.cat.label} · ${dateLabel}${cp.outOfWindow === 'before' ? ' (przed oknem)' : cp.outOfWindow === 'after' ? ' (po oknie)' : ''} · ${stateLabel}`;
 
         return (
-          <button
+          <Button
             key={cp.cat.key}
-            type="button"
+            variant="ghost"
             disabled={cancelled}
             onMouseEnter={() => setHoveredKey(cp.cat.key)}
             onMouseLeave={() => setHoveredKey(null)}
@@ -202,7 +203,7 @@ export function PipelineMilestones({
             aria-current={state === 'active' ? 'step' : undefined}
             aria-pressed={state === 'passed'}
             title={tooltip}
-            className={`absolute z-10 grid place-items-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+            className={`absolute z-10 grid place-items-center rounded-full p-0 border-0 bg-clip-border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
               cancelled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
             } ${
               state === 'active'
@@ -218,7 +219,7 @@ export function PipelineMilestones({
             }}
           >
             {state === 'passed' ? (
-              <Check className="w-3.5 h-3.5" strokeWidth={3} />
+              <Check className="size-3.5" strokeWidth={3} />
             ) : state === 'active' ? (
               <span className="block w-2 h-2 rounded-full bg-background animate-pulse" />
             ) : null}
@@ -230,7 +231,7 @@ export function PipelineMilestones({
                 {cp.outOfWindow === 'before' ? '‹' : '›'}
               </span>
             ) : null}
-          </button>
+          </Button>
         );
       })}
 

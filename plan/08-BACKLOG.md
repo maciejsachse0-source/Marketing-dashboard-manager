@@ -735,7 +735,7 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   F7-16). `npm run test`: 2 testy `Button` zielone. Negatywne:
   `grep -rl 'PrimaryButton\|SmallButton\|IconButton' src/ | wc -l` = 0.
 
-- [ ] **F3-02** `ui` Migracja guzików: kalendarz
+- [x] **F3-02** `ui` Migracja guzików: kalendarz
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5
   AC:
   - `grep -r '<button' src/components/calendar | wc -l` zwraca `0`
@@ -743,6 +743,26 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
     guziki bez tekstu mają `aria-label`
   - wygląd niezmieniony: zrzuty przed i po dla widoku ganta i tabeli w `screenshots/F3/`
   - negatywne: testy z F2-01 i scenariusze e2e nadal zielone
+  DOWÓD (2026-09-02): `grep -r '<button' src/components/calendar | wc -l` = 0 (przed: 11).
+  Wszystkie 11 na `<Button variant="ghost">`; guziki bez tekstu (chevrony nawigacji,
+  ikona folderu, punkty osi, pinezka, strzałka rozwijania) mają `aria-label`. Rozmiar
+  bierze się z klas oryginalnych, nie z katalogu `size`, bo geometria punktów osi zmienia
+  się w czasie działania (20, 24 albo 28 px zależnie od stanu kroku), a chevrony paska mają
+  44 x 36 px, czego katalog kwadratowych rozmiarów `icon-*` nie opisuje; wariant jest
+  z katalogu, rozmiar podany klasą - odnotowane świadomie. Wygląd: zrzuty
+  `screenshots/F3/przed-F3-02-calendar?view=week.png` wobec `po-F3-02-...`,
+  `node scripts/perf/pngdiff.mjs` = **1848 pikseli z 7 823 808** (0,024%). Pierwsze
+  podejście dawało 33 505; cztery przyczyny wytropione i usunięte jedna po drugiej:
+  (1) `[&_svg:not([class*='size-'])]:size-4` z bazowej klasy guzika powiększało ikony
+  opisane `w-5 h-5` do 16 px (naprawa: `size-5`), (2) `border border-transparent` dokładało
+  2 px wysokości guzikom bez ustalonej wysokości (naprawa: `border-0`), (3) `bg-clip-padding`
+  obcinało tło pod przezroczystą obwódką (naprawa: `bg-clip-border`), (4) `px-2.5` z
+  domyślnego rozmiaru rozpychało okrągłe znaczniki z 20 do 24 px, bo w kontenerze `grid`
+  działa `min-width: auto` (naprawa: `p-0`). Reszta, 1848 pikseli, to jaśniejsza kropka
+  wewnątrz aktywnego znacznika: geometria zmierzona w przeglądarce jest identyczna przed
+  i po (guzik 29,4 px, kropka 8,4 px), różni się wyłącznie jasność, czyli faza
+  `animate-pulse`. Negatywne: `npm run test` 21 testów zielonych, `npx playwright test`
+  8 scenariuszy zielonych, `npm run typecheck` kod 0.
 
 - [ ] **F3-03** `ui` Migracja guzików: kampanie (20 sztuk)
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5

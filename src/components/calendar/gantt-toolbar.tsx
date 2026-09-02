@@ -166,32 +166,32 @@ export function GanttToolbar({
       {/* Row 1 — Navigation, range, count, action */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="inline-flex rounded-lg border border-border bg-card overflow-hidden shadow-sm">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => navigate(-1)}
-            className="px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
+            className="h-auto border-0 rounded-none px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
             aria-label={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
             title={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
           >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
+            <ChevronLeft className="size-5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={goToday}
-            className="px-4 py-2 text-sm font-semibold border-x border-border hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
+            className="h-auto rounded-none px-4 py-2 text-sm font-semibold border-y-0 border-x border-border hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
             title="Wróć do dziś"
           >
             Dziś
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => navigate(1)}
-            className="px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
+            className="h-auto border-0 rounded-none px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
             aria-label={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
             title={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
           >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            <ChevronRight className="size-5" />
+          </Button>
         </div>
 
         <div className="flex flex-col leading-tight min-w-0">
@@ -286,15 +286,15 @@ export function GanttToolbar({
         </div>
 
         {filtersActive ? (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={resetFilters}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition"
+            className="ml-auto h-auto border-0 rounded-none p-0 gap-1.5 text-xs font-semibold text-muted-foreground hover:bg-transparent hover:text-foreground transition"
             title="Wyczyść filtry"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="size-3.5" />
             Wyczyść filtry
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -334,19 +334,19 @@ function SegmentedControl<T>({
         {options.map((o) => {
           const selected = getKey(o) === getKey(current);
           return (
-            <button
+            <Button
               key={getKey(o)}
-              type="button"
+              variant="ghost"
               onClick={() => onChange(o)}
-              className={`px-2.5 py-1 text-xs font-semibold ui-transition active:scale-[0.96] ${
+              className={`h-auto border-0 rounded-none px-2.5 py-1 text-xs font-semibold ui-transition active:scale-[0.96] ${
                 selected
-                  ? 'bg-foreground text-background shadow-inner'
+                  ? 'bg-foreground text-background shadow-inner hover:bg-foreground hover:text-background'
                   : 'hover:bg-muted/60 text-muted-foreground hover:text-foreground'
               }`}
               aria-pressed={selected}
             >
               {getLabel(o)}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -376,21 +376,21 @@ function DisplayModeToggle({
       {options.map(({ key, label, Icon }) => {
         const selected = key === current;
         return (
-          <button
+          <Button
             key={key}
-            type="button"
+            variant="ghost"
             onClick={() => onChange(key)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold ui-transition active:scale-[0.96] ${
+            className={`h-auto border-0 rounded-none gap-1.5 px-3 py-1.5 text-xs font-semibold ui-transition active:scale-[0.96] ${
               selected
-                ? 'bg-foreground text-background shadow-inner'
+                ? 'bg-foreground text-background shadow-inner hover:bg-foreground hover:text-background'
                 : 'hover:bg-muted/60 text-muted-foreground hover:text-foreground'
             }`}
             aria-pressed={selected}
             title={`Widok: ${label}`}
           >
-            <Icon className="w-3.5 h-3.5" />
+            <Icon className="size-3.5" />
             {label}
-          </button>
+          </Button>
         );
       })}
     </div>

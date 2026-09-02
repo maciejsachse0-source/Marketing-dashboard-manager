@@ -7,6 +7,7 @@ import { ProductionPeopleStack } from '@/components/productions/production-peopl
 import { NextStepIndicator } from './gantt-next-step';
 import type { GanttRow } from './gantt-geometry';
 import type { SubStepInfo } from './gantt-substep-bar';
+import { Button } from '@/components/ui/button';
 
 /**
  * Lewa szyna wiersza ganta: awatar, nazwa artysty, wskaźnik następnego kroku
@@ -70,18 +71,18 @@ export function GanttRowRail({
                     >
                       {displayName}
                     </Link>
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
                       onClick={() => setExpanded((v) => !v)}
-                      className="shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
+                      className="h-auto border-0 shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
                       aria-expanded={expanded}
                       aria-label={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
                       title={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
                     >
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
+                        className={`size-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
                       />
-                    </button>
+                    </Button>
                   </div>
                   <div
                     className={`text-xs truncate leading-tight mt-0.5 ${

@@ -5,6 +5,7 @@ import { cascadeStepsTo } from '@/server/actions/production-steps';
 import { PRODUCTION_PROGRESSION, type ProductionStatus } from '../../../drizzle/schema';
 import { STAGE_INDEX, subStepKey, type StageCategory, type WeekFrameCode } from './gantt-geometry';
 import { FRAME_TONE } from './gantt-frames';
+import { Button } from '@/components/ui/button';
 
 /**
  * 9-step numbered sub-progress bar — positioned ABSOLUTELY in the timeline
@@ -246,9 +247,9 @@ export function SubStepBar({
         const customRing = isCustom ? 'ring-1 ring-offset-1 ring-offset-background ring-foreground/15' : '';
 
         return (
-          <button
+          <Button
             key={k}
-            type="button"
+            variant="ghost"
             disabled={cancelled}
             onMouseEnter={() => setHoveredKey(k)}
             onMouseLeave={() => setHoveredKey(null)}
@@ -260,7 +261,7 @@ export function SubStepBar({
             aria-current={state === 'active' ? 'step' : undefined}
             title={tooltip}
             style={{ top: TRACK_TOP, left: `${x}%`, transform: 'translate(-50%, -50%)' }}
-            className={`absolute z-20 grid place-items-center rounded-full text-[11px] font-bold tabular-nums transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+            className={`absolute z-20 grid place-items-center rounded-full p-0 border-0 bg-clip-border text-[11px] font-bold tabular-nums transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
               cancelled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
             } ${customRing} ${
               state === 'passed'
@@ -279,7 +280,7 @@ export function SubStepBar({
                 {s.outOfWindow === 'before' ? '‹' : '›'}
               </span>
             ) : null}
-          </button>
+          </Button>
         );
       })}
 

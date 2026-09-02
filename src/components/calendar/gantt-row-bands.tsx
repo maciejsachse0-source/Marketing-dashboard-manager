@@ -6,6 +6,7 @@ import { openProductionFolder } from '@/server/actions/production-folder';
 import { FRAME_TONE } from './gantt-frames';
 import type { GanttRow } from './gantt-geometry';
 import type { RowModel } from './gantt-row-model';
+import { Button } from '@/components/ui/button';
 
 /**
  * Górny pas wiersza: tło siatki kalendarza, pasy T1/T2/T3, skróty do folderów
@@ -93,9 +94,9 @@ export function GanttRowBands({
                 }}
               >
                 {stages.map(({ stage, label }) => (
-                  <button
+                  <Button
                     key={stage}
-                    type="button"
+                    variant="ghost"
                     onClick={() => {
                       void openProductionFolder(row.id, stage).then((res) => {
                         if (!res.ok) {
@@ -108,10 +109,10 @@ export function GanttRowBands({
                     }}
                     aria-label={`Otwórz folder ${label} dla ${displayName}`}
                     title={`Otwórz folder: ${label}`}
-                    className={`grid place-items-center w-6 h-6 rounded ${tone.passed} shadow-sm hover:scale-110 hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
+                    className={`grid place-items-center w-6 h-6 rounded p-0 border-0 bg-clip-border ${tone.passed} shadow-sm hover:scale-110 hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
                   >
-                    <FolderOpen className="w-3.5 h-3.5" />
-                  </button>
+                    <FolderOpen className="size-3.5" />
+                  </Button>
                 ))}
               </div>
             );
@@ -155,14 +156,14 @@ export function GanttRowBands({
                   className={`absolute left-1/2 -translate-x-1/2 -top-4 -bottom-4 w-px ${tone.passed.split(' ')[0]} opacity-40 group-hover/pin:opacity-80 transition`}
                   aria-hidden
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   aria-label={ariaLabel}
                   tabIndex={0}
-                  className={`relative grid place-items-center w-7 h-7 rounded-full text-[11px] font-bold tabular-nums border-2 border-white shadow-md ring-1 ring-black/5 ${tone.passed} cursor-help group-hover/pin:scale-110 group-hover/pin:shadow-lg group-focus-within/pin:scale-110 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
+                  className={`relative grid place-items-center w-7 h-7 rounded-full p-0 bg-clip-border text-[11px] font-bold tabular-nums border-2 border-white shadow-md ring-1 ring-black/5 ${tone.passed} cursor-help group-hover/pin:scale-110 group-hover/pin:shadow-lg group-focus-within/pin:scale-110 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40`}
                 >
                   {pin.n}
-                </button>
+                </Button>
                 {/* Hover/focus card — appears above the pin with full step
                     context. Uses pointer-events-none so it never traps the
                     cursor; the parent group keeps it visible while the user
