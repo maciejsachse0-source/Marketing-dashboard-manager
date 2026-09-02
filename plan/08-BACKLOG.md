@@ -152,7 +152,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   a `perf/fixtures-ids.json` jest bajt w bajt ten sam co przed próbą. Pusty
   `PERF_DATABASE_URL` też kończy się kodem 1.
 
-- [ ] **F0-04** `perf` `tooling` Harness, część pierwsza: baza
+- [x] **F0-04** `perf` `tooling` Harness, część pierwsza: baza
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.2 i 4, `plan/02-architektura.md` sekcja 3
   AC:
   - `scripts/perf/pg-info.mjs` wypisuje wersję Postgresa, host, listę indeksów
@@ -165,6 +165,25 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     na p50 o mniej niż 10% dla każdego zapytania (dowód: dwa pliki w `perf/runs/`)
   - negatywne: skrypt kończy się kodem 1, gdy `PERF_DATABASE_URL` jest pusty albo baza
     jest pusta (0 wierszy w `productions`), zamiast raportować świetne czasy na pustce
+  DOWÓD (2026-09-02): `npm run pg:info` wypisuje Postgres **17.11 (Debian 17.11-1.pgdg13+2)**,
+  host `127.0.0.1:5433/marketing_perf`, `max_connections` 100, listę **12 indeksów**
+  z `pg_indexes` (wszystkie to `_pkey`, co potwierdza A1: zero indeksów poza kluczami
+  głównymi) i liczby wierszy per tabela. Klient: `postgres-js`, `psql` nieużywany.
+  `node scripts/perf/measure-db.mjs` zwraca dla 4 zapytań krytycznych p50, p95, `rows`
+  oraz `seqScan` z `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` przez ten sam klient.
+  Stan wyjściowy (zestaw L, przed indeksami z F1-01):
+  calendar-window p50 1,39 p95 ok. 1,6 `seqScan: true` (`calendar_entries:3000`);
+  productions-list p50 0,72 `seqScan: false`;
+  campaign-detail p50 0,55 `seqScan: false`;
+  posts-analytics p50 1,14 `seqScan: true` (`posts:5000`).
+  Powtarzalność: po **restarcie kontenera** `mc-pg`, czyli przy zimnym cache serwera,
+  trzy przebiegi pod rząd dają max różnicę p50 **7,9%** (przebieg 1 vs 2) i **5,4%**
+  (2 vs 3), obie poniżej progu 10%. Pliki w `perf/runs/`. Droga do tego wyniku
+  (rozgrzewka adaptacyjna zamiast stałej) opisana w `DECISIONS.md`.
+  Negatywne: pusty `PERF_DATABASE_URL` kończy się kodem **1**; baza z 0 wierszy
+  w `productions` (`marketing_test`) kończy się kodem **1** z komunikatem
+  „odmawiam pomiaru na pustce", a liczba plików w `perf/runs/` przed i po próbie
+  jest ta sama (3 i 3), czyli nic nie zostało zapisane.
 
 - [ ] **F0-05** `perf` `tooling` ⚠ HARD Harness, część druga: strony, dev, raport, baseline
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.1, 1.3, 3 i 4, `src/proxy.ts`
