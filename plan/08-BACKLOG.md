@@ -185,7 +185,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   „odmawiam pomiaru na pustce", a liczba plików w `perf/runs/` przed i po próbie
   jest ta sama (3 i 3), czyli nic nie zostało zapisane.
 
-- [ ] **F0-05** `perf` `tooling` ⚠ HARD Harness, część druga: strony, dev, raport, baseline
+- [x] **F0-05** `perf` `tooling` ⚠ HARD Harness, część druga: strony, dev, raport, baseline
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.1, 1.3, 3 i 4, `src/proxy.ts`
   AC:
   - `scripts/perf/measure-page.mjs` sam się loguje: `POST /login` parą `AUTH_EMAIL`
@@ -211,6 +211,26 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   - negatywne: harness odmawia zapisu, gdy którakolwiek odpowiedź ma status inny niż 200
     (dowód: uruchomienie z błędnym `BASE_URL` kończy się kodem 1 i nie tworzy pliku
     w `perf/runs/`)
+  DOWÓD (2026-09-02): pomiar na URUCHOMIONYM serwerze produkcyjnym (`npm run perf:serve`,
+  `next build` + `next start` z `DATABASE_URL` = `PERF_DATABASE_URL`, baza `marketing_perf`
+  z zestawem L, 500 produkcji). `node scripts/perf/measure-page.mjs` loguje się sam
+  i mierzy 7 ścieżek, p95 kolejno: home 21.7 ms, calendar 64.3, calendar-table 30.2,
+  productions 126, production-detail 23.6, campaign-detail 39.2, analytics 34.8;
+  `dbUrlHost` w wyniku to `127.0.0.1:5433/marketing_perf`.
+  `npm run perf:dev`: readyMs 619, firstCompileMs 2603, warmP50Ms 49, hmrMs 2079,
+  peakRssMb 1510 (`perf/runs/dev-2026-09-02T18-43-13-209Z.json`).
+  `node scripts/perf/report.mjs` kończy się kodem 1 i wypisuje trzy przekroczenia:
+  `seqScan calendar-window (calendar_entries:3000)`, `seqScan posts-analytics (posts:5000)`,
+  `JS /calendar (gzip): 354.8 wobec 301.6 (+18%)`; dryf liczony wobec poprzedniego pliku
+  w `perf/runs/`, nie wobec baseline. `perf/baseline.json` niesie `mode: "local-docker"`,
+  `commit: f337f1f`, pomiar produkcyjny, deweloperski i `bundle.calendarFirstLoadKb: 354.8`.
+  Próg bundla w `perf/budget.json` skorygowany regułą z plan/03 sekcja 4:
+  354.8 minus 15% = 301.6 kB, cel 350 kB został celem długoterminowym.
+  NEGATYWNE: `BASE_URL=http://localhost:3999 node scripts/perf/measure-page.mjs` kończy się
+  kodem 1, liczba plików w `perf/runs/` przed i po jest ta sama (9 i 9). Drugi wariant
+  potwierdzony przy okazji: uruchomienie przeciw serwerowi na bazie roboczej dało
+  `/productions/1` -> 404, kod 1, brak zapisu.
+  Zrzut: `screenshots/F0/`.
 
 - [ ] **F0-06** `arch` `docs` Dokument architektury
   CZYTAJ: `plan/02-architektura.md` sekcje 1, 2 i 3
@@ -771,6 +791,27 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `npx eslint . -f json | grep -c 'no-unused-vars'` zwraca `0`
   - dla każdej usuniętej zmiennej sprawdzone, czy nie miała być użyta; przypadki
     „miała być" opisane w `DECISIONS.md` zamiast po cichu skasowane
+
+- [ ] **F7-08** `znalezisko` `ui` Lewy pasek akcentu, zakazany zasadą Z8
+  Waga: **ważne**. Szacunek: 1 godzina.
+  Znalezione przy zrzucie ekranu do F0-05: karta „Następny krok" w gancie ma pionowy
+  pasek koloru przyklejony do lewej krawędzi
+  (`src/components/calendar/gantt-view.tsx:1586`, `absolute left-0 top-1.5 bottom-1.5
+  w-[4px] rounded-full`), a cytat w oknie pomocy ma to samo w wersji tailwindowej
+  (`src/components/help-dialog.tsx:362`, `border-l-2 border-amber-400/60`).
+  Zasada Z8 zakazuje lewego brandowego paska akcentu wprost. Pasma T1/T2/T3 mają nadal być
+  rozróżnialne kolorem, więc to nie jest „usuń i zapomnij": kolor przenosi się na
+  kropkę z numerem kroku i na etykietę pasma, które już istnieją w tej karcie.
+  Uwaga na fałszywe trafienia: `gantt-view.tsx:1410` i `:1434` też używają `border-l-2`,
+  ale rysują linie drzewa łączące kroki, nie pasek akcentu, i zostają.
+  AC:
+  - `grep -rn 'border-l-2\|border-l-4\|left-0 top-1.5 bottom-1.5' src/ | wc -l` zwraca `2`
+    (zostają wyłącznie dwie linie drzewa w gancie)
+  - karta „Następny krok" nadal rozróżnia pasma T1, T2 i T3 kolorem, dowód: zrzut ekranu
+    `/calendar?week=2026-03-02` z trzema kartami w różnych pasmach obok siebie
+  - kolory brane z tokenów, nie z klas `amber-500`, `violet-500`, `emerald-500` wprost
+    (zasada Z4)
+  - negatywne: `npm run e2e` kod 0, czyli usunięcie paska nie zbiło żadnego selektora
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.

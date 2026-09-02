@@ -1,0 +1,35 @@
+
+STRONY  (2026-09-02T18:43:50.956Z, serwer http://localhost:3000, baza 127.0.0.1:5433/marketing_perf)
+  ok   p95 home                               26.1 ms / limit 600
+  ok   p95 calendar                           70.8 ms / limit 900
+  ok   p95 calendar-table                       29 ms / limit 900
+  ok   p95 productions                       119.8 ms / limit 600
+  ok   p95 production-detail                  23.8 ms / limit 900
+  ok   p95 campaign-detail                    36.9 ms / limit 900
+  ok   p95 analytics                          31.7 ms / limit 600
+
+BAZA  (2026-09-02T18:43:46.562Z, 127.0.0.1:5433/marketing_perf)
+  ok   p95 calendar-window                    1.92 ms / limit 120
+ PRÓG  seqScan calendar-window            calendar_entries:3000
+  ok   p95 productions-list                   1.08 ms / limit 120
+  ok   p95 campaign-detail                    0.79 ms / limit 120
+  ok   p95 posts-analytics                     1.4 ms / limit 120
+ PRÓG  seqScan posts-analytics            posts:5000
+
+DEV  (2026-09-02T18:43:13.209Z)
+  ok   readyMs                                 619 ms / limit 8000
+  ok   firstCompileMs                         2603 ms / limit 15000
+  ok   warmP50Ms                                49 ms / limit 1200
+  ok   hmrMs                                  2079 ms / limit 3000
+  ok   peakRssMb                              1510 MB / limit 2500
+
+BUNDLE
+ PRÓG  JS /calendar (gzip)                   354.8 kB / limit 301.6
+
+DRYF względem poprzedniego przebiegu (próg 15%):
+  p95 home: 21.7 -> 26.1 (+20%)
+
+PRZEKROCZONE PROGI:
+  seqScan calendar-window (calendar_entries:3000): jest wobec brak
+  seqScan posts-analytics (posts:5000): jest wobec brak
+  JS /calendar (gzip): 354.8 wobec 301.6 (+18%)

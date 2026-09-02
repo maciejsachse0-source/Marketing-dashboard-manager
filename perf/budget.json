@@ -1,0 +1,29 @@
+{
+  "_zrodlo": "plan/03-wydajnosc.md sekcja 4. Progi twarde, zestaw L, tryb produkcyjny.",
+  "page": {
+    "home": { "p95Ms": 600 },
+    "productions": { "p95Ms": 600 },
+    "analytics": { "p95Ms": 600 },
+    "calendar": { "p95Ms": 900 },
+    "calendar-table": { "p95Ms": 900 },
+    "campaign-detail": { "p95Ms": 900 },
+    "production-detail": { "p95Ms": 900 }
+  },
+  "db": {
+    "_kazdeZapytanie": { "p95Ms": 120 },
+    "seqScanMinTableRows": 1000
+  },
+  "bundle": {
+    "_opis": "Rozmiar JS pierwszego ładowania /calendar po gzip, z wyjścia next build. Wartość startowa zmierzona w F0-05: 354.8 kB, czyli powyżej celu 350 kB. Zgodnie z regułą z plan/03 sekcja 4 próg egzekwowany to wartość startowa minus 15%, czyli 301.6 kB; 350 kB zostaje celem długoterminowym.",
+    "calendarFirstLoadKbTarget": 350,
+    "calendarFirstLoadKb": 301.6
+  },
+  "dev": {
+    "readyMs": 8000,
+    "firstCompileMs": 15000,
+    "warmP50Ms": 1200,
+    "hmrMs": 3000,
+    "peakRssMb": 2500
+  },
+  "driftPct": 15
+}

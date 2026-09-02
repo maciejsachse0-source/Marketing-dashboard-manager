@@ -1,0 +1,135 @@
+{
+  "_opis": "Pomiar bazowy przed jakąkolwiek optymalizacją. Tryb produkcyjny mierzony przez npm run perf:serve (next build + next start z DATABASE_URL = PERF_DATABASE_URL), tryb deweloperski przez npm run perf:dev na bazie roboczej.",
+  "mode": "local-docker",
+  "_mode": "Baza to kontener Docker na 127.0.0.1:5433, nie hosting produkcyjny. Liczby nie zawierają RTT do bazy zdalnej. Gdy user dostarczy DATABASE_URL do prawdziwej bazy, baseline trzeba przemierzyć i zapisać z mode = remote.",
+  "at": "2026-09-02T18:44:03.480Z",
+  "commit": "f337f1f",
+  "node": "v26.7.0",
+  "host": "Mac mini M1, 16 GB, macOS",
+  "dataset": "L (plan/03 sekcja 2), baza marketing_perf",
+  "production": {
+    "at": "2026-09-02T18:43:50.956Z",
+    "baseUrl": "http://localhost:3000",
+    "dbUrlHost": "127.0.0.1:5433/marketing_perf",
+    "warmup": 3,
+    "runs": 11,
+    "pages": {
+      "home": {
+        "url": "/",
+        "p50Ms": 14.2,
+        "p95Ms": 26.1,
+        "bytes": 67509,
+        "status": 200
+      },
+      "calendar": {
+        "url": "/calendar?week=2026-03-02",
+        "p50Ms": 59.4,
+        "p95Ms": 70.8,
+        "bytes": 1674069,
+        "status": 200
+      },
+      "calendar-table": {
+        "url": "/calendar?week=2026-03-02&mode=table",
+        "p50Ms": 24.9,
+        "p95Ms": 29,
+        "bytes": 413198,
+        "status": 200
+      },
+      "productions": {
+        "url": "/productions/list",
+        "p50Ms": 115.5,
+        "p95Ms": 119.8,
+        "bytes": 4528801,
+        "status": 200
+      },
+      "production-detail": {
+        "url": "/productions/1",
+        "p50Ms": 21.2,
+        "p95Ms": 23.8,
+        "bytes": 155195,
+        "status": 200
+      },
+      "campaign-detail": {
+        "url": "/campaigns/1",
+        "p50Ms": 34.5,
+        "p95Ms": 36.9,
+        "bytes": 560866,
+        "status": 200
+      },
+      "analytics": {
+        "url": "/analytics",
+        "p50Ms": 26.4,
+        "p95Ms": 31.7,
+        "bytes": 267336,
+        "status": 200
+      }
+    }
+  },
+  "db": {
+    "at": "2026-09-02T18:43:46.562Z",
+    "dbUrlHost": "127.0.0.1:5433/marketing_perf",
+    "runs": 25,
+    "queries": {
+      "calendar-window": {
+        "p50Ms": 1.8,
+        "p95Ms": 1.92,
+        "rows": 118,
+        "seqScan": true,
+        "seqScanTables": [
+          {
+            "table": "calendar_entries",
+            "scanRows": 118,
+            "tableRows": 3000
+          }
+        ],
+        "plan": "Sort"
+      },
+      "productions-list": {
+        "p50Ms": 1,
+        "p95Ms": 1.08,
+        "rows": 100,
+        "seqScan": false,
+        "seqScanTables": [],
+        "plan": "Limit"
+      },
+      "campaign-detail": {
+        "p50Ms": 0.75,
+        "p95Ms": 0.79,
+        "rows": 11,
+        "seqScan": false,
+        "seqScanTables": [],
+        "plan": "Sort"
+      },
+      "posts-analytics": {
+        "p50Ms": 1.26,
+        "p95Ms": 1.4,
+        "rows": 6,
+        "seqScan": true,
+        "seqScanTables": [
+          {
+            "table": "posts",
+            "scanRows": 1002,
+            "tableRows": 5000
+          }
+        ],
+        "plan": "Sort"
+      }
+    }
+  },
+  "dev": {
+    "at": "2026-09-02T18:43:13.209Z",
+    "readyMs": 619,
+    "firstCompileMs": 2603,
+    "warmP50Ms": 49,
+    "hmrMs": 2079,
+    "peakRssMb": 1510,
+    "note": "mierzone na bazie roboczej marketing, bo pomiar dotyczy kompilacji, nie danych"
+  },
+  "bundle": {
+    "calendarFirstLoadKb": 354.8,
+    "files": 20,
+    "method": "suma gzip wszystkich /_next/static/*.js linkowanych przez /calendar; next build w 16.2.4 nie drukuje już kolumny First Load JS",
+    "targetKb": 350,
+    "enforcedKb": 301.6
+  }
+}

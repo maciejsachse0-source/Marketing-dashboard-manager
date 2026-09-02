@@ -17,7 +17,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "pg:info": "node scripts/perf/pg-info.mjs"
+    "pg:info": "node scripts/perf/pg-info.mjs",
+    "perf": "node scripts/perf/measure-db.mjs && node scripts/perf/measure-page.mjs && node scripts/perf/report.mjs",
+    "perf:dev": "node scripts/perf/measure-dev.mjs",
+    "perf:serve": "next build && node scripts/perf/start-perf.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
