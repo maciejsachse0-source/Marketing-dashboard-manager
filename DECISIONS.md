@@ -270,3 +270,56 @@ które istnieją, z gotowym przepisem technicznym z tego wpisu).
 od cache: że mutacja z interfejsu odświeża widok bez twardego przeładowania.
 Scenariusz dodaje osobę przez formularz, a nie wpis kalendarza jak mówiło pierwotne
 kryterium, bo wpisu kalendarza nie da się dodać z interfejsu (znalezisko F7-09).
+
+## F1 — raport fazy (2026-09-02)
+
+**Cztery issues, cztery różne wyniki.** F1-01 i F1-02 poprawiły liczby. F1-03 poprawił
+kod, ale nie liczby, więc wrócił. F1-04 nie miał niczego przyspieszać i nie przyspieszył
+— zawęża zasięg unieważniania i stawia pod tym siatkę pięciu scenariuszy e2e.
+
+**Baza, przed i po (`measure-db.mjs`, p95 w milisekundach).**
+
+| zapytanie | przed (baseline) | po F1-01 | seqScan przed | seqScan po |
+|---|---|---|---|---|
+| calendar-window | 1,82 | 1,49 | **tak** | nie |
+| productions-list | 1,04 | 1,13 | nie | nie |
+| campaign-detail | 0,83 | 0,70 | nie | nie |
+| posts-analytics | 1,47 | 0,95 | **tak** | nie |
+
+Oba Seq Scany zniknęły, wszystkie cztery zapytania są o dwa rzędy wielkości poniżej
+progu 120 ms. Indeksów w bazie jest 25 zamiast 12: dwanaście kluczy głównych i trzynaście
+nowych z migracji `0002`.
+
+**Strony, przed i po (`measure-page.mjs`, p95 w milisekundach, mediana z trzech przebiegów).**
+
+| strona | baseline | po F1-01 | po F1-02 | po F1-03 (cofnięte) | stan końcowy |
+|---|---|---|---|---|---|
+| home | 21,7 | 25,8 | 12,3 | 11,7 | 15,5 |
+| calendar | 64,3 | 63,8 | 63,8 | 59,8 | 81,6 |
+| calendar-table | 30,2 | 30,2 | 26,5 | 25,5 | 27,4 |
+| productions | 126,0 | 128,1 | 128,1 | 132,5 | 165,5 |
+| production-detail | 23,6 | 23,1 | 23,1 | 22,4 | 25,0 |
+| campaign-detail | 39,2 | 40,3 | 30,7 | 34,1 | 33,1 |
+| analytics | 34,8 | 34,8 | 27,5 | 28,0 | 30,3 |
+
+Czytać to trzeba ostrożnie i tak też jest napisane. Kolumna „stan końcowy" pochodzi
+z pojedynczego przebiegu `npm run perf`, nie z mediany, i widać w niej szum: `calendar`
+81,6 wobec 59,8 zmierzonych chwilę wcześniej, `productions` 165,5 wobec 132,5. Rozrzut
+między przebiegami na tej maszynie sięga 40% i jest większy niż każdy efekt, którego
+szukamy poniżej `home` i `campaign-detail`. **Jedyne dwie zmiany, które wychodzą ponad
+szum, to `home` (25,8 → 12,3, czyli -52%) i `campaign-detail` (40,3 → 30,7, -24%), obie
+z F1-02.** Reszta tabeli to zapis stanu, nie dowód poprawy.
+
+**Definition of Done fazy F1, punkt po punkcie.**
+
+1. „`npm run perf` kod 0 dla progów bazodanowych (p95 zapytań, `seqScan`)" — **spełnione**.
+   Wszystkie cztery progi bazodanowe raportują `ok`, `seqScan` jest `nie` dla każdego
+   zapytania. Samo `npm run perf` kończy się kodem **1**, ale wyłącznie z powodu progu
+   rozmiaru bundla (`JS /calendar (gzip)`: 354,8 kB wobec 301,6 kB), który jest zadaniem
+   fazy F2 (kroki P7 i P8), nie F1.
+2. „tabela przed i po w raporcie fazy" — **spełnione**, dwie tabele wyżej.
+
+**Co zostało otwarte.** F7-10 i F7-11, oba z F1-03: zestaw pomiarowy nie zawiera danych
+katalogowych, więc krok P3 nie miał czego przyspieszyć, a przepis techniczny na jego
+powtórzenie leży gotowy we wpisie „F1-03". Otwarta zostaje też bramka z F0: potwierdzenie
+`docs/ARCHITEKTURA.md` przez usera.
