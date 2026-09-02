@@ -1364,7 +1364,7 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   które zwraca **0 wierszy**, a `videographers` jest pusta. Zrzuty obejrzane: widać na
   nich wyłącznie nazwy w rodzaju „Artysta F1-04 1788377111132".
 
-- [ ] **F5-04** `docs` Środowisko do klikania dla zespołu
+- [ ] **F5-04** `docs` ⏳ CZĘŚCIOWO, `BLOCKED-ASK-USER` na publicznym adresie: środowisko do klikania dla zespołu
   CZYTAJ: `plan/06-testy.md` sekcja 5
   AC:
   - aplikacja dostępna pod adresem, który członek zespołu otwiera bez instalowania
@@ -1375,6 +1375,51 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
     po odhaczeniu F7
   - negatywne: środowisko testowe nie używa bazy produkcyjnej (dowód: różne hosty
     w URL, wpisane do dokumentu)
+  STAN (2026-09-03): trzy kryteria z czterech spełnione, pierwsze spełnione tylko
+  w sieci lokalnej. Issue zostaje otwarte, bo publiczny adres jest decyzją usera.
+  1. ADRES — CZĘŚCIOWO. Środowisko stoi i działa: `npm run preview:setup`
+     (schemat plus zestaw L) oraz `npm run preview:serve` (`next build` plus
+     `next start -p 3001 -H 0.0.0.0`, skrypt `scripts/preview.mjs`). Kolega z tej samej
+     sieci otwiera `http://192.168.1.42:3001` bez instalowania czegokolwiek —
+     ale **zaloguje się dopiero po https**: `next start` biegnie z `NODE_ENV=production`,
+     więc ciasteczko sesji ma flagę `secure` i po `http://` przeglądarka je wyrzuca.
+     Zmierzone: po zalogowaniu na `http://192.168.1.42:3001` wejście na
+     `/productions/list` odbija na `/login?next=%2Fproductions%2Flist`.
+     Przejście po https sprawdzone na tailnecie tej maszyny
+     (`tailscale serve --bg --https=8443 http://127.0.0.1:3001`): logowanie przechodzi,
+     lista pokazuje 500 produkcji, zrzut `screenshots/F5/F5-05-srodowisko-podgladowe.png`.
+     Serwowanie po sprawdzeniu **wyłączone** (`tailscale serve --https=8443 off`,
+     `tailscale serve status` wraca do jednego wpisu), bo tailnet wymaga od zespołu
+     instalacji klienta, a kryterium mówi „bez instalowania czegokolwiek".
+     CZEGO POTRZEBA OD USERA: zgody na jedno z dwóch — (a) `tailscale funnel --bg
+     --https=443 http://127.0.0.1:3001`, publiczny adres `https://jans-mac-mini.
+     tailb37a7a.ts.net`, zero kont i opłat, ale wystawia aplikację publicznie i zajmuje
+     port 443, na którym stoi dziś vibe-kanban; (b) hosting (Vercel plus Postgres),
+     co wymaga konta z sekcji 2 dokumentu architektury oraz **wypchnięcia repozytorium
+     poza tę maszynę**, a w historii gita siedzą prawdziwe dane osobowe (F4-07).
+     Opis obu dróg: `docs/ARCHITEKTURA.md` sekcja 2.1.
+  2. ZESTAW L, ZERO PRAWDZIWYCH OSÓB — SPEŁNIONE. Osobna baza `marketing_preview`
+     (`PREVIEW_DATABASE_URL`), wypełniona generatorem `scripts/perf/seed-large.ts`
+     (ziarno 1337). `node scripts/perf/table-counts.mjs --preview`: artists 200,
+     videographers 60, campaigns 40, productions 500, calendar_entries 3000, posts 5000,
+     csv_uploads 20, csv_rows 12000 — dokładnie liczby z `plan/03` sekcja 2.
+     Wyrywkowo 10 pierwszych nazw: „Ewa Wójcik", „Norbert Dąbrowski", „Zofia Jankowski",
+     „Ewa Wiśniewska", „Norbert Szymańska", „Norbert Szymańska", „Damian Wiśniewska",
+     „Małgorzata Kozłowska", „Olga Kozłowska", „Urszula Król" — pary imię plus nazwisko
+     losowane niezależnie z dwóch list w generatorze (stąd „Zofia Jankowski"), żadna
+     nie pochodzi od prawdziwej osoby.
+  3. `WERYFIKACJA.md` — SPEŁNIONE. Szkielet w korzeniu repozytorium: instrukcja
+     korzystania, format pozycji (pole wyboru, adres, czynność, oczekiwanie), nagłówki
+     faz F0 do F7 i tabela podpisu. Wypełnia go recenzent po odhaczeniu F7.
+  4. NEGATYWNE, brak bazy produkcyjnej — SPEŁNIONE, z zastrzeżeniem nazewnictwa.
+     Środowisko podglądowe gada do `marketing_preview`, robocze do `marketing`,
+     pomiarowe do `marketing_perf` — trzy różne bazy, wszystkie w kontenerze `mc-pg`
+     na `127.0.0.1:5433`. Host jest **ten sam**, bo bazy produkcyjnej dziś nie ma
+     (patrz sekcja 2 dokumentu architektury: konto hostingu nieustalone). Rozdział jest
+     twardy: `PREVIEW_DATABASE_URL`, `DATABASE_URL` i `PERF_DATABASE_URL` to trzy
+     osobne zmienne, `scripts/preview.mjs` podstawia wyłącznie pierwszą, a generator
+     zestawu L odmawia pracy, gdy cel równa się bazie roboczej. Wpisane do
+     `docs/ARCHITEKTURA.md` sekcja 2.1 razem z tabelą adresów.
 
 **DoD F5:** wszystkie komendy jakości zielone; e2e zielone; adres środowiska przekazany
 userowi.

@@ -682,3 +682,32 @@ przebiegu i nigdy ich nie kasują (F7-21).
 **Znaleziska fazy:** F7-20 (pole wyboru pokazuje surową wartość zamiast etykiety, kod
 zastany), F7-21 (e2e importu pisze do bazy roboczej, brak izolacji), F7-22 (`AGENTS.md`
 wskazywał nieistniejący plik planu), F7-23 (prawdziwe handle w kryterium F4-07).
+
+## F5 — testy, dryf, środowisko dla zespołu (2026-09-03)
+
+**Bramka dryfu ma drugi warunek, bezwzględny.** `plan/06` sekcja 4 mówi: powyżej 15%
+ostrzeżenie, powyżej 30% błąd blokujący. Sam procent nie działa na tych danych.
+Zmierzone na 280 parach kolejnych przebiegów z `perf/runs`: największe odchylenie między
+przebiegami to 242% (`p95 productions-list` 0,76 → 2,84 ms), na stronach 77%
+(`p95 home` 17,6 → 31,2 ms). Bramka na samym procencie zapalałaby się na szumie i
+zostałaby wyłączona w tydzień. Blokada wymaga więc jednocześnie ≥30% ORAZ pogorszenia
+większego niż 10% limitu budżetowego danej metryki (`driftAbsFloorPct`). Sprawdzone
+skryptem `scripts/perf/drift-selftest.mjs`: zero fałszywych alarmów na historii, każda
+regresja podchodząca pod limit blokuje. Ostrzeżenie od 15% zostało bez zmian, więc szum
+nadal widać w raporcie — po prostu nie zatrzymuje pracy.
+
+**Środowisko podglądowe stoi lokalnie, publiczny adres czeka na usera.** Postawione:
+osobna baza `marketing_preview` z zestawem L, `scripts/preview.mjs` (migracje, zasiew,
+serwer na porcie 3001, nasłuch na 0.0.0.0), `npm run preview:setup` i
+`npm run preview:serve`. Zmierzone przy okazji: **po zwykłym `http://` nikt się nie
+zaloguje**, bo `next start` biegnie z `NODE_ENV=production`, a ciasteczko sesji ma wtedy
+flagę `secure`. Przejście sprawdzone po https przez `tailscale serve` na tailnecie tej
+maszyny i po sprawdzeniu wyłączone — tailnet wymaga od zespołu instalacji klienta, czyli
+łamie warunek „bez stawiania czegokolwiek u siebie". Publiczny adres to decyzja usera:
+`tailscale funnel` (nic nie kosztuje, ale wystawia aplikację publicznie i zajmuje port
+443 zajęty dziś przez vibe-kanban) albo hosting, który wymaga wypchnięcia repozytorium
+poza tę maszynę — a w historii gita nadal siedzą prawdziwe dane osobowe (F4-07).
+
+**Zrzuty scenariuszy e2e nie są `fullPage`.** Pełna strona `/calendar` w zestawie
+roboczym ma 16 854 px wysokości; na takim zrzucie nie widać niczego. Zrzuty F5 to widok
+okna 1280×720.

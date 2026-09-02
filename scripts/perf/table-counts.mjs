@@ -1,8 +1,9 @@
 /**
  * Liczby wierszy per tabela. Domyślnie z bazy pomiarowej (PERF_DATABASE_URL),
- * `--work` przełącza na roboczą (DATABASE_URL).
+ * `--work` przełącza na roboczą (DATABASE_URL), `--preview` na podglądową
+ * dla zespołu (PREVIEW_DATABASE_URL, F5-04).
  *
- * Uruchomienie: node scripts/perf/table-counts.mjs [--work] [--json]
+ * Uruchomienie: node scripts/perf/table-counts.mjs [--work|--preview] [--json]
  */
 import { config } from 'dotenv';
 config({ path: '.env.local', quiet: true });
@@ -10,12 +11,16 @@ config({ quiet: true });
 
 import postgres from 'postgres';
 
-const useWork = process.argv.includes('--work');
 const asJson = process.argv.includes('--json');
-const url = useWork ? process.env.DATABASE_URL : process.env.PERF_DATABASE_URL;
+const zmienna = process.argv.includes('--work')
+  ? 'DATABASE_URL'
+  : process.argv.includes('--preview')
+    ? 'PREVIEW_DATABASE_URL'
+    : 'PERF_DATABASE_URL';
+const url = process.env[zmienna];
 
 if (!url) {
-  console.error(`[table-counts] ${useWork ? 'DATABASE_URL' : 'PERF_DATABASE_URL'} nie jest ustawiony`);
+  console.error(`[table-counts] ${zmienna} nie jest ustawiony`);
   process.exit(1);
 }
 
@@ -42,7 +47,7 @@ await sql.end();
 if (asJson) {
   console.log(JSON.stringify(counts, null, 2));
 } else {
-  console.log(`baza: ${useWork ? 'DATABASE_URL' : 'PERF_DATABASE_URL'}`);
+  console.log(`baza: ${zmienna}`);
   for (const [t, n] of Object.entries(counts)) {
     console.log(`${t.padEnd(18)} ${String(n).padStart(6)}`);
   }

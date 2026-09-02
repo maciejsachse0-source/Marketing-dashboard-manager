@@ -20,7 +20,9 @@
     "pg:info": "node scripts/perf/pg-info.mjs",
     "perf": "node scripts/perf/measure-db.mjs && node scripts/perf/measure-page.mjs && node scripts/perf/report.mjs",
     "perf:dev": "node scripts/perf/measure-dev.mjs",
-    "perf:serve": "next build && node scripts/perf/start-perf.mjs"
+    "perf:serve": "next build && node scripts/perf/start-perf.mjs",
+    "preview:setup": "node scripts/preview.mjs migrate && node scripts/preview.mjs seed",
+    "preview:serve": "next build && node scripts/preview.mjs serve"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

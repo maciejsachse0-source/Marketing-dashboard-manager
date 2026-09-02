@@ -87,6 +87,63 @@ Odpowiedź usera: **jeszcze nie udzielona**. Dopóki jej nie ma, przyjmujemy, ż
 środowiskiem docelowym jest Vercel, a jedyną bazą, do której mamy dostęp, jest
 lokalny kontener z sekcji 3.
 
+### 2.1 Środowisko podglądowe dla zespołu (F5-04)
+
+Cel: ekipa klika aplikację i zgłasza uwagi, nic u siebie nie stawiając. Środowisko
+stoi **na danych syntetycznych** (zestaw L) i na **osobnej bazie**, więc klikanie
+zespołu nie rusza ani bazy roboczej, ani bazy pomiarowej, na której stoją progi.
+
+Postawienie na tej maszynie, dwie komendy:
+
+```
+npm run preview:setup    # schemat + zestaw L na bazie marketing_preview
+npm run preview:serve    # next build && next start -p 3001 -H 0.0.0.0
+```
+
+| Rzecz | Wartość |
+|---|---|
+| Adres w sieci lokalnej | `http://192.168.1.42:3001` (ta maszyna, ta sama sieć Wi-Fi) |
+| Baza | `postgres://…@127.0.0.1:5433/**marketing_preview**` (`PREVIEW_DATABASE_URL`) |
+| Baza robocza, dla porównania | `postgres://…@127.0.0.1:5433/**marketing**` (`DATABASE_URL`) |
+| Baza pomiarowa | `postgres://…@127.0.0.1:5433/**marketing_perf**` (`PERF_DATABASE_URL`) |
+| Zawartość | zestaw L: 200 artystów, 60 kamerzystów, 40 kampanii, 500 produkcji, 3 000 wpisów kalendarza, 5 000 postów, 12 000 wierszy CSV; wszystkie nazwy z generatora `scripts/perf/seed-large.ts` (ziarno 1337) |
+| Logowanie | ta sama para co lokalnie: `AUTH_EMAIL` i `AUTH_PASSWORD` z `.env.local`. Środowisko podglądowe MA mieć własną parę — ustaw ją w środowisku procesu przed `preview:serve` |
+
+**Adres musi być po https, inaczej nikt się nie zaloguje.** `next start` biegnie
+z `NODE_ENV=production`, a `createSession` ustawia wtedy ciasteczko sesji z flagą
+`secure` (`src/lib/auth.ts`). Po zwykłym `http://` przeglądarka ciasteczka nie
+zapisze: formularz przyjmie hasło, a następna strona odbije z powrotem na `/login`.
+Zmierzone 2026-09-03 na `http://192.168.1.42:3001` — dokładnie takie odbicie.
+
+Sprawdzone przejście po https, na tailnecie tej maszyny:
+
+```
+tailscale serve --bg --https=8443 http://127.0.0.1:3001
+# adres: https://jans-mac-mini.tailb37a7a.ts.net:8443
+tailscale serve --https=8443 off        # wyłączenie
+```
+
+Logowanie i lista 500 produkcji działają (zrzut:
+`screenshots/F5/F5-05-srodowisko-podgladowe.png`). Serwowanie zostało po sprawdzeniu
+**wyłączone**, bo tailnet wymaga od członka zespołu instalacji Tailscale, a warunek
+z `plan/06` sekcja 5 brzmi „bez stawiania czegokolwiek u siebie".
+
+**Czego brakuje do adresu, który zespół otwiera bez instalowania czegokolwiek**
+(`BLOCKED-ASK-USER`, decyzja usera, nie agenta):
+
+1. **Najtaniej: `tailscale funnel --bg --https=443 http://127.0.0.1:3001`** — publiczny
+   adres `https://jans-mac-mini.tailb37a7a.ts.net`, zero kont, zero opłat, działa
+   dopóki ta maszyna stoi. Wymaga zgody usera, bo wystawia aplikację publicznie
+   (dane syntetyczne, ale logowanie jest jednym hasłem) i zajmuje port 443, na którym
+   siedzi dziś vibe-kanban.
+2. **Hosting: Vercel plus baza (Neon albo inny Postgres)** — wymaga konta z sekcji 2,
+   wypchnięcia repozytorium poza tę maszynę i zmiennych środowiskowych po stronie
+   hostingu. Repozytorium ma w historii gita prawdziwe dane osobowe (sekcja 9), więc
+   wypchnięcie go gdziekolwiek jest osobną decyzją usera.
+
+Do czasu tej decyzji środowiskiem podglądowym jest adres w sieci lokalnej z tabeli
+wyżej, a `WERYFIKACJA.md` w korzeniu repozytorium czeka z gotowym szkieletem.
+
 ---
 
 ## 3. Baza
