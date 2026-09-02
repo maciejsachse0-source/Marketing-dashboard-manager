@@ -150,3 +150,46 @@ gita nadal je zna, więc gdyby kiedyś okazały się potrzebne, wyciąga je
 `git show <commit>:data/marketing-crew.pre-drop.bak.db`. Wzorzec w `.gitignore`
 rozszerzony z konkretnej nazwy na `/data/*.db`, żeby żaden plik bazy nie wjechał
 tam ponownie przez przypadek.
+
+---
+
+## Raport fazy F0
+
+Osiem issues, F0-00 do F0-07, wszystkie odhaczone z dowodem przy każdym kryterium.
+
+**Co stoi po fazie.** Środowisko: PostgreSQL 17.11 w kontenerze `mc-pg` na porcie 5433,
+trzy bazy (robocza, pomiarowa, testowa), `.env.local` poza gitem. Przyrządy: pięć
+skryptów w `scripts/perf/` plus `report.mjs` jako sędzia progów. Pomiar bazowy:
+`perf/baseline.json`, commitowany, z polem `mode: "local-docker"`. Dokument kanoniczny:
+`docs/ARCHITEKTURA.md`, dziewięć sekcji, każda z komendą weryfikującą.
+
+**Liczby startowe, punkt odniesienia dla całej reszty przebudowy.**
+Strony (tryb produkcyjny, zestaw L), p95: `home` 21.7 ms, `calendar` 64.3,
+`calendar-table` 30.2, `productions` 126, `production-detail` 23.6,
+`campaign-detail` 39.2, `analytics` 34.8. Wszystkie z ogromnym zapasem pod progami
+z `plan/03` sekcja 4, co jest samo w sobie wnioskiem: wąskim gardłem nie jest czas
+odpowiedzi serwera na tej skali.
+Baza, p95: 1.82 / 1.04 / 0.83 / 1.47 ms, ale dwa zapytania idą przez Seq Scan
+(`calendar_entries` po 3000 wierszach, `posts` po 5000).
+Tryb deweloperski: start 619 ms, pierwsza kompilacja `/calendar` 2603 ms, kolejne
+wejścia 49 ms, HMR 2079 ms, szczyt pamięci 1510 MB.
+Bundel: 354.8 kB po gzip w 20 plikach.
+
+**Co z tego wynika dla kolejnych faz.** Ból zgłoszony przez usera („najbardziej boli
+lokalnie") nie ma pokrycia w liczbach trybu deweloperskiego: każdy z pięciu progów
+z `plan/03` jest spełniony, a `peakRssMb` 1510 przy limicie heapu 4096 sugeruje, że
+`--max-old-space-size=4096` w `package.json` jest zabobonem, nie potrzebą. Kandydaci
+na prawdziwą przyczynę: rozmiar bundla (354.8 kB) i praca po stronie przeglądarki
+w gancie, nie serwer. To jest hipoteza do obalenia w F2, nie ustalenie.
+Dwa Seq Scany to najtańsza i najpewniejsza naprawa, idzie pierwsza jako F1-01.
+
+**Czego faza nie domknęła.** Potwierdzenie hostingu przez usera. GitHub mówi, że
+projekt był wdrażany na Vercel i że ostatnie wdrożenie produkcyjne z 2026-05-03
+padło, ale stałej domeny, dostępów ani decyzji „naprawiamy czy porzucamy" nie da się
+odczytać z API. To jedyny punkt Definition of Done fazy F0, który zostaje otwarty,
+i jest to bramka do usera, nie zaległość workera.
+
+**Znaleziska fazy.** F7-01 do F7-09. Trzy dopisane w tej paczce: F7-08 (lewy pasek
+akcentu wbrew zasadzie Z8, znaleziony na zrzucie ekranu do F0-05) i F7-09
+(`createCalendarEntry` bez wywołania z interfejsu, znaleziony przy pisaniu sekcji 6
+dokumentu architektury). Blokujących nie ma.
