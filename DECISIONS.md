@@ -591,3 +591,25 @@ jednorazowa pomyłka.
 Wydzielenie sekcji kamieni milowych wymagałoby przepchnięcia dziesięciu uchwytów przez
 granicę komponentu, czyli więcej kodu niż zostaje w środku. Kryterium mówi o NOWYCH
 plikach i to jest spełnione; plik zastany wolno zostawić, byle nie rósł.
+
+## F4 — import osób z arkusza
+
+**Decyzja: `exceljs` jako jedyna nowa zależność fazy (Z16).** Żadna z obecnych paczek
+nie czyta `.xlsx`: `papaparse` obsługuje CSV, a `.xlsx` to spakowany ZIP z XML-em,
+którego nie parsuje się ręcznie ani jedną linijką. Alternatywa `xlsx` (SheetJS) odpada,
+bo wydanie na npm jest zamrożone i miało otwarte podatności na prototype pollution.
+`exceljs` 4.4.0 czyta z bufora w pamięci, czyli plik nie musi lądować na dysku, co jest
+zgodne z anty-specem z `plan/04` sekcja 7 (arkusz nie trafia do repozytorium ani do `data/`).
+Waga: parser żyje wyłącznie po stronie serwera, więc nie dotyka bundla stron.
+
+**Decyzja: limity wejścia sprawdzane przed otwarciem pliku.** `checkFile` patrzy na
+rozszerzenie i rozmiar, zanim `parseWorkbook` w ogóle poda dane do `exceljs`. Plik
+odrzucony nigdy nie jest czytany, więc limit 10 MB jest realną ochroną pamięci,
+a nie komunikatem wyświetlanym po fakcie. Limit wierszy i kolumn można sprawdzić
+dopiero po otwarciu skoroszytu i tak też jest zrobione, per arkusz.
+
+**Decyzja: fixture generowany skryptem, nie plikiem wrzuconym do repo.**
+`scripts/make-fixture-xlsx.ts` buduje `tests/fixtures/osoby.xlsx` deterministycznie
+z licznika: imiona z krótkiej listy, nazwiska typu „Przykładowa", handle `@atrapa_0001`,
+domena `przyklad.test`. Dzięki temu widać w kodzie, że w pliku nie ma ani jednej
+prawdziwej osoby, a fixture da się odtworzyć po każdej zmianie kształtu arkusza.

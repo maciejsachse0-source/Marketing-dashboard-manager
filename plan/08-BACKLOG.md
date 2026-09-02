@@ -1076,7 +1076,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   `npm run test` **71 zielonych**, `npm run lint` kod 0 z 0 błędami,
   `node scripts/check-typography.mjs` kod 0.
 
-- [ ] **F4-03** `import` Parser arkusza, fixture i mapowanie kolumn
+- [x] **F4-03** `import` Parser arkusza, fixture i mapowanie kolumn
   CZYTAJ: `plan/04-import-excel.md` sekcje 1, 4 i 8
   AC:
   - `exceljs` dodany, wpis w `DECISIONS.md` z uzasadnieniem z `plan/04` sekcja 1
@@ -1087,6 +1087,28 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   - parsowanie i suchy przebieg 1000 wierszy poniżej 3000 ms (pomiar w raporcie)
   - negatywne: plik powyżej 10 MB, plik powyżej 5000 wierszy i plik o innym rozszerzeniu
     są odrzucane z komunikatem, bez próby przetworzenia (3 testy)
+
+  DOWÓD: `exceljs` 4.4.0 w `package.json`, uzasadnienie w `DECISIONS.md`
+  (sekcja „F4 - import osób z arkusza"): papaparse czyta tylko CSV, xlsx to spakowany XML,
+  SheetJS z npm jest zamrożony i miał podatności na prototype pollution.
+  `npx tsx scripts/make-fixture-xlsx.ts` tworzy `tests/fixtures/osoby.xlsx`: 2 arkusze,
+  **1131 wierszy danych** (1010 twórców, 121 kamerzystów), w tym 30 wierszy błędnych
+  (brak nazwy, zły email, zły telefon), 5 pustych oraz duplikaty pewne po handle
+  i po emailu i duplikaty prawdopodobne po nazwie z lokalizacją. Dane w całości
+  syntetyczne, generowane z licznika (`@atrapa_0001`, domena `przyklad.test`),
+  zero prawdziwych osób.
+  Mapowanie: `src/lib/import/mapping.ts`, test przechodzi po **wszystkich 38 aliasach**
+  z `plan/04` sekcja 4 (`it.each` po `FIELD_ALIASES`) plus po nagłówkach fixture'a:
+  arkusz twórców daje `[name, handle, email, phone, location, notes]`, arkusz
+  kamerzystów dokłada `status`.
+  Wydajność: `npx tsx scripts/perf/measure-import.ts`, trzy przebiegi
+  **62, 66, 88 ms**, mediana **66 ms** przy progu 3000 ms dla 1010 wierszy
+  (parsowanie plus normalizacja plus decyzja o wierszu wobec 200 osób w bazie).
+  Negatywne, 3 testy w `src/lib/import/parse.test.ts`: rozszerzenie inne niż `.xlsx`
+  i rozmiar powyżej 10 MB są odrzucane przez `checkFile` PRZED podaniem danych
+  do `exceljs`, arkusz z 5001 wierszami dostaje komunikat z limitem.
+  `npm run test` **115 zielonych** (było 71), `npm run lint` kod 0 z 0 błędami,
+  `npm run typecheck` kod 0, `node scripts/check-typography.mjs` kod 0.
 
 - [ ] **F4-04** `import` `ui` Ekran importu: kroki 1 do 4 (wybór, mapowanie, suchy przebieg)
   CZYTAJ: `plan/04-import-excel.md` sekcje 2, 6 i 7, `plan/05-ui-system.md` sekcje 2 i 3
