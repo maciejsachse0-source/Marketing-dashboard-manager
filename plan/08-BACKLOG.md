@@ -1018,7 +1018,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   Negatywne: `grep -c 'DROP\|ALTER COLUMN' drizzle/migrations/0003_confused_penance.sql`
   zwraca `0`. `npm run typecheck` kod 0, `npm run test` 29 zielonych.
 
-- [ ] **F4-01** `import` `test` Normalizacja osoby, test przed kodem
+- [x] **F4-01** `import` `test` Normalizacja osoby, test przed kodem
   CZYTAJ: `plan/04-import-excel.md` sekcje 4 i 5, `plan/06-testy.md` sekcja 2
   AC:
   - testy dla wszystkich reguł z `plan/04` sekcja 5 napisane PRZED implementacją
@@ -1028,6 +1028,26 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
     w 4 zapisach, email z wielkimi literami, nazwa z polskimi znakami, wiersz pusty,
     wiersz z samą nazwą, `status` dla roli twórcy (pole ignorowane)
   - negatywne: pusta komórka zwraca `null`, nigdy pustego łańcucha (osobny test)
+
+  DOWÓD: `src/lib/import/normalize.test.ts` napisany przed implementacją, pierwszy
+  przebieg czerwony (`Failed to resolve import "./normalize"`, 1 plik nieudany,
+  zero testów). Po implementacji `src/lib/import/normalize.ts`: **29 zielonych**
+  w tym pliku, `npm run test` **58 zielonych** (było 29).
+  Kontrola, że testy naprawdę trzymają reguły: celowa mutacja implementacji
+  (handle bez małpy, status niezależny od roli) daje **6 czerwonych**, po cofnięciu
+  znów 29 zielonych.
+  Scenariuszy 29, w tym: handle jako pełny URL z `https://` i z `www.`, handle bez
+  małpy, handle z podwójną małpą, telefon w czterech zapisach (`+48 ...`, `0048 ...`,
+  z myślnikami, w nawiasach), email z wielkimi literami, nazwa z polskimi znakami,
+  wiersz pusty, wiersz z samą nazwą, `status` ignorowany dla roli twórcy,
+  komórka nietekstowa (liczba, obiekt).
+  Negatywne: osobny test sprawdza, że sześć pól opcjonalnych pustych daje `null`
+  i że w wyniku nie ma ani jednego pustego łańcucha.
+  Granica zaufania: wiersz przechodzi przez schemat Zod (`cellSchema`) zanim dotknie
+  reguł domenowych, obiekt w komórce daje błąd wiersza, nie wyjątek (Z14).
+  `npm run lint` kod 0, 108 ostrzeżeń, 0 błędów (pierwsza wersja `normalizeRow`
+  miała złożoność 15, rozbita na `normalizeChecked` i `toPerson`).
+  `node scripts/check-typography.mjs` kod 0.
 
 - [ ] **F4-02** `import` `test` Wykrywanie duplikatów
   CZYTAJ: `plan/04-import-excel.md` sekcja 5
