@@ -17,9 +17,9 @@ async function fixtureSheets() {
 }
 
 describe('parseWorkbook - fixture', () => {
-  it('czyta oba arkusze i ponad 1000 wierszy danych', async () => {
+  it('czyta wszystkie arkusze i ponad 1000 wierszy danych', async () => {
     const sheets = await fixtureSheets();
-    expect(sheets.map((s) => s.name)).toEqual(['Twórcy', 'Kamerzyści']);
+    expect(sheets.map((s) => s.name)).toEqual(['Twórcy', 'Kamerzyści', 'Pusty']);
     const rows = sheets.reduce((sum, s) => sum + s.rows.length, 0);
     expect(rows).toBeGreaterThanOrEqual(1000);
   });
@@ -91,5 +91,13 @@ describe('parseWorkbook - odrzucenia', () => {
     const result = await parseWorkbook('duzy.xlsx', buffer as unknown as Buffer);
     expect(result.ok).toBe(false);
     expect(result.ok === false && result.message).toContain('limit to 5000');
+  });
+});
+
+describe('parseWorkbook - arkusz bez danych', () => {
+  it('arkusz z samym nagłówkiem daje zero wierszy, nie błąd', async () => {
+    const sheets = await fixtureSheets();
+    const pusty = sheets.find((s) => s.name === 'Pusty');
+    expect(pusty?.rows).toEqual([]);
   });
 });

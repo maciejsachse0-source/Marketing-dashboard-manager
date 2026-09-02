@@ -3,12 +3,9 @@
  * najpierw limity, dopiero potem parsowanie. Plik odrzucony nigdy nie jest czytany.
  */
 import ExcelJS from 'exceljs';
+import { IMPORT_LIMITS, checkFile } from './limits';
 
-export const IMPORT_LIMITS = {
-  maxBytes: 10 * 1024 * 1024,
-  maxRows: 5000,
-  maxColumns: 60,
-} as const;
+export { IMPORT_LIMITS, checkFile } from './limits';
 
 export type ParsedSheet = {
   name: string;
@@ -20,24 +17,6 @@ export type ParsedSheet = {
 export type ParseResult =
   | { ok: true; sheets: ParsedSheet[] }
   | { ok: false; message: string };
-
-function megabytes(bytes: number): string {
-  return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',');
-}
-
-/** Sprawdzenie samego pliku, bez otwierania go. */
-export function checkFile(fileName: string, size: number): { ok: true } | { ok: false; message: string } {
-  if (!fileName.toLowerCase().endsWith('.xlsx')) {
-    return { ok: false, message: 'Ten format nie jest obsługiwany. Wgraj plik xlsx' };
-  }
-  if (size > IMPORT_LIMITS.maxBytes) {
-    return {
-      ok: false,
-      message: `Plik ma ${megabytes(size)} MB, a limit to ${megabytes(IMPORT_LIMITS.maxBytes)} MB`,
-    };
-  }
-  return { ok: true };
-}
 
 /** Komórka złożona: hiperlink, formuła, tekst z formatowaniem. */
 function objectCellValue(value: object): string | number | boolean | Date | null {

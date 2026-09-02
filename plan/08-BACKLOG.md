@@ -1110,7 +1110,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   `npm run test` **115 zielonych** (było 71), `npm run lint` kod 0 z 0 błędami,
   `npm run typecheck` kod 0, `node scripts/check-typography.mjs` kod 0.
 
-- [ ] **F4-04** `import` `ui` Ekran importu: kroki 1 do 4 (wybór, mapowanie, suchy przebieg)
+- [x] **F4-04** `import` `ui` Ekran importu: kroki 1 do 4 (wybór, mapowanie, suchy przebieg)
   CZYTAJ: `plan/04-import-excel.md` sekcje 2, 6 i 7, `plan/05-ui-system.md` sekcje 2 i 3
   AC:
   - `/import/osoby` przechodzi kroki 1 do 4 z `plan/04` sekcja 2
@@ -1122,6 +1122,27 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
     (dowód: `grep -r '<button' src/app/import src/components/import | wc -l` zwraca `0`)
   - negatywne: po suchym przebiegu `COUNT(*)` w `artists` i `videographers` bez zmian
     (dowód: liczby przed i po w raporcie)
+  DOWÓD (2026-09-03): `/import/osoby` przechodzi kroki 1 do 4, sprawdzone w przeglądarce
+  na `npm run dev`; zrzuty `screenshots/F4/F4-04-krok1-wybor-pliku.png`,
+  `F4-04-krok1-wczytuje.png`, `F4-04-krok2-arkusz-i-rola.png`, `F4-04-krok3-mapowanie.png`,
+  `F4-04-krok3-kolizja.png`, `F4-04-krok4-suchy-przebieg.png`.
+  Scenariusz e2e `e2e/import-osoby.spec.ts`, 10 testów zielonych, pokrywa 7 wierszy tabeli
+  zdarzeń z plan/04 sekcja 6: podświetlenie strefy zrzutu, plik spoza xlsx (komunikat
+  dosłownie „Ten format nie jest obsługiwany. Wgraj plik xlsx"), plik ponad limit
+  („Plik ma 11,0 MB, a limit to 10,0 MB"), zmiana mapowania przeliczająca podgląd przy
+  zerze żądań do `/api/import/people`, kolizja dwóch kolumn na jedno pole (oba selecty
+  `aria-invalid`, przycisk dalej zablokowany, komunikat wymienia „E-mail" i „Uwagi"),
+  Tab przez pięć selectów w kolejności kolumn, arkusz bez wierszy. Ósmy wiersz, „Parsowanie
+  trwa", sprawdzony ręcznie ze wstrzymaniem odpowiedzi serwera: przycisk zablokowany
+  z tekstem „Wczytuję", strefa wygaszona (`F4-04-krok1-wczytuje.png`).
+  Walidacja Zod: `src/app/api/import/people/route.ts` (schemat na nazwie i rozmiarze pliku,
+  potem `checkFile`), wiersz arkusza dalej przez `cellSchema` w `normalizeRow` (Z13).
+  `grep -r '<button' src/app/import src/components/import | wc -l` zwraca `0`.
+  NEGATYWNE: `select count(*) from artists` i `videographers` przed suchymi przebiegami
+  `62|0`, po dziesięciu przebiegach e2e plus zrzutach `62|0`, bez zmiany.
+  Bramki: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 108 ostrzeżeń, tyle
+  co przed), `npm run test` 122 zielone (było 115), `node scripts/check-typography.mjs`
+  kod 0, `npm run perf` kod 0, bundel `/calendar` 292,8 kB przy progu 301,6 kB.
 
 - [ ] **F4-05** `import` `security` Ekran importu: zapis transakcyjny i podsumowanie
   CZYTAJ: `plan/04-import-excel.md` sekcje 2, 6, 7 i 8

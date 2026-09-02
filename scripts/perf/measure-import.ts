@@ -9,9 +9,9 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseWorkbook } from '../../src/lib/import/parse';
-import { autoMap, toRawRow } from '../../src/lib/import/mapping';
-import { normalizeRow } from '../../src/lib/import/normalize';
-import { planRow, type ExistingPerson } from '../../src/lib/import/dedup';
+import { autoMap } from '../../src/lib/import/mapping';
+import { dryRun } from '../../src/lib/import/dry-run';
+import type { ExistingPerson } from '../../src/lib/import/dedup';
 
 const FIXTURE = path.join(process.cwd(), 'tests', 'fixtures', 'osoby.xlsx');
 
@@ -34,23 +34,17 @@ async function przebieg(data: Buffer) {
   if (!parsed.ok) throw new Error(parsed.message);
   const sheet = parsed.sheets[0];
   const mapping = autoMap(sheet.headers, 'artist');
-
-  let insert = 0;
-  let skip = 0;
-  let update = 0;
-  let bledy = 0;
-  let puste = 0;
-  for (const cells of sheet.rows) {
-    const result = normalizeRow(toRawRow(cells, mapping), 'artist');
-    if (result.kind === 'empty') { puste += 1; continue; }
-    if (result.kind === 'error') { bledy += 1; continue; }
-    const plan = planRow(result.person, 'artist', istniejacy, 'update');
-    if (plan.action === 'insert') insert += 1;
-    else if (plan.action === 'update') update += 1;
-    else skip += 1;
-  }
+  const wynik = dryRun(sheet.rows, mapping, 'artist', istniejacy, 'update');
   const ms = performance.now() - start;
-  return { ms, wierszy: sheet.rows.length, insert, update, skip, bledy, puste };
+  return {
+    ms,
+    wierszy: sheet.rows.length,
+    insert: wynik.inserts,
+    update: wynik.updates,
+    skip: wynik.skips,
+    bledy: wynik.errors,
+    puste: wynik.empty,
+  };
 }
 
 async function main() {

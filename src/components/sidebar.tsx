@@ -14,6 +14,7 @@ import {
   Film,
   Camera,
   LayoutTemplate,
+  FileUp,
   Megaphone,
   Menu,
   X,
@@ -56,6 +57,7 @@ const NAV: NavItem[] = [
     children: [
       { href: '/artists', label: 'Artyści', icon: Users },
       { href: '/videographers', label: 'Kamerzyści', icon: Camera },
+      { href: '/import/osoby', label: 'Import osób', icon: FileUp },
     ],
   },
   { href: '/agents', label: 'Agenci', icon: Bot },

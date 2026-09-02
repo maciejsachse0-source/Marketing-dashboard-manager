@@ -89,11 +89,15 @@ async function main() {
   kamerzysci.addRow(['Osoba', 'Nick', 'Mail', 'Numer', 'Region', 'Dostępność', 'Notatki']);
   for (const row of wierszeKamerzystow()) kamerzysci.addRow(row);
 
+  // Arkusz z samym nagłówkiem: sprawdza stan pusty ekranu importu.
+  const pusty = workbook.addWorksheet('Pusty');
+  pusty.addRow(['Imię', 'Instagram']);
+
   await mkdir(path.dirname(OUT), { recursive: true });
   await workbook.xlsx.writeFile(OUT);
 
   const dane = wierszeTworcow().length + wierszeKamerzystow().length;
-  console.log(`[fixture] ${OUT}: 2 arkusze, ${dane} wierszy danych`);
+  console.log(`[fixture] ${OUT}: 3 arkusze, ${dane} wierszy danych`);
 }
 
 main().catch((err) => {
