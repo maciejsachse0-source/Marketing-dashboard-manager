@@ -10,11 +10,8 @@ import type {
   CampaignMilestone,
   CampaignSubmilestone,
 } from '@/lib/campaign-templates-types';
-import {
-  periodsSchema,
-  resolvePeriods,
-  type TemplatePeriod,
-} from '@/lib/production-periods';
+import { resolvePeriods, type TemplatePeriod } from '@/lib/production-periods';
+import { periodsSchema } from '@/lib/production-periods-schema';
 
 export async function createCampaign(
   input: CampaignInput & { templateSlug?: string | null },

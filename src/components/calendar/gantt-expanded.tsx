@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { DeleteProductionButton } from '@/components/productions/delete-production-button';

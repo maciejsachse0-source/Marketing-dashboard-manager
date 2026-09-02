@@ -659,7 +659,7 @@ tabela przed i po w raporcie fazy.
     wariancie (webpack, bez flagi pamięci). `npm run typecheck` kod 0,
     `npm run lint` kod 0.
 
-- [ ] **F2-06** `perf` `ui` Zejście z liczby komponentów klienckich (P8)
+- [x] **F2-06** `perf` `ui` Zejście z liczby komponentów klienckich (P8)
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P8
   AC:
   - `grep -rl "'use client'" src/components | wc -l` spada z `47` o co najmniej 8,
@@ -667,6 +667,39 @@ tabela przed i po w raporcie fazy.
   - rozmiar JS pierwszego ładowania `/calendar` po gzip poniżej progu z `perf/budget.json`
     (dowód: wyjście `next build` w raporcie)
   - negatywne: pełny zestaw e2e zielony, żaden interaktywny element nie przestaje działać
+
+  DOWÓD (2026-09-02):
+  - `grep -rl "'use client'" src/components | wc -l` spada z **58 do 50**
+    (kryterium mówi „z 47", ale F2-02 dołożył jedenaście plików ganta; spadek
+    o osiem jest ten sam). Dyrektywa zniknęła z ośmiu plików, w których nie ma
+    ani jednego hooka, ani jednej obsługi zdarzenia, ani odwołania do `window`:
+    `gantt-table-view.tsx`, `gantt-next-step.tsx`, `gantt-expanded.tsx`,
+    `gantt-header.tsx`, `gantt-milestone-labels.tsx`, `gantt-legend.tsx`,
+    `gantt-row-guides.tsx`, `campaigns/timeline.tsx`.
+  - **Rozmiar JS pierwszego ładowania `/calendar`: 292,0 kB po gzip wobec progu
+    301,6 kB** (`perf/budget.json`). Startowaliśmy z 355,5 kB. Trzy przebiegi
+    `measure-page.mjs` dają 292 / 292 / 292 — liczba jest deterministyczna.
+    `npm run perf` kończy się **kodem 0** po raz pierwszy w tej fazie.
+  - Skąd 63 kB. Sześćdziesiąt jeden z nich to **zod, który nie miał prawa być
+    w bundlu klienckim**: `src/lib/production-periods.ts` importował go dla
+    `periodsSchema`, a ten plik czyta gant (`gantt-geometry.ts`,
+    `gantt-row-placement.ts`). Schematy przeniesione do nowego
+    `src/lib/production-periods-schema.ts`, który importuje wyłącznie serwer
+    (akcja `campaigns.ts`, ładowarki szablonów). Sam podział na moduły to
+    355,5 → 293,7 kB; usunięcie ośmiu dyrektyw dołożyło 293,7 → 292,0 kB.
+  - Poprawka w harnessie, bez której to kryterium było nieweryfikowalne:
+    `scripts/perf/report.mjs` czytał rozmiar bundla z `perf/baseline.json`,
+    czyli z pomiaru z F0-05, i pokazywał 354,8 kB niezależnie od tego, co
+    właśnie zbudowano. Teraz bierze liczbę z najnowszego przebiegu `page-*`
+    i liczy dryf względem poprzedniego.
+  - Negatywne: `npx playwright test` — **8 z 8 scenariuszy zielonych** na
+    serwerze produkcyjnym (w tym odhaczanie kroku produkcji, kreator produkcji,
+    kreator kampanii, dodawanie osoby), więc żaden interaktywny element nie
+    przestał działać. Wygląd: zrzut produkcyjny `/calendar?view=week` przed
+    i po różni się o **1155** pikseli z 7 823 808, czyli w paśmie szumu
+    (`screenshots/F2/prod-check-week.png` wobec `po-F2-06-week.png`), a widok
+    tabeli, który z klienckiego stał się serwerowy, pokazuje wszystkie pięć
+    przypadków statusu bez zmian (`po-F2-06-table.png`).
 
 **DoD F2:** budżety stron z `plan/03` sekcja 4 spełnione albo przekroczenie opisane
 w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.

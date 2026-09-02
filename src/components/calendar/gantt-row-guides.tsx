@@ -1,5 +1,3 @@
-'use client';
-
 import { STAGE_CATEGORIES } from './gantt-geometry';
 import type { SubStepInfo } from './gantt-substep-bar';
 

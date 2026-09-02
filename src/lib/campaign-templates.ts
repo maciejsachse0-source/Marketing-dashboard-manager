@@ -1,7 +1,7 @@
 import 'server-only';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { periodsSchema } from './production-periods';
+import { periodsSchema } from './production-periods-schema';
 import type { MarketingTemplate } from './campaign-templates-types';
 import { db, schema } from './db';
 

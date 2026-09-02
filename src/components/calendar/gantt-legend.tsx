@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * Group header row inside the gantt body. Spans the same `22rem | 1fr` grid
  * the day-rows use, so the label sticks to the left rail and the divider on

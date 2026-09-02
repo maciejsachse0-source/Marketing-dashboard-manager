@@ -1,5 +1,3 @@
-'use client';
-
 import type { CheckpointInfo } from './gantt-milestones';
 
 /**

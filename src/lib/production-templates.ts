@@ -7,7 +7,7 @@ import {
   STEP_DATE_MODES,
 } from '../../drizzle/schema';
 import type { ProductionTemplate } from './production-templates-types';
-import { periodsSchema } from './production-periods';
+import { periodsSchema } from './production-periods-schema';
 import { db, schema } from './db';
 
 /**

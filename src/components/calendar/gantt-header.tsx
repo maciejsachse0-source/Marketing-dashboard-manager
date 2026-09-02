@@ -1,5 +1,3 @@
-'use client';
-
 import { DAY_MS, startOfDay } from './gantt-geometry';
 
 /**

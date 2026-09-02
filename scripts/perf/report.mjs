@@ -95,13 +95,18 @@ if (devRuns.length > 0) {
 }
 
 // --- bundle -----------------------------------------------------------------
-if (existsSync('perf/baseline.json')) {
-  const baseline = JSON.parse(readFileSync('perf/baseline.json', 'utf8'));
-  const kb = baseline.bundle?.calendarFirstLoadKb;
-  if (typeof kb === 'number') {
-    lines.push('\nBUNDLE');
-    check('JS /calendar (gzip)', kb, budget.bundle.calendarFirstLoadKb, 'kB');
-  }
+// Rozmiar bierzemy z NAJNOWSZEGO przebiegu `page-*`, nie z `perf/baseline.json`.
+// Do F2-06 czytany był baseline, czyli liczba z F0-05, i bramka rozmiaru pokazywała
+// stan sprzed pomiaru niezależnie od tego, co właśnie zbudowano.
+const bundleRun = pageRuns.at(-1)?.bundle ?? null;
+const baselineBundle = existsSync('perf/baseline.json')
+  ? JSON.parse(readFileSync('perf/baseline.json', 'utf8')).bundle
+  : null;
+const bundleKb = bundleRun?.calendarFirstLoadKb ?? baselineBundle?.calendarFirstLoadKb;
+if (typeof bundleKb === 'number') {
+  lines.push('\nBUNDLE');
+  check('JS /calendar (gzip)', bundleKb, budget.bundle.calendarFirstLoadKb, 'kB');
+  drift('JS /calendar (gzip)', bundleKb, pageRuns.at(-2)?.bundle?.calendarFirstLoadKb);
 }
 
 console.log(lines.join('\n'));
