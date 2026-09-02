@@ -193,3 +193,80 @@ i jest to bramka do usera, nie zaległość workera.
 akcentu wbrew zasadzie Z8, znaleziony na zrzucie ekranu do F0-05) i F7-09
 (`createCalendarEntry` bez wywołania z interfejsu, znaleziony przy pisaniu sekcji 6
 dokumentu architektury). Blokujących nie ma.
+
+## F1-03 — Cache Components włączony, zmierzony i cofnięty (2026-09-02)
+
+**Co było hipotezą.** Krok P3 z `plan/03-wydajnosc.md` zakładał, że włączenie
+mechanizmu Cache Components w Next 16, zdjęcie `force-dynamic` i wpięcie trzech
+odczytów niezależnych od użytkownika w `use cache` zmniejszy pracę serwera na
+wejście, mierzalnie na `productions`, `templates` i `analytics`.
+
+**Co zostało zrobione, żeby to sprawdzić.** Pełna implementacja, doprowadzona do
+`npm run build` z kodem 0:
+
+- `next.config.ts`: `cacheComponents: true`.
+- Usunięte **26** deklaracji `export const dynamic = 'force-dynamic'` (25 stron plus
+  układ). Wariant „zostaje z komentarzem uzasadniającym" jest niewykonalny: build
+  przerywa z komunikatem `Route segment config "dynamic" is not compatible with
+  nextConfig.cacheComponents. Please remove it.` To samo dotyczy `export const
+  runtime = 'nodejs'` w `src/app/api/csv/route.ts` i `src/app/api/upload/route.ts`.
+- `use cache` z `cacheLife('minutes')` i `cacheTag` na czterech odczytach:
+  `loadTemplates` i `getTemplate` (tag `production-templates`), `loadMarketingTemplates`
+  i `getMarketingTemplate` (tag `marketing-templates`), `loadAgentMeta` i `getAgent`
+  (tag `agents`), oraz odczyt listy osób wyjęty z `listArtists` (tag `artists`).
+  Bramka sesji zostaje na zewnątrz funkcji cachowanej, bo `use cache` nie czyta ciasteczek.
+- Unieważnianie przez `updateTag`, nie `revalidateTag`: `revalidateTag` daje
+  stale-while-revalidate, czyli po zapisie użytkownik widziałby jeszcze starą listę.
+  Owinięte w `safeUpdateTag` w `src/server/actions/revalidate.ts`, tak jak wcześniej
+  `revalidatePath`, żeby wywołanie ze skryptu `tsx` nie wysypywało akcji.
+
+**Trzy pułapki, które kosztowały najwięcej i nie są oczywiste z dokumentacji.**
+
+1. `<Suspense>` wokół `{children}` w układzie **nie jest** granicą, której szuka
+   prerender. Granicą jest `src/app/loading.tsx` — jeden plik w korzeniu załatwia
+   wszystkie 25 tras naraz.
+2. Prawdziwym winowajcą błędu `blocking-route` na trasach z parametrem
+   (`/agents/[slug]`, `/productions/[id]`, `/campaigns/[id]`, trzy strony edycji) nie
+   była strona, tylko **układ**: `<Sidebar>` jest komponentem klienckim i woła
+   `usePathname()`, a ścieżka jest daną żądania, której nie da się znać przy budowaniu
+   statycznej powłoki trasy z parametrem. `<Suspense>` wokół samego `<Sidebar>`
+   naprawia komplet tych tras jednym ruchem. Ślad w `next build --debug-prerender`
+   wskazywał `RootLayout`, ale bez tej flagi build pokazuje tylko pierwszy błąd
+   i wygląda to na problem strony.
+3. `new Date()` w `src/app/page.tsx` przerywa prerender, dopóki nie zostanie odczytana
+   jakakolwiek dana żądania. Rozwiązanie: `await connection()` z `next/server` przed
+   pierwszym odczytem zegara.
+
+**Pomiar, czyli powód cofnięcia.** `measure-page.mjs`, po trzy przebiegi, mediana p95
+w milisekundach. Kolumna „po F1-02" to punkt odniesienia, „po F1-03" to stan z cache.
+
+| strona | po F1-02 | po F1-03 | zmiana |
+|---|---|---|---|
+| home | 12,3 | 11,7 | -5% |
+| calendar | 63,8 | 59,8 | -6% |
+| calendar-table | 26,5 | 25,5 | -4% |
+| productions | 128,1 | 132,5 | +3% |
+| production-detail | 23,1 | 22,4 | -3% |
+| campaign-detail | 30,7 | 34,1 | +11% |
+| analytics | 27,5 | 28,0 | +2% |
+
+Żadna ścieżka nie poprawiła się o 10%. Kryterium akceptacji F1-03 mówi w tym wypadku
+wprost: hipoteza obalona, zmiana cofnięta poza zdjęciem `force-dynamic` z układu.
+Tak zrobiono.
+
+**Ale hipoteza nie została obalona uczciwie i trzeba to powiedzieć.** Trzy z czterech
+cachowanych katalogów **nie istnieją w bazie pomiarowej**: `production_templates`,
+`marketing_templates` i `agents` mają w `marketing_perf` po zero wierszy. Cache miał
+omijać zapytania, które i tak nie mają czego czytać. Do tego zestaw mierzonych stron
+nie zawiera `/templates` ani `/agents`, czyli stron, które te katalogi renderują.
+Wynik pomiaru mówi więc „na tych siedmiu stronach i na tych danych nie widać różnicy",
+a nie „cache nie działa". Braki zapisane jako **F7-10** (dosianie katalogów do zestawu L
+i rozszerzenie zestawu mierzonych stron) i **F7-11** (powrót do P3 na danych,
+które istnieją, z gotowym przepisem technicznym z tego wpisu).
+
+**Co zostaje w repozytorium po cofnięciu.** Zdjęte `force-dynamic` z
+`src/app/layout.tsx` (jedyny wyjątek dopuszczony przez kryterium) oraz
+`e2e/stale-data.spec.ts` — scenariusz przeżył cofnięcie, bo pilnuje rzeczy niezależnej
+od cache: że mutacja z interfejsu odświeża widok bez twardego przeładowania.
+Scenariusz dodaje osobę przez formularz, a nie wpis kalendarza jak mówiło pierwotne
+kryterium, bo wpisu kalendarza nie da się dodać z interfejsu (znalezisko F7-09).

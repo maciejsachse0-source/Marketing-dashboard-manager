@@ -371,7 +371,23 @@ uruchamialne.
     żadna strona nie zaczyna pokazywać danych w innej kolejności niż wcześniej
     (dowód: zrzuty ekranu przed i po dla `campaign-detail`)
 
-- [ ] **F1-03** `perf` ⚠ HARD Cache zamiast bezwarunkowej dynamiki (P3)
+- [x] **F1-03** `perf` ⚠ HARD Cache zamiast bezwarunkowej dynamiki (P3)
+  WYNIK: **hipoteza obalona, zmiana cofnięta zgodnie z własnym kryterium.**
+  Pełny opis w `DECISIONS.md`, wpis „F1-03".
+  DOWOD: implementacja doprowadzona do `npm run build` kod 0 z `cacheComponents: true`,
+  26 usuniętych deklaracji `force-dynamic` (wariant „zostaje z komentarzem" jest
+  niewykonalny, build go zabrania), cztery odczyty w `use cache` z `cacheLife('minutes')`
+  i tagami, unieważnianie przez `updateTag`. Pomiar `measure-page.mjs`, po 3 przebiegi,
+  mediana p95: home 12,3 -> 11,7; calendar 63,8 -> 59,8; calendar-table 26,5 -> 25,5;
+  productions 128,1 -> 132,5; production-detail 23,1 -> 22,4; campaign-detail
+  30,7 -> 34,1; analytics 27,5 -> 28,0. Żadna ścieżka nie poprawiła się o 10%,
+  więc zmiana cofnięta poza zdjęciem `force-dynamic` z `src/app/layout.tsx`.
+  Przyczyna niemierzalności zapisana jako **F7-10** (trzy z czterech cachowanych
+  katalogów mają w bazie pomiarowej zero wierszy) i **F7-11** (powrót do P3
+  z gotowym przepisem technicznym).
+  ZOSTAJE: `e2e/stale-data.spec.ts` zielony na serwerze produkcyjnym
+  (`npm run e2e`: 2 passed), `src/app/layout.tsx` bez `force-dynamic`,
+  `npm run build` kod 0, `npm run typecheck` kod 0, `npm run lint` kod 0.
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P3, `src/app/layout.tsx`,
   dokumentacja Next 16 o Cache Components (przeczytaj przed pisaniem kodu)
   AC:
@@ -896,6 +912,43 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     mówiący wprost, że wywołuje je Claude Code, nie interfejs, a `docs/ARCHITEKTURA.md`
     sekcja 6 zmienia zdanie o brakującym przycisku na opis świadomego wyboru
   - negatywne: `npm run typecheck` i `npm run lint` kończą się kodem 0 w obu wariantach
+
+- [ ] **F7-10** `znalezisko` `perf` Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny
+  Waga: **ważne**. Szacunek: godzina.
+  Znalezione przy F1-03. W bazie pomiarowej `marketing_perf` tabele
+  `production_templates`, `marketing_templates` i `agents` mają **0 wierszy**
+  (`docker exec mc-pg psql -U postgres -d marketing_perf -tAc "select count(*)
+  from production_templates"`). Dokładnie te trzy odczyty krok P3 miał wpiąć
+  w cache. Efekt: pomiar nie mógł pokazać poprawki, bo zapytania, które cache
+  miał omijać, i tak nie mają czego czytać. Hipoteza P3 nie została obalona
+  uczciwie, tylko przepadła na luce w danych.
+  AC:
+  - generator zestawu L (`scripts/perf/`, patrz F0-03) sieje co najmniej
+    5 szablonów produkcji, 5 szablonów kampanii i 6 agentów
+  - `npm run pg:info` na bazie pomiarowej pokazuje niezerowe liczby dla tych
+    trzech tabel
+  - `perf/baseline.json` przemierzony po dosianiu i zacommitowany
+  - do zestawu mierzonych stron w `scripts/perf/measure-page.mjs` dochodzą
+    `/templates` i `/agents`, czyli strony, które te katalogi renderują
+  - negatywne: liczby dla siedmiu dotychczasowych stron nie zmieniają się
+    o więcej niż 10%, bo dosiane katalogi ich nie dotyczą
+
+- [ ] **F7-11** `znalezisko` `perf` `arch` Cache Components: wrócić do P3 na danych, które istnieją
+  Waga: **drobne**. Szacunek: pół dnia. **Zależy od F7-10.**
+  Krok P3 (issue F1-03) został cofnięty zgodnie z własnym kryterium, bo żadna
+  z siedmiu mierzonych ścieżek nie poprawiła się o 10%. Droga techniczna jest
+  jednak rozpoznana i opisana w `DECISIONS.md` (wpis F1-03): działający układ
+  to `cacheComponents: true`, `src/app/loading.tsx` jako granica Suspense dla
+  wszystkich tras, `<Suspense>` wokół `<Sidebar>` w układzie (bo `usePathname`
+  jest daną żądania i wysypuje powłokę tras z parametrem), `await connection()`
+  przed `new Date()` w `src/app/page.tsx` oraz zdjęcie `export const runtime`
+  z dwóch tras API.
+  AC:
+  - F7-10 zamknięte, czyli katalogi w bazie pomiarowej są niepuste
+  - zmiana odtworzona wg opisu z `DECISIONS.md`, `npm run build` kod 0
+  - pomiar przed i po na `/templates` i `/agents`; poprawa co najmniej 10% p95
+    na dwóch ścieżkach albo ponowne cofnięcie z wpisem w `DECISIONS.md`
+  - negatywne: `e2e/stale-data.spec.ts` zielony
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
