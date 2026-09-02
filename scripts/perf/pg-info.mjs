@@ -41,6 +41,12 @@ const tables = await sql`
   where table_schema = 'public' and table_type = 'BASE TABLE'
   order by table_name`;
 
+const columns = await sql`
+  select table_name, column_name, data_type, is_nullable
+  from information_schema.columns
+  where table_schema = 'public'
+  order by table_name, ordinal_position`;
+
 const counts = {};
 for (const { table_name } of tables) {
   const [row] = await sql`select count(*)::int as n from ${sql(table_name)}`;
@@ -64,6 +70,12 @@ const info = {
   indexCount: indexes.length,
   indexes: indexes.map((i) => ({ table: i.tablename, name: i.indexname, def: i.indexdef })),
   rowCounts: counts,
+  columns: columns.map((c) => ({
+    table: c.table_name,
+    name: c.column_name,
+    type: c.data_type,
+    nullable: c.is_nullable === 'YES',
+  })),
 };
 
 if (asJson) {
@@ -76,6 +88,10 @@ if (asJson) {
   console.log(`strefa czasowa ${info.timezone}`);
   console.log(`\nindeksy (${info.indexCount}):`);
   for (const i of info.indexes) console.log(`  ${i.table.padEnd(22)} ${i.name}`);
+  console.log(`\nkolumny (${info.columns.length}):`);
+  for (const c of info.columns) {
+    console.log(`  ${c.table.padEnd(22)} ${c.name.padEnd(22)} ${c.type}${c.nullable ? '' : ' NOT NULL'}`);
+  }
   console.log('\nwiersze:');
   for (const [t, n] of Object.entries(info.rowCounts)) {
     console.log(`  ${t.padEnd(22)} ${String(n).padStart(6)}`);

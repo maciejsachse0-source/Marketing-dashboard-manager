@@ -991,7 +991,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
 
 ## F4 — Import osób z arkusza Excel
 
-- [ ] **F4-00** `db` Wyrównanie schematu osób
+- [x] **F4-00** `db` Wyrównanie schematu osób
   CZYTAJ: `plan/04-import-excel.md` sekcja 3, `drizzle/schema.ts`
   AC:
   - migracja dodaje `location` do `artists` oraz `handle`, `email`, `phone`,
@@ -1002,6 +1002,21 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
     w `videographers` zachowane (dowód: `table-counts.mjs` przed i po)
   - negatywne: `grep -c 'DROP\|ALTER COLUMN' drizzle/migrations/<nowa>.sql` zwraca `0`;
     migracja nie przenosi danych z `contact` (to osobne issue w F7)
+
+  DOWÓD: migracja `drizzle/migrations/0003_confused_penance.sql`, sześć instrukcji
+  `ALTER TABLE ... ADD COLUMN ... text`, wszystkie dopuszczają `null`.
+  `npm run db:migrate` kod **0** na bazie roboczej oraz (z podmienionym `DATABASE_URL`)
+  na `marketing_perf` i `marketing_test`.
+  `npm run pg:info -- --work` wypisuje `artists.location` oraz `videographers.handle`,
+  `email`, `phone`, `location`, `status` (do skryptu doszła sekcja `kolumny`,
+  bo wcześniej wypisywał tylko indeksy i liczby wierszy — bez niej kryterium
+  było niesprawdzalne).
+  Dane nietknięte: `scripts/perf/table-counts.mjs --work` przed i po daje ten sam
+  wynik (`diff` pusty; artists 62, videographers 0, campaigns 10, productions 40).
+  Na bazie pomiarowej po migracji `artists` 209 i `videographers` 60 (tyle samo co
+  przed) oraz **36 niepustych `contact`** — kolumna zachowana, żadnego przenoszenia danych.
+  Negatywne: `grep -c 'DROP\|ALTER COLUMN' drizzle/migrations/0003_confused_penance.sql`
+  zwraca `0`. `npm run typecheck` kod 0, `npm run test` 29 zielonych.
 
 - [ ] **F4-01** `import` `test` Normalizacja osoby, test przed kodem
   CZYTAJ: `plan/04-import-excel.md` sekcje 4 i 5, `plan/06-testy.md` sekcja 2
