@@ -409,7 +409,22 @@ uruchamialne.
   - negatywne: żadna strona nie pokazuje danych sprzed mutacji ani danych innej sesji
     (dowód: `e2e/stale-data.spec.ts` zielony)
 
-- [ ] **F1-04** `perf` Zawężenie unieważniania ścieżek (P4)
+- [x] **F1-04** `perf` Zawężenie unieważniania ścieżek (P4)
+  DOWOD: `grep -r "revalidatePath('/')" src/ | wc -l` zwraca **0** (było 8).
+  Cztery wywołania zniknęły całkiem, bo pulpit nie renderuje tych danych:
+  `productions.ts` (2), `production-steps.ts` (1), `templates.ts` (1); w zamian
+  odświeżana jest `/productions/list`. Cztery zostały, bo pulpit faktycznie
+  pokazuje te dane (wpisy kalendarza w `calendar.ts`, kafle agentów w `agents.ts`),
+  ale mają teraz jawny typ: `revalidatePath('/', 'page')` z komentarzem. Jawny typ
+  nie jest kosmetyką: obawa z `plan/03` dotyczyła unieważnienia całej aplikacji,
+  a to robi dopiero typ `layout`. `safeRevalidatePath` przyjmuje drugi argument.
+  `e2e/revalidate.spec.ts`: 5 scenariuszy, wszystkie zielone na serwerze
+  produkcyjnym (`npm run e2e`: 7 passed łącznie z login i stale-data).
+  Scenariusz „wpis kalendarza" zastąpiony scenariuszem „produkcja widoczna
+  na osi w /calendar", bo wpisu kalendarza nie da się dodać z interfejsu
+  (znalezisko F7-09); powód zapisany w nagłówku pliku.
+  `npm run typecheck` kod 0, `npm run lint` kod 0, `npm run test` 6/6,
+  `npm run build` kod 0.
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P4
   AC:
   - `grep -r "revalidatePath('/')" src/ | wc -l` zwraca `0` (dziś 8); każde wywołanie

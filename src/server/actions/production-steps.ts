@@ -45,7 +45,7 @@ function bumpRevalidate(productionId: number) {
   revalidatePath('/calendar');
   revalidatePath(`/productions/${productionId}`);
   revalidatePath('/productions');
-  revalidatePath('/');
+  revalidatePath('/productions/list');
 }
 
 async function saveSteps(productionId: number, steps: ProductionStep[]) {

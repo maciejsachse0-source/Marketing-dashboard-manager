@@ -74,8 +74,8 @@ export async function createProduction(input: ProductionInput): Promise<Producti
     }
   }
   revalidatePath('/productions');
+  revalidatePath('/productions/list');
   revalidatePath('/calendar');
-  revalidatePath('/');
   return row;
 }
 
@@ -150,7 +150,6 @@ export async function deleteProduction(id: number): Promise<void> {
     revalidatePath('/productions');
     revalidatePath('/productions/list');
     revalidatePath('/calendar');
-    revalidatePath('/');
     revalidatePath('/analytics');
   } catch (err) {
     console.warn('[deleteProduction] revalidatePath failed (delete itself succeeded):', err);

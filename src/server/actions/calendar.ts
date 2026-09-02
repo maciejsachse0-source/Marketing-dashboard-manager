@@ -33,7 +33,10 @@ export async function createCalendarEntry(input: CalendarEntryInput) {
     })
     .returning();
   revalidatePath('/calendar');
-  revalidatePath('/');
+  // Pulpit pokazuje najblizsze wpisy kalendarza i strumien ostatnich zmian,
+  // wiec wchodzi w zakres. Typ `page` jawnie: unieważniamy sam pulpit,
+  // a nie uklad z cala aplikacja pod spodem.
+  revalidatePath('/', 'page');
   return row;
 }
 
@@ -51,7 +54,10 @@ export async function updateCalendarEntry(input: unknown) {
     .where(eq(schema.calendarEntries.id, id))
     .returning();
   revalidatePath('/calendar');
-  revalidatePath('/');
+  // Pulpit pokazuje najblizsze wpisy kalendarza i strumien ostatnich zmian,
+  // wiec wchodzi w zakres. Typ `page` jawnie: unieważniamy sam pulpit,
+  // a nie uklad z cala aplikacja pod spodem.
+  revalidatePath('/', 'page');
   return row;
 }
 
@@ -59,7 +65,10 @@ export async function deleteCalendarEntry(id: number) {
   await requireSession();
   await db.delete(schema.calendarEntries).where(eq(schema.calendarEntries.id, id));
   revalidatePath('/calendar');
-  revalidatePath('/');
+  // Pulpit pokazuje najblizsze wpisy kalendarza i strumien ostatnich zmian,
+  // wiec wchodzi w zakres. Typ `page` jawnie: unieważniamy sam pulpit,
+  // a nie uklad z cala aplikacja pod spodem.
+  revalidatePath('/', 'page');
 }
 
 export async function listCalendarEntries() {

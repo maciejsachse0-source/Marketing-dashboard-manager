@@ -65,7 +65,6 @@ function bumpRevalidations(slug?: string) {
   revalidatePath('/templates');
   revalidatePath('/calendar');
   revalidatePath('/productions');
-  revalidatePath('/');
   if (slug) revalidatePath(`/templates/${slug}/edit`);
 }
 

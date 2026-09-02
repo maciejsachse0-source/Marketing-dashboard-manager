@@ -85,7 +85,8 @@ async function upsertAgent(def: AgentDef) {
 }
 
 function bumpRevalidations(slug?: string) {
-  revalidatePath('/');
+  // Pulpit renderuje kafle agentow, wiec wchodzi w zakres. Typ `page` jawnie.
+  revalidatePath('/', 'page');
   revalidatePath('/agents');
   if (slug) revalidatePath(`/agents/${slug}`);
 }
