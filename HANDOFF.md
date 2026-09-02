@@ -44,6 +44,13 @@ z wklejonym dowodem, commit per issue.
 - `STOP-GATE:` — pętla zatrzymana, czeka na decyzję usera
 - `BLOCKED-ASK-USER:` — brakuje danych wejściowych od usera
 
+`BLOCKED-ASK-USER:` publiczny adres środowiska podglądowego (F5-04). Środowisko stoi
+i działa lokalnie oraz w sieci lokalnej, brakuje wyłącznie decyzji usera: (a) `tailscale
+funnel` na porcie 443, który dziś zajmuje vibe-kanban, albo (b) hosting, co wymaga
+wypchnięcia repozytorium poza tę maszynę, a w historii gita nadal siedzą prawdziwe dane
+osobowe. Niezależnie od wyboru potrzebna osobna para `AUTH_EMAIL` i `AUTH_PASSWORD`
+dla podglądu.
+
 `BLOCKED-ASK-USER:` trzy pytania o produkcję z `docs/ARCHITEKTURA.md` sekcja 2
 (aktywna domena, dostęp do panelu Vercela, los padniętego wdrożenia z 2026-05-03).
 To jedyny niespełniony punkt Definition of Done fazy F0. Nie blokuje fazy F1, bo indeksy
