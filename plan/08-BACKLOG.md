@@ -1247,7 +1247,7 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
 
 ## F5 — Testy, dryf i środowisko dla zespołu
 
-- [ ] **F5-01** `test` Domknięcie zakresu minimalnego
+- [x] **F5-01** `test` Domknięcie zakresu minimalnego
   CZYTAJ: `plan/06-testy.md` sekcja 3
   AC:
   - każdy obszar z tabeli w `plan/06` sekcja 3 ma co najmniej wskazaną liczbę scenariuszy
@@ -1256,6 +1256,35 @@ z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
   - `npm run test` poniżej 60 sekund
   - negatywne: przebieg z losową kolejnością (`vitest --sequence.shuffle`) zielony,
     czyli żaden test nie zależy od danych innego
+  DOWÓD (2026-09-03): `npm run test` **193 zielone** w 19 plikach (było 130 w 12),
+  czas **3,21 s** przy progu 60 s. Liczby scenariuszy per obszar policzone reporterem
+  JSON vitesta (`vitest run --reporter=json`), a nie `grep`em, bo `it.each` daje wiele
+  scenariuszy z jednego wywołania: normalizacja osoby **29** (próg 12), wykrywanie
+  duplikatów **13** plus 6 w `dry-run.test.ts` (próg 6), mapowanie kolumn **8**
+  (próg 5, nowy `src/lib/import/mapping.test.ts`), oś czasu ganta **14** (próg 6),
+  kroki produkcji **12** w nowym `src/lib/production-steps.test.ts` plus 2 na
+  `resolveStepSequence` (próg 4). Obszar end-to-end domyka F5-03.
+  NOWE PLIKI TESTÓW: `src/lib/import/mapping.test.ts`, `src/lib/production-steps.test.ts`,
+  `src/lib/production-periods.test.ts` (okresy, paleta, `periodsSchema`),
+  `src/lib/campaign-milestone-state.test.ts` (kamienie kampanii i `category-sequence`),
+  `src/lib/csv-mappers.test.ts` (`csv-parser` i `csv-mappers`), `src/lib/auth-token.test.ts`,
+  `src/lib/production-work-folder.test.ts` (zapora na wyjście z folderu produkcji).
+  Dopisane do zastanych: `dates.test.ts` (`startOfWeek`, `addDays`, `endOfDay`,
+  formatowanie, `timeUntil`, `timeAgo`), `parse.test.ts` (`checkFile`, `megabytes`).
+  PLIKI `src/lib/` BEZ TESTÓW I POWÓD: `activity.ts`, `agents/index.ts`,
+  `agents/widget.ts`, `context/index.ts`, `campaign-templates.ts`,
+  `production-templates.ts`, `import/existing.ts`, `db.ts` — zapytania do bazy, nie
+  funkcje czyste; `auth.ts`, `files.ts`, `outreach-files.ts`, `production-files.ts` —
+  ciasteczka, dysk i Vercel Blob, nie funkcje czyste; `env.ts` — konfiguracja czytana
+  raz przy starcie; `use-shortcut.ts` — hak Reacta, nie funkcja czysta;
+  `category-colors.ts`, `production-stages.ts`, `campaign-templates-types.ts`,
+  `production-templates-types.ts`, `agents/types.ts` — same stałe i typy, bez logiki;
+  `utils.ts` — jednolinijkowe opakowanie `clsx` plus `tailwind-merge` (plan/06 sekcja 2
+  wprost je wyłącza). Żadna funkcja czysta nie została bez testu.
+  NEGATYWNE: `npx vitest run --sequence.shuffle` **193 zielone**, czyli żaden test nie
+  zależy od kolejności ani od danych innego.
+  BRAMKI: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 108 ostrzeżeń),
+  `node scripts/check-typography.mjs` kod 0.
 
 - [ ] **F5-02** `test` `perf` Bramka wydajnościowa i wykrywanie dryfu
   CZYTAJ: `plan/06-testy.md` sekcja 4, `plan/03` sekcja 4

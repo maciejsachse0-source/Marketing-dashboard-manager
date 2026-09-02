@@ -5,7 +5,7 @@
 import ExcelJS from 'exceljs';
 import { IMPORT_LIMITS, checkFile } from './limits';
 
-export { IMPORT_LIMITS, checkFile } from './limits';
+export { IMPORT_LIMITS, checkFile, megabytes } from './limits';
 
 export type ParsedSheet = {
   name: string;

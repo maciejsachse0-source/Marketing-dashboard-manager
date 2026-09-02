@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
-import { parseWorkbook, checkFile, IMPORT_LIMITS } from './parse';
+import { parseWorkbook, checkFile, megabytes, IMPORT_LIMITS } from './parse';
 import { autoMap, mappingConflicts, toRawRow, FIELD_ALIASES, PERSON_FIELDS, type PersonField } from './mapping';
 import { normalizeRow } from './normalize';
 
@@ -99,5 +99,22 @@ describe('parseWorkbook - arkusz bez danych', () => {
     const sheets = await fixtureSheets();
     const pusty = sheets.find((s) => s.name === 'Pusty');
     expect(pusty?.rows).toEqual([]);
+  });
+});
+
+describe('checkFile i megabytes - sprawdzenie pliku bez otwierania go', () => {
+  it('inne rozszerzenie niż xlsx jest odrzucone niezależnie od wielkości liter', () => {
+    expect(checkFile('osoby.csv', 10).ok).toBe(false);
+    expect(checkFile('OSOBY.XLSX', 10).ok).toBe(true);
+  });
+
+  it('plik w limicie przechodzi, a komunikat o przekroczeniu podaje rozmiar po polsku', () => {
+    expect(checkFile('osoby.xlsx', IMPORT_LIMITS.maxBytes).ok).toBe(true);
+    const over = checkFile('osoby.xlsx', 12 * 1024 * 1024);
+    expect(over.ok === false && over.message).toBe('Plik ma 12,0 MB, a limit to 10,0 MB');
+  });
+
+  it('megabytes zaokrągla do jednego miejsca i używa przecinka', () => {
+    expect(megabytes(1_572_864)).toBe('1,5');
   });
 });
