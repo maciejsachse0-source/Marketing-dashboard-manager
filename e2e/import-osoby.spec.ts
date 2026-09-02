@@ -180,6 +180,9 @@ test.describe('import osób, kroki 5 do 7', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Każdy test tego bloku startuje z tego samego stanu bazy, inaczej import
+    // z jednego testu robi z wierszy następnego same duplikaty.
+    await sql`delete from artists where id > ${znacznik}`;
     await zaloguj(page);
     await page.goto('/import/osoby');
     await wgrajFixture(page);
@@ -207,9 +210,18 @@ test.describe('import osób, kroki 5 do 7', () => {
     const zapisano = page.getByTestId('import-do-zapisu');
     await expect(zapisano).toContainText('nowych');
 
+    // Licznik paczek sprawdzamy na strumieniu, nie na przelotnym stanie DOM:
+    // zapis 975 wierszy trwa kilkadziesiąt milisekund, więc asercja na widoku
+    // wygrywała wyścig raz na kilka przebiegów. Widok pokazuje dokładnie te linie.
+    const linie: string[] = [];
+    await page.route('**/api/import/people/save', async (route) => {
+      const res = await route.fetch();
+      const body = await res.body();
+      linie.push(...body.toString('utf8').split('\n').filter(Boolean));
+      await route.fulfill({ response: res, body });
+    });
+
     await page.getByTestId('import-zapisz').click();
-    await expect(page.getByTestId('import-zapisz')).toBeDisabled();
-    await expect(page.getByTestId('import-postep')).toContainText('paczka');
 
     const podsumowanie = page.getByTestId('import-podsumowanie');
     await expect(podsumowanie).toBeVisible({ timeout: 30_000 });
@@ -217,6 +229,10 @@ test.describe('import osób, kroki 5 do 7', () => {
     const link = page.getByTestId('import-link-lista');
     await expect(link).toHaveText('Przejdź do artystów');
     await expect(link).toHaveAttribute('href', '/artists');
+
+    expect(linie).toContain('{"batch":1,"of":10}');
+    expect(linie).toContain('{"batch":10,"of":10}');
+    expect(linie.at(-1)).toContain('"done":true');
 
     const pobranie = page.waitForEvent('download');
     await page.getByTestId('import-pobierz-bledy').click();

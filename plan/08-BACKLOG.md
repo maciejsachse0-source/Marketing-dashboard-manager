@@ -1176,8 +1176,16 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   RSS **50,5 MB** przy progu 300 MB. Skrypt kończy się kodem 0 i wypisuje
   `wierszy w artists po pomiarze 0`.
   TABELA ZDARZEŃ, wiersze o zapisie, sprawdzone w e2e `e2e/import-osoby.spec.ts`
-  (20 testów całego katalogu zielonych): „Klik Importuj" - przycisk zablokowany i licznik
-  paczek (`Zapisuję, paczka 4 z 10`, zrzut `screenshots/F4/F4-05-krok6-zapis.png`);
+  (12 testów pliku zielonych w trzech przebiegach z rzędu): „Klik Importuj" - licznik
+  paczek sprawdzany na strumieniu, bo zapis 975 wierszy trwa kilkadziesiąt milisekund
+  i asercja na widoku przegrywała wyścig raz na kilka przebiegów: test wymaga linii
+  `{"batch":1,"of":10}` i `{"batch":10,"of":10}` oraz `"done":true` na końcu.
+  Samo rysowanie licznika pokrywa `src/components/import/import-progress.test.tsx`
+  (tekst „Zapisuję, paczka 4 z 10", `aria-valuenow` 4, `aria-valuemax` 10, zero paczek
+  bez dzielenia przez zero). Widok w akcji na zrzucie
+  `screenshots/F4/F4-05-krok6-zapis.png`: przycisk zablokowany z tekstem „Zapisuję",
+  „Zapisuję, paczka 4 z 10", pasek na 40 procentach, zrzut zrobiony na przebiegu
+  aktualizacyjnym (975 osobnych UPDATE), gdzie okno jest dość długie;
   „Zapis nie powiódł się" - wymuszone HTTP 500, komunikat z treścią błędu, krok 5 i wybór
   polityki zachowane, przycisk znów aktywny; „Zapis powiódł się" - podsumowanie
   „Dodano 975, zaktualizowano 0, pominięto 0", link do `/artists` z `href="/artists"`,
@@ -1188,7 +1196,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   pusty zestaw zmian, a `set({})` wywracał całą transakcję komunikatem „No values to set";
   taki wiersz liczy się teraz jako pominięty (test „aktualizacja bez zmian jest pomijana").
   Bramki: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 108 ostrzeżeń),
-  `npm run test` 127 zielonych, `node scripts/check-typography.mjs` kod 0, `npm run perf`
+  `npm run test` 130 zielonych, `node scripts/check-typography.mjs` kod 0, `npm run perf`
   kod 0, bundel `/calendar` 292,5 kB przy progu 301,6 kB.
 
 - [ ] **F4-06** `import` ⏳ ZABLOKOWANE: czeka na plik `.xlsx` od usera — dopasowanie do prawdziwego arkusza
@@ -1676,15 +1684,17 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   importu wpisuje 975 syntetycznych osób do tej bazy, na której stoi serwer deweloperski
   (`marketing`). Test sprząta po sobie po znaczniku `max(id)` sprzed przebiegu, ale to
   łata, nie izolacja: przerwany przebieg zostawia dane, a równoległe workery skasowałyby
-  sobie wiersze nawzajem. Przy okazji zniknęło pięć zastanych wierszy testowych z bazy
-  roboczej, kasowanych ręcznie po czasie utworzenia, zanim sprzątanie po `max(id)`
-  powstało; to były wiersze z poprzednich sesji („Artysta F1-04", „Test cache"), nie dane
-  użytkownika, ale pokazuje, jak łatwo tu o pomyłkę.
+  sobie wiersze nawzajem. Zastane `e2e/revalidate.spec.ts` i `e2e/stale-data.spec.ts`
+  nie sprzątają w ogóle: każdy pełny `npx playwright test` dokłada do bazy roboczej pięć
+  wierszy („Artysta F1-04" x3, „Osoba F1-04", „Test cache"), zmierzone na czterech
+  kolejnych przebiegach. Baza robocza rośnie o śmieci testowe przy każdym uruchomieniu
+  zestawu.
   Waga: **ważne**. Szacunek: pół dnia.
   AC:
   - `npx playwright test` startuje serwer na `TEST_DATABASE_URL`, nie na `DATABASE_URL`
     (dowód: `select count(*) from artists` w bazie `marketing` przed i po pełnym przebiegu
-    e2e daje tę samą liczbę, bez żadnego sprzątania w teście)
+    e2e daje tę samą liczbę, bez żadnego sprzątania w teście; dziś rośnie o 5)
+  - `revalidate.spec.ts` i `stale-data.spec.ts` kasują wiersze, które utworzyły
   - baza testowa jest czyszczona przed przebiegiem, nie po nim, więc przerwany przebieg
     nie psuje następnego
   - sprzątanie po znaczniku `max(id)` znika z `e2e/import-osoby.spec.ts`

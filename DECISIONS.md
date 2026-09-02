@@ -670,6 +670,15 @@ gita i wyjmie je stamtąd każdy, kto sklonuje repozytorium; czyszczenie histori
 decyzja usera, opisana w `docs/ARCHITEKTURA.md` sekcja 9. Dwa prawdziwe handle nadal
 stoją w kryterium akceptacji F4-07 w `plan/08-BACKLOG.md`, jako znalezisko **F7-23**.
 
+**Pułapka, którą zostawiam następnemu.** Zapis 975 wierszy trwa kilkadziesiąt milisekund,
+więc każda asercja e2e na przelotnym stanie widoku („pasek postępu jest widoczny")
+przegrywa wyścig raz na kilka przebiegów. Licznik paczek sprawdzamy więc na strumieniu
+(linie `{"batch":n,"of":10}`), a samo rysowanie w teście komponentu. Zrzut kroku 6
+udało się zrobić dopiero na przebiegu aktualizacyjnym, gdzie 975 osobnych `UPDATE`
+daje okno rzędu sekundy. Przy okazji: zastane `e2e/revalidate.spec.ts` i
+`e2e/stale-data.spec.ts` dokładają do bazy roboczej pięć wierszy przy każdym pełnym
+przebiegu i nigdy ich nie kasują (F7-21).
+
 **Znaleziska fazy:** F7-20 (pole wyboru pokazuje surową wartość zamiast etykiety, kod
 zastany), F7-21 (e2e importu pisze do bazy roboczej, brak izolacji), F7-22 (`AGENTS.md`
 wskazywał nieistniejący plik planu), F7-23 (prawdziwe handle w kryterium F4-07).
