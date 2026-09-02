@@ -339,7 +339,7 @@ function PeriodBucket({
                   variant="ghost"
                   onClick={handleParentClick}
                   disabled={pending}
-                  className={`mt-0.5 grid place-items-center w-5 h-5 p-0 rounded-full border-2 bg-clip-border shrink-0 ui-transition cursor-pointer ${
+                  className={`disabled:opacity-100 mt-0.5 grid place-items-center w-5 h-5 p-0 rounded-full border-2 bg-clip-border shrink-0 ui-transition cursor-pointer ${
                     isDone
                       ? 'bg-emerald-500 border-emerald-600 text-white'
                       : isMixed
@@ -400,7 +400,7 @@ function PeriodBucket({
                   variant="ghost"
                   onClick={() => onRemoveMilestone(m.id, m.label)}
                   disabled={pending}
-                  className="h-auto border-0 p-1 rounded text-muted-foreground/50 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0"
+                  className="disabled:opacity-100 h-auto border-0 p-1 rounded text-muted-foreground/50 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0"
                   title="Usuń milestone"
                   aria-label="Usuń milestone"
                 >
@@ -418,7 +418,7 @@ function PeriodBucket({
                         variant="ghost"
                         onClick={() => onToggle(m.id, s.id)}
                         disabled={pending}
-                        className={`mt-0.5 grid place-items-center w-4 h-4 p-0 rounded-md border-2 bg-clip-border shrink-0 ui-transition ${
+                        className={`disabled:opacity-100 mt-0.5 grid place-items-center w-4 h-4 p-0 rounded-md border-2 bg-clip-border shrink-0 ui-transition ${
                           sDone
                             ? 'bg-emerald-500 border-emerald-600 text-white'
                             : 'bg-card border-border text-transparent hover:border-foreground/40 cursor-pointer'
@@ -537,7 +537,7 @@ function AddInline({
         variant="ghost"
         onClick={() => setOpen(true)}
         disabled={pending}
-        className={`block h-auto border-0 w-full text-left text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 ui-transition italic`}
+        className={`disabled:opacity-100 block h-auto border-0 w-full text-left text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 ui-transition italic`}
       >
         {placeholder}
       </Button>

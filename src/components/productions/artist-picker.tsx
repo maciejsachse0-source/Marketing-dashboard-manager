@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Check, ChevronDown, Mic, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateProduction } from '@/server/actions/productions';
+import { Button } from '@/components/ui/button';
 
 export type ArtistOption = {
   id: number;
@@ -61,7 +62,7 @@ export function ArtistPicker({
             variant === 'warning' ? 'text-amber-900' : 'text-muted-foreground'
           }`}
         >
-          <Mic className="w-3.5 h-3.5" strokeWidth={1.75} />
+          <Mic className="size-3.5" strokeWidth={1.75} />
           Artysta
           {variant === 'warning' && !current ? (
             <span className="ml-1 text-[10px] uppercase tracking-[0.14em] text-amber-900 font-bold">
@@ -87,11 +88,11 @@ export function ArtistPicker({
           </span>
         )}
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setOpen((o) => !o)}
           disabled={pending}
-          className={`ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-medium transition disabled:opacity-50 ${
+          className={`h-auto bg-clip-border ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-medium transition disabled:opacity-50 ${
             variant === 'warning'
               ? 'border-amber-600 bg-amber-100 text-amber-900 hover:bg-amber-200'
               : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
@@ -101,17 +102,17 @@ export function ArtistPicker({
             <>
               zmień
               <ChevronDown
-                className={`w-3 h-3 transition ${open ? 'rotate-180' : ''}`}
+                className={`size-3 transition ${open ? 'rotate-180' : ''}`}
                 strokeWidth={2}
               />
             </>
           ) : (
             <>
-              <Plus className="w-3 h-3" strokeWidth={2.5} />
+              <Plus className="size-3" strokeWidth={2.5} />
               przypisz
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {open ? (
@@ -132,23 +133,23 @@ export function ArtistPicker({
               {artists.map((a) => {
                 const active = a.id === currentArtistId;
                 return (
-                  <button
+                  <Button
+                    variant="ghost"
                     key={a.id}
-                    type="button"
                     onClick={() => assign(a.id)}
                     disabled={pending}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border transition disabled:opacity-50 ${
+                    className={`h-auto font-normal bg-clip-border hover:bg-transparent inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border transition disabled:opacity-50 ${
                       active
                         ? 'border-foreground bg-foreground text-background'
                         : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
                     }`}
                   >
-                    {active ? <Check className="w-3 h-3" strokeWidth={2.5} /> : null}
+                    {active ? <Check className="size-3" strokeWidth={2.5} /> : null}
                     <span>{a.name}</span>
                     {a.handle ? (
                       <span className="opacity-60">{a.handle}</span>
                     ) : null}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

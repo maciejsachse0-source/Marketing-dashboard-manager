@@ -203,8 +203,8 @@ export function PipelineMilestones({
             aria-current={state === 'active' ? 'step' : undefined}
             aria-pressed={state === 'passed'}
             title={tooltip}
-            className={`absolute z-10 grid place-items-center rounded-full p-0 border-0 bg-clip-border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-              cancelled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            className={`disabled:opacity-100 absolute z-10 grid place-items-center rounded-full p-0 border-0 bg-clip-border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+              cancelled ? 'opacity-50 disabled:opacity-50 cursor-not-allowed' : 'cursor-pointer'
             } ${
               state === 'active'
                 ? 'w-7 h-7 bg-foreground text-background ring-4 ring-[var(--accent-blue)]/25 scale-105'

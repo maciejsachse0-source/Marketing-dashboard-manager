@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import type { ProductionStage, ProductionStep } from '../../../drizzle/schema';
+import { Button } from '@/components/ui/button';
 
 type WeekPhase = 'T1' | 'T2' | 'T3';
 
@@ -189,8 +190,8 @@ export function ProductionStepTracker({
           const isEmpty = state === 'empty';
           return (
             <div key={cat} className="grid place-items-center">
-              <button
-                type="button"
+              <Button
+                variant="ghost"
                 onMouseEnter={() => setHoveredKey(cat)}
                 onMouseLeave={() => setHoveredKey(null)}
                 onFocus={() => setHoveredKey(cat)}
@@ -199,22 +200,22 @@ export function ProductionStepTracker({
                 disabled={cancelled || isEmpty || !onCascadeTo}
                 aria-label={`${CATEGORY_META[cat].label} (${state})`}
                 aria-current={state === 'active' ? 'step' : undefined}
-                className={`relative grid place-items-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`disabled:opacity-100 p-0 font-normal bg-clip-border hover:bg-transparent hover:text-inherit relative grid place-items-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   isEmpty
-                    ? 'w-4 h-4 bg-muted border border-border cursor-not-allowed opacity-50'
+                    ? 'size-4 bg-muted border border-border cursor-not-allowed opacity-50 disabled:opacity-50'
                     : state === 'active'
-                      ? 'w-7 h-7 bg-foreground text-background ring-4 ring-[var(--accent-blue)]/25 scale-105 cursor-pointer'
+                      ? 'size-7 bg-foreground text-background ring-4 ring-[var(--accent-blue)]/25 scale-105 cursor-pointer'
                       : state === 'passed'
-                        ? 'w-6 h-6 bg-[var(--accent-blue)] text-white hover:scale-110 cursor-pointer'
-                        : 'w-5 h-5 bg-background border-2 border-border hover:border-foreground/50 hover:scale-110 cursor-pointer'
+                        ? 'size-6 bg-[var(--accent-blue)] text-white hover:scale-110 cursor-pointer'
+                        : 'size-5 bg-background border-2 border-border hover:border-foreground/50 hover:scale-110 cursor-pointer'
                 } ${isHovered && state !== 'active' && !isEmpty ? 'ring-4 ring-foreground/10' : ''} ${cancelled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {state === 'passed' ? (
-                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                  <Check className="size-3.5" strokeWidth={3} />
                 ) : state === 'active' ? (
-                  <span className="block w-2 h-2 rounded-full bg-background animate-pulse" />
+                  <span className="block size-2 rounded-full bg-background animate-pulse" />
                 ) : null}
-              </button>
+              </Button>
             </div>
           );
         })}

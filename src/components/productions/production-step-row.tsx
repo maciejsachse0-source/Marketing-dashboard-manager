@@ -28,6 +28,7 @@ import {
 } from '@/server/actions/production-steps';
 import { getStepWeekRange } from '@/lib/production-steps';
 import type { ProductionPeriods, ProductionStep } from '../../../drizzle/schema';
+import { Button } from '@/components/ui/button';
 
 function formatBytes(b: number): string {
   if (b < 1024) return `${b} B`;
@@ -218,26 +219,26 @@ export function ProductionStepRow({
     <div className={`group rounded-xl border transition ${cardTone}`}>
       <div className="flex items-center gap-2.5 px-3 py-2">
         {/* Cascade checkbox — same visual language as the old SubStageButton */}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={onCascadeClick}
           aria-label={done ? `Cofnij krok: ${step.label}` : `Odhacz krok: ${step.label}`}
           aria-pressed={done}
           disabled={pending || productionCancelled}
-          className="shrink-0 disabled:opacity-50"
+          className="h-auto border-0 p-0 font-normal hover:bg-transparent hover:text-inherit shrink-0 disabled:opacity-50"
         >
           {optimisticState === 'passed' ? (
-            <span className="w-4 h-4 rounded-full bg-[var(--accent-blue)] grid place-items-center text-white">
-              <Check className="w-2.5 h-2.5" strokeWidth={3} />
+            <span className="size-4 rounded-full bg-[var(--accent-blue)] grid place-items-center text-white">
+              <Check className="size-2.5" strokeWidth={3} />
             </span>
           ) : optimisticState === 'active' ? (
-            <span className="w-4 h-4 rounded-full bg-foreground grid place-items-center">
-              <span className="block w-1.5 h-1.5 rounded-full bg-background animate-pulse" />
+            <span className="size-4 rounded-full bg-foreground grid place-items-center">
+              <span className="block size-1.5 rounded-full bg-background animate-pulse" />
             </span>
           ) : (
-            <Circle className="w-4 h-4 text-muted-foreground/60 hover:text-foreground transition" strokeWidth={1.75} />
+            <Circle className="size-4 text-muted-foreground/60 hover:text-foreground transition" strokeWidth={1.75} />
           )}
-        </button>
+        </Button>
 
         {/* Label — editable in place */}
         <div className="flex-1 min-w-0">
@@ -259,66 +260,66 @@ export function ProductionStepRow({
               className="w-full text-sm font-medium px-1 py-0.5 rounded border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
             />
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setEditingLabel(true)}
-              className={`text-sm font-medium text-left w-full truncate ui-transition ${
+              className={`h-auto border-0 p-0 hover:bg-transparent inline-block text-sm font-medium text-left w-full truncate ui-transition ${
                 done ? 'line-through text-muted-foreground' : 'text-foreground hover:text-[var(--accent-blue)]'
               }`}
               title="Kliknij, aby zmienić etykietę"
             >
               <span className="tabular-nums opacity-70 mr-1">{displayNumber}.</span>
               {step.label}
-              <Pencil className="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-50 transition" />
-            </button>
+              <Pencil className="inline-block size-3 ml-1 opacity-0 group-hover:opacity-50 transition" />
+            </Button>
           )}
         </div>
 
         <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => onMove('up')}
             disabled={!canMoveUp || pending}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition"
             aria-label="Przesuń w górę"
             title="Przesuń w górę"
           >
-            <ArrowUp className="w-3.5 h-3.5" strokeWidth={2} />
-          </button>
-          <button
-            type="button"
+            <ArrowUp className="size-3.5" strokeWidth={2} />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => onMove('down')}
             disabled={!canMoveDown || pending}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition"
             aria-label="Przesuń w dół"
             title="Przesuń w dół"
           >
-            <ArrowDown className="w-3.5 h-3.5" strokeWidth={2} />
-          </button>
-          <button
-            type="button"
+            <ArrowDown className="size-3.5" strokeWidth={2} />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={onDelete}
             disabled={pending}
-            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 transition"
+            className="disabled:opacity-100 h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 transition"
             aria-label="Usuń krok"
             title="Usuń krok"
           >
-            <Trash2 className="w-3.5 h-3.5" strokeWidth={2} />
-          </button>
+            <Trash2 className="size-3.5" strokeWidth={2} />
+          </Button>
         </div>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setExpanded((v) => !v)}
-          className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition shrink-0"
+          className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition shrink-0"
           aria-expanded={expanded}
           aria-label={expanded ? 'Zwiń' : 'Rozwiń'}
           title={expanded ? 'Zwiń' : 'Opis + plik'}
         >
           <ChevronDown
-            className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`size-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`}
             strokeWidth={2}
           />
-        </button>
+        </Button>
       </div>
 
       {/* Date row — only when the step has a non-none dateMode. Stays visible
@@ -327,7 +328,7 @@ export function ProductionStepRow({
         <div className="px-3 pb-2 -mt-1 pl-9">
           {isDerived ? (
             <div className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <Lock className="w-3 h-3" />
+              <Lock className="size-3" />
               <span className="italic">data:</span>
               <span className="font-medium tabular-nums">
                 {date ? formatDate(date, withTime) : 'czeka na datę nagrań'}
@@ -337,17 +338,17 @@ export function ProductionStepRow({
               </span>
             </div>
           ) : !editingDate ? (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setEditingDate(true)}
               disabled={productionCancelled}
-              className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-medium transition disabled:opacity-50 ${
+              className={`h-auto bg-clip-border inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-medium transition disabled:opacity-50 ${
                 date
                   ? 'bg-[var(--accent-blue-tint)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue-soft)]/40'
                   : 'border border-dashed border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
               }`}
             >
-              {date ? <Calendar className="w-3 h-3" /> : <CalendarPlus className="w-3 h-3" />}
+              {date ? <Calendar className="size-3" /> : <CalendarPlus className="size-3" />}
               <span className="italic">data:</span>
               <span className="not-italic font-medium tabular-nums">
                 {date ? formatDate(date, withTime) : 'wpisz'}
@@ -357,7 +358,7 @@ export function ProductionStepRow({
                   · w kalendarzu
                 </span>
               ) : null}
-            </button>
+            </Button>
           ) : (
             <div className="flex items-center gap-2 flex-wrap">
               <input
@@ -396,15 +397,15 @@ export function ProductionStepRow({
                 {weekRangeLabel}
               </span>
               {date ? (
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => saveDate(null)}
                   disabled={pending}
-                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-rose-600 transition"
+                  className="disabled:opacity-100 h-auto border-0 p-0 font-normal hover:bg-transparent inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-rose-600 transition"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="size-3" />
                   wyczyść
-                </button>
+                </Button>
               ) : null}
               {dateError ? <span className="text-[11px] text-rose-600">{dateError}</span> : null}
             </div>
@@ -420,7 +421,7 @@ export function ProductionStepRow({
           ) : null}
           {step.attachmentName ? (
             <span className="inline-flex items-center gap-1 shrink-0">
-              <Paperclip className="w-3 h-3" />
+              <Paperclip className="size-3" />
               {step.attachmentName}
             </span>
           ) : null}
@@ -453,33 +454,33 @@ export function ProductionStepRow({
             </label>
             {step.attachmentPath ? (
               <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5">
-                <Paperclip className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <Paperclip className="size-3.5 text-muted-foreground shrink-0" />
                 <span className="text-xs flex-1 truncate" title={step.attachmentName ?? ''}>
                   {step.attachmentName}
                 </span>
                 <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
                   {step.attachmentSize ? formatBytes(step.attachmentSize) : ''}
                 </span>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={onRemoveFile}
-                  className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 transition"
+                  className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 transition"
                   aria-label="Usuń plik"
                   title="Usuń plik"
                 >
-                  <X className="w-3 h-3" strokeWidth={2.5} />
-                </button>
+                  <X className="size-3" strokeWidth={2.5} />
+                </Button>
               </div>
             ) : (
-              <button
-                type="button"
+              <Button
+                variant="ghost"
                 onClick={onPickFile}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-dashed border-border hover:border-foreground/40 hover:bg-muted/30 transition text-xs text-muted-foreground disabled:opacity-50"
+                className="h-auto font-normal bg-clip-border hover:text-inherit inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-dashed border-border hover:border-foreground/40 hover:bg-muted/30 transition text-xs text-muted-foreground disabled:opacity-50"
               >
-                <FileUp className="w-3.5 h-3.5" />
+                <FileUp className="size-3.5" />
                 {busy ? 'Wgrywanie…' : 'Wgraj plik (max 25 MB)'}
-              </button>
+              </Button>
             )}
             <input ref={fileRef} type="file" hidden onChange={onFileChange} />
           </div>

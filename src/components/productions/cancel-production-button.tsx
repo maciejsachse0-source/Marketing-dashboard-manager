@@ -3,6 +3,7 @@
 import { useTransition } from 'react';
 import { Ban, Undo2 } from 'lucide-react';
 import { setProductionCancelled } from '@/server/actions/production-steps';
+import { Button } from '@/components/ui/button';
 
 /**
  * Toggle a production's cancellation. Replaces the legacy "set status to
@@ -29,11 +30,11 @@ export function CancelProductionButton({
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
       disabled={pending}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition disabled:opacity-50 ${
+      className={`h-auto bg-clip-border hover:text-inherit inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition disabled:opacity-50 ${
         cancelled
           ? 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'
           : 'border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-400'
@@ -41,15 +42,15 @@ export function CancelProductionButton({
     >
       {cancelled ? (
         <>
-          <Undo2 className="w-3.5 h-3.5" />
+          <Undo2 className="size-3.5" />
           Wznów
         </>
       ) : (
         <>
-          <Ban className="w-3.5 h-3.5" />
+          <Ban className="size-3.5" />
           Anuluj produkcję
         </>
       )}
-    </button>
+    </Button>
   );
 }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Camera, Check, ChevronDown, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateProduction } from '@/server/actions/productions';
+import { Button } from '@/components/ui/button';
 
 export type VideographerOption = {
   id: number;
@@ -52,7 +53,7 @@ export function VideographerPicker({
     <div className="rounded-xl border border-border bg-card/60 p-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
         <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
-          <Camera className="w-3.5 h-3.5" strokeWidth={1.75} />
+          <Camera className="size-3.5" strokeWidth={1.75} />
           Kamerzysta
         </span>
 
@@ -62,41 +63,41 @@ export function VideographerPicker({
             {current.hourlyRate ? (
               <span className="opacity-70 tabular-nums">{current.hourlyRate}zł/h</span>
             ) : null}
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => assign(null)}
               disabled={pending}
               title="Usuń przypisanie"
-              className="opacity-60 hover:opacity-100 transition disabled:opacity-30"
+              className="h-auto border-0 p-0 font-normal hover:bg-transparent hover:text-inherit opacity-60 hover:opacity-100 transition disabled:opacity-30"
             >
-              <X className="w-3 h-3" strokeWidth={2.5} />
-            </button>
+              <X className="size-3" strokeWidth={2.5} />
+            </Button>
           </div>
         ) : (
           <span className="text-xs italic text-muted-foreground">nie przypisano</span>
         )}
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setOpen((o) => !o)}
           disabled={pending}
-          className="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-border text-[11px] font-medium text-muted-foreground hover:border-foreground/40 hover:text-foreground transition disabled:opacity-50"
+          className="h-auto hover:bg-transparent ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-border text-[11px] font-medium text-muted-foreground hover:border-foreground/40 hover:text-foreground transition disabled:opacity-50"
         >
           {current ? (
             <>
               zmień
               <ChevronDown
-                className={`w-3 h-3 transition ${open ? 'rotate-180' : ''}`}
+                className={`size-3 transition ${open ? 'rotate-180' : ''}`}
                 strokeWidth={2}
               />
             </>
           ) : (
             <>
-              <Plus className="w-3 h-3" strokeWidth={2.5} />
+              <Plus className="size-3" strokeWidth={2.5} />
               przypisz
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {open ? (
@@ -117,23 +118,23 @@ export function VideographerPicker({
               {videographers.map((v) => {
                 const active = v.id === currentVideographerId;
                 return (
-                  <button
+                  <Button
+                    variant="ghost"
                     key={v.id}
-                    type="button"
                     onClick={() => assign(v.id)}
                     disabled={pending}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border transition disabled:opacity-50 ${
+                    className={`h-auto font-normal bg-clip-border hover:bg-transparent inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border transition disabled:opacity-50 ${
                       active
                         ? 'border-foreground bg-foreground text-background'
                         : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
                     }`}
                   >
-                    {active ? <Check className="w-3 h-3" strokeWidth={2.5} /> : null}
+                    {active ? <Check className="size-3" strokeWidth={2.5} /> : null}
                     <span>{v.name}</span>
                     {v.hourlyRate ? (
                       <span className="opacity-60 tabular-nums">{v.hourlyRate}zł/h</span>
                     ) : null}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

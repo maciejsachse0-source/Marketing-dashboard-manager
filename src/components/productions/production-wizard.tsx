@@ -329,10 +329,10 @@ function TemplateCard({
 }) {
   const total = template.steps.length;
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className={`group text-left rounded-lg border p-3.5 ui-transition ${
+      className={`h-auto font-normal bg-clip-border hover:text-inherit block whitespace-normal group text-left rounded-lg border p-3.5 ui-transition ${
         active
           ? 'border-primary bg-primary/10 shadow-sm'
           : 'border-border hover:border-foreground/30 hover:bg-muted/30'
@@ -350,7 +350,7 @@ function TemplateCard({
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-snug">{template.summary}</p>
-    </button>
+    </Button>
   );
 }
 
@@ -366,16 +366,16 @@ function TypeCard({
   description: string;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className={`text-left rounded-lg border p-4 transition ${
+      className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit block whitespace-normal text-left rounded-lg border p-4 transition ${
         active ? 'border-primary bg-primary/10' : 'border-border hover:border-foreground/30'
       }`}
     >
       <div className="font-medium mb-1">{title}</div>
       <div className="text-xs text-muted-foreground">{description}</div>
-    </button>
+    </Button>
   );
 }
 
@@ -459,23 +459,23 @@ function StepDetails({
       <div className="grid gap-1.5">
         <Label>Artysta</Label>
         <div className="flex flex-wrap gap-1">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => setArtistId(null)}
-            className={`px-2.5 py-1 text-xs rounded border transition ${
+            className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2.5 py-1 text-xs rounded border transition ${
               artistId === null
                 ? 'border-foreground bg-foreground text-background'
                 : 'border-border text-muted-foreground hover:border-foreground/40'
             }`}
           >
             brak
-          </button>
+          </Button>
           {artists.map((a) => (
-            <button
+            <Button
+              variant="ghost"
               key={a.id}
-              type="button"
               onClick={() => setArtistId(a.id)}
-              className={`px-2.5 py-1 text-xs rounded border transition ${
+              className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2.5 py-1 text-xs rounded border transition ${
                 artistId === a.id
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-muted-foreground hover:border-foreground/40'
@@ -483,7 +483,7 @@ function StepDetails({
             >
               {a.name}
               {a.handle ? <span className="opacity-60 ml-1">{a.handle}</span> : null}
-            </button>
+            </Button>
           ))}
         </div>
         <p className="text-[10px] text-muted-foreground">
@@ -498,23 +498,23 @@ function StepDetails({
         <div className="grid gap-1.5">
           <Label>Kamerzysta</Label>
           <div className="flex flex-wrap gap-1">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setVideographerId(null)}
-              className={`px-2.5 py-1 text-xs rounded border transition ${
+              className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2.5 py-1 text-xs rounded border transition ${
                 videographerId === null
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-muted-foreground hover:border-foreground/40'
               }`}
             >
               brak / solo cam
-            </button>
+            </Button>
             {videographers.map((v) => (
-              <button
+              <Button
+                variant="ghost"
                 key={v.id}
-                type="button"
                 onClick={() => setVideographerId(v.id)}
-                className={`px-2.5 py-1 text-xs rounded border transition ${
+                className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2.5 py-1 text-xs rounded border transition ${
                   videographerId === v.id
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-muted-foreground hover:border-foreground/40'
@@ -522,7 +522,7 @@ function StepDetails({
               >
                 {v.name}
                 {v.hourlyRate ? <span className="opacity-60 ml-1">{v.hourlyRate}zł/h</span> : null}
-              </button>
+              </Button>
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground">
@@ -534,18 +534,18 @@ function StepDetails({
         <Label>Platformy publikacji (opcjonalnie)</Label>
         <div className="flex flex-wrap gap-1">
           {PLATFORMS.map((p) => (
-            <button
+            <Button
+              variant="ghost"
               key={p}
-              type="button"
               onClick={() => togglePlatform(p)}
-              className={`px-2.5 py-1 text-xs rounded border transition ${
+              className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2.5 py-1 text-xs rounded border transition ${
                 platforms.includes(p)
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-muted-foreground hover:border-foreground/40'
               }`}
             >
               {p}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

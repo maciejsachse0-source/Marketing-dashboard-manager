@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Trash2 } from 'lucide-react';
 import { deleteProduction } from '@/server/actions/productions';
+import { Button } from '@/components/ui/button';
 
 export function DeleteProductionButton({
   productionId,
@@ -37,18 +38,18 @@ export function DeleteProductionButton({
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
       disabled={pending}
-      className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-rose-200 bg-white text-rose-700 text-sm font-semibold hover:bg-rose-50 hover:border-rose-400 hover:shadow-sm hover:shadow-rose-200/50 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ui-transition"
+      className="h-auto bg-clip-border hover:text-inherit group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-rose-200 bg-white text-rose-700 text-sm font-semibold hover:bg-rose-50 hover:border-rose-400 hover:shadow-sm hover:shadow-rose-200/50 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ui-transition"
       title={`Usuń produkcję "${productionName}"`}
     >
       <Trash2
-        className="w-3.5 h-3.5 ui-transition group-hover:rotate-[-6deg] group-hover:scale-110"
+        className="size-3.5 ui-transition group-hover:rotate-[-6deg] group-hover:scale-110"
         strokeWidth={2.25}
       />
       {pending ? 'Usuwam…' : 'Usuń produkcję'}
-    </button>
+    </Button>
   );
 }

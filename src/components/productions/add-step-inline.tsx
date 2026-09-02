@@ -7,6 +7,7 @@ import {
   attachFileToStep,
 } from '@/server/actions/production-steps';
 import type { ProductionStage } from '../../../drizzle/schema';
+import { Button } from '@/components/ui/button';
 
 /**
  * Inline "add step" form for a category. Collapsed by default → "+ Dodaj krok"
@@ -74,14 +75,14 @@ export function AddStepInline({
 
   if (!open) {
     return (
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition"
+        className="h-auto border-0 p-0 hover:bg-transparent inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition"
       >
-        <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+        <Plus className="size-3.5" strokeWidth={2.5} />
         Dodaj krok
-      </button>
+      </Button>
     );
   }
 
@@ -91,17 +92,17 @@ export function AddStepInline({
         <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
           Nowy krok
         </span>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => {
             setOpen(false);
             reset();
           }}
-          className="p-1 rounded text-muted-foreground hover:text-foreground transition"
+          className="h-auto border-0 font-normal hover:bg-transparent p-1 rounded text-muted-foreground hover:text-foreground transition"
           aria-label="Anuluj"
         >
-          <X className="w-3.5 h-3.5" />
-        </button>
+          <X className="size-3.5" />
+        </Button>
       </div>
 
       <div className="space-y-2">
@@ -146,26 +147,26 @@ export function AddStepInline({
           </label>
           {file ? (
             <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2 py-1.5">
-              <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
+              <Paperclip className="size-3.5 text-muted-foreground" />
               <span className="text-xs flex-1 truncate">{file.name}</span>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
                 onClick={() => setFile(null)}
-                className="p-1 rounded text-muted-foreground hover:text-rose-600 transition"
+                className="h-auto border-0 font-normal hover:bg-transparent p-1 rounded text-muted-foreground hover:text-rose-600 transition"
                 aria-label="Usuń plik"
               >
-                <X className="w-3 h-3" />
-              </button>
+                <X className="size-3" />
+              </Button>
             </div>
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-dashed border-border hover:border-foreground/40 hover:bg-muted/30 transition text-xs text-muted-foreground"
+              className="h-auto font-normal bg-clip-border hover:text-inherit inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-dashed border-border hover:border-foreground/40 hover:bg-muted/30 transition text-xs text-muted-foreground"
             >
-              <FileUp className="w-3.5 h-3.5" />
+              <FileUp className="size-3.5" />
               Wybierz plik (max 25 MB)
-            </button>
+            </Button>
           )}
           <input
             ref={fileRef}
@@ -185,24 +186,24 @@ export function AddStepInline({
         {error ? <div className="text-xs text-rose-600">{error}</div> : null}
 
         <div className="flex items-center gap-2 pt-1">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onSubmit}
             disabled={busy || !label.trim()}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-foreground text-background disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition"
+            className="h-auto border-0 bg-clip-border hover:bg-transparent hover:text-inherit px-3 py-1.5 text-xs font-semibold rounded-lg bg-foreground text-background disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition"
           >
             {busy ? 'Dodawanie…' : 'Dodaj krok'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => {
               setOpen(false);
               reset();
             }}
-            className="px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition"
+            className="h-auto border-0 font-normal hover:bg-transparent px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition"
           >
             Anuluj
-          </button>
+          </Button>
         </div>
       </div>
     </div>

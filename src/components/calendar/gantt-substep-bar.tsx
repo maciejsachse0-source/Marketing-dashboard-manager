@@ -261,8 +261,8 @@ export function SubStepBar({
             aria-current={state === 'active' ? 'step' : undefined}
             title={tooltip}
             style={{ top: TRACK_TOP, left: `${x}%`, transform: 'translate(-50%, -50%)' }}
-            className={`absolute z-20 grid place-items-center rounded-full p-0 border-0 bg-clip-border text-[11px] font-bold tabular-nums transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-              cancelled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            className={`disabled:opacity-100 absolute z-20 grid place-items-center rounded-full p-0 border-0 bg-clip-border text-[11px] font-bold tabular-nums transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+              cancelled ? 'opacity-50 disabled:opacity-50 cursor-not-allowed' : 'cursor-pointer'
             } ${customRing} ${
               state === 'passed'
                 ? `w-6 h-6 ${tone.passed} hover:scale-110 shadow-sm`

@@ -788,13 +788,39 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   i `<span onClick>` = 0, `npm run test` 21 zielonych, `npx playwright test` 8 zielonych,
   `npm run typecheck` kod 0.
 
-- [ ] **F3-04** `ui` Migracja guzików: produkcje (32 sztuki)
+- [x] **F3-04** `ui` Migracja guzików: produkcje (32 sztuki)
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5
   AC:
   - `grep -r '<button' src/components/productions | wc -l` zwraca `0` (dziś 32)
   - warianty i `aria-label` jak w F3-02; zrzuty przed i po dla listy produkcji
     i szczegółu produkcji
   - negatywne: `grep -r '<div onClick\|<span onClick' src/components/productions | wc -l` zwraca `0`
+  DOWÓD (2026-09-02): `grep -r '<button' src/components/productions | wc -l` = 0 (przed: 32),
+  dziewięć plików, wszystkie na `<Button variant="ghost">`, guziki bez tekstu z `aria-label`.
+  Rozmiar znów z klas oryginalnych, bo znaczniki osi kroków mają 16, 20, 24 albo 28 px
+  zależnie od stanu. Wygląd: `screenshots/F3/przed2-F3-04-productions.png` wobec
+  `po3-F3-04-productions.png` = **1015 pikseli z 7 823 808**, `przed2-F3-04-productions_31.png`
+  wobec `po3-F3-04-productions_31.png` = **356 pikseli**, kreator produkcji
+  `przed-F3-04-prodwizard.png` wobec `po-F3-04-prodwizard.png` = **0 pikseli**. Reszta
+  w obu liczbach to faza `animate-pulse` kropki w aktywnym znaczniku, sprawdzona
+  powiększeniem sześciokrotnym. Trzy nowe pułapki wytropione po drodze, wszystkie
+  potwierdzone pomiarem w przeglądarce, nie z kodu:
+  (1) `disabled:opacity-50` z klasy bazowej przygaszało znaczniki, które wcześniej były
+  pełne (zmierzone: krycie 0,5 wobec 1) - naprawa `disabled:opacity-100`, ale wyłącznie
+  tam, gdzie oryginał nie miał własnego `opacity-*`; gdzie miał (stan pusty, anulowana
+  produkcja), dopisany jawny `disabled:opacity-50`, bo inaczej kółka stanu pustego
+  robiły się pełne;
+  (2) zamiana guzika liniowego na `block` skracała wiersz kroku o 4 px (znika miejsce na
+  wydłużenia dolne w wierszu tekstu), razy siedem bloków = 28 px na stronie szczegółu -
+  naprawa `inline-block`;
+  (3) `hover:bg-muted` z wariantu `ghost` dokładał tło guzikom, które na najechanie
+  zmieniały tylko kolor pisma - naprawa `hover:bg-transparent` tam, gdzie oryginał
+  nie miał `hover:bg-`.
+  Poprawki (1) dotyczyły także plików kalendarza z F3-02, więc kalendarz przemierzony
+  jeszcze raz wobec kodu sprzed F3-02 (`git checkout 8360b94 -- src/components/calendar`):
+  `przed3-F3-02` wobec `po3-F3-02` = 2 460 pikseli, w całości ta sama faza kropki
+  (30 znaczników po 82 piksele). Negatywne: `<div onClick>` i `<span onClick>` = 0,
+  `npm run test` 21 zielonych, `npx playwright test` 8 zielonych, `npm run typecheck` kod 0.
 
 - [ ] **F3-05** `ui` Migracja guzików: reszta i zamknięcie reguły lintu
   CZYTAJ: `plan/05-ui-system.md` sekcje 2 do 6, `plan/01` zasada Z3

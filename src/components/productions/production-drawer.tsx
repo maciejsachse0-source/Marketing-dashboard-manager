@@ -16,6 +16,7 @@ import type {
   Artist,
   Campaign,
 } from '../../../drizzle/schema';
+import { Button } from '@/components/ui/button';
 
 type Bundle = {
   production: Production;
@@ -75,14 +76,14 @@ export function ProductionDrawer({
       <aside className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-xl bg-background border-l border-border shadow-2xl overflow-y-auto">
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-5 py-3 flex items-center justify-between">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">Produkcja</span>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onClose}
-            className="p-1 rounded hover:bg-muted transition"
+            className="h-auto border-0 font-normal bg-clip-border hover:text-inherit p-1 rounded hover:bg-muted transition"
             aria-label="Zamknij"
           >
-            <X className="w-4 h-4" />
-          </button>
+            <X className="size-4" />
+          </Button>
         </div>
 
         {loading ? (
