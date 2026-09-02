@@ -26,8 +26,8 @@ import type {
 /**
  * Server actions for the flexible-steps model. Replaces the legacy
  * `production-custom-steps.ts` + `production-step-dates.ts` actions one-for-one
- * but operates on `productions.steps[]` instead of (status + customSteps +
- * stepOrder + stepDates).
+ * but operates on `productions.steps[]` instead of the legacy status +
+ * dates + custom-step quartet dropped in migration 0011.
  *
  * Co-existence: the legacy actions are still exported and wired to the old UI.
  * As phases progress, callers migrate over to these. Cleanup phase deletes the

@@ -5,9 +5,9 @@
  */
 import { STATUS_LABEL as PROD_STATUS_LABEL } from '@/components/productions/status-pill';
 import { startOfWeek as startOfWeekFn } from '@/lib/dates';
-import { resolveCategorySequence } from '@/lib/category-sequence';
+import { resolveStepSequence } from '@/lib/category-sequence';
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
-import type { CustomStep, ProductionStatus } from '../../../drizzle/schema';
+import type { ProductionStatus, ProductionStep } from '../../../drizzle/schema';
 import { STAGE_CATEGORIES, type GanttRow, type StageCategory, type WeekFrameCode } from './gantt-geometry';
 
 export type WorkItem = {
@@ -17,7 +17,6 @@ export type WorkItem = {
   stage: ProductionStatus | null;
   customId: string | null;
   label: string;
-  positionAfter: ProductionStatus | null;
   doneAt: string | null;
   day: number;
   isEnd: boolean;
@@ -26,12 +25,9 @@ export type WorkItem = {
 export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkItem[] } {
 
   // Effective sub-step list — joint canonical + custom sequence per category,
-  // resolved via `resolveCategorySequence` so a category that has been touched
-  // by `moveStepInCategory` reads from its persisted `stepOrder` while
-  // untouched categories fall back to legacy positionAfter ordering.
+  // read straight off `row.steps` in its persisted order.
   const t0MonForSteps = startOfWeekFn(row.t0At);
-  const customStepsByCat = row.customSteps ?? {};
-  const stepOrderByCat = row.stepOrder ?? {};
+  const steps = row.steps ?? [];
 
   // PLACEMENT MODEL — uniform distribution INSIDE the T-frame.
   //
@@ -91,7 +87,6 @@ export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkIte
     stage: ProductionStatus | null;
     customId: string | null;
     label: string;
-    positionAfter: ProductionStatus | null;
     doneAt: string | null;
     day: number;
     isEnd: boolean;
@@ -104,17 +99,14 @@ export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkIte
     const cats = STAGE_CATEGORIES.filter((c) => c.frame === frameCode);
 
     type FrameSeqItem =
-      | { cat: StageCategory; kind: 'canonical'; stage: ProductionStatus }
-      | { cat: StageCategory; kind: 'custom'; step: CustomStep };
+      | { cat: StageCategory; kind: 'canonical'; stage: ProductionStatus; step: ProductionStep | null }
+      | { cat: StageCategory; kind: 'custom'; step: ProductionStep };
     const frameSeq: FrameSeqItem[] = [];
 
     for (const cat of cats) {
-      const allCustoms = (customStepsByCat[cat.key] ?? []) as CustomStep[];
-      const storedOrder = stepOrderByCat[cat.key];
-      const sequence = resolveCategorySequence(cat.key, allCustoms, storedOrder);
-      for (const it of sequence) {
+      for (const it of resolveStepSequence(steps, cat.key)) {
         if (it.kind === 'canonical') {
-          frameSeq.push({ cat, kind: 'canonical', stage: it.stage });
+          frameSeq.push({ cat, kind: 'canonical', stage: it.stage, step: it.step });
         } else {
           frameSeq.push({ cat, kind: 'custom', step: it.step });
         }
@@ -131,15 +123,12 @@ export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkIte
         N === 1 ? bounds.startDay : bounds.startDay + (k / (N - 1)) * frameSpan;
 
       if (entry.kind === 'canonical') {
-        // Pull the canonical's actual doneAt out of the production's flat
-        // steps[] so the gantt's per-step state can rely on the real source
-        // of truth instead of inferring done-ness from the derived
-        // ProductionStatus alone. Status-only derivation goes wrong at the
-        // terminal stage (status='publishing' marks publishing canonical as
-        // 'active' even after it's been marked done), and that mismatch
-        // causes the canonical to appear to "unmark itself" when a later
-        // custom is unmarked.
-        const canonicalStep = (row.steps ?? []).find((x) => x.id === entry.stage);
+        // `doneAt` comes from the step itself, never from the derived
+        // ProductionStatus. Status-only derivation goes wrong at the terminal
+        // stage (status='publishing' marks the publishing canonical as
+        // 'active' even after it's been marked done), and that mismatch makes
+        // the canonical appear to "unmark itself" when a later custom is
+        // unmarked. A canonical missing from steps[] has no doneAt.
         draft.push({
           cat: entry.cat,
           frame: frameCode,
@@ -147,8 +136,7 @@ export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkIte
           stage: entry.stage,
           customId: null,
           label: PROD_STATUS_LABEL[entry.stage],
-          positionAfter: null,
-          doneAt: canonicalStep?.doneAt ?? null,
+          doneAt: entry.step?.doneAt ?? null,
           day,
           isEnd: entry.stage === entry.cat.endStage,
         });
@@ -160,7 +148,6 @@ export function buildDraft(row: GanttRow): { t0MonForSteps: Date; draft: WorkIte
           stage: null,
           customId: entry.step.id,
           label: entry.step.label,
-          positionAfter: entry.step.positionAfter ?? null,
           doneAt: entry.step.doneAt,
           day,
           isEnd: false,

@@ -1,7 +1,7 @@
 import type {
-  CustomStep,
   ProductionStage,
   ProductionStatus,
+  ProductionStep,
 } from '../../drizzle/schema';
 
 /** Canonical sub-stages per category — fixed at the schema level by the
@@ -17,83 +17,40 @@ export const CANONICAL_STAGES_BY_CATEGORY: Record<ProductionStage, ProductionSta
 };
 
 export type SequenceItem =
-  | { kind: 'canonical'; key: string; stage: ProductionStatus }
-  | { kind: 'custom'; key: string; step: CustomStep };
+  | { kind: 'canonical'; key: string; stage: ProductionStatus; step: ProductionStep | null }
+  | { kind: 'custom'; key: string; step: ProductionStep };
 
 /**
- * Resolve a category's display sequence — joint canonical + custom list in
- * the order the user sees on /productions and in the gantt sub-bar.
+ * Resolve a category's display sequence straight from the production's flat
+ * `steps[]` — the single source of truth since migration 0011. The order the
+ * user sees is the order the steps sit in the array; `moveStepInCategory`
+ * reorders that array, so no separate order map is needed.
  *
- * Two sources of truth, in priority order:
- *  1. `storedOrder` (from `productions.step_order[category]`) — once a category
- *     has been touched by `moveStepInCategory`, this becomes authoritative.
- *  2. Default: canonicals in their fixed enum order, with each custom slotted
- *     in after `c.positionAfter` (legacy positionAfter model). Customs whose
- *     positionAfter doesn't match any canonical fall back to "end of category".
- *
- * Either way the result is a flat ordered list of `SequenceItem`s. `key` is
- * unique within the category and is what `moveStepInCategory` accepts as
- * `stepKey`.
+ * A canonical stage missing from `steps[]` (production created before the
+ * flexible model, or with an empty list) is appended at the end of its
+ * category so the strip still renders the full pipeline skeleton instead of
+ * an empty row.
  */
-export function resolveCategorySequence(
+export function resolveStepSequence(
+  steps: ProductionStep[],
   category: ProductionStage,
-  customs: CustomStep[],
-  storedOrder: string[] | undefined,
 ): SequenceItem[] {
   const canonicals = CANONICAL_STAGES_BY_CATEGORY[category];
   const canonicalSet = new Set<string>(canonicals);
-  const customById = new Map(customs.map((c) => [c.id, c] as const));
-
-  if (storedOrder && storedOrder.length > 0) {
-    const seen = new Set<string>();
-    const items: SequenceItem[] = [];
-    for (const key of storedOrder) {
-      if (seen.has(key)) continue;
-      if (canonicalSet.has(key)) {
-        items.push({ kind: 'canonical', key, stage: key as ProductionStatus });
-        seen.add(key);
-      } else {
-        const c = customById.get(key);
-        if (c) {
-          items.push({ kind: 'custom', key, step: c });
-          seen.add(key);
-        }
-      }
-    }
-    // Append any canonical/custom not present in storedOrder (e.g. a custom
-    // added after the last reorder, or schema growth) so nothing disappears.
-    for (const stage of canonicals) {
-      if (!seen.has(stage)) items.push({ kind: 'canonical', key: stage, stage });
-    }
-    for (const c of customs) {
-      if (!seen.has(c.id)) items.push({ kind: 'custom', key: c.id, step: c });
-    }
-    return items;
-  }
-
-  // Legacy default: canonicals in enum order, customs interleaved by positionAfter.
-  const fallback = canonicals[canonicals.length - 1];
-  const customsByAfter = new Map<ProductionStatus, CustomStep[]>();
-  for (const c of customs) {
-    const after =
-      c.positionAfter && canonicalSet.has(c.positionAfter)
-        ? c.positionAfter
-        : fallback;
-    const arr = customsByAfter.get(after) ?? [];
-    arr.push(c);
-    customsByAfter.set(after, arr);
-  }
   const items: SequenceItem[] = [];
+  const seen = new Set<string>();
+
+  for (const s of steps) {
+    if (s.category !== category || seen.has(s.id)) continue;
+    seen.add(s.id);
+    items.push(
+      canonicalSet.has(s.id)
+        ? { kind: 'canonical', key: s.id, stage: s.id as ProductionStatus, step: s }
+        : { kind: 'custom', key: s.id, step: s },
+    );
+  }
   for (const stage of canonicals) {
-    items.push({ kind: 'canonical', key: stage, stage });
-    for (const c of customsByAfter.get(stage) ?? []) {
-      items.push({ kind: 'custom', key: c.id, step: c });
-    }
+    if (!seen.has(stage)) items.push({ kind: 'canonical', key: stage, stage, step: null });
   }
   return items;
-}
-
-/** Convert a SequenceItem[] into the string[] persistence format. */
-export function sequenceToOrder(seq: SequenceItem[]): string[] {
-  return seq.map((it) => it.key);
 }

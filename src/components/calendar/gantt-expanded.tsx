@@ -6,7 +6,7 @@ import { DeleteProductionButton } from '@/components/productions/delete-producti
 import { ProductionStepRow } from '@/components/productions/production-step-row';
 import { AddStepInline } from '@/components/productions/add-step-inline';
 import { T1StartEditor } from '@/components/productions/t1-start-editor';
-import { resolveCategorySequence } from '@/lib/category-sequence';
+import { resolveStepSequence } from '@/lib/category-sequence';
 import { getFirstPeriodStart } from '@/lib/production-steps';
 import { type ProductionStatus, type ProductionStep } from '../../../drizzle/schema';
 import { STAGE_CATEGORIES, type GanttRow, type StageCategory } from './gantt-geometry';
@@ -102,12 +102,7 @@ export function ExpandedDetails({
             const offsetsByCat = new Map<string, number>();
             for (const cat of STAGE_CATEGORIES) {
               offsetsByCat.set(cat.key, stepOffset);
-              const seq = resolveCategorySequence(
-                cat.key,
-                (row.customSteps ?? {})[cat.key] ?? [],
-                (row.stepOrder ?? {})[cat.key],
-              );
-              stepOffset += seq.length;
+              stepOffset += resolveStepSequence(row.steps ?? [], cat.key).length;
             }
             return EXPANDED_FRAMES.map((frame) => {
               const weekCategories = STAGE_CATEGORIES.filter((c) => c.frame === frame.code);

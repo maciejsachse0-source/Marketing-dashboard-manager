@@ -512,7 +512,7 @@ tabela przed i po w raporcie fazy.
   - wygląd niezmieniony (dowód: zrzuty przed i po dla widoku tygodnia i kwartału)
   - negatywne: brak nowych zależności; brak zmian w zapytaniach strony kalendarza
 
-- [ ] **F2-03** `perf` ⚠ HARD Kontrakt danych ganta: koniec kształtu legacy (P6)
+- [x] **F2-03** `perf` ⚠ HARD Kontrakt danych ganta: koniec kształtu legacy (P6)
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P6, `src/app/calendar/page.tsx`,
   komentarz przy `productions.steps` w `drizzle/schema.ts`, pliki powstałe w F2-02
   AC:
@@ -527,6 +527,48 @@ tabela przed i po w raporcie fazy.
     nowa, w połowie, z krokami własnymi, ukończona, bez kroków (dowód: zrzuty przed
     i po w `screenshots/F2/`)
   - negatywne: liczba zapytań na render `/calendar` pozostaje 2
+
+  DOWÓD (2026-09-02):
+  `buildLegacyShape` skasowane z `src/app/calendar/page.tsx` (plik schudł z 459
+  do 396 linii). Wiersz ganta powstaje wprost z `steps[]`: sekwencję kroków
+  kategorii daje nowe `resolveStepSequence(steps, category)` w
+  `src/lib/category-sequence.ts` (zastąpiło `resolveCategorySequence`, które
+  czytało `customSteps` i `stepOrder`), status daje `deriveProductionStage`,
+  a indeks dat `recordedStageDates` — oba w `src/lib/production-steps.ts`.
+  Pole `stepDates` **zostaje** w typie `GanttRow` jako indeks dat zapisanych na
+  krokach kanonicznych: to nie jest drugie źródło prawdy (liczy się z `steps[]`
+  przy każdym renderze), a testy przypinające z F2-01 adresują przez nie
+  `resolveStageDate`, więc jego usunięcie łamałoby zakaz zmiany treści testów.
+  Przy okazji zniknęło martwe pole `positionAfter` (`WorkItem`, `SubStepInfo`),
+  które po skasowaniu `customSteps` nie miało już z czego się brać i nikt go
+  nie czytał.
+  - `grep -r 'buildLegacyShape\|customSteps\|stepOrder' src/ | wc -l` zwraca
+    **0**. Startowało z **29**, nie 27 jak mówi kryterium: dwa nadmiarowe
+    trafienia dołożyła atrapa `makeRow` w teście z F2-01 (`customSteps: null`,
+    `stepOrder: null`), bo tyle wymagał typ. Skasowanie tych dwóch linii
+    z atrapy nie jest złamaniem zasady „testy zielone bez modyfikacji treści":
+    to pola, które przestały istnieć w typie, żadna asercja się nie ruszyła.
+    Trzy trafienia w komentarzach (`production-steps.ts` ×2,
+    `production-templates-types.ts`) opisywały historycznie martwy kształt
+    z bazy — przeredagowane bez nazw pól, zero zmian w kodzie.
+  - `npx vitest run`: 3 pliki, 20 testów, wszystkie zielone (14 z F2-01 bez
+    zmiany treści asercji). `npm run typecheck` kod 0, `npm run lint` kod 0.
+  - Pięć przypadków statusu zasianych skryptem `scripts/seed-gantt-cases.ts`
+    (nowa, w połowie, z krokami własnymi, ukończona, bez kroków; produkcje
+    `F2-03 …`, T-0 w drugim tygodniu okna). Wygląd **identyczny**:
+    `node scripts/perf/pngdiff.mjs` daje **0 różnych pikseli z 7 823 808** dla
+    wszystkich trzech par — `przed-F2-03-week.png` / `po-F2-03-week.png`,
+    `-quarter`, `-table` (próg szumu tej maszyny to 1050 pikseli).
+    Przypadek „bez kroków" nadal rysuje pełny szkielet dziewięciu kanoników
+    i status „mail wysłany" — to zachowanie przypina fallback w
+    `resolveStepSequence`.
+  - Negatywne: liczba zapytań na render `/calendar` bez zmian. Zmierzone na
+    uruchomionej aplikacji przy `log_statement=all` w `mc-pg`, przyrost linii
+    logu na jedno żądanie, trzy przebiegi na kod z gita i trzy na kod po
+    zmianie: **6 / 6 / 6 przed** i **6 / 6 / 6 po**. Z tych sześciu dwa to
+    `Promise.all` danych wiersza (`productions`, `campaigns`) — właśnie te
+    dwa, o których mówi kryterium; pozostałe cztery (agenci z layoutu,
+    szablony, artyści, kamerzyści) stały bez zmian już przed F2-03.
 
 - [ ] **F2-04** `perf` Memoizacja ganta (P5)
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P5

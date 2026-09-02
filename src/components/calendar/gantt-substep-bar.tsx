@@ -39,8 +39,6 @@ export type SubStepInfo = {
   outOfWindow: 'before' | 'after' | null;
   /** For custom only: the doneAt timestamp from DB. */
   doneAt: string | null;
-  /** For custom only: the canonical stage AFTER which it sits. */
-  positionAfter: ProductionStatus | null;
   /** Resolved scheduling date for the step — drives the inline date chip
    *  rendered under the circle. Source is one of:
    *    recorded   — user typed it under the step on the production page

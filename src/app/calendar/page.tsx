@@ -10,19 +10,17 @@ import { addDays, endOfDay, startOfWeek } from '@/lib/dates';
 import { listArtists } from '@/server/actions/artists';
 import { listVideographers } from '@/server/actions/videographers';
 import { loadTemplates } from '@/lib/production-templates';
-import { isProductionDone } from '@/lib/production-steps';
+import {
+  deriveProductionStage,
+  isProductionDone,
+  recordedStageDates,
+} from '@/lib/production-steps';
 import type {
-  CustomStep,
   Production,
-  ProductionStage,
   ProductionStatus,
-  ProductionStep,
   ProductionType,
 } from '../../../drizzle/schema';
-import { PRODUCTION_PROGRESSION } from '../../../drizzle/schema';
 import type { GanttRow } from '@/components/calendar/gantt-view';
-
-const CANONICAL_STAGE_SET = new Set<string>(PRODUCTION_PROGRESSION);
 
 /** Parse the ?week= search param, falling back to a sane default on invalid
  *  input. Without this, `?week=garbage` produces an `Invalid Date` that
@@ -32,71 +30,6 @@ function parseWeekParam(raw: string | undefined): Date {
   if (!raw) return fallback;
   const d = new Date(raw);
   return Number.isFinite(d.getTime()) ? d : fallback;
-}
-
-/** Synthesize the legacy GanttRow shape from a production's `steps[]` so the
- *  gantt — which still renders against that shape internally — keeps working
- *  during the cleanup window. After Phase 6 the gantt switches to consuming
- *  steps directly and this adapter goes away. */
-function buildLegacyShape(steps: ProductionStep[]): {
-  status: ProductionStatus;
-  stepDates: Partial<Record<ProductionStatus, string>>;
-  customSteps: Partial<Record<ProductionStage, CustomStep[]>>;
-  stepOrder: Partial<Record<ProductionStage, string[]>>;
-} {
-  // Status = id of the first canonical step that's not done. If every canonical
-  // is already done (regardless of customs), the pipeline has reached the
-  // terminal 'publishing' stage — falling back to 'email-sent' here would make
-  // a near-complete production look as if it were starting over and would
-  // break the visual cascade (later canonicals would render pending while
-  // their custom doneAts mark them as done).
-  const canonicalSteps = steps.filter((s) => CANONICAL_STAGE_SET.has(s.id));
-  const firstUndoneCanonical = canonicalSteps.find((s) => !s.doneAt);
-  let status: ProductionStatus;
-  if (firstUndoneCanonical) {
-    status = firstUndoneCanonical.id as ProductionStatus;
-  } else if (canonicalSteps.length > 0) {
-    status = 'publishing';
-  } else {
-    status = 'email-sent';
-  }
-
-  const stepDates: Partial<Record<ProductionStatus, string>> = {};
-  const customSteps: Partial<Record<ProductionStage, CustomStep[]>> = {};
-  const stepOrder: Partial<Record<ProductionStage, string[]>> = {};
-
-  for (const s of steps) {
-    const cat = s.category;
-    if (!stepOrder[cat]) stepOrder[cat] = [];
-    stepOrder[cat]!.push(s.id);
-
-    if (CANONICAL_STAGE_SET.has(s.id)) {
-      if (s.dateIso) stepDates[s.id as ProductionStatus] = s.dateIso;
-    } else {
-      if (!customSteps[cat]) customSteps[cat] = [];
-      const cs: CustomStep = {
-        id: s.id,
-        label: s.label,
-        doneAt: s.doneAt,
-      };
-      // Anchor every custom to the first canonical of its category so the
-      // legacy `positionAfter`-driven sequence falls back gracefully if the
-      // gantt ignores stepOrder.
-      const canonicalsInCat = steps.filter(
-        (x) => x.category === cat && CANONICAL_STAGE_SET.has(x.id),
-      );
-      if (canonicalsInCat[0]) {
-        cs.positionAfter = canonicalsInCat[0].id as ProductionStatus;
-      }
-      if (s.description) cs.description = s.description;
-      if (s.attachmentPath) cs.attachmentPath = s.attachmentPath;
-      if (s.attachmentName) cs.attachmentName = s.attachmentName;
-      if (s.attachmentSize !== undefined) cs.attachmentSize = s.attachmentSize;
-      customSteps[cat]!.push(cs);
-    }
-  }
-
-  return { status, stepDates, customSteps, stepOrder };
 }
 
 export const dynamic = 'force-dynamic';
@@ -290,7 +223,6 @@ export default async function CalendarPage({
       : null;
     const steps = p.steps ?? [];
     const isCancelled = !!p.cancelledAt;
-    const legacy = buildLegacyShape(steps);
     return {
       id: p.id,
       title: p.title,
@@ -298,11 +230,9 @@ export default async function CalendarPage({
       type: p.type as ProductionType,
       // Cancellation overrides synthesized status — gantt uses 'cancelled' as
       // its terminal off-track state.
-      status: (isCancelled ? 'cancelled' : legacy.status) as ProductionStatus,
+      status: (isCancelled ? 'cancelled' : deriveProductionStage(steps)) as ProductionStatus,
       t0At: p.t0At,
-      stepDates: legacy.stepDates,
-      customSteps: legacy.customSteps,
-      stepOrder: legacy.stepOrder,
+      stepDates: recordedStageDates(steps),
       steps,
       periods: p.periods ?? null,
       cancelled: isCancelled,

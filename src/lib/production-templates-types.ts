@@ -24,7 +24,7 @@ export type TemplateStep = {
 
 /**
  * Template = ordered list of steps + identity metadata. The legacy
- * `customSteps` field has been replaced by a single flat `steps[]` list,
+ * per-category custom-step map has been replaced by a single flat `steps[]`,
  * which now expresses the full pipeline (no implicit canonical 9-step base).
  */
 export type ProductionTemplate = {

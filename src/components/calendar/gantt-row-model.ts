@@ -103,7 +103,6 @@ export function buildRowModel(
       dayIdx: clippedIdx,
       outOfWindow,
       doneAt: d.doneAt,
-      positionAfter: d.positionAfter,
       date,
       dateSource,
       withTime: d.cat.withTime,

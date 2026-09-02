@@ -32,8 +32,6 @@ function makeRow(over: Partial<GanttRow> = {}): GanttRow {
     // Czwartek 2026-06-18 — T-0 leży w oknie kwartalnym, poza oknem tygodnia.
     t0At: new Date(2026, 5, 18),
     stepDates: null,
-    customSteps: null,
-    stepOrder: null,
     steps: [],
     periods: null,
     cancelled: false,

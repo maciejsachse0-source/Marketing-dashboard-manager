@@ -8,10 +8,8 @@ import { startOfWeek as startOfWeekFn } from '@/lib/dates';
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import {
   PRODUCTION_PROGRESSION,
-  type CustomStep,
   type Platform,
   type ProductionPeriods,
-  type ProductionStage,
   type ProductionStatus,
   type ProductionStep,
   type ProductionType,
@@ -56,12 +54,12 @@ export type GanttRow = {
   type: ProductionType;
   status: ProductionStatus;
   t0At: Date;
+  /** Index of dates the user recorded on canonical steps, keyed by stage.
+   *  Derived from `steps` by `recordedStageDates` — a lookup, not a second
+   *  source of truth. */
   stepDates: Partial<Record<ProductionStatus, string>> | null;
-  customSteps: Partial<Record<ProductionStage, CustomStep[]>> | null;
-  stepOrder: Partial<Record<ProductionStage, string[]>> | null;
-  /** New flexible-steps payload — used by the expanded view to render the
-   *  full pipeline list. Synthesized legacy fields above stay for now to
-   *  keep the strip's status/date math unchanged during the cleanup window. */
+  /** Flexible-steps payload — the production's pipeline, in display order.
+   *  Single source of truth for the strip: sequence, labels and done state. */
   steps: ProductionStep[];
   /** Persisted T-period overrides cloned from the template at production
    *  creation. Null for legacy rows; consumers fall back to defaults. */

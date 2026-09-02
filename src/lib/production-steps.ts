@@ -1,7 +1,9 @@
-import type {
-  ProductionStage,
-  ProductionStep,
-  StepDateMode,
+import {
+  PRODUCTION_PROGRESSION,
+  type ProductionStage,
+  type ProductionStatus,
+  type ProductionStep,
+  type StepDateMode,
 } from '../../drizzle/schema';
 import { startOfWeek, addDays, endOfDay } from './dates';
 import {
@@ -15,6 +17,8 @@ import {
  * derive state from a `steps[]` array. Keep this file dependency-free so it
  * can be imported from server actions, RSC, and client components alike.
  */
+
+const CANONICAL_STAGE_SET = new Set<string>(PRODUCTION_PROGRESSION);
 
 /** Index of the first step that is not yet `done`. Returns `steps.length`
  *  when every step is done (i.e. production is finished). */
@@ -88,7 +92,7 @@ export function cloneTemplateSteps(
 }
 
 /** Generate a stable-but-unique step id for newly-added (non-template) steps.
- *  Format mirrors the legacy `customSteps[*].id` for backwards compatibility
+ *  Format mirrors the legacy custom-step id for backwards compatibility
  *  with attachment paths and persisted references. */
 export function newStepId(): string {
   return Math.random().toString(36).slice(2, 14);
@@ -156,4 +160,28 @@ export function deriveProductionState(
   if (cancelledAt) return 'cancelled';
   if (isProductionDone(steps)) return 'done';
   return 'in-progress';
+}
+
+/** Canonical stage the production currently sits on — the first canonical step
+ *  without `doneAt`. Every canonical done means the pipeline reached its
+ *  terminal stage ('publishing'); a production with no canonical steps at all
+ *  starts at the beginning. Drives the status pill and the gantt's cascade. */
+export function deriveProductionStage(steps: ProductionStep[]): ProductionStatus {
+  const canonicals = steps.filter((s) => CANONICAL_STAGE_SET.has(s.id));
+  const firstUndone = canonicals.find((s) => !s.doneAt);
+  if (firstUndone) return firstUndone.id as ProductionStatus;
+  return canonicals.length > 0 ? 'publishing' : 'email-sent';
+}
+
+/** Index of the dates the user actually recorded on canonical steps, keyed by
+ *  stage. Lookup shape for the gantt and the table view, both of which ask
+ *  "does this stage have a real date?" per stage rather than walking steps. */
+export function recordedStageDates(
+  steps: ProductionStep[],
+): Partial<Record<ProductionStatus, string>> {
+  const out: Partial<Record<ProductionStatus, string>> = {};
+  for (const s of steps) {
+    if (s.dateIso && CANONICAL_STAGE_SET.has(s.id)) out[s.id as ProductionStatus] = s.dateIso;
+  }
+  return out;
 }
