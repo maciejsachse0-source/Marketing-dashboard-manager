@@ -1201,13 +1201,36 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   - negatywne: żadne prawdziwe imię, handle ani telefon nie trafia do repozytorium,
     do testów ani do zrzutów ekranu
 
-- [ ] **F4-07** `import` `security` Wycofanie skryptu z danymi na sztywno
+- [x] **F4-07** `import` `security` Wycofanie skryptu z danymi na sztywno
   CZYTAJ: `scripts/import-people.ts`, `plan/01` zasada Z14
   AC:
   - `scripts/import-people.ts` usunięty, jego funkcję przejmuje ekran importu
   - `docs/ARCHITEKTURA.md` sekcja 9 odnotowuje, że dane osobowe były w kodzie i pozostają
     w historii gita, z rekomendacją dla usera (czyszczenie historii to jego decyzja)
   - negatywne: `grep -r '@noyasnee\|@akku.wav' src scripts | wc -l` zwraca `0`
+  DOWÓD (2026-09-03): `scripts/import-people.ts` usunięty (`git rm`, commit tego issue),
+  `git status --porcelain` pokazuje `D scripts/import-people.ts`, `test -e` na tej ścieżce
+  zwraca kod 1. Sprawdzone, czy skrypt nie był jedyną drogą wprowadzenia czegokolwiek:
+  pisał `name`, `handle`, `contact`, `availabilityNotes` i `notes` z doklejoną lokalizacją.
+  Nazwę, handle i lokalizację wprowadza teraz ekran `/import/osoby` (F4-04 i F4-05), i to
+  do właściwych kolumn zamiast do `notes`; `contact`, `hourlyRate`, `equipment`
+  i `availabilityNotes` kamerzysty wypełnia okno edycji osoby
+  (`src/components/videographers/videographer-dialog.tsx`, pola sprawdzone w kodzie
+  i w `src/server/actions/schemas.ts`). Żadna zdolność nie znika, więc nie ma tu
+  znaleziska do F7.
+  `docs/ARCHITEKTURA.md` sekcja 9 dostała akapit „Dane osobowe, które były w kodzie":
+  co dokładnie stało w skrypcie (13 kamerzystów, 45 twórców, imiona, lokalizacje, handle
+  z Instagrama, adres arkusza Google w komentarzu), że **usunięcie pliku nie czyści
+  historii gita** i że czyszczenie historii jest decyzją usera, bo przepisuje wszystkie
+  commity i wymusza ponowne sklonowanie. `plan/README.md` punkt 4 poprawiony z czasu
+  teraźniejszego na przeszły.
+  NEGATYWNE: `grep -r '@noyasnee\|@akku.wav' src scripts | wc -l` zwraca `0`.
+  W całym drzewie roboczym poza gitem zostaje **jedno** trafienie i jest nim ta linia
+  kryterium powyżej; zapisane jako znalezisko **F7-23**, bo backlog też jest plikiem
+  w repozytorium.
+  W HISTORII: `git log --oneline -S '@noyasnee' -- scripts/import-people.ts` zwraca
+  1 commit, czyli dane dalej są w historii i będą tam, dopóki user nie zdecyduje
+  o jej przepisaniu.
 
 **DoD F4:** pełny import fixture od pliku do bazy przechodzi jako scenariusz e2e; progi
 z `plan/04` sekcja 8 spełnione; zrzuty wszystkich 7 kroków.
@@ -1677,6 +1700,22 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - każda ścieżka wymieniona w tabeli `AGENTS.md` istnieje (dowód: pętla po ścieżkach
     z tabeli, `test -e` dla każdej, zero brakujących)
   - negatywne: treść wierszy tabeli poza ścieżkami nie zmienia się
+
+- [ ] **F7-23** `znalezisko` `security` Dwa prawdziwe handle z Instagrama zostały
+  w kryterium akceptacji F4-07
+  Znalezione przy F4-07. Skrypt z danymi na sztywno zniknął, ale kryterium, które
+  kazało go usunąć, cytuje dwa prawdziwe handle w komendzie `grep`. `plan/08-BACKLOG.md`
+  jest zwykłym plikiem w repozytorium, więc dane osobowe dalej leżą w drzewie roboczym,
+  tyle że w innym miejscu. Świadomie nie tknięte przy F4-07: usunięcie ich teraz i tak
+  nie wyjmie ich z historii, a zmiana kryterium w trakcie jego rozliczania zabiera dowód.
+  Robić razem z decyzją o czyszczeniu historii (`docs/ARCHITEKTURA.md` sekcja 9).
+  Waga: **ważne**. Szacunek: pół godziny, plus czas decyzji usera.
+  AC:
+  - `grep -rn '@noyasnee' --exclude-dir=node_modules --exclude-dir=.git . | wc -l`
+    zwraca `0`
+  - dowód F4-07 dalej daje się odtworzyć: kryterium zastąpione komendą, która nie cytuje
+    prawdziwych danych, na przykład sprawdzeniem, że `scripts/import-people.ts` nie istnieje
+  - negatywne: żadne inne kryterium w `plan/08-BACKLOG.md` nie zmienia treści
 
 ---
 

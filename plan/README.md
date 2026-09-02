@@ -77,9 +77,10 @@ w samym repozytorium. Znalazł 37 rzeczy, wszystkie z dyspozycją. Najcięższe 
 2. **Etap 2 (logowanie i role)** nie jest planowany, zgodnie z Twoją decyzją. Siedzi
    jako F8-03 z opisem zakresu i pułapek, żeby dało się go wycenić bez ponownej analizy.
 3. **Bundler deweloperski** rozstrzyga pomiar w F2-05, nie preferencja.
-4. **Dane osobowe w historii gita**: `scripts/import-people.ts` zawiera prawdziwe imiona
-   i handle z Instagrama. Usunięcie pliku (F4-07) nie czyści historii. Czyszczenie
-   historii to osobna decyzja Twoja, bo przepisuje wszystkie commity. Odnotowane
-   w `docs/ARCHITEKTURA.md` sekcja 9.
+4. **Dane osobowe w historii gita**: `scripts/import-people.ts` zawierał prawdziwe imiona
+   i handle z Instagrama. Plik został usunięty w F4-07, ale to nie czyści historii:
+   dane siedzą w każdym commicie sprzed tego issue. Czyszczenie historii to osobna
+   decyzja Twoja, bo przepisuje wszystkie commity. Odnotowane w `docs/ARCHITEKTURA.md`
+   sekcja 9.
 5. **Środowisko dla zespołu** (F5-04): adres podglądowy z danymi syntetycznymi.
    Wybór hostingu należy do agenta, chyba że wskażesz konkretny.

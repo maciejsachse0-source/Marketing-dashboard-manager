@@ -380,6 +380,25 @@ Kształt zastany, który wygląda na dług, a nim nie jest:
   Do issue F1-02 było twarde `max: 1` wszędzie, co dławiło zrównoleglone zapytania
   na serwerze lokalnym.
 
+**Dane osobowe, które były w kodzie.** Do issue F4-07 w repozytorium leżał skrypt
+`scripts/import-people.ts`: jednorazowy import osób z arkusza Google, z prawdziwymi
+imionami, lokalizacjami i handle'ami z Instagrama wpisanymi na sztywno w dwóch tablicach
+(13 kamerzystów i 45 twórców), plus adres tamtego arkusza w komentarzu. Skrypt został
+usunięty, a jego robotę przejął ekran `/import/osoby` (kroki 1 do 7, `plan/04-import-excel.md`),
+który przyjmuje te same dane z pliku xlsx, nie z kodu. Nic, co robił skrypt, nie zniknęło:
+pola `contact`, `hourlyRate`, `equipment` i `availabilityNotes` kamerzysty wypełnia
+okno edycji osoby, reszta idzie importem.
+
+Usunięcie pliku **nie czyści historii gita**. Te imiona, lokalizacje i handle nadal
+siedzą w każdym commicie sprzed F4-07 i wyjmie je stamtąd każdy, kto sklonuje
+repozytorium. Wyczyszczenie historii (`git filter-repo`, `BFG`) przepisuje wszystkie
+commity, zmienia każdy hash i wymaga wymuszonego pusha oraz ponownego sklonowania
+u wszystkich, którzy repozytorium mają. To jest **decyzja usera**, nie agenta, i nie
+została podjęta. Rekomendacja: jeżeli repozytorium ma kiedykolwiek trafić poza jeden
+prywatny komputer, historię wyczyścić przed tym krokiem, a nie po nim. Do tego czasu
+obowiązuje zasada Z14: żadne prawdziwe imię, handle, adres ani telefon nie wchodzi
+do repozytorium, a arkusze żyją w `.data-import/` poza gitem.
+
 **Uwaga historyczna, żeby nie wracała przy czytaniu starych plików.** Pierwsza wersja
 projektu stała na SQLite przez `better-sqlite3`, z plikiem bazy w `data/`. Ten stan
 nie istnieje od migracji na PostgreSQL. Dwa pliki `*.bak.db` w repozytorium to

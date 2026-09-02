@@ -613,3 +613,63 @@ dopiero po otwarciu skoroszytu i tak też jest zrobione, per arkusz.
 z licznika: imiona z krótkiej listy, nazwiska typu „Przykładowa", handle `@atrapa_0001`,
 domena `przyklad.test`. Dzięki temu widać w kodzie, że w pliku nie ma ani jednej
 prawdziwej osoby, a fixture da się odtworzyć po każdej zmianie kształtu arkusza.
+
+## F4 — raport fazy (2026-09-03)
+
+**Co powstało.** Ekran `/import/osoby` prowadzi przez siedem kroków z `plan/04` sekcja 2:
+plik, arkusz i rola, mapowanie kolumn, suchy przebieg, zatwierdzenie, zapis, podsumowanie.
+Logika jest w `src/lib/import/` (normalizacja, duplikaty, mapowanie, parser, suchy przebieg,
+zapis), widok w `src/components/import/`, granice zaufania w dwóch trasach API.
+
+**Decyzja: suchy przebieg to jedna funkcja czysta, używana po obu stronach.**
+`dryRun` w `src/lib/import/dry-run.ts` dostaje wiersze, mapowanie, stan bazy i politykę,
+oddaje plan bez jednego zapisu. Przeglądarka liczy nim podgląd, serwer liczy nim to,
+co faktycznie zapisze. Gdyby podgląd miał własną arytmetykę, prędzej czy później
+pokazałby inne liczby niż zapis, a to jest dokładnie ten rodzaj błędu, którego nikt
+nie zgłasza, bo wygląda jak literówka w podsumowaniu.
+
+**Decyzja: zapis idzie strumieniem NDJSON, nie server action.** Tabela zdarzeń wymaga
+paska postępu z licznikiem faktycznie zapisanych paczek, a anty-spec zabrania paska,
+który udaje postęp. Jedno wywołanie server action nie ma jak wypuścić niczego przed
+końcem, więc zapis siedzi w trasie `POST /api/import/people/save`, która zwraca
+`ReadableStream`: linia po każdej zapisanej paczce, na końcu linia z podsumowaniem albo
+z błędem. Cała pętla mieści się w jednym `db.transaction`, więc strumień pokazuje postęp
+wewnątrz transakcji, a nie serię niezależnych zapisów.
+
+**Decyzja: `checkFile` i limity mieszkają osobno od parsera.** `parse.ts` ciągnie
+`exceljs`, którego do bundla przeglądarki wpuścić nie wolno, a strefa zrzutu musi
+odrzucić zły plik natychmiast, bez okrążenia po serwerze. Stąd `src/lib/import/limits.ts`
+bez żadnej zależności; `parse.ts` reeksportuje te same funkcje, żeby wołający miał
+jedno miejsce.
+
+**Decyzja: testy zapisu chodzą po prawdziwym Postgresie.** `src/lib/import/save.test.ts`
+łączy się z `TEST_DATABASE_URL`. Wycofania transakcji nie da się udowodnić na atrapie:
+test psuje wiersz 120 ze 150 i sprawdza, że po wyjątku w bazie nie ma również tych 100
+z pierwszej paczki. Na zaślepce ten test przechodziłby zawsze i nie znaczyłby nic.
+
+**Naprawione w trakcie, bo to był błąd tej fazy.** Duplikat pewny, w którym arkusz nie
+wnosi żadnej nowej wartości, dostawał plan `update` z pustym zestawem zmian, a
+`set({})` wywracał całą transakcję komunikatem „No values to set". Powtórny import tego
+samego arkusza z polityką aktualizacji padał w całości. Taki wiersz liczy się teraz jako
+pominięty (`savePlans`, test „aktualizacja bez zmian jest pomijana").
+
+**Pomiary.** Parsowanie plus suchy przebieg 1010 wierszy: mediana **66 ms** przy progu
+3000 ms. Zapis 1000 nowych osób: mediana **56 ms** przy progu 5000 ms. Wzrost RSS przy
+pliku 10,0 MB (5000 wierszy): **50,5 MB** przy progu 300 MB. Pomiar zapisu wycofuje
+transakcję, więc nie zostawia w bazie ani jednego wiersza
+(`npx tsx scripts/perf/measure-import-save.ts`).
+
+**F4-06 świadomie odłożone.** Dopasowanie do prawdziwego arkusza czeka na plik `.xlsx`
+od usera. Nie było go, więc issue zostaje niezaznaczone. Zastępczego „prawdziwego"
+arkusza nie wymyślono: fixture syntetyczny (`scripts/make-fixture-xlsx.ts`, 3 arkusze,
+1131 wierszy z błędami i duplikatami) pokrywa całą resztę fazy, ale nie zastąpi
+sprawdzenia, jak naprawdę nazywają się kolumny w arkuszu usera.
+
+**Dane osobowe.** `scripts/import-people.ts` usunięty (F4-07). Dane zostają w historii
+gita i wyjmie je stamtąd każdy, kto sklonuje repozytorium; czyszczenie historii to
+decyzja usera, opisana w `docs/ARCHITEKTURA.md` sekcja 9. Dwa prawdziwe handle nadal
+stoją w kryterium akceptacji F4-07 w `plan/08-BACKLOG.md`, jako znalezisko **F7-23**.
+
+**Znaleziska fazy:** F7-20 (pole wyboru pokazuje surową wartość zamiast etykiety, kod
+zastany), F7-21 (e2e importu pisze do bazy roboczej, brak izolacji), F7-22 (`AGENTS.md`
+wskazywał nieistniejący plik planu), F7-23 (prawdziwe handle w kryterium F4-07).
