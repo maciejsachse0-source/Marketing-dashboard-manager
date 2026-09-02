@@ -71,3 +71,23 @@ to, co ma usunąć indeks z F1-01. Po poprawce zapytanie raportuje `seqScan: tru
 (`calendar_entries:3000`), tak samo `posts-analytics` (`posts:5000`).
 Konsekwencja: stan wyjściowy przed F1-01 to 2 z 4 zapytań krytycznych z Seq Scan.
 Kryterium F1-01 „seqScan równe false dla wszystkich 4" ma teraz sensowny punkt startu.
+
+## 2026-09-02 — pomiar kontekstu workerów: naprawiony skrypt i właściwe okno
+
+**Problem.** `~/.claude/agent-context.sh` zwracał `NO-TRANSCRIPT` w każdym wywołaniu
+workera, więc cała faza F0 przeszła bez pomiaru kontekstu. Przyczyna: skrypt szukał
+transkryptu po slugu katalogu roboczego (`-Users-slajs-Desktop-projekty-Marketing-dashboard-manager`),
+a transkrypty subagentów leżą pod katalogiem projektu SESJI RODZICA
+(`~/.claude/projects/-Users-slajs/<sesja>/subagents/agent-*.jsonl`). Orkiestrator siedzi
+w innym katalogu niż repozytorium, które buduje worker, więc trafienia nigdy nie było.
+
+**Naprawa.** Do skryptu dodany fallback: gdy szukanie po slugu nic nie zwróci, bierzemy
+najnowszy `subagents/agent-*.jsonl` z całego drzewa projektów. Przy twardym zakazie
+równoległości (jeden worker naraz) jest on jednoznaczny, a istniejący filtr
+`STALE-TRANSCRIPT` (cisza > 120 s) odsiewa transkrypty martwe.
+
+**Okno modelu = 1 000 000, nie 200 000.** Domyślna stała skryptu (200000) nie pasuje
+do Opusa 5 w tym środowisku. Wyliczenie z sesji głównej: 120 664 tokenów przy 12%
+raportowanych przez statusline daje okno ~1 005 000. Wniosek operacyjny: worker musi
+wołać `bash ~/.claude/agent-context.sh 1000000`. Bez argumentu dostaje liczbę pięć razy
+zawyżoną (worker paczki F0-00..F0-04 wyszedłby na 107% zamiast realnych ~21%).

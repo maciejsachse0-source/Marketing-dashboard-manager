@@ -33,6 +33,10 @@ z wklejonym dowodem, commit per issue.
   (`docker start mc-pg`). Liczby wydajnościowe są przez to porównywalne między sobą,
   ale nie są prognozą produkcji.
 - ESLint jest przypięty do 9.x. Wersja 10 wysypuje wtyczkę react z `eslint-config-next`.
+- Pomiar kontekstu workera: `bash ~/.claude/agent-context.sh 1000000`. ARGUMENT JEST
+  OBOWIĄZKOWY, okno modelu to 1 000 000, a domyślna stała skryptu to 200 000, więc bez
+  niego wynik jest pięć razy zawyżony. Skrypt naprawiony 2026-09-02 (szukał transkryptu
+  po złym katalogu i zwracał `NO-TRANSCRIPT`), szczegóły w `DECISIONS.md`.
 - Pełna lista pułapek i stan środowiska: `NEXT-TASKS.md`.
 
 ## Znaczniki
