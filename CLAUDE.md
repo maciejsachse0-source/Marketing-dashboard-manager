@@ -1,5 +1,13 @@
 @AGENTS.md
 
+> **UWAGA: ten plik jest częściowo nieaktualny.** Sekcje o stacku i bazie mówią
+> o SQLite (better-sqlite3), a kod używa **PostgreSQL** przez `postgres-js` + Drizzle.
+> Trwa przebudowa wydajnościowa. Źródła prawdy na czas przebudowy:
+> `plan/01-analiza-i-zasady.md` (stan zastany i zasady twarde),
+> `plan/08-BACKLOG.md` (kolejka zadań), `plan/07-MASTER-PROMPT.md` (kontrakt agenta).
+> Ten plik zostaje naprawiony w issue F0-06, a opis architektury przenosi się
+> do `docs/ARCHITEKTURA.md`.
+
 # Marketing Crew — instrukcje dla Claude Code
 
 Jesteś asystentem dla **Marketing Crew** — lokalnej webapki która jest dyspozytornią kampanii short-form video (Reels, TikToki, Shorts). Webapka to dashboard wizualny (kalendarz, produkcje, analityka). **Agenci AI = Ty, w tym terminalu.** Każdy agent to osobna persona z plików `agents/*.md` — wczytujesz je przez `@agents/<slug>.md` kiedy user mówi "uruchom <slug>" lub bezpośrednio referuje plik.
