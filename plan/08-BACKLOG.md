@@ -903,7 +903,7 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   i widać je na pulpicie, ale leżą poza dosłownym zakresem Z7 („literały w `src/`")
   i w tych samych plikach stoją system prompty, więc poprawka to osobne issue **F7-17**.
 
-- [ ] **F3-07** `ui` `test` Rozbicie `template-form.tsx`
+- [x] **F3-07** `ui` `test` Rozbicie `template-form.tsx`
   CZYTAJ: `plan/01` zasada Z11, `plan/06-testy.md` sekcja 2
   AC:
   - test przypinający zachowanie formularza (zapis poprawny, zapis z błędem walidacji,
@@ -913,6 +913,39 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   - `npm run lint` z regułą `complexity: 10` przechodzi bez wyjątków w nowych plikach
   - negatywne: liczba żądań sieciowych przy zapisie formularza nie rośnie (dowód:
     zakładka sieci albo log serwera, wynik w raporcie)
+  DOWÓD (2026-09-02): test przypinający `src/components/templates/__tests__/template-form.test.tsx`
+  napisany PRZED rozbiciem i uruchomiony na kodzie sprzed niego: 3 zielone (zapis poprawny,
+  zapis odrzucony przez walidację „Szablon musi mieć co najmniej jeden krok.", wyjście
+  z formularza bez zapisu). Ten sam test po rozbiciu: 3 zielone, bez ani jednej zmiany
+  w pliku testu. Test celowo pinuje też LICZBĘ wywołań akcji serwerowej przy zapisie
+  (`createTemplate` dokładnie raz). Użyty `fireEvent` z `@testing-library/react`,
+  bez dokładania `@testing-library/user-event` do zależności.
+  Podział: `template-form.tsx` 1250 → **552** linie (plik zastany, wolno mu zostać
+  powyżej progu, byle nie rósł), a obok pięć NOWYCH plików, wszystkie poniżej 300 linii:
+  `template-form-utils.ts` 120, `template-period-axis.tsx` 150, `template-period-rail.tsx` 119,
+  `template-periods-slider.tsx` 199, `template-step-row.tsx` 200. Największy nowy plik
+  ma 200 linii, czyli 100 zapasu do progu Z11.
+  Lint: `npx eslint src/components/templates/` **0 błędów**, i to bez dopisywania czegokolwiek
+  do listy grandfathera w `eslint.config.mjs` (lista jest tylko do wypisywania się).
+  Trzy błędy, które wyszły przy wyjęciu kodu spod grandfathera, naprawione u źródła:
+  złożoność 15 w uchwycie `pointermove` (wydzielona czysta funkcja `patchForDrag`,
+  przy okazji zniknęły cztery martwe `??`, bo `startDrag` zawsze ustawia wszystkie trzy
+  pola przeciągania i typ to teraz wymusza), złożoność 12 w `StepRow` (rozwinięty panel
+  ustawień wydzielony do `StepDetails`) oraz `react-hooks/immutability` na
+  `document.body.style.userSelect` (zamienione na `classList.add('select-none')`,
+  ta sama blokada zaznaczania, bez mutacji stylu). `npm run lint` kod 0, ostrzeżeń
+  109 wobec 111 przed zmianą. `npm run typecheck` kod 0, `npm run test` 24 zielone
+  (21 + 3 nowe).
+  Negatywne, żądania sieciowe przy zapisie: skrypt playwrighta loguje się, wypełnia
+  formularz na `/templates/new`, czyści licznik tuż przed kliknięciem „Utwórz szablon"
+  i liczy wszystko do zakończenia nawigacji. Przed rozbiciem (`git stash` na samym
+  `template-form.tsx`): **6** żądań, w tym jedno `POST /templates/new` (akcja serwerowa).
+  Po rozbiciu: **6** żądań, lista identyczna co do ścieżki, potwierdzone dwoma kolejnymi
+  przebiegami. Pierwszy przebieg po zmianie pokazał 9 i to była wyłącznie krzątanina
+  trybu deweloperskiego po przekompilowaniu (`webpack.hot-update.json`, `hot-update.js`,
+  `__nextjs_font`), która nie powtórzyła się w żadnym następnym przebiegu.
+  Zrzuty: `screenshots/F3/przed-F3-07-templates-after-save.png` i `po-F3-07-...` (lista
+  szablonów po zapisie).
 
 - [ ] **F3-08** `ui` `test` Rozbicie `campaign-template-form.tsx` i `timeline.tsx`
   CZYTAJ: `plan/01` zasada Z11, `plan/06-testy.md` sekcja 2
