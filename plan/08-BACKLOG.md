@@ -473,7 +473,34 @@ tabela przed i po w raporcie fazy.
   - obejmują produkcję bez kotwicy T0 i okno kwartalne
   - negatywne: żaden test nie używa migawki całego drzewa komponentu
 
-- [ ] **F2-02** `ui` Podział pliku ganta
+- [x] **F2-02** `ui` Podział pliku ganta
+  DOWÓD (2026-09-02): `gantt-view.tsx` zszedł z **2545 do 187 linii**. Powstało
+  jedenaście plików, żaden nie przekracza 300 linii (`wc -l`): `gantt-row.tsx` 250
+  (wiersz produkcji), `gantt-header.tsx` 174 (nagłówek osi), `gantt-view.tsx` 187
+  (kontener), a poza wymaganą trójką `gantt-stages.ts` 170, `gantt-geometry.ts` 193,
+  `gantt-row-placement.ts` 174, `gantt-row-model.ts` 192, `gantt-row-rail.tsx` 141,
+  `gantt-row-bands.tsx` 206, `gantt-row-guides.tsx` 106, `gantt-milestones.tsx` 255,
+  `gantt-milestone-labels.tsx` 113, `gantt-substep-bar.tsx` 294, `gantt-expanded.tsx` 256,
+  `gantt-next-step.tsx` 102, `gantt-legend.tsx` 66, `gantt-frames.tsx` 48.
+  Podział mechaniczny: treść funkcji i JSX przeniesiona bez edycji, doklejone tylko
+  nagłówki importów, listy propsów i wywołania w miejscu wyciętego bloku.
+  Testy z F2-01 zielone **bez jednej zmiany w ich treści** (`npx vitest run`:
+  „Test Files 3 passed, Tests 20 passed"; `git diff` na pliku testu pusty).
+  Wygląd niezmieniony: `node scripts/perf/pngdiff.mjs` daje **980 różnych pikseli
+  na 7 823 808** dla widoku tygodnia i **910 na 7 766 688** dla widoku kwartału
+  (poniżej 0,013 procent), przy czym **próg szumu na tej maszynie to 1050 pikseli** —
+  tyle różnią się dwa przebiegi tego samego, niezmienionego kodu. Zrzuty:
+  `screenshots/F2/przed-calendar-week.png`, `screenshots/F2/po-F2-02-calendar-week.png`,
+  `screenshots/F2/przed-calendar-quarter.png`, `screenshots/F2/po-F2-02-calendar-quarter.png`.
+  Negatywne spełnione: `git diff --stat package.json` pusty (zero nowych zależności),
+  `git diff --stat src/app/calendar/page.tsx` pusty (zapytania strony nietknięte).
+  Reszta bramki: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 205
+  ostrzeżeń), `npm run build` kod 0, `npm run e2e` 7 passed.
+  Jedna decyzja poza czystym przenoszeniem, opisana w `DECISIONS.md` i w komentarzu
+  w `eslint.config.mjs`: lista grandfather w ESLint dostała sześć nowych ścieżek, bo
+  zastany kod o za wysokiej złożoności zmienił plik. To nie jest nowy dług — bilans
+  przed podziałem to 8 zgłoszeń w gancie, po podziale 10, a suma złożoności wiersza
+  spadła z 55 do 49. Wypisanie się z listy to F7-13.
   CZYTAJ: `plan/01` zasada Z11, `src/components/calendar/gantt-view.tsx`
   AC:
   - `gantt-view.tsx` (2545 linii) rozbity na co najmniej: kontener, wiersz produkcji,
@@ -1003,6 +1030,24 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     w komentarzu przy kodzie
   - negatywne: `npm run test` kod 0, wygląd `/calendar` bez zmian (dowód: `pngdiff`
     przed i po, poniżej 0,02 procent pikseli)
+
+- [ ] **F7-13** `znalezisko` `ui` Wypisać gant z listy grandfather w ESLint
+  Waga: **drobne**. Szacunek: pół dnia. Powstało przy F2-02.
+  Sześć plików ganta siedzi na liście wyjątków w `eslint.config.mjs` wyłącznie dlatego,
+  że zastany kod o złożoności powyżej 10 zmienił plik przy podziale. Reguła z komentarza
+  przy liście mówi: z tej listy się wypisujemy, nie dopisujemy do niej. Wypisanie wymaga
+  zejścia poniżej progu 10 w: `GanttRowView` (18), `buildRowModel` (20), `buildDraft` (11),
+  dwie funkcje strzałkowe w `gantt-milestones.tsx` (12 i 17), jedna w
+  `gantt-milestone-labels.tsx` (18), dwie w `gantt-substep-bar.tsx` (13 i 16),
+  plus `Date.now()` w `gantt-row.tsx` wołane w trakcie renderowania (`react-hooks/purity`).
+  AC:
+  - z listy grandfather w `eslint.config.mjs` znika co najmniej pięć z sześciu ścieżek
+    `src/components/calendar/gantt-*`, a `npm run lint` nadal kończy się kodem 0
+  - żadna funkcja w wypisanych plikach nie przekracza złożoności 10
+    (dowód: `npm run lint 2>&1 | grep -c "complexity"` liczony przed i po, podany w raporcie)
+  - `Date.now()` w wierszu ganta przestaje być wołane w trakcie renderowania
+  - negatywne: testy z F2-01 zielone bez zmiany treści, `npm run e2e` zielony,
+    wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs` poniżej progu szumu)
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.

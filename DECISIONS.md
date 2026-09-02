@@ -323,3 +323,42 @@ z F1-02.** Reszta tabeli to zapis stanu, nie dowód poprawy.
 katalogowych, więc krok P3 nie miał czego przyspieszyć, a przepis techniczny na jego
 powtórzenie leży gotowy we wpisie „F1-03". Otwarta zostaje też bramka z F0: potwierdzenie
 `docs/ARCHITEKTURA.md` przez usera.
+
+---
+
+## F2-02 — podział ganta i lista wyjątków w ESLint
+
+**Kontekst.** `src/components/calendar/gantt-view.tsx` miał 2545 linii i mieszał w sobie
+kontener, nagłówek osi, wiersz produkcji, matematykę rozmieszczenia kroków, pasy T1/T2/T3,
+kamienie milowe, pasek podkroków i panel rozwinięty. Zasada Z11 mówi, że nowy plik nie
+przekracza 300 linii; kryterium F2-02 wymagało rozbicia na co najmniej kontener, wiersz
+i nagłówek. Wyszło jedenaście nowych plików, żaden powyżej 300 linii.
+
+**Dlaczego geometria wyjechała już w F2-01, a nie w F2-02.** Test jednostkowy nie umie
+zaimportować `gantt-view.tsx`: łańcuch `import` prowadzi przez server action do
+`src/lib/db.ts` i do `src/lib/env.ts`, który rzuca `Invalid environment variables` przy
+samym imporcie. Bez wydzielenia czystej arytmetyki do osobnego modułu testy przypinające
+z F2-01 nie miały czego importować. Przeniesienie było dosłowne: skopiowane linie plus
+słowo `export`.
+
+**Decyzja, która nie jest czystym przenoszeniem: lista grandfather w `eslint.config.mjs`.**
+Lista niesie komentarz „z tej listy się WYPISUJEMY, nigdy do niej nie dopisujemy", a przy
+podziale trzeba było dopisać sześć ścieżek. Powód: reguła `complexity` jest błędem dla
+nowego kodu i ostrzeżeniem dla plików z listy, a zastany kod o za wysokiej złożoności
+zmienił plik. Alternatywy były dwie i obie gorsze. Zbijanie złożoności przy okazji łamie
+kryterium „podział jest czysto mechaniczny, bez zmiany zachowania" — czyli dokładnie to,
+przed czym chronią testy z F2-01. Zostawienie `npm run lint` z dziewięcioma błędami łamie
+Definition of Done fazy. Bilans liczbowy: gant miał przed podziałem 8 zgłoszeń
+(7 x `complexity`, 1 x `react-hooks/purity`), po podziale ma 10, bo `GanttRowView`
+o złożoności 55 rozpadł się na `GanttRowView` (18), `buildRowModel` (20) i `buildDraft` (11),
+w sumie 49. Dług nie urósł, zmienił adres. Wypisanie się z listy jest osobnym issue: F7-13.
+
+**Jak wyglądał dowód „wygląd niezmieniony".** Powstało `scripts/perf/pngdiff.mjs` —
+porównanie dwóch zrzutów piksel po pikselu (dekodowanie chromium z playwrighta, bo repo
+nie ma biblioteki graficznej, a `magick` ani `compare` nie są zainstalowane).
+**Ustalenie, bez którego liczba z tego narzędzia nic nie znaczy: próg szumu na tej maszynie
+wynosi 1050 pikseli z 7 823 808.** Tyle różnią się dwa zrzuty tego samego, niezmienionego
+kodu, wykonane po restarcie kompilacji serwera deweloperskiego; różnica siedzi w jednym
+pionowym pasie szerokości 18 pikseli, na kresce „dziś". Dwa zrzuty pod rząd bez restartu
+dają 0. Wniosek praktyczny na kolejne issues: różnica poniżej ~1100 pikseli to szum,
+nie regresja, i dopiero powyżej warto szukać przyczyny.

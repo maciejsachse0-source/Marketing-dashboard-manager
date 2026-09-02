@@ -71,7 +71,19 @@ export default [
       'src/components/artists/artist-dialog.tsx',
       'src/components/artists/artists-shell.tsx',
       'src/components/calendar/gantt-toolbar.tsx',
+      // F2-02: `gantt-view.tsx` (2545 linii) rozpadł się na jedenaście plików.
+      // Poniższe ścieżki NIE są nowym długiem — to ten sam, zastany kod, który
+      // zmienił plik. Bilans: przed podziałem gant miał 8 zgłoszeń (7 x complexity,
+      // 1 x purity), po podziale ma 10, bo `GanttRowView` o złożoności 55 rozpadł
+      // się na trzy funkcje o złożonościach 18, 20 i 11 (suma 49, czyli mniej).
+      // Wypisujemy się z tego stąd przez F7-13, nie przez dopisywanie kolejnych.
       'src/components/calendar/gantt-view.tsx',
+      'src/components/calendar/gantt-row.tsx',
+      'src/components/calendar/gantt-row-model.ts',
+      'src/components/calendar/gantt-row-placement.ts',
+      'src/components/calendar/gantt-milestones.tsx',
+      'src/components/calendar/gantt-milestone-labels.tsx',
+      'src/components/calendar/gantt-substep-bar.tsx',
       'src/components/campaigns/apply-template-button.tsx',
       'src/components/campaigns/campaign-periods-editor.tsx',
       'src/components/campaigns/campaign-template-form.tsx',
