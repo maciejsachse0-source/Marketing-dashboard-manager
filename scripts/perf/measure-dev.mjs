@@ -4,8 +4,10 @@
  * mediana kolejnych wejść, czas HMR po dotknięciu ganta, szczytowy RSS drzewa
  * procesów dev.
  *
- * Uruchomienie: npm run perf:dev
- * Wynik: perf/runs/dev-<timestamp>.json oraz tabela na stdout.
+ * Uruchomienie: npm run perf:dev [nazwa-skryptu-npm]   (domyślnie `dev`)
+ * Wynik: perf/runs/dev-<timestamp>.json oraz tabela na stdout. W pliku ląduje
+ * pole `bundler` (webpack albo turbopack) i `maxOldSpace`, żeby dało się
+ * porównywać przebiegi wariantów — tego wymaga issue F2-05.
  */
 import { config } from 'dotenv';
 config({ path: '.env.local', quiet: true });
@@ -15,6 +17,14 @@ import { spawn, execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 
 const BASE_URL = 'http://localhost:3000';
+const SCRIPT = process.argv[2] ?? 'dev';
+const SCRIPT_CMD = JSON.parse(readFileSync('package.json', 'utf8')).scripts[SCRIPT];
+if (!SCRIPT_CMD) {
+  console.error(`[measure-dev] w package.json nie ma skryptu "${SCRIPT}"`);
+  process.exit(1);
+}
+const BUNDLER = SCRIPT_CMD.includes('--turbopack') ? 'turbopack' : 'webpack';
+const MAX_OLD_SPACE = /max-old-space-size=(\d+)/.exec(SCRIPT_CMD)?.[1] ?? null;
 const GANTT = 'src/components/calendar/gantt-view.tsx';
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
@@ -90,7 +100,7 @@ const started = process.hrtime.bigint();
 // detached: własna grupa procesów, żeby na końcu dało się ubić CAŁE drzewo
 // (npm → next dev → workery kompilatora) jednym `kill(-pid)`. Bez tego next
 // zostaje w tle i następny pomiar mierzy rozgrzany serwer.
-const dev = spawn('npm', ['run', 'dev'], { env: process.env, detached: true });
+const dev = spawn('npm', ['run', SCRIPT], { env: process.env, detached: true });
 
 let peakRssMb = 0;
 const sampler = setInterval(() => {
@@ -123,25 +133,33 @@ try {
   for (let i = 0; i < 5; i++) warm.push((await timedGet('/calendar', cookie)).ms);
   const warmP50Ms = median(warm);
 
-  // HMR: dopisujemy komentarz na końcu pliku ganta i mierzymy, po jakim czasie
-  // serwer oddaje PRZEKOMPILOWANĄ stronę. Oryginał wraca na miejsce w finally.
+  // HMR: podmieniamy w gancie NAPIS, który trafia do HTML-a, i mierzymy, po
+  // jakim czasie serwer oddaje stronę z nowym napisem. Oryginał wraca na
+  // miejsce w finally.
   //
-  // Pułapka, w którą wdepnąłem: pierwsze GET po zapisie potrafi wrócić w 50 ms,
-  // bo obserwator plików jeszcze nie zauważył zmiany i serwer oddaje starą,
-  // skompilowaną wersję. Zapisany wtedy „hmrMs = 54" jest pomiarem niczego.
-  // Dlatego czekamy na odpowiedź wyraźnie wolniejszą od rozgrzanej — to jest ta,
-  // w której webpack faktycznie przebudował moduł. Gdy taka nie przyjdzie
-  // w 30 s, wolimy wywalić pomiar niż zapisać ładną liczbę bez pokrycia.
-  const recompileThresholdMs = Math.max(warmP50Ms * 3, 150);
+  // Poprzednia wersja (dopisz komentarz na końcu pliku i czekaj na odpowiedź
+  // trzy razy wolniejszą od rozgrzanej) działała dla webpacka i NIE działała
+  // dla turbopacka: ten przebudowuje moduł tak szybko, że żadna odpowiedź nie
+  // przekracza progu i pomiar wywalał się z komunikatem „nie zaobserwowano
+  // przebudowy". Porównanie całych odpowiedzi też odpada — dwa identyczne
+  // żądania różnią się między sobą (identyfikatory Reacta). Marker w treści
+  // znaczy dokładnie „serwer oddaje już przekompilowany moduł" i znaczy to
+  // samo dla obu bundlerów.
+  const TOUCH_ANCHOR = 'Outreach + ustalenia';
+  const TOUCH_MARK = `PERFTOUCH${Date.now()}`;
   const original = readFileSync(GANTT, 'utf8');
+  if (!original.includes(TOUCH_ANCHOR)) {
+    throw new Error(`w ${GANTT} nie ma napisu "${TOUCH_ANCHOR}" — pomiar HMR nie ma czego podmienić`);
+  }
   let hmrMs = null;
   const tHmr = process.hrtime.bigint();
   try {
-    writeFileSync(GANTT, `${original}\n// perf-touch ${Date.now()}\n`);
+    writeFileSync(GANTT, original.replace(TOUCH_ANCHOR, `${TOUCH_ANCHOR} ${TOUCH_MARK}`));
     while (Number(process.hrtime.bigint() - tHmr) / 1e6 < 30_000) {
-      const r = await timedGet('/calendar', cookie);
-      if (r.status !== 200) throw new Error(`po dotknięciu ganta strona zwróciła ${r.status}`);
-      if (r.ms > recompileThresholdMs) {
+      const res = await fetch(`${BASE_URL}/calendar`, { headers: { cookie }, redirect: 'manual' });
+      const body = await res.text();
+      if (res.status !== 200) throw new Error(`po dotknięciu ganta strona zwróciła ${res.status}`);
+      if (body.includes(TOUCH_MARK)) {
         hmrMs = Number(process.hrtime.bigint() - tHmr) / 1e6;
         break;
       }
@@ -150,9 +168,7 @@ try {
     writeFileSync(GANTT, original);
   }
   if (hmrMs === null) {
-    throw new Error(
-      `w 30 s od zapisu ganta nie zaobserwowano przebudowy (żadna odpowiedź nie przekroczyła ${Math.round(recompileThresholdMs)} ms)`,
-    );
+    throw new Error('w 30 s od zapisu ganta serwer nie oddał strony z nowym napisem');
   }
 
   peakRssMb = Math.max(peakRssMb, treeRssMb(dev.pid));
@@ -160,6 +176,9 @@ try {
   out = {
     kind: 'dev',
     at: new Date().toISOString(),
+    script: SCRIPT,
+    bundler: BUNDLER,
+    maxOldSpace: MAX_OLD_SPACE ? Number(MAX_OLD_SPACE) : null,
     readyMs: Math.round(readyMs),
     firstCompileMs: Math.round(firstCompileMs),
     warmP50Ms: Math.round(warmP50Ms),
@@ -181,9 +200,10 @@ try {
 }
 
 mkdirSync('perf/runs', { recursive: true });
-const file = `perf/runs/dev-${out.at.replace(/[:.]/g, '-')}.json`;
+const file = `perf/runs/dev-${BUNDLER}-${out.at.replace(/[:.]/g, '-')}.json`;
 writeFileSync(file, JSON.stringify(out, null, 2) + '\n');
 
+console.log(`\nskrypt: ${SCRIPT} (${BUNDLER}${MAX_OLD_SPACE ? `, --max-old-space-size=${MAX_OLD_SPACE}` : ', bez flagi pamięci'})`);
 console.log('\nmetryka             wartość');
 for (const k of ['readyMs', 'firstCompileMs', 'warmP50Ms', 'hmrMs', 'peakRssMb']) {
   console.log(`${k.padEnd(19)} ${String(out[k]).padStart(7)}`);

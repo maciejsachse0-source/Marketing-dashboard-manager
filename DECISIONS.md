@@ -394,3 +394,47 @@ nieodróżnialny. Rozstrzygać należy powtórką: dwa zrzuty potrafią wyjść
 identyczne (0 pikseli), więc jedna liczba powyżej 1100 nie jest jeszcze
 dowodem regresji.
 
+## F2-05 — bundler deweloperski: pomiar wygrywa turbopack, decyzja zostaje przy webpacku
+
+Trzy przebiegi na wariant, `npm run perf:dev` na zimnym `.next`, mediany:
+
+| metryka | webpack | turbopack | kto lepszy |
+|---|---|---|---|
+| `readyMs` | 493 | 468 | remis |
+| `firstCompileMs` | 2777 | 1187 | turbopack, 2,3x |
+| `warmP50Ms` | 135 | 74 | turbopack, 1,8x |
+| `hmrMs` | 2017 | 157 | turbopack, 13x |
+| `peakRssMb` | 1555 | 1521 | remis |
+
+Czysto czasowo nie ma o czym dyskutować: turbopack wygrywa wszystko, co się liczy,
+a `hmrMs` to dokładnie ten ból, który user zgłosił jako główny.
+
+**A jednak `dev` zostaje na webpacku.** Do kryterium F2-05 dołożyłem sprawdzenie,
+którego w nim nie było: czy tryb deweloperski pokazuje to samo, co produkcja. Nie
+pokazuje. Zrzut `/calendar?view=week` z `next build` + `next start` różni się od
+zrzutu z dev-webpacka o **6 306** pikseli z 7 823 808, a od zrzutu z dev-turbopacka
+o **82 921**. Różnica jest widoczna gołym okiem po powiększeniu: wewnątrz kolorowych
+pasów T1/T2/T3 znikają pionowe kreski siatki dni. Bundler deweloperski, który rysuje
+główny ekran inaczej niż produkcja, kosztuje więcej niż dwie sekundy przebudowy —
+każda poprawka wyglądu robiona w takim trybie jest robiona na fałszywym obrazku.
+
+Dlatego: `dev` = webpack, `dev:alt` = turbopack, przyczyna różnicy jako issue
+**F7-14**. Po zamknięciu F7-14 przełączenie to jedna linijka w `package.json`
+i powtórzenie pomiaru — liczby są już zebrane.
+
+**Flaga `--max-old-space-size=4096` usunięta z obu skryptów.** Szczytowy RSS całego
+drzewa procesów deweloperskich bez flagi: webpack 1513 / 1679 / 1556 MB, turbopack
+1347 / 1471 / 1469 MB, przy progu 2500 MB. Z flagą webpack dawał 1437-1750 MB, czyli
+flaga niczego nie oszczędzała ani nie kosztowała, tylko podnosiła sufit sterty, do
+którego proces i tak nie dochodzi. Był to zabobon, teraz go nie ma.
+
+**Poprawka w `scripts/perf/measure-dev.mjs`, bez której pomiar był niewykonalny.**
+`hmrMs` rozpoznawał przebudowę po pierwszej odpowiedzi trzy razy wolniejszej od
+rozgrzanej. Dla turbopacka próg (222 ms) nigdy nie padał, bo przebudowa jest szybsza
+niż rozrzut zwykłego żądania, i skrypt kończył się błędem „nie zaobserwowano
+przebudowy". Porównywanie całych odpowiedzi też odpada: dwa identyczne żądania
+do `/calendar` różnią się między sobą (identyfikatory Reacta). Harness podmienia więc
+w gancie napis, który trafia do HTML-a, i czeka na stronę z markerem. To jedyny
+sygnał znaczący dokładnie „serwer oddaje już przekompilowany moduł" i znaczący
+to samo dla obu bundlerów.
+

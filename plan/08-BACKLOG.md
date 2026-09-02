@@ -614,7 +614,7 @@ tabela przed i po w raporcie fazy.
     `po-F2-03-week.png` o **0 pikseli**.
   - Brak nowej zależności: `package.json` bez zmian.
 
-- [ ] **F2-05** `perf` `tooling` Decyzja o bundlerze deweloperskim (P7)
+- [x] **F2-05** `perf` `tooling` Decyzja o bundlerze deweloperskim (P7)
   CZYTAJ: `plan/03-wydajnosc.md` sekcje 1.3, 4 i 5 wiersz P7, `plan/01` zasada Z2
   AC:
   - `npm run perf:dev` wykonany dla obu wariantów (`--webpack` i `--turbopack`), oba
@@ -626,6 +626,38 @@ tabela przed i po w raporcie fazy.
   - sprawdzone, czy `--max-old-space-size=4096` jest jeszcze potrzebny: pomiar
     `peakRssMb` bez flagi; mieści się poniżej progu → flaga usunięta
   - negatywne: scenariusz logowania e2e zielony na wybranym wariancie
+
+  DOWÓD (2026-09-02): `npm run perf:dev` przyjmuje teraz nazwę skryptu npm
+  (`npm run perf:dev -- dev:alt`) i zapisuje w pliku pola `script`, `bundler`
+  i `maxOldSpace`; pliki `perf/runs/dev-webpack-*.json`
+  i `perf/runs/dev-turbopack-*.json`, po trzy przebiegi na wariant.
+  Mediany (readyMs / firstCompileMs / warmP50Ms / hmrMs / peakRssMb):
+  webpack **493 / 2777 / 135 / 2017 / 1555**, turbopack
+  **468 / 1187 / 74 / 157 / 1521**. Tabela i rekomendacja: `DECISIONS.md`,
+  sekcja „F2-05 — bundler deweloperski".
+  **Odstępstwo od kryterium „dev ustawiony na zwycięzcę pomiaru":** zwycięzcą
+  pomiaru czasu jest turbopack (HMR 157 ms wobec 2017 ms), ale przegrywa
+  sprawdzenie poprawności, które musiało dojść, bo kryterium go nie zawierało:
+  pod turbopackiem `/calendar` renderuje się INACZEJ niż produkcja. Zrzut
+  z `next build` + `next start` różni się od zrzutu z dev-webpacka o 6 306
+  pikseli, a od zrzutu z dev-turbopacka o **82 921** — w pasach T1/T2/T3 znika
+  siatka dni. Dlatego `dev` zostaje na webpacku, `dev:alt` to turbopack,
+  a przyczyna różnicy to nowe issue **F7-14**. Po jego zamknięciu przełączenie
+  jest zmianą jednej linijki w `package.json`.
+  - Flaga `--max-old-space-size=4096` **usunięta z obu skryptów**: bez niej
+    szczytowy RSS drzewa procesów to 1513 / 1679 / 1556 MB (mediana 1556)
+    na webpacku i 1347 / 1471 / 1469 MB (mediana 1469) na turbopacku, wobec
+    progu 2500 MB z `perf/budget.json`. Z flagą webpack dawał 1437-1750 MB,
+    czyli flaga nie zmieniała zużycia, tylko podnosiła sufit sterty.
+  - Poprawka w harnessie, bez której pomiar turbopacka był niewykonalny:
+    `hmrMs` wykrywał przebudowę po odpowiedzi trzykrotnie wolniejszej od
+    rozgrzanej. Turbopack przebudowuje tak szybko, że próg nigdy nie padał
+    i skrypt kończył się błędem „nie zaobserwowano przebudowy". Teraz harness
+    podmienia w gancie napis widoczny w HTML-u i czeka, aż serwer odda stronę
+    z markerem. To ten sam sygnał dla obu bundlerów.
+  - Negatywne: `npx playwright test e2e/login.spec.ts` zielony na wybranym
+    wariancie (webpack, bez flagi pamięci). `npm run typecheck` kod 0,
+    `npm run lint` kod 0.
 
 - [ ] **F2-06** `perf` `ui` Zejście z liczby komponentów klienckich (P8)
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P8
@@ -1122,6 +1154,27 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `Date.now()` w wierszu ganta przestaje być wołane w trakcie renderowania
   - negatywne: testy z F2-01 zielone bez zmiany treści, `npm run e2e` zielony,
     wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs` poniżej progu szumu)
+
+- [ ] **F7-14** `znalezisko` `ui` `tooling` Turbopack w trybie deweloperskim gubi siatkę dni w pasach T
+  Znalezione przy F2-05. `npm run dev:alt` (turbopack) renderuje `/calendar` inaczej niż
+  `next build` + `next start` i inaczej niż `npm run dev` (webpack): wewnątrz kolorowych
+  pasów T1/T2/T3 znikają pionowe kreski siatki dni. Siatka jest rysowana inline stylem
+  `repeating-linear-gradient(... var(--border) ...)` w `gantt-row-bands.tsx`, a pas leży
+  nad nią z klasą tła z modyfikatorem przezroczystości (`FRAME_TONE[*].bg`
+  w `gantt-frames.tsx`), więc pierwszy podejrzany to inne przetworzenie modyfikatora
+  alfa Tailwinda v4 przez turbopacka. Liczby: zrzut produkcyjny wobec dev-webpacka
+  różni się o 6 306 pikseli z 7 823 808, wobec dev-turbopacka o 82 921.
+  Waga: **ważne** — blokuje przełączenie trybu deweloperskiego na bundler
+  trzynaście razy szybszy w HMR (157 ms wobec 2017 ms), czyli na główny ból zgłoszony
+  przez usera. Szacunek: pół dnia.
+  AC:
+  - przyczyna różnicy nazwana i zapisana w `DECISIONS.md` (który plik CSS albo która
+    klasa, i dlaczego bundler ją zmienia)
+  - zrzut `/calendar?view=week` z `npm run dev:alt` różni się od zrzutu produkcyjnego
+    o mniej niż 10 000 pikseli z 7 823 808 (dowód: `node scripts/perf/pngdiff.mjs`)
+  - po spełnieniu powyższego `dev` przełączone na turbopacka, `dev:alt` na webpacka,
+    a pomiar `npm run perf:dev` powtórzony i dopisany do `DECISIONS.md`
+  - negatywne: `npm run build` kod 0, pełny zestaw e2e zielony
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
