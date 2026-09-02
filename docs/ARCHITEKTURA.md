@@ -110,7 +110,7 @@ strefa czasowa Etc/UTC
 | Provider | **kontener Docker na tej maszynie**, nie hosting | `docker ps --filter name=mc-pg` |
 | Region | brak, baza jest lokalna | jak wyżej |
 | Limit połączeń serwera | 100 | `npm run pg:info` |
-| Pula po stronie aplikacji | `max: 1`, `idle_timeout: 20 s` | `src/lib/db.ts:23` |
+| Pula po stronie aplikacji | `1` gdy `process.env.VERCEL`, poza Vercelem `DB_POOL_MAX` z domyślną **10**; `idle_timeout: 20 s` | `src/lib/db.ts` |
 | Tryb poolera | `prepare: false`, czyli klient jest gotowy na pooler w trybie transakcyjnym (pgbouncer, Neon pooled, Supabase) | `src/lib/db.ts:20` |
 
 Trzy bazy w tym samym kontenerze, rozdzielone po to, żeby generator zestawu L nie
@@ -121,6 +121,15 @@ zasiał bazy roboczej:
 | `marketing` | `DATABASE_URL` | robocza, z niej czyta `npm run dev` |
 | `marketing_perf` | `PERF_DATABASE_URL` | pomiarowa, mieszka w niej zestaw L (500 produkcji) |
 | `marketing_test` | `TEST_DATABASE_URL` | testowa, testy ją czyszczą między przebiegami |
+
+**Skąd 10.** Limit połączeń serwera to 100 (`npm run pg:info`, wiersz wyżej), a poza
+Vercelem aplikację obsługuje **jeden** długo żyjący proces `next start`. Dziesięć
+połączeń to dziesiąta część limitu, więc obok aplikacji mieszczą się jeszcze
+`npm run db:studio`, skrypty pomiarowe i `psql` w kontenerze, a jednocześnie strona
+z pięcioma równoległymi zapytaniami (`/campaigns/[id]`) nie stoi w kolejce po
+połączenie. Wartość jest do zmiany zmienną `DB_POOL_MAX` bez dotykania kodu.
+Na Vercelu wymuszamy 1, bo tam procesów jest tyle, ile ciepłych instancji funkcji,
+i każdy pomnożyłby pulę przez siebie.
 
 **Dług, nie stan docelowy.** `DATABASE_URL` do bazy, z której korzysta wdrożenie na
 Vercelu, nie został dostarczony. Kontener stanął po to, żeby dało się cokolwiek
@@ -366,8 +375,10 @@ Kształt zastany, który wygląda na dług, a nim nie jest:
 - `steps` i `periods` w `jsonb` zamiast w tabelach zależnych. Wybór świadomy, zostaje.
   Cena: po zawartości `jsonb` nie filtrujemy, wszystko filtrowane dostaje osobną
   kolumnę z indeksem.
-- `max: 1` w puli połączeń. Wygląda na literówkę, jest ustawieniem pod funkcje
-  bezserwerowe, gdzie każda ciepła instancja i tak obsługuje jedno żądanie naraz.
+- Pula połączeń zależna od środowiska: `1` na Vercelu (każda ciepła instancja
+  funkcji obsługuje jedno żądanie naraz), `DB_POOL_MAX` z domyślną 10 poza nim.
+  Do issue F1-02 było twarde `max: 1` wszędzie, co dławiło zrównoleglone zapytania
+  na serwerze lokalnym.
 
 **Uwaga historyczna, żeby nie wracała przy czytaniu starych plików.** Pierwsza wersja
 projektu stała na SQLite przez `better-sqlite3`, z plikiem bazy w `data/`. Ten stan

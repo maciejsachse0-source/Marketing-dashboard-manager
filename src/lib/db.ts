@@ -18,9 +18,11 @@ function getClient() {
     // Disable prepared statements for compatibility with serverless poolers
     // (Neon pooled, Vercel Postgres pooled, Supabase pgbouncer in transaction mode).
     prepare: false,
-    // Keep the pool tiny — serverless functions get short lifetimes; one
-    // active connection per warm instance is plenty.
-    max: 1,
+    // Na Vercelu kazda instancja funkcji trzyma wlasna pule i zyje krotko,
+    // wiec jedno polaczenie na instancje wystarcza i nie wyczerpuje limitu
+    // providera. Poza Vercelem (serwer dlugo zyjacy, jeden proces) pula ma
+    // sens: DB_POOL_MAX, domyslnie 10. Uzasadnienie limitu: docs/ARCHITEKTURA.md sekcja 3.
+    max: process.env.VERCEL ? 1 : env.DB_POOL_MAX,
     idle_timeout: 20,
   });
   if (env.NODE_ENV !== 'production') {

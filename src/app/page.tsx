@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
 
-  const [upcoming, weekPosts, monthPosts, topPosts, activity] = await Promise.all([
+  const [upcoming, weekPosts, monthPosts, topPosts, activity, agents] = await Promise.all([
     getUpcomingCalendar(7),
     db.query.posts.findMany({ where: gte(schema.posts.publishedAt, sevenDaysAgo) }),
     db.query.posts.findMany({ where: gte(schema.posts.publishedAt, thirtyDaysAgo) }),
@@ -41,6 +41,7 @@ export default async function DashboardPage() {
       limit: 4,
     }),
     getRecentActivity(8),
+    loadAgents(),
   ]);
 
   const ersInMonth = monthPosts.filter((p) => p.engagementRate !== null);
@@ -49,7 +50,8 @@ export default async function DashboardPage() {
     : null;
   const newFollowers = weekPosts.reduce((s, p) => s + (p.followersGained ?? 0), 0);
 
-  const agents = await loadAgents();
+  // Sekwencyjne z powodu: widgety liczy sie z definicji agentow, ktore znamy
+  // dopiero po loadAgents().
   const agentHints = await Promise.all(
     agents.map((a) => (a.dashboardWidget ? runAgentWidget(a.dashboardWidget) : Promise.resolve(null))),
   );

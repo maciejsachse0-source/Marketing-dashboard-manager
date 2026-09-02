@@ -340,7 +340,20 @@ uruchamialne.
   - tabela przed i po w raporcie, liczby z `perf/baseline.json` i nowego przebiegu
   - negatywne: `grep -c 'DROP\|ALTER COLUMN' drizzle/migrations/<nowa>.sql` zwraca `0`
 
-- [ ] **F1-02** `perf` Zrównoleglenie zapytań i pula połączeń (P2)
+- [x] **F1-02** `perf` Zrównoleglenie zapytań i pula połączeń (P2)
+  DOWOD: `campaigns/[id]` ma teraz 5 zapytan w jednym `Promise.all` (bramka
+  `notFound` przeniesiona za nie), zapytanie o artystow zostaje sekwencyjne
+  z komentarzem; `src/app/page.tsx` wciaga `loadAgents()` do istniejacego
+  `Promise.all` (6 rownoleglych), `agentHints` sekwencyjne z komentarzem;
+  `src/app/calendar/page.tsx` laczy `productions` i `campaigns` w `Promise.all`.
+  `src/lib/db.ts`: `max: process.env.VERCEL ? 1 : env.DB_POOL_MAX` (domyslna 10),
+  uzasadnienie limitu w `docs/ARCHITEKTURA.md` sekcja 3.
+  POMIAR (`measure-page.mjs`, po 3 przebiegi, mediana p95): home 25.75 ms -> 12.3 ms
+  (-52%), campaign-detail 40.25 ms -> 30.7 ms (-24%). Oba powyzej progu 10%.
+  NEGATYWNE: `DB_POOL_MAX=1 npm run test` 6/6 zielonych, serwer na `DB_POOL_MAX=1`
+  wstaje i `/login` zwraca 200. Zrzuty `screenshots/f1-02-przed-campaigns_1.png`
+  i `screenshots/f1-02-po-campaigns_1.png` maja identyczny SHA-1 (9a87f271992a),
+  czyli widok nie zmienil ani tresci, ani kolejnosci danych.
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P2, `src/lib/db.ts`,
   `src/app/campaigns/[id]/page.tsx`, `src/app/page.tsx`
   AC:

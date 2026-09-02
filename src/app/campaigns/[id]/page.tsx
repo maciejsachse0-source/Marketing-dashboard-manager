@@ -26,12 +26,14 @@ export default async function CampaignDetailPage({
   const campaignId = Number(id);
   if (!Number.isFinite(campaignId)) notFound();
 
-  const campaign = await db.query.campaigns.findFirst({
-    where: eq(schema.campaigns.id, campaignId),
-  });
-  if (!campaign) notFound();
-
-  const [entries, posts, productions, marketingTemplates] = await Promise.all([
+  // Wszystkie piec zapytan zalezy tylko od campaignId, wiec ida rownolegle.
+  // Bramka notFound przeniesiona za Promise.all: przy nieistniejacej kampanii
+  // cztery pozostale zapytania zwrocą puste listy, co jest tansze niz szeregowe
+  // czekanie na findFirst przy kazdym poprawnym wejsciu.
+  const [campaign, entries, posts, productions, marketingTemplates] = await Promise.all([
+    db.query.campaigns.findFirst({
+      where: eq(schema.campaigns.id, campaignId),
+    }),
     db.query.calendarEntries.findMany({
       where: eq(schema.calendarEntries.campaignId, campaignId),
       orderBy: schema.calendarEntries.startsAt,
@@ -46,6 +48,7 @@ export default async function CampaignDetailPage({
     }),
     loadMarketingTemplates(),
   ]);
+  if (!campaign) notFound();
 
   // Bulk-load artists referenced by the productions so the timeline can show
   // names without N+1 round trips. Productions without an artist (solo) get
@@ -53,6 +56,8 @@ export default async function CampaignDetailPage({
   const artistIds = Array.from(
     new Set(productions.map((p) => p.artistId).filter((id): id is number => id != null)),
   );
+  // Sekwencyjne z powodu: lista artistIds powstaje dopiero z wyniku zapytania
+  // o produkcje, wiec nie da sie tego wystartowac rownolegle.
   const artists =
     artistIds.length > 0
       ? await db.query.artists.findMany({

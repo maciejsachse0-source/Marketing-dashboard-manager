@@ -179,12 +179,6 @@ export default async function CalendarPage({
   // visible window — later sub-stages (post-publish wraps) may still be active.
   const lookbehindStart = addDays(weekStart, -3 * 7);
 
-  const productionsRaw = await db.query.productions.findMany({
-    where: and(
-      gte(schema.productions.t0At, lookbehindStart),
-      lte(schema.productions.t0At, lookaheadEnd),
-    ),
-  });
 
   // Campaigns whose narrative arc overlaps the wider lookbehind/lookahead
   // window. We intentionally use the wider window (not the strict visible
@@ -197,9 +191,17 @@ export default async function CalendarPage({
   // strip would otherwise stack into a wall of bands and crowd out the
   // production rows. The user picks which one through the toolbar selector;
   // selection is persisted in the `campaign` search param.
-  const campaignsAll = await db.query.campaigns.findMany({
-    orderBy: schema.campaigns.releaseAt,
-  });
+  const [productionsRaw, campaignsAll] = await Promise.all([
+    db.query.productions.findMany({
+      where: and(
+        gte(schema.productions.t0At, lookbehindStart),
+        lte(schema.productions.t0At, lookaheadEnd),
+      ),
+    }),
+    db.query.campaigns.findMany({
+      orderBy: schema.campaigns.releaseAt,
+    }),
+  ]);
   const overlappingCampaigns = campaignsAll
     .map((c) => {
       const resolved = resolvePeriods(c.periods);

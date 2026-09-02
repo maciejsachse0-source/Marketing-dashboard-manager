@@ -10,6 +10,9 @@ const schema = z.object({
     z.string().min(32, 'SESSION_SECRET must be at least 32 characters — generate with: openssl rand -base64 48'),
   ),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  // Rozmiar puli polaczen do Postgresa poza Vercelem. Na Vercelu wymuszamy 1
+  // (patrz src/lib/db.ts), bo kazda instancja funkcji trzyma wlasna pule.
+  DB_POOL_MAX: z.preprocess(emptyToUndef, z.coerce.number().int().positive().default(10)),
 });
 
 const parsed = schema.safeParse(process.env);
