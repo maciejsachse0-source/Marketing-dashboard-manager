@@ -54,7 +54,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   `next dev --webpack` JEST wspierany w Next 16.2.4 (`npx next dev --help` wypisuje
   `--webpack  Starts development mode using webpack.`), więc F2-05 zachowuje sens.
 
-- [ ] **F0-01** `db` `tooling` Bazy i zmienne środowiskowe
+- [x] **F0-01** `db` `tooling` Bazy i zmienne środowiskowe
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 2, `src/lib/env.ts`, `.env.example`
   AC:
   - `.env.local` zawiera i wszystkie odpowiadają na zapytanie `select 1`:
@@ -72,6 +72,14 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     `DB_POOL_MAX` z komentarzem, po co każda
   - negatywne: `git status --porcelain | grep -c '.env.local'` zwraca 0;
     `PERF_DATABASE_URL` różni się od `DATABASE_URL` i od `TEST_DATABASE_URL`
+  DOWÓD (2026-09-02): `DATABASE_URL` nieobecny na starcie issue, więc zadziałał wariant
+  zapasowy: `docker info` kod 0, kontener `mc-pg` (postgres:17, port 5433), trzy bazy
+  `marketing` / `marketing_perf` / `marketing_test`, wybór opisany w `DECISIONS.md`.
+  `select 1` przez klienta `postgres-js` odpowiada `1` na każdym z trzech URL-i.
+  `drizzle/migrate.ts` kod 0 na każdej z trzech baz, po migracji każda ma 12 tabel
+  w `public`. `npm run build` kod 0 (czyli `src/lib/env.ts` przechodzi walidację).
+  `git status --porcelain | grep -c '.env.local'` zwraca `0`. `.env.example` uzupełniony
+  o `PERF_DATABASE_URL`, `TEST_DATABASE_URL`, `DB_POOL_MAX`, każda z komentarzem.
 
 - [ ] **F0-02** `tooling` `test` Przyrządy jakości: typecheck, lint, Vitest, Playwright
   CZYTAJ: `plan/06-testy.md` sekcje 1 i 2, `plan/01` zasady Z10 i Z11,
