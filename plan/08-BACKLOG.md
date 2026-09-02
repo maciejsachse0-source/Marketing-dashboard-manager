@@ -1144,7 +1144,7 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   co przed), `npm run test` 122 zielone (było 115), `node scripts/check-typography.mjs`
   kod 0, `npm run perf` kod 0, bundel `/calendar` 292,8 kB przy progu 301,6 kB.
 
-- [ ] **F4-05** `import` `security` Ekran importu: zapis transakcyjny i podsumowanie
+- [x] **F4-05** `import` `security` Ekran importu: zapis transakcyjny i podsumowanie
   CZYTAJ: `plan/04-import-excel.md` sekcje 2, 6, 7 i 8
   AC:
   - zapis w jednej transakcji paczkami po 100; podsumowanie podaje dodane,
@@ -1158,6 +1158,38 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
     należą do F6-01, nie tutaj)
   - negatywne: import nigdy nie usuwa osób nieobecnych w arkuszu (test: arkusz
     z jednym wierszem na bazie z 200 osobami, `COUNT(*)` rośnie albo zostaje)
+  DOWÓD (2026-09-03): zapis idzie strumieniem NDJSON z `src/app/api/import/people/save/route.ts`,
+  cały w jednym `db.transaction`, wstawki paczkami po 100 (`src/lib/import/save.ts`,
+  `BATCH_SIZE = 100`). Podchwycone linie prawdziwego strumienia dla fixture'a:
+  `{"batch":0,"of":10}` do `{"batch":10,"of":10}`, potem
+  `{"done":true,"inserted":975,"updated":0,"skipped":0,"errors":30}`.
+  TRANSAKCYJNOŚĆ: `src/lib/import/save.test.ts` chodzi po prawdziwym Postgresie
+  (`TEST_DATABASE_URL`, baza `marketing_test`), 5 testów zielonych. Test „błąd w drugiej
+  paczce wycofuje całą transakcję" psuje wiersz 120 ze 150 (NOT NULL na `name`); bez
+  transakcji zostałoby w bazie 100 wierszy z pierwszej paczki, a `COUNT(*)` po wyjątku
+  wynosi tyle co przed, czyli 0.
+  NEGATYWNE, import nie usuwa: test „nie usuwa osób nieobecnych w arkuszu" wstawia 200
+  osób, potem importuje arkusz z jednym wierszem; `COUNT(*)` rośnie z 200 do 201.
+  WYDAJNOŚĆ: `npx tsx scripts/perf/measure-import-save.ts` (trzy przebiegi, mediana,
+  transakcja wycofywana, więc pomiar nie zostawia wierszy): zapis 1000 osób
+  **56 ms** przy progu 5000 ms (przebiegi 56, 56, 96); plik 10,0 MB, 5000 wierszy, wzrost
+  RSS **50,5 MB** przy progu 300 MB. Skrypt kończy się kodem 0 i wypisuje
+  `wierszy w artists po pomiarze 0`.
+  TABELA ZDARZEŃ, wiersze o zapisie, sprawdzone w e2e `e2e/import-osoby.spec.ts`
+  (20 testów całego katalogu zielonych): „Klik Importuj" - przycisk zablokowany i licznik
+  paczek (`Zapisuję, paczka 4 z 10`, zrzut `screenshots/F4/F4-05-krok6-zapis.png`);
+  „Zapis nie powiódł się" - wymuszone HTTP 500, komunikat z treścią błędu, krok 5 i wybór
+  polityki zachowane, przycisk znów aktywny; „Zapis powiódł się" - podsumowanie
+  „Dodano 975, zaktualizowano 0, pominięto 0", link do `/artists` z `href="/artists"`,
+  przycisk „Importuj kolejny plik" oraz pobranie `import-bledy.csv` (zdarzenie `download`
+  w teście). Zrzuty: `F4-05-krok5-zatwierdzenie.png`, `F4-05-krok6-zapis.png`,
+  `F4-05-krok7-podsumowanie.png`.
+  NAPRAWIONE PO DRODZE, w kodzie tego issue: duplikat pewny bez żadnej nowej wartości dawał
+  pusty zestaw zmian, a `set({})` wywracał całą transakcję komunikatem „No values to set";
+  taki wiersz liczy się teraz jako pominięty (test „aktualizacja bez zmian jest pomijana").
+  Bramki: `npm run typecheck` kod 0, `npm run lint` kod 0 (0 błędów, 108 ostrzeżeń),
+  `npm run test` 127 zielonych, `node scripts/check-typography.mjs` kod 0, `npm run perf`
+  kod 0, bundel `/calendar` 292,5 kB przy progu 301,6 kB.
 
 - [ ] **F4-06** `import` ⏳ ZABLOKOWANE: czeka na plik `.xlsx` od usera — dopasowanie do prawdziwego arkusza
   CZYTAJ: `plan/04-import-excel.md` sekcje 1 i 4
@@ -1600,6 +1632,51 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
+
+
+- [ ] **F7-20** `znalezisko` `ui` Pole wyboru pokazuje surową wartość zamiast etykiety
+  Znalezione przy F4-04. `SelectValue` z Base UI renderuje domyślnie `value`, a nie tekst
+  wybranej pozycji, więc formularz agenta pokazuje w zwiniętym polu `sidePanel` i
+  `widgetKind` surowe klucze, mimo że lista rozwinięta ma polskie etykiety. Ekran importu
+  miał ten sam błąd i dostał formatter (`<SelectValue>{(v) => ETYKIETY[v]}</SelectValue>`),
+  ale zastane pole w `src/components/agents/agent-form.tsx` nadal go nie ma.
+  Waga: **drobne**. Szacunek: godzina.
+  AC:
+  - `/agents/new` pokazuje w zwiniętym polu „Panel kontekstu" i „Widget na pulpicie"
+    tę samą etykietę, którą widać na liście rozwiniętej (dowód: zrzut ekranu obu stanów)
+  - `grep -rn 'SelectValue />' src/components | wc -l` zwraca `0` albo każde pozostałe
+    wystąpienie ma wartość równą etykiecie i jest to napisane w komentarzu obok
+  - negatywne: żaden inny tekst na formularzu agenta się nie zmienia
+
+- [ ] **F7-21** `znalezisko` `test` `tooling` Testy e2e importu piszą do bazy roboczej
+  Znalezione przy F4-05. `playwright.config.ts` nie ustawia bazy, więc scenariusz pełnego
+  importu wpisuje 975 syntetycznych osób do tej bazy, na której stoi serwer deweloperski
+  (`marketing`). Test sprząta po sobie po znaczniku `max(id)` sprzed przebiegu, ale to
+  łata, nie izolacja: przerwany przebieg zostawia dane, a równoległe workery skasowałyby
+  sobie wiersze nawzajem. Przy okazji zniknęło pięć zastanych wierszy testowych z bazy
+  roboczej, kasowanych ręcznie po czasie utworzenia, zanim sprzątanie po `max(id)`
+  powstało; to były wiersze z poprzednich sesji („Artysta F1-04", „Test cache"), nie dane
+  użytkownika, ale pokazuje, jak łatwo tu o pomyłkę.
+  Waga: **ważne**. Szacunek: pół dnia.
+  AC:
+  - `npx playwright test` startuje serwer na `TEST_DATABASE_URL`, nie na `DATABASE_URL`
+    (dowód: `select count(*) from artists` w bazie `marketing` przed i po pełnym przebiegu
+    e2e daje tę samą liczbę, bez żadnego sprzątania w teście)
+  - baza testowa jest czyszczona przed przebiegiem, nie po nim, więc przerwany przebieg
+    nie psuje następnego
+  - sprzątanie po znaczniku `max(id)` znika z `e2e/import-osoby.spec.ts`
+  - negatywne: `npm run dev` i `npm run perf` dalej używają swoich baz, żaden skrypt
+    nie zaczyna wskazywać na `marketing_test`
+
+- [ ] **F7-22** `znalezisko` `docs` `AGENTS.md` wskazuje nieistniejący plik planu
+  Znalezione przy F4-04. Wiersz „Import osób z arkusza" w `AGENTS.md` kieruje do
+  `plan/04-import-osob.md`, a plik nazywa się `plan/04-import-excel.md`. Router, który
+  wysyła w nieistniejące miejsce, kosztuje każdego agenta jedno zmarnowane szukanie.
+  Waga: **drobne**. Szacunek: pięć minut.
+  AC:
+  - każda ścieżka wymieniona w tabeli `AGENTS.md` istnieje (dowód: pętla po ścieżkach
+    z tabeli, `test -e` dla każdej, zero brakujących)
+  - negatywne: treść wierszy tabeli poza ścieżkami nie zmienia się
 
 ---
 

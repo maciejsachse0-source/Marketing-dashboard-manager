@@ -78,7 +78,11 @@ export function ImportMapping({
                         aria-invalid={kolizja || undefined}
                         className="w-full"
                       >
-                        <SelectValue />
+                        <SelectValue>
+                          {(chosen: string) =>
+                            chosen === SKIP ? 'kolumna pomijana' : FIELD_LABELS[chosen as PersonField]
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={SKIP}>kolumna pomijana</SelectItem>

@@ -1,4 +1,12 @@
-const STEP_LABELS = ['Plik', 'Arkusz i rola', 'Mapowanie', 'Suchy przebieg'];
+const STEP_LABELS = [
+  'Plik',
+  'Arkusz i rola',
+  'Mapowanie',
+  'Suchy przebieg',
+  'Zatwierdzenie',
+  'Zapis',
+  'Podsumowanie',
+];
 
 /** Pasek kroków importu (plan/04 sekcja 2). Sam wskaźnik, bez nawigacji. */
 export function ImportSteps({ current }: { current: number }) {

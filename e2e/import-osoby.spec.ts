@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
+import postgres from 'postgres';
 
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
@@ -158,4 +159,68 @@ test.describe('import osób, kroki 1 do 4', () => {
 test('fixture jest syntetyczny, bez prawdziwych danych', () => {
   const bytes = readFileSync(FIXTURE);
   expect(bytes.byteLength).toBeGreaterThan(0);
+});
+
+test.describe('import osób, kroki 5 do 7', () => {
+  // Ten blok naprawdę pisze do bazy, z której korzysta serwer deweloperski.
+  // ponytail: sprzątanie po znaczniku najwyższego id sprzed testu, czyli
+  // kasujemy wyłącznie wiersze wstawione przez ten test. Osobna baza dla e2e
+  // to szersza zmiana środowiska, opisana jako znalezisko w F7.
+  const sql = postgres(process.env.DATABASE_URL!, { prepare: false, max: 2 });
+  let znacznik = 0;
+
+  test.beforeAll(async () => {
+    const [row] = await sql`select coalesce(max(id), 0)::int as id from artists`;
+    znacznik = row.id as number;
+  });
+
+  test.afterAll(async () => {
+    await sql`delete from artists where id > ${znacznik}`;
+    await sql.end();
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await zaloguj(page);
+    await page.goto('/import/osoby');
+    await wgrajFixture(page);
+    await doMapowania(page);
+    await page.getByTestId('import-do-podgladu').click();
+    await page.getByTestId('import-do-zatwierdzenia').click();
+    await expect(page.getByTestId('import-do-zapisu')).toBeVisible();
+  });
+
+  // Tabela zdarzeń: zapis nie powiódł się.
+  test('błąd zapisu zachowuje formularz i nie zostawia danych', async ({ page }) => {
+    await page.route('**/api/import/people/save', (route) =>
+      route.fulfill({ status: 500, body: 'boom' }),
+    );
+    await page.getByTestId('import-zapisz').click();
+
+    await expect(page.getByTestId('import-blad-zapisu')).toContainText('HTTP 500');
+    // Formularz zachowany: krok 5 dalej stoi, z tym samym wyborem i liczbami.
+    await expect(page.getByLabel('Duplikaty pewne, czyli ten sam handle albo email')).toBeVisible();
+    await expect(page.getByTestId('import-zapisz')).toBeEnabled();
+  });
+
+  // Tabela zdarzeń: trwający zapis oraz sukces z podsumowaniem.
+  test('zapis pokazuje licznik paczek, potem podsumowanie', async ({ page }) => {
+    const zapisano = page.getByTestId('import-do-zapisu');
+    await expect(zapisano).toContainText('nowych');
+
+    await page.getByTestId('import-zapisz').click();
+    await expect(page.getByTestId('import-zapisz')).toBeDisabled();
+    await expect(page.getByTestId('import-postep')).toContainText('paczka');
+
+    const podsumowanie = page.getByTestId('import-podsumowanie');
+    await expect(podsumowanie).toBeVisible({ timeout: 30_000 });
+    await expect(podsumowanie).toContainText('Dodano 975');
+    const link = page.getByTestId('import-link-lista');
+    await expect(link).toHaveText('Przejdź do artystów');
+    await expect(link).toHaveAttribute('href', '/artists');
+
+    const pobranie = page.waitForEvent('download');
+    await page.getByTestId('import-pobierz-bledy').click();
+    const plik = await pobranie;
+    expect(plik.suggestedFilename()).toBe('import-bledy.csv');
+  });
 });

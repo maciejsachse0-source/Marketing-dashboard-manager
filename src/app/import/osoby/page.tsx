@@ -1,40 +1,12 @@
 import { PageShell } from '@/components/page-shell';
 import { ImportShell } from '@/components/import/import-shell';
 import { db, schema } from '@/lib/db';
-import type { ExistingPerson } from '@/lib/import/dedup';
+import { existingPeople } from '@/lib/import/existing';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ImportPeoplePage() {
-  const [artists, videographers] = await Promise.all([
-    db.query.artists.findMany({ orderBy: schema.artists.name }),
-    db.query.videographers.findMany({ orderBy: schema.videographers.name }),
-  ]);
-
-  const existing: ExistingPerson[] = [
-    ...artists.map((row) => ({
-      id: row.id,
-      role: 'artist' as const,
-      name: row.name,
-      handle: row.handle,
-      email: row.email,
-      phone: row.phone,
-      location: row.location,
-      status: null,
-      notes: row.notes,
-    })),
-    ...videographers.map((row) => ({
-      id: row.id,
-      role: 'videographer' as const,
-      name: row.name,
-      handle: row.handle,
-      email: row.email,
-      phone: row.phone,
-      location: row.location,
-      status: row.status,
-      notes: row.notes,
-    })),
-  ];
+  const existing = await existingPeople(db, schema);
 
   return (
     <PageShell

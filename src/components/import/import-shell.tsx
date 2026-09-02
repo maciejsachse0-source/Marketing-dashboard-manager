@@ -2,23 +2,29 @@
 
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ImportConfirm } from './import-confirm';
 import { ImportDropzone } from './import-dropzone';
-import { ImportMapping } from './import-mapping';
+import { ImportMappingStep } from './import-mapping-step';
 import { ImportPreview } from './import-preview';
+import { ImportProgress } from './import-progress';
 import { ImportSource } from './import-source';
 import { ImportSteps } from './import-steps';
-import type { ExistingPerson } from '@/lib/import/dedup';
+import { ImportSummary } from './import-summary';
+import { useImportSave } from './use-import-save';
+import type { DuplicatePolicy, ExistingPerson } from '@/lib/import/dedup';
 import { dryRun } from '@/lib/import/dry-run';
 import { autoMap, mappingConflicts, type PersonField } from '@/lib/import/mapping';
 import type { PersonRole } from '@/lib/import/normalize';
+import type { SaveCounts } from '@/lib/import/save';
 
 type Cell = string | number | boolean | null;
 export type SheetData = { name: string; headers: string[]; rows: Cell[][] };
 
 /**
- * Kroki 1 do 4 importu osób (plan/04 sekcja 2). Suchy przebieg liczy się w
- * przeglądarce z tych samych funkcji, których na serwerze użyje zapis, więc
- * zmiana mapowania przelicza podgląd bez ponownego wysyłania pliku.
+ * Kroki 1 do 7 importu osób (plan/04 sekcja 2). Suchy przebieg liczy się w
+ * przeglądarce z tych samych funkcji, których na serwerze używa zapis, więc
+ * zmiana mapowania przelicza podgląd bez ponownego wysyłania pliku, a serwer
+ * i tak liczy plan od zera, zanim cokolwiek zapisze.
  */
 export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
   const [step, setStep] = useState(1);
@@ -28,12 +34,15 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
   const [sheetIndex, setSheetIndex] = useState(0);
   const [role, setRole] = useState<PersonRole>('artist');
   const [mapping, setMapping] = useState<(PersonField | null)[]>([]);
+  const [policy, setPolicy] = useState<DuplicatePolicy>('skip');
+  const [counts, setCounts] = useState<SaveCounts | null>(null);
+  const { saving, progress, error: saveError, save } = useImportSave();
 
   const sheet = sheets[sheetIndex];
   const conflicts = useMemo(() => mappingConflicts(mapping), [mapping]);
   const result = useMemo(
-    () => dryRun(sheet?.rows ?? [], mapping, role, existing, 'skip'),
-    [sheet, mapping, role, existing],
+    () => dryRun(sheet?.rows ?? [], mapping, role, existing, policy),
+    [sheet, mapping, role, existing, policy],
   );
 
   const upload = async (file: File) => {
@@ -58,19 +67,17 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
     }
   };
 
-  const openMapping = () => {
-    setMapping(autoMap(sheets[sheetIndex].headers, role));
-    setStep(3);
-  };
-
-  const setColumn = (index: number, field: PersonField | null) => {
-    setMapping((prev) => prev.map((value, i) => (i === index ? field : value)));
+  const zapisz = async () => {
+    const wynik = await save({ role, policy, mapping, rows: sheet.rows });
+    setCounts(wynik);
   };
 
   const restart = () => {
     setSheets([]);
     setMapping([]);
     setServerError(null);
+    setCounts(null);
+    setPolicy('skip');
     setStep(1);
   };
 
@@ -92,7 +99,10 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
           onSheet={setSheetIndex}
           onRole={setRole}
           onBack={restart}
-          onNext={openMapping}
+          onNext={() => {
+            setMapping(autoMap(sheets[sheetIndex].headers, role));
+            setStep(3);
+          }}
         />
       </Ramka>
     );
@@ -101,43 +111,63 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
   if (step === 3) {
     return (
       <Ramka step={3}>
-        <ImportMapping
-          headers={sheet.headers}
+        <ImportMappingStep
+          sheet={sheet}
           mapping={mapping}
           role={role}
           conflicts={conflicts}
-          sample={sheet.rows[0] ?? []}
-          onChange={setColumn}
+          result={result}
+          onChange={(index, field) =>
+            setMapping((prev) => prev.map((value, i) => (i === index ? field : value)))
+          }
+          onBack={() => setStep(2)}
+          onNext={() => setStep(4)}
         />
-        <p data-testid="import-podsumowanie-na-zywo" className="text-sm text-muted-foreground">
-          Suchy przebieg: {result.inserts} nowych, {result.skips} duplikatów, {result.errors} z
-          błędem
-        </p>
-        <NazwaBrakuje mapping={mapping} />
+      </Ramka>
+    );
+  }
+
+  if (step === 4) {
+    return (
+      <Ramka step={4}>
+        <ImportPreview result={result} />
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setStep(2)}>
-            Wróć
+          <Button variant="secondary" onClick={() => setStep(3)}>
+            Wróć do mapowania
           </Button>
-          <Button
-            data-testid="import-do-podgladu"
-            onClick={() => setStep(4)}
-            disabled={conflicts.length > 0 || !mapping.includes('name')}
-          >
-            Pokaż suchy przebieg
+          <Button data-testid="import-do-zatwierdzenia" onClick={() => setStep(5)}>
+            Dalej
           </Button>
         </div>
       </Ramka>
     );
   }
 
+  if (counts) {
+    return (
+      <Ramka step={7}>
+        <ImportSummary
+          counts={counts}
+          errorRows={result.errorRows}
+          role={role}
+          onRestart={restart}
+        />
+      </Ramka>
+    );
+  }
+
   return (
-    <Ramka step={4}>
-      <ImportPreview result={result} />
-      <div className="flex gap-2">
-        <Button variant="secondary" onClick={() => setStep(3)}>
-          Wróć do mapowania
-        </Button>
-      </div>
+    <Ramka step={saving ? 6 : 5}>
+      <ImportConfirm
+        result={result}
+        policy={policy}
+        saving={saving}
+        error={saveError}
+        onPolicy={setPolicy}
+        onBack={() => setStep(4)}
+        onSave={zapisz}
+      />
+      {saving && progress ? <ImportProgress done={progress.done} total={progress.total} /> : null}
     </Ramka>
   );
 }
@@ -148,14 +178,5 @@ function Ramka({ step, children }: { step: number; children: React.ReactNode }) 
       <ImportSteps current={step} />
       <div className="grid gap-4">{children}</div>
     </div>
-  );
-}
-
-function NazwaBrakuje({ mapping }: { mapping: readonly (PersonField | null)[] }) {
-  if (mapping.includes('name')) return null;
-  return (
-    <p role="alert" className="text-sm text-destructive">
-      Żadna kolumna nie jest zmapowana na pole Nazwa
-    </p>
   );
 }

@@ -47,7 +47,7 @@ export function ImportSource({
         <Label htmlFor="arkusz">Arkusz</Label>
         <Select value={String(sheetIndex)} onValueChange={(value) => onSheet(Number(value))}>
           <SelectTrigger id="arkusz" className="w-full sm:w-80">
-            <SelectValue />
+            <SelectValue>{(value: string) => sheets[Number(value)]?.name ?? ''}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {sheets.map((item, index) => (
@@ -63,7 +63,7 @@ export function ImportSource({
         <Label htmlFor="rola">Rola osób z tego arkusza</Label>
         <Select value={role} onValueChange={(value) => onRole(value as PersonRole)}>
           <SelectTrigger id="rola" className="w-full sm:w-80">
-            <SelectValue />
+            <SelectValue>{(value: PersonRole) => ROLE_LABELS[value]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="artist">{ROLE_LABELS.artist}</SelectItem>
