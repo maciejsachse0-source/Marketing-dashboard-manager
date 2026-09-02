@@ -1,0 +1,123 @@
+// eslint-config-next 16.2.4 ships native flat configs, so there is no FlatCompat
+// here. Going through @eslint/eslintrc crashed ESLint 10 outright
+// ("Converting circular structure to JSON"), and the compat layer bought nothing.
+// The version is pinned in package.json to exactly the `next` version this repo
+// runs; an unpinned range would silently pull rules the framework does not match.
+import coreWebVitals from 'eslint-config-next/core-web-vitals';
+import typescript from 'eslint-config-next/typescript';
+
+export default [
+  {
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'drizzle/migrations/**',
+      'perf/**',
+      'next-env.d.ts',
+    ],
+  },
+
+  ...coreWebVitals,
+  ...typescript,
+
+  {
+    files: ['**/*.{ts,tsx,js,jsx,mjs}'],
+    rules: {
+      // Z11: no NEW function above cyclomatic complexity 10.
+      complexity: ['error', 10],
+    },
+  },
+
+  {
+    // Z3: every action element renders <Button> from src/components/ui/button.tsx.
+    // The rule ships as a WARNING in F0 on purpose: the 89 raw buttons inherited
+    // from before the rebuild would make `npm run lint` red from day one and the
+    // gate would then prove nothing. F3 migrates them and raises this to 'error'.
+    files: ['src/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector: 'JSXOpeningElement[name.name="button"]',
+          message:
+            'Uzyj <Button> z @/components/ui/button. Brakuje wariantu? Dodaj wariant, nie nowy komponent.',
+        },
+      ],
+    },
+  },
+
+  {
+    // GRANDFATHER, kurczy się do zera. Te 47 plików weszły do przebudowy z 91
+    // błędami: 63 x complexity (Z11 dotyczy NOWEGO kodu, zastany wolno zostawić,
+    // ale nie powiększyć), 21 x reguły react-hooks z Reacta 19 (set-state-in-effect,
+    // purity, immutability, refs), 5 x no-unescaped-entities, 2 x
+    // no-html-link-for-pages. Wszystkie mają issues w F7 (F7-01 do F7-05).
+    // Zjechanie na 'warn' TYLKO tutaj trzyma `npm run lint` zielony dla nowego kodu,
+    // zamiast zamieniać całą bramkę w szum, który każdy zaraz zacznie ignorować.
+    // Reguła: z tej listy się WYPISUJEMY, nigdy do niej nie dopisujemy.
+    files: [
+      'drizzle/seed-catalog.ts',
+      'scripts/migrate-templates-flexible.ts',
+      'src/app/api/csv/route.ts',
+      'src/app/calendar/page.tsx',
+      'src/app/campaigns/\\[id\\]/page.tsx',
+      'src/app/page.tsx',
+      'src/app/productions/\\[id\\]/page.tsx',
+      'src/app/productions/list/page.tsx',
+      'src/components/agents/agent-form.tsx',
+      'src/components/analytics/analytics-shell.tsx',
+      'src/components/analytics/csv-dropzone.tsx',
+      'src/components/analytics/post-dialog.tsx',
+      'src/components/artists/artist-dialog.tsx',
+      'src/components/artists/artists-shell.tsx',
+      'src/components/calendar/gantt-toolbar.tsx',
+      'src/components/calendar/gantt-view.tsx',
+      'src/components/campaigns/apply-template-button.tsx',
+      'src/components/campaigns/campaign-periods-editor.tsx',
+      'src/components/campaigns/campaign-template-form.tsx',
+      'src/components/campaigns/campaign-wizard.tsx',
+      'src/components/campaigns/campaigns-list.tsx',
+      'src/components/campaigns/gantt-narrative-row.tsx',
+      'src/components/campaigns/milestones-tracker.tsx',
+      'src/components/campaigns/narrative-section.tsx',
+      'src/components/campaigns/timeline.tsx',
+      'src/components/command-palette.tsx',
+      'src/components/inline-edit.tsx',
+      'src/components/periods-slider.tsx',
+      'src/components/productions/artist-avatar.tsx',
+      'src/components/productions/artist-picker.tsx',
+      'src/components/productions/production-drawer.tsx',
+      'src/components/productions/production-step-row.tsx',
+      'src/components/productions/production-step-tracker.tsx',
+      'src/components/productions/production-wizard.tsx',
+      'src/components/productions/productions-list.tsx',
+      'src/components/productions/t1-start-editor.tsx',
+      'src/components/sidebar.tsx',
+      'src/components/templates/template-form.tsx',
+      'src/components/videographers/videographer-dialog.tsx',
+      'src/lib/agents/widget.ts',
+      'src/lib/category-sequence.ts',
+      'src/lib/csv-mappers.ts',
+      'src/lib/dates.ts',
+      'src/lib/production-work-folder.ts',
+      'src/server/actions/production-folder.ts',
+      'src/server/actions/production-steps.ts',
+      'src/server/actions/productions.ts',
+    ],
+    rules: {
+      complexity: 'warn',
+      'react-hooks/purity': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react-hooks/refs': 'warn',
+      'react/no-unescaped-entities': 'warn',
+      '@next/next/no-html-link-for-pages': 'warn',
+    },
+  },
+
+  {
+    // The primitive itself is the one place a raw <button> is legitimate.
+    files: ['src/components/ui/**/*.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
+];

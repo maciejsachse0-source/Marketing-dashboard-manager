@@ -4,7 +4,6 @@ import * as schema from '../../drizzle/schema';
 import { env } from './env';
 
 declare global {
-  // eslint-disable-next-line no-var
   var __dbClient__: ReturnType<typeof postgres> | undefined;
 }
 

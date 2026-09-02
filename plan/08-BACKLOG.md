@@ -81,7 +81,7 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
   `git status --porcelain | grep -c '.env.local'` zwraca `0`. `.env.example` uzupełniony
   o `PERF_DATABASE_URL`, `TEST_DATABASE_URL`, `DB_POOL_MAX`, każda z komentarzem.
 
-- [ ] **F0-02** `tooling` `test` Przyrządy jakości: typecheck, lint, Vitest, Playwright
+- [x] **F0-02** `tooling` `test` Przyrządy jakości: typecheck, lint, Vitest, Playwright
   CZYTAJ: `plan/06-testy.md` sekcje 1 i 2, `plan/01` zasady Z10 i Z11,
   `plan/05-ui-system.md` sekcja 6
   AC:
@@ -103,6 +103,25 @@ ani `grep -rc` (drukuje licznik per plik, nigdy pojedynczej liczby), ani globów
     ma issue w F7 (nie wolno ich cicho ignorować ani wyciszać w konfiguracji)
   - negatywne: `grep -rn 'eslint-disable' src/ | wc -l` — każde trafienie ma powód
     w tej samej linii (dowód: lista trafień z powodami w raporcie)
+  DOWÓD (2026-09-02): skrypty `typecheck`, `lint`, `test`, `test:watch`, `e2e`, `pg:info`
+  są w `package.json`. `eslint.config.mjs` używa NATYWNYCH flat configów
+  `eslint-config-next/core-web-vitals` i `/typescript` (wersja przypięta na `16.2.4`,
+  bez `^`), ma `complexity: ['error', 10]` i regułę `no-restricted-syntax` blokującą
+  surowy `<button>` na poziomie `warn`. `vitest.config.ts`: `environment: 'jsdom'`
+  plus alias `@` z `tsconfig`. `npm run test` kod 0, 2 pliki, 6 testów: `dates.test.ts`
+  (5 przypadków wokół `toIsoWeekString` i `isoWeekToMonday`, w tym brzegowy
+  2025-12-29 → `2026-W01`) i `button.test.tsx` (render + `fireEvent.click`, handler
+  wołany raz). `npx playwright install chromium` wykonane, `npm run e2e` kod 0,
+  1 scenariusz przechodzi w 5.5 s: logowanie parą z `.env.local`, potem `/calendar`
+  ze statusem 200 i nagłówkiem h1 „Pipeline".
+  `npm run typecheck` kod 0, **0 błędów** z kodu zastanego, więc F7 nie dostaje z tego
+  tytułu żadnego issue. `npm run lint` kod 0: 205 problemów, **0 błędów**, 205 ostrzeżeń
+  (89 surowych guzików, 63 przekroczenia złożoności, 21 reguł react-hooks, 17 nieużywanych
+  zmiennych, reszta drobne). Wszystkie 91 błędów zastanych zjechało na `warn` wyłącznie
+  przez jawną, kurczącą się listę 47 plików w `eslint.config.mjs` i każdy z nich ma issue:
+  F7-01 do F7-07.
+  `grep -rn 'eslint-disable' src/ | wc -l` zwraca `0` (jedyna dyrektywa, `no-var`
+  w `src/lib/db.ts`, była martwa i bez powodu, więc została usunięta zamiast opisana).
 
 - [ ] **F0-03** `perf` `db` Zestaw L
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 2
@@ -642,6 +661,81 @@ Waga `blokujące` przerywa pracę i idzie do usera.
 Wiadome już teraz, do dopisania przez pierwszego workera, który je potwierdzi:
 błędy `typecheck` z kodu zastanego (F0-02), przeniesienie danych z `videographers.contact`
 do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gantem (F2-02).
+
+- [ ] **F7-01** `znalezisko` `ui` Reguła `react-hooks/set-state-in-effect` w 10 komponentach
+  Waga: **ważne**. Szacunek: 1 dzień.
+  Znalezione w F0-02, gdy ESLint ruszył pierwszy raz. `setState` wołany wprost
+  w `useEffect` to dodatkowy przebieg renderu na każdą zmianę, czyli dokładnie ta klasa
+  kosztu, którą F2 i F3 mają usuwać. Pliki: `analytics/post-dialog.tsx`,
+  `artists/artist-dialog.tsx`, `campaigns/campaign-periods-editor.tsx`,
+  `campaigns/narrative-section.tsx`, `command-palette.tsx`, `inline-edit.tsx`,
+  `productions/production-drawer.tsx`, `productions/t1-start-editor.tsx`, `sidebar.tsx`,
+  `videographers/videographer-dialog.tsx` (11 trafień).
+  AC:
+  - `npx eslint . -f json` nie zawiera już trafień reguły `react-hooks/set-state-in-effect`
+    (dowód: `npx eslint . -f json | grep -c set-state-in-effect` zwraca `0`)
+  - te 10 plików wypisane z listy grandfather w `eslint.config.mjs`
+  - `npm run test` i `npm run e2e` nadal kod 0, czyli zachowanie się nie zmieniło
+
+- [ ] **F7-02** `znalezisko` `perf` Reguła `react-hooks/purity` w 6 plikach, w tym w gancie
+  Waga: **ważne**. Szacunek: pół dnia.
+  „Cannot call impure function during render", 6 trafień. `gantt-view.tsx` jest wśród nich,
+  a to główny podejrzany o zawieszki z A5, więc to znalezisko wchodzi w drogę F2.
+  Pliki: `app/campaigns/[id]/page.tsx`, `app/productions/[id]/page.tsx`,
+  `calendar/gantt-view.tsx`, `campaigns/campaigns-list.tsx`,
+  `campaigns/gantt-narrative-row.tsx`, `productions/production-drawer.tsx`.
+  AC:
+  - `npx eslint . -f json | grep -c 'react-hooks/purity'` zwraca `0`
+  - pomiar `/calendar` z harnessu przed i po, obie liczby w `DECISIONS.md`
+  - te 6 plików wypisane z listy grandfather
+
+- [ ] **F7-03** `znalezisko` `ui` `react-hooks/immutability` i `react-hooks/refs`
+  Waga: **drobne**. Szacunek: 2 godziny.
+  4 trafienia: mutacja wartości traktowanej przez Reacta jako niezmienna
+  (`periods-slider.tsx`, `templates/template-form.tsx`) oraz czytanie refa w renderze
+  (`campaigns/campaign-periods-editor.tsx`).
+  AC:
+  - `npx eslint . -f json | grep -cE 'react-hooks/(immutability|refs)'` zwraca `0`
+  - te 3 pliki wypisane z listy grandfather
+
+- [ ] **F7-04** `znalezisko` `ui` Dwa `<a href>` na trasy wewnętrzne zamiast `<Link>`
+  Waga: **drobne**. Szacunek: 15 minut.
+  `@next/next/no-html-link-for-pages`, 2 trafienia: `campaigns/apply-template-button.tsx`
+  i `campaigns/campaign-wizard.tsx`. Surowy `<a>` na trasę wewnętrzną robi pełne
+  przeładowanie strony zamiast nawigacji klientem, czyli traci cały cache routera.
+  AC:
+  - `npx eslint . -f json | grep -c 'no-html-link-for-pages'` zwraca `0`
+  - kliknięcie obu linków w przeglądarce nie przeładowuje dokumentu (dowód: scenariusz
+    e2e sprawdzający, że wartość ustawiona w `window` przed kliknięciem przeżywa nawigację)
+
+- [ ] **F7-05** `znalezisko` `ui` Pięć niezaescapowanych apostrofów i cudzysłowów w JSX
+  Waga: **drobne**. Szacunek: 15 minut.
+  `react/no-unescaped-entities` w `campaigns/campaign-periods-editor.tsx`,
+  `command-palette.tsx`, `templates/template-form.tsx`.
+  AC:
+  - `npx eslint . -f json | grep -c 'no-unescaped-entities'` zwraca `0`
+
+- [ ] **F7-06** `znalezisko` `tooling` 63 funkcje ponad progiem złożoności 10
+  Waga: **ważne**. Szacunek: rozłożone na F2 i F3, nie w jednym podejściu.
+  Z11 chroni NOWY kod, więc zastane funkcje są świadomie zgrandfatherowane, ale
+  lista ma się kurczyć. Najgorsze: `setStepDate` 18, `resolveCategorySequence` 18,
+  `CampaignDetailPage` 18, `ProductionDetailPage` 18, `mapYouTubeRow` 17.
+  AC:
+  - po zakończeniu F3 liczba trafień reguły `complexity` spada o co najmniej połowę
+    (dowód: `npx eslint . -f json | grep -c '\"complexity\"'` przed i po, obie liczby
+    w raporcie fazy)
+  - żadna funkcja dotknięta w F1 do F6 nie zostaje z złożonością wyższą niż zastana
+
+- [ ] **F7-07** `znalezisko` `tooling` 17 nieużywanych zmiennych i importów
+  Waga: **drobne**. Szacunek: 1 godzina.
+  `@typescript-eslint/no-unused-vars`, 17 ostrzeżeń. Część to prawdopodobnie
+  niedokończone refaktory (`totalPlay`, `watchHours`, `ctr` w `csv-mappers.ts`,
+  `StepDateMode` w `production-steps.ts`, `stamp` w `campaigns.ts`) i każde z nich
+  jest pytaniem, czy jakiejś metryki nie gubimy po cichu.
+  AC:
+  - `npx eslint . -f json | grep -c 'no-unused-vars'` zwraca `0`
+  - dla każdej usuniętej zmiennej sprawdzone, czy nie miała być użyta; przypadki
+    „miała być" opisane w `DECISIONS.md` zamiast po cichu skasowane
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
