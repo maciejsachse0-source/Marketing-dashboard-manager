@@ -1461,6 +1461,26 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - negatywne: `npm run test` kod 0, treść promptów agentów bajt w bajt bez zmian
     (`git diff -- data/agents | grep '"systemPrompt"' | wc -l` zwraca `0`)
 
+- [ ] **F7-18** `znalezisko` `test` `tooling` `npx playwright test` po cichu bierze
+  cudzy serwer i cudzą bazę
+  Znalezione przy zamykaniu F3. `playwright.config.ts` ma `reuseExistingServer: true`,
+  więc gdy na porcie 3000 stoi cokolwiek innego niż `npm run dev` (na przykład
+  `npm run perf:serve`, czyli build produkcyjny na bazie `marketing_perf`), testy
+  puszczają się na tamtym serwerze i tamtej bazie bez jednego słowa ostrzeżenia. Efekt:
+  dwa czerwone testy, których treść sugeruje regresję w kodzie („element nie znaleziony",
+  „brak szablonu kampanii"), a naprawdę mówią tylko tyle, że baza nie ma danych.
+  Wersja z ubitym serwerem produkcyjnym: 8 zielonych, ten sam kod.
+  Waga: **drobne**, ale kosztuje godzinę fałszywego tropu za każdym razem.
+  AC:
+  - przed pierwszym testem uruchamia się sprawdzenie, które porównuje bazę
+    używaną przez serwer pod `E2E_BASE_URL` z oczekiwaną (`marketing`) i przerywa
+    przebieg z czytelnym komunikatem, gdy się różnią; najtańsza droga to endpoint
+    diagnostyczny albo `globalSetup` wołający istniejącą stronę i sprawdzający znacznik
+  - dowód: `npm run perf:serve` w tle plus `npx playwright test` kończy się komunikatem
+    o niewłaściwym serwerze, a nie dwoma czerwonymi testami
+  - negatywne: przy poprawnie wystawionym `npm run dev` przebieg nadal daje 8 zielonych
+    i nie wydłuża się o więcej niż 2 sekundy
+
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
 

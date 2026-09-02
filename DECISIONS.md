@@ -536,3 +536,58 @@ Dwie rzeczy, których nie da się wyczytać z klas:
    wyłącznie jasność. Skupiska po 82 do 85 pikseli na znacznik są tym, nie regresją;
    licznik rośnie z liczbą produkcji w bazie, więc po każdym przebiegu `npx playwright
    test` (który dosiewa dane) trzeba wziąć nowy zrzut odniesienia.
+
+## F3 — raport fazy (2026-09-02)
+
+**Co faza miała zrobić:** wyzerować surowe `<button>`, zamknąć regułę lintu na guzik,
+ustawić kanon typografii i ikon oraz rozbić trzy przerośnięte pliki.
+
+**Stan po fazie, liczby zmierzone, nie przepisane z planu:**
+
+- `grep -r '<button' src/ | wc -l` = **0** (start fazy: 89), `<Button>` = 146.
+  Reguła `no-restricted-syntax` w `eslint.config.mjs` jest błędem z pustą listą wyjątków.
+- `node scripts/check-typography.mjs` = **0 trafień** (przed F3-06: 234, czyli 5 emoji,
+  70 wyśrodkowanych kropek, 159 długich myślników w literałach i tekstach JSX).
+- `grep -rn 'border-l-' src/ | wc -l` = 4, wszystkie funkcjonalne, ozdobny lewy pasek
+  akcentu z kafelka „Wskazówka" usunięty.
+- Trzy pliki rozbite: `template-form.tsx` 1250 → 552, `campaign-template-form.tsx`
+  792 → 580, `timeline.tsx` 735 → 228. Jedenaście nowych plików, największy 202 linie.
+- `npm run typecheck` kod 0, `npm run lint` kod 0 (108 ostrzeżeń, na starcie fazy 111,
+  zero błędów, ani jednego dopisku do listy grandfathera), `npm run test` 29 zielonych
+  (na starcie 21), `npx playwright test` 8 zielonych, `npm run perf` kod 0
+  (bundel `/calendar` 292,2 kB przy progu 301,6 kB).
+
+**Decyzja: długi myślnik zamieniamy na krótki z odstępami, nie na przecinek.**
+Zasada Z7 dopuszcza trzy zamienniki (przecinek, dwukropek, krótki myślnik z odstępami).
+Dla 159 wystąpień jedyny zamiennik, który nigdzie nie zmienia sensu zdania ani nie
+wymaga czytania każdego zdania z osobna, to krótki myślnik: „Krok 1 - Szablon" znaczy
+dokładnie to samo co „Krok 1 — Szablon", a „Krok 1, Szablon" już nie. Wyśrodkowana
+kropka poszła na przecinek, bo tam zawsze rozdziela dwie równorzędne informacje.
+
+**Decyzja: sprawdzanie typografii przez parser, nie przez grep.** Zasada Z7 wyłącza
+komentarze w kodzie, a grep nie odróżnia komentarza od literału i podaje o kilkadziesiąt
+trafień za dużo. `scripts/check-typography.mjs` chodzi po drzewie TypeScriptu i patrzy
+wyłącznie na węzły tekstowe. Ten sam parser posłużył do zamiany, więc żadna nazwa klasy
+ani komentarz nie zostały ruszone. Skrypt zostaje w repo jako bramka do ponownego użycia.
+
+**Decyzja: nowy kod nie wchodzi na listę grandfathera lintu.** Wyjęcie kodu z wielkich
+plików do nowych zamienia ostrzeżenia w błędy, bo nowe ścieżki nie są objęte wyjątkiem.
+Za każdym razem naprawialiśmy przyczynę, nie dopisywali pliku do listy: uchwyt
+`pointermove` w suwaku okresów dostał czystą funkcję `patchForDrag`, `StepRow` oddał
+panel ustawień do `StepDetails`, `ProductionRow` oddał lewą komórkę do
+`ProductionRowLabel` i pasek postępu do `StepsProgress`. Przy okazji zmierzone:
+do złożoności cyklomatycznej liczy się także `?.` i `??`, więc komponent, który tylko
+czyta opcjonalne pola, potrafi przekroczyć próg bez ani jednego `if`.
+
+**Obalona hipoteza: „e2e pada, więc coś zepsuliśmy".** Po F3-08 `npx playwright test`
+pokazał 2 czerwone. Przyczyną nie był kod, tylko `reuseExistingServer: true`
+w `playwright.config.ts`: na porcie 3000 stał wtedy serwer produkcyjny z `npm run perf:serve`,
+czyli baza `marketing_perf` bez szablonów kampanii, których szuka test. Po ubiciu go
+i podniesieniu `npm run dev` wszystkie 8 testów jest zielonych. Pułapka opisana jako
+issue **F7-18**, bo cisza przy podmianie bazy pod testami to błąd narzędzia, nie
+jednorazowa pomyłka.
+
+**Świadomie nierozbite:** `campaign-template-form.tsx` zostaje na 580 liniach.
+Wydzielenie sekcji kamieni milowych wymagałoby przepchnięcia dziesięciu uchwytów przez
+granicę komponentu, czyli więcej kodu niż zostaje w środku. Kryterium mówi o NOWYCH
+plikach i to jest spełnione; plik zastany wolno zostawić, byle nie rósł.
