@@ -441,13 +441,13 @@ export function CampaignTemplateForm({
             >
               <Plus className="w-3 h-3 mr-1" /> Dodaj okres
             </Button>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={resetPeriods}
-              className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition"
+              className="h-auto border-0 p-0 font-normal hover:bg-transparent text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition"
             >
               Domyślne
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -646,44 +646,44 @@ function MilestoneRow({
           {milestone.submilestones.length} sub.
         </span>
         <div className="flex items-center gap-0.5 shrink-0">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            className="h-auto border-0 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń wyżej"
             aria-label="Przesuń wyżej"
           >
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <ArrowUp className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            className="h-auto border-0 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń niżej"
             aria-label="Przesuń niżej"
           >
-            <ArrowDown className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <ArrowDown className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={onRemove}
-            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+            className="h-auto border-0 p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
             title="Usuń milestone"
             aria-label="Usuń milestone"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <Trash2 className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setExpanded((v) => !v)}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted ui-transition"
+            className="h-auto border-0 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted ui-transition"
             aria-expanded={expanded}
             title={expanded ? 'Zwiń' : 'Rozwiń'}
           >
-            <ChevronDown className={`w-3.5 h-3.5 ui-transition ${expanded ? 'rotate-180' : ''}`} />
-          </button>
+            <ChevronDown className={`size-3.5 ui-transition ${expanded ? 'rotate-180' : ''}`} />
+          </Button>
         </div>
       </div>
 
@@ -738,35 +738,35 @@ function MilestoneRow({
                         maxLength={120}
                         className="flex-1 h-7 text-xs"
                       />
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
                         onClick={() => onMoveSub(sIdx, -1)}
                         disabled={sIdx === 0}
-                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+                        className="h-auto border-0 p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
                         title="Przesuń wyżej"
                         aria-label="Przesuń wyżej"
                       >
-                        <ArrowUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        type="button"
+                        <ArrowUp className="size-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
                         onClick={() => onMoveSub(sIdx, 1)}
                         disabled={sIdx === milestone.submilestones.length - 1}
-                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+                        className="h-auto border-0 p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
                         title="Przesuń niżej"
                         aria-label="Przesuń niżej"
                       >
-                        <ArrowDown className="w-3 h-3" />
-                      </button>
-                      <button
-                        type="button"
+                        <ArrowDown className="size-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
                         onClick={() => onRemoveSub(sIdx)}
-                        className="p-0.5 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+                        className="h-auto border-0 p-0.5 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
                         title="Usuń submilestone"
                         aria-label="Usuń submilestone"
                       >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                        <Trash2 className="size-3" />
+                      </Button>
                     </div>
                     <Textarea
                       value={s.description ?? ''}

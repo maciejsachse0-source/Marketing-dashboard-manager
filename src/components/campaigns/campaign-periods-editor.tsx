@@ -278,11 +278,11 @@ export function CampaignPeriodsEditor({
             {HORIZON_OPTIONS.map((opt) => {
               const active = horizonDays === opt.days;
               return (
-                <button
+                <Button
                   key={opt.label}
-                  type="button"
+                  variant="ghost"
                   onClick={() => setHorizonDays(opt.days)}
-                  className={`px-2 py-1 rounded border text-[11px] font-medium tracking-tight ui-transition ${
+                  className={`h-auto px-2 py-1 rounded border bg-clip-border text-[11px] font-medium tracking-tight ui-transition ${
                     active
                       ? 'bg-foreground text-background border-foreground'
                       : 'bg-background text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground'
@@ -290,7 +290,7 @@ export function CampaignPeriodsEditor({
                   title={opt.title}
                 >
                   {opt.label}
-                </button>
+                </Button>
               );
             })}
           </div>

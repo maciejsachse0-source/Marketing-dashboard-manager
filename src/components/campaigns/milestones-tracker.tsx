@@ -335,11 +335,11 @@ function PeriodBucket({
               className={`rounded-lg border bg-card transition ${isDone ? 'opacity-80' : ''}`}
             >
               <div className="flex items-start gap-2 px-3 py-2">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={handleParentClick}
                   disabled={pending}
-                  className={`mt-0.5 grid place-items-center w-5 h-5 rounded-full border-2 shrink-0 ui-transition cursor-pointer ${
+                  className={`mt-0.5 grid place-items-center w-5 h-5 p-0 rounded-full border-2 bg-clip-border shrink-0 ui-transition cursor-pointer ${
                     isDone
                       ? 'bg-emerald-500 border-emerald-600 text-white'
                       : isMixed
@@ -355,16 +355,16 @@ function PeriodBucket({
                         ? 'Odznacz'
                         : 'Zaznacz jako zrobione'
                   }
-                  aria-label="Toggle milestone"
+                  aria-label="Przełącz fazę"
                 >
                   {isDone ? (
-                    <Check className="w-3 h-3" strokeWidth={3} />
+                    <Check className="size-3" strokeWidth={3} />
                   ) : isMixed ? (
-                    <MinusCircle className="w-3 h-3" strokeWidth={2.5} />
+                    <MinusCircle className="size-3" strokeWidth={2.5} />
                   ) : (
-                    <Circle className="w-3 h-3" strokeWidth={2} />
+                    <Circle className="size-3" strokeWidth={2} />
                   )}
-                </button>
+                </Button>
                 <div className="flex-1 min-w-0">
                   <div
                     className={`text-sm font-semibold leading-snug flex items-baseline gap-1.5 ${isDone ? 'line-through text-muted-foreground' : ''}`}
@@ -396,16 +396,16 @@ function PeriodBucket({
                     />
                   </div>
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => onRemoveMilestone(m.id, m.label)}
                   disabled={pending}
-                  className="p-1 rounded text-muted-foreground/50 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0"
+                  className="h-auto border-0 p-1 rounded text-muted-foreground/50 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0"
                   title="Usuń milestone"
-                  aria-label="Delete milestone"
+                  aria-label="Usuń milestone"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                  <Trash2 className="size-3.5" />
+                </Button>
               </div>
 
               <ul className="border-t border-border/60 px-3 py-2 space-y-1.5">
@@ -414,20 +414,20 @@ function PeriodBucket({
                   const subStepNo = `${stepNo}.${sIdx + 1}`;
                   return (
                     <li key={s.id} className="flex items-start gap-2 group">
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
                         onClick={() => onToggle(m.id, s.id)}
                         disabled={pending}
-                        className={`mt-0.5 grid place-items-center w-4 h-4 rounded-md border-2 shrink-0 ui-transition ${
+                        className={`mt-0.5 grid place-items-center w-4 h-4 p-0 rounded-md border-2 bg-clip-border shrink-0 ui-transition ${
                           sDone
                             ? 'bg-emerald-500 border-emerald-600 text-white'
                             : 'bg-card border-border text-transparent hover:border-foreground/40 cursor-pointer'
                         }`}
                         title={sDone ? 'Odznacz' : 'Zaznacz jako zrobione'}
-                        aria-label="Toggle submilestone"
+                        aria-label="Przełącz krok fazy"
                       >
-                        {sDone ? <Check className="w-2.5 h-2.5" strokeWidth={3} /> : null}
-                      </button>
+                        {sDone ? <Check className="size-2.5" strokeWidth={3} /> : null}
+                      </Button>
                       <div className="flex-1 min-w-0">
                         <div
                           className={`text-xs leading-snug flex items-baseline gap-1 ${sDone ? 'line-through text-muted-foreground' : ''}`}
@@ -462,16 +462,16 @@ function PeriodBucket({
                           </div>
                         )}
                       </div>
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
                         onClick={() => onRemoveSubmilestone(m.id, s.id, s.label)}
                         disabled={pending}
-                        className="p-1 rounded text-muted-foreground/30 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0 opacity-0 group-hover:opacity-100"
+                        className="h-auto border-0 p-1 rounded text-muted-foreground/30 hover:text-rose-600 hover:bg-rose-50 ui-transition shrink-0 opacity-0 group-hover:opacity-100"
                         title="Usuń krok"
-                        aria-label="Delete submilestone"
+                        aria-label="Usuń krok fazy"
                       >
-                        <X className="w-3 h-3" />
-                      </button>
+                        <X className="size-3" />
+                      </Button>
                     </li>
                   );
                 })}
@@ -533,14 +533,14 @@ function AddInline({
 
   if (!open) {
     return (
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => setOpen(true)}
         disabled={pending}
-        className={`w-full text-left text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 ui-transition italic`}
+        className={`block h-auto border-0 w-full text-left text-[11px] px-2 py-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 ui-transition italic`}
       >
         {placeholder}
-      </button>
+      </Button>
     );
   }
   return (

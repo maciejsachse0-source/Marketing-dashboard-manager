@@ -250,10 +250,10 @@ function TemplateCard({
   const totalSubs = template.milestones.reduce((s, m) => s + m.submilestones.length, 0);
   const periods = resolvePeriods(template.periods);
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className={`group text-left rounded-lg border p-3.5 ui-transition ${
+      className={`group block h-auto font-normal whitespace-normal text-left rounded-lg border bg-clip-border p-3.5 ui-transition ${
         active
           ? 'border-primary bg-primary/10 shadow-sm'
           : 'border-border hover:border-foreground/30 hover:bg-muted/30'
@@ -288,7 +288,7 @@ function TemplateCard({
           );
         })}
       </div>
-    </button>
+    </Button>
   );
 }
 

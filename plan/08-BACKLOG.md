@@ -764,12 +764,29 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   `animate-pulse`. Negatywne: `npm run test` 21 testów zielonych, `npx playwright test`
   8 scenariuszy zielonych, `npm run typecheck` kod 0.
 
-- [ ] **F3-03** `ui` Migracja guzików: kampanie (20 sztuk)
+- [x] **F3-03** `ui` Migracja guzików: kampanie (20 sztuk)
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5
   AC:
   - `grep -r '<button' src/components/campaigns | wc -l` zwraca `0` (dziś 20)
   - warianty i `aria-label` jak w F3-02; zrzuty przed i po dla ekranu kampanii
   - negatywne: `grep -r '<div onClick\|<span onClick' src/components/campaigns | wc -l` zwraca `0`
+  DOWÓD (2026-09-02): `grep -r '<button' src/components/campaigns | wc -l` = 0 (przed: 20),
+  siedem plików. Wszystkie na `<Button variant="ghost">`; guziki bez tekstu mają `aria-label`.
+  Przy okazji trzy etykiety `aria-label` po angielsku (`Toggle milestone`,
+  `Toggle submilestone`, `Delete milestone`, `Delete submilestone`) przetłumaczone na polski,
+  bo migracja i tak dotykała tych linii. Guzik „Usuń kampanię" korzysta z nowego `loading`
+  z F3-01 zamiast ręcznej podmiany ikony. Wygląd: cztery ekrany i jedno okno modalne,
+  wszystkie **0 pikseli różnicy** (`node scripts/perf/pngdiff.mjs`):
+  `screenshots/F3/przed-F3-03-campaigns.png`, `-campaigns_1.png`, `-campaigns_templates.png`,
+  `-campaigns_templates_premiera-singla_edit.png` i `-wizard.png` (kreator kampanii otwarty
+  skryptem, karty szablonów są tylko w oknie modalnym) wobec odpowiedników `po-F3-03-*`.
+  Dwa odchylenia wykryte i usunięte przed zaliczeniem: `font-medium` z klasy bazowej
+  pogrubiało napis „Domyślne" (293 piksele) i teksty w kartach szablonów (11 523 piksele);
+  naprawa: `font-normal` w klasie guzika. Karta „Zastosuj szablon" ma ten sam kształt co
+  karta w kreatorze i tę samą poprawkę, ale jej okno modalne pojawia się wyłącznie dla
+  kampanii bez milestone'ów, więc dowodem jest zrzut kreatora. Negatywne: `<div onClick>`
+  i `<span onClick>` = 0, `npm run test` 21 zielonych, `npx playwright test` 8 zielonych,
+  `npm run typecheck` kod 0.
 
 - [ ] **F3-04** `ui` Migracja guzików: produkcje (32 sztuki)
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5

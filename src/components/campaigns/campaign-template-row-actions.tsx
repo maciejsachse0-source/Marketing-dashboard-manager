@@ -8,6 +8,7 @@ import {
   deleteMarketingTemplate,
   duplicateMarketingTemplate,
 } from '@/server/actions/campaign-templates';
+import { Button } from '@/components/ui/button';
 
 export function CampaignTemplateRowActions({ slug, name }: { slug: string; name: string }) {
   const router = useRouter();
@@ -47,26 +48,26 @@ export function CampaignTemplateRowActions({ slug, name }: { slug: string; name:
 
   return (
     <div className="flex items-center gap-1">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={onDuplicate}
         disabled={pending}
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted ui-transition disabled:opacity-50"
+        className="h-auto border-0 gap-1 px-2 py-1 rounded-md text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted ui-transition disabled:opacity-50"
         title="Sklonuj jako nowy szablon"
       >
-        <Copy className="w-3 h-3" />
+        <Copy className="size-3" />
         Klonuj
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
+        variant="ghost"
         onClick={onDelete}
         disabled={pending}
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold text-muted-foreground hover:text-rose-700 hover:bg-rose-50 ui-transition disabled:opacity-50"
+        className="h-auto border-0 gap-1 px-2 py-1 rounded-md text-[11px] font-semibold text-muted-foreground hover:text-rose-700 hover:bg-rose-50 ui-transition disabled:opacity-50"
         title={`Usuń szablon "${name}"`}
       >
-        <Trash2 className="w-3 h-3" />
+        <Trash2 className="size-3" />
         Usuń
-      </button>
+      </Button>
     </div>
   );
 }

@@ -134,10 +134,10 @@ function TemplateOption({
     0,
   );
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className={`text-left rounded-lg border p-3.5 ui-transition ${
+      className={`block h-auto font-normal whitespace-normal text-left rounded-lg border bg-clip-border p-3.5 ui-transition ${
         active
           ? 'border-primary bg-primary/10 shadow-sm'
           : 'border-border hover:border-foreground/30 hover:bg-muted/30'
@@ -167,6 +167,6 @@ function TemplateOption({
           );
         })}
       </div>
-    </button>
+    </Button>
   );
 }

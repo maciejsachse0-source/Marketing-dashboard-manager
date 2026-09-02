@@ -20,6 +20,7 @@ import {
 } from '@/components/campaigns/campaign-inline-fields';
 import { CampaignPeriodsEditor } from '@/components/campaigns/campaign-periods-editor';
 import type { CampaignPhase } from '../../../drizzle/schema';
+import { Button } from '@/components/ui/button';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -101,18 +102,18 @@ export function CampaignGanttNarrativeRow({
             >
               {campaign.name}
             </Link>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setExpanded((v) => !v)}
-              className="shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
+              className="h-auto border-0 shrink-0 p-1 rounded-md hover:bg-muted active:scale-90 ui-transition text-muted-foreground hover:text-foreground"
               aria-expanded={expanded}
               aria-label={expanded ? 'Zwiń kampanię' : 'Rozwiń kampanię'}
               title={expanded ? 'Zwiń kampanię' : 'Rozwiń kampanię'}
             >
               <ChevronDown
-                className={`w-4 h-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
+                className={`size-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${expanded ? 'rotate-180' : ''}`}
               />
-            </button>
+            </Button>
           </div>
           <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground tabular-nums flex items-center gap-2">
             <PhasePill phase={campaign.phase} />
@@ -282,19 +283,21 @@ function ExpandedCampaignDetails({ campaign }: { campaign: GanttNarrativeCampaig
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={onDelete}
-              disabled={pending}
-              className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-rose-200 bg-white text-rose-700 text-sm font-semibold hover:bg-rose-50 hover:border-rose-400 hover:shadow-sm hover:shadow-rose-200/50 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ui-transition"
+              loading={pending}
+              className="group h-auto gap-1.5 px-3 py-1.5 rounded-md border border-rose-200 bg-white bg-clip-border text-rose-700 text-sm font-semibold hover:bg-rose-50 hover:border-rose-400 hover:shadow-sm hover:shadow-rose-200/50 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ui-transition"
               title={`Usuń kampanię "${campaign.name}"`}
             >
-              <Trash2
-                className="w-3.5 h-3.5 ui-transition group-hover:rotate-[-6deg] group-hover:scale-110"
-                strokeWidth={2.25}
-              />
+              {pending ? null : (
+                <Trash2
+                  className="size-3.5 ui-transition group-hover:rotate-[-6deg] group-hover:scale-110"
+                  strokeWidth={2.25}
+                />
+              )}
               {pending ? 'Usuwam…' : 'Usuń kampanię'}
-            </button>
+            </Button>
             <Link
               href={`/campaigns/${campaign.id}`}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition shadow-sm"
