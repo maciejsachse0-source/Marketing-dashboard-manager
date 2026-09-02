@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, real, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, real, timestamp, jsonb, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const PLATFORMS = ['instagram', 'tiktok', 'youtube', 'facebook', 'x', 'linkedin'] as const;
@@ -230,7 +230,12 @@ export const productions = pgTable('productions', {
   folderPath: text('folder_path'),
   notes: text('notes'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-});
+}, (t) => [
+  index('productions_campaign_id_idx').on(t.campaignId),
+  index('productions_artist_id_idx').on(t.artistId),
+  index('productions_videographer_id_idx').on(t.videographerId),
+  index('productions_t0_at_idx').on(t.t0At),
+]);
 
 export const calendarEntries = pgTable('calendar_entries', {
   id: serial('id').primaryKey(),
@@ -247,7 +252,12 @@ export const calendarEntries = pgTable('calendar_entries', {
   briefPath: text('brief_path'),
   status: text('status').$type<CalendarStatus>().notNull().default('planned'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-});
+}, (t) => [
+  index('calendar_entries_production_id_idx').on(t.productionId),
+  index('calendar_entries_campaign_id_idx').on(t.campaignId),
+  index('calendar_entries_artist_id_idx').on(t.artistId),
+  index('calendar_entries_starts_at_idx').on(t.startsAt),
+]);
 
 export const csvUploads = pgTable('csv_uploads', {
   id: serial('id').primaryKey(),
@@ -261,7 +271,9 @@ export const csvRows = pgTable('csv_rows', {
   id: serial('id').primaryKey(),
   uploadId: integer('upload_id').notNull().references(() => csvUploads.id, { onDelete: 'cascade' }),
   data: jsonb('data').$type<Record<string, unknown>>().notNull(),
-});
+}, (t) => [
+  index('csv_rows_upload_id_idx').on(t.uploadId),
+]);
 
 export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
@@ -283,7 +295,12 @@ export const posts = pgTable('posts', {
   followersGained: integer('followers_gained'),
   rawCsvRowId: integer('raw_csv_row_id').references(() => csvRows.id, { onDelete: 'set null' }),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-});
+}, (t) => [
+  index('posts_campaign_id_idx').on(t.campaignId),
+  index('posts_production_id_idx').on(t.productionId),
+  index('posts_raw_csv_row_id_idx').on(t.rawCsvRowId),
+  index('posts_published_at_idx').on(t.publishedAt),
+]);
 
 /**
  * Agent definitions — replaces the per-file `data/agents/<slug>.json` store

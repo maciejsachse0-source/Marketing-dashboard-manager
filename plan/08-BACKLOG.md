@@ -315,7 +315,15 @@ uruchamialne.
 
 ## F1 — Wydajność warstwy danych i serwera (kroki P1 do P4)
 
-- [ ] **F1-01** `db` `perf` Indeksy na kolumnach filtrowanych i sortowanych (P1)
+- [x] **F1-01** `db` `perf` Indeksy na kolumnach filtrowanych i sortowanych (P1)
+  DOWOD: migracja `drizzle/migrations/0002_long_killraven.sql` (13 CREATE INDEX,
+  `grep -c 'DROP\|ALTER COLUMN'` = 0), zastosowana na marketing, marketing_perf,
+  marketing_test. `npm run pg:info`: 25 indeksow (12 PK + 13 nowych), wszystkie 13
+  wymienione. `node scripts/perf/measure-db.mjs` po zmianie: seqScan `nie` dla
+  wszystkich 4 zapytan, p95 (ms) calendar-window 1.34, productions-list 1.09,
+  campaign-detail 0.77, posts-analytics 1.01 - kazde ponizej 120 ms.
+  PRZED (perf/baseline.json): calendar-window 1.82 Seq Scan, productions-list 1.04,
+  campaign-detail 0.83, posts-analytics 1.47 Seq Scan.
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P1, `plan/01` zasada Z9
   AC:
   - `drizzle/schema.ts` deklaruje indeks na **każdej z 10 kolumn `references()`**:
