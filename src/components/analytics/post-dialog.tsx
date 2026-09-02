@@ -104,18 +104,18 @@ export function PostDialog({ open, onOpenChange }: { open: boolean; onOpenChange
               <Label>Platforma</Label>
               <div className="flex flex-wrap gap-1">
                 {PLATFORMS.map((p) => (
-                  <button
+                  <Button
+                    variant="ghost"
                     key={p}
-                    type="button"
                     onClick={() => setForm({ ...form, platform: p })}
-                    className={`px-2 py-1 text-xs rounded border transition ${
+                    className={`h-auto font-normal bg-clip-border hover:bg-transparent hover:text-inherit px-2 py-1 text-xs rounded border transition ${
                       form.platform === p
                         ? 'border-foreground bg-foreground text-background'
                         : 'border-border text-muted-foreground hover:border-foreground/40'
                     }`}
                   >
                     {p}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

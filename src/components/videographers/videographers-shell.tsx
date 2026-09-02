@@ -54,7 +54,7 @@ export function VideographersShell({ rows }: { rows: VideographerRow[] }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 justify-between">
         <div className="relative max-w-sm w-full">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Szukaj po nazwie, kontakcie, sprzęcie..."
             value={query}
@@ -129,19 +129,19 @@ function VideographerCard({
               <h3 className="font-semibold text-base leading-tight truncate">{v.name}</h3>
               {v.hourlyRate ? (
                 <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                  <Wallet className="w-3 h-3 shrink-0" />
+                  <Wallet className="size-3 shrink-0" />
                   <span className="tabular-nums">{v.hourlyRate} zł/h</span>
                 </p>
               ) : null}
             </div>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={onEdit}
               aria-label="Edytuj kamerzystę"
-              className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 transition"
+              className="h-auto border-0 font-normal bg-clip-border shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 transition"
             >
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
+              <Pencil className="size-3.5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ function VideographerCard({
       {v.contact ? (
         <div className="mt-3 space-y-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5 truncate">
-            <ContactIcon className="w-3 h-3 shrink-0" />
+            <ContactIcon className="size-3 shrink-0" />
             <span className="truncate">{v.contact}</span>
           </span>
         </div>
@@ -175,7 +175,7 @@ function VideographerCard({
       {v.availabilityNotes ? (
         <div className="mt-3 text-xs">
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5 flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
+            <Calendar className="size-3" />
             Dostępność
           </p>
           <p className="text-foreground/85 leading-relaxed line-clamp-2">{v.availabilityNotes}</p>
@@ -184,7 +184,7 @@ function VideographerCard({
 
       <div className="mt-4 pt-3 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1" title="Liczba produkcji">
-          <Film className="w-3 h-3" />
+          <Film className="size-3" />
           <span className="tabular-nums font-medium text-foreground">{productionCount}</span>
           <span>produkcji</span>
         </span>

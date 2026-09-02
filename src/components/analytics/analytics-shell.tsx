@@ -78,7 +78,7 @@ export function AnalyticsShell({
       <section>
         <div className="relative mb-3">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
             strokeWidth={1.5}
           />
           <Input
@@ -102,46 +102,46 @@ export function AnalyticsShell({
                 ['completion', 'completion'],
               ] as const
             ).map(([k, label]) => (
-              <button
+              <Button
+                variant="ghost"
                 key={k}
-                type="button"
                 onClick={() => setSortKey(k)}
-                className={`px-2 py-1 rounded border transition ${
+                className={`h-auto font-normal text-xs bg-clip-border hover:bg-transparent hover:text-inherit px-2 py-1 rounded border transition ${
                   sortKey === k
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-muted-foreground hover:border-foreground/40'
                 }`}
               >
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
           <div className="flex items-center gap-1 ml-2 text-xs">
             <span className="text-muted-foreground">Platforma:</span>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setPlatformFilter('all')}
-              className={`px-2 py-1 rounded border transition ${
+              className={`h-auto font-normal text-xs bg-clip-border hover:bg-transparent hover:text-inherit px-2 py-1 rounded border transition ${
                 platformFilter === 'all'
                   ? 'border-foreground bg-foreground text-background'
                   : 'border-border text-muted-foreground hover:border-foreground/40'
               }`}
             >
               wszystko
-            </button>
+            </Button>
             {PLATFORMS.map((p) => (
-              <button
+              <Button
+                variant="ghost"
                 key={p}
-                type="button"
                 onClick={() => setPlatformFilter(p)}
-                className={`px-2 py-1 rounded border transition ${
+                className={`h-auto font-normal text-xs bg-clip-border hover:bg-transparent hover:text-inherit px-2 py-1 rounded border transition ${
                   platformFilter === p
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-muted-foreground hover:border-foreground/40'
                 }`}
               >
                 {p}
-              </button>
+              </Button>
             ))}
           </div>
           <Button size="sm" variant="outline" className="ml-auto" onClick={() => setPostDialogOpen(true)}>

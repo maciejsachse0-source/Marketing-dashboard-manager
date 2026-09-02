@@ -510,3 +510,29 @@ punktach na sześć nietrafiona; szczegóły w przepisanej sekcji 1. Nie powsta�
 plik w `src/components/ui/`, bo żaden brakujący wzorzec nie wystąpił w dwóch miejscach.
 Dwa realne znaleziska poszły do backlogu jako F7-15 (mikro-etykieta sekcji, 90 kopii)
 i F7-16 (`card`, `badge` i `table` bez ani jednego użycia).
+
+## F3 — dlaczego migracja guzika nie jest zamianą jednego słowa
+
+Klasa bazowa `<Button>` niesie własną geometrię i typografię, więc podmiana
+`<button>` na `<Button>` bez dopisania klas **zmienia wygląd**, choć w kodzie
+wygląda na zmianę kosmetyczną. W tej fazie każdy taki przypadek wyszedł dopiero
+na zrzucie ekranu; z samego kodu nie widać żadnego z nich. Pierwsze podejście do
+kalendarza dawało 33 505 różniących się pikseli, ostatecznie zeszło do 1 848.
+
+Pełna tabela pułapek z lekarstwami: `plan/05-ui-system.md` sekcja 6. W skrócie:
+wymuszony rozmiar ikony (`size-4`), przezroczysta obwódka plus `bg-clip-padding`,
+domyślne wypełnienie poziome w kontenerze `grid`, `h-8`/`text-sm`/`font-medium`/
+`justify-center` i wreszcie `disabled:opacity-50` z `hover:bg-muted`.
+
+Dwie rzeczy, których nie da się wyczytać z klas:
+
+1. **`display: block` skraca wiersz o 4 px.** Guzik liniowy tworzy wiersz tekstu
+   z miejscem na wydłużenia dolne; blokowy nie. Siedem takich guzików na stronie
+   szczegółu produkcji dało 28 px różnicy wysokości strony. Guzik, który był
+   `inline-block`, ma zostać `inline-block`.
+2. **Reszta różnicy pikseli to faza `animate-pulse`.** Kropka w aktywnym znaczniku
+   pulsuje; dwa zrzuty z różnych wersji kodu łapią ją w innym momencie. Geometria
+   zmierzona w przeglądarce jest identyczna (guzik 29,4 px, kropka 8,4 px), różni się
+   wyłącznie jasność. Skupiska po 82 do 85 pikseli na znacznik są tym, nie regresją;
+   licznik rośnie z liczbą produkcji w bazie, więc po każdym przebiegu `npx playwright
+   test` (który dosiewa dane) trzeba wziąć nowy zrzut odniesienia.

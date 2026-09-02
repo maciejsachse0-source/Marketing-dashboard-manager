@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
+import { Button } from '@/components/ui/button';
 
 type CommandItem = {
   id: string;
@@ -174,7 +175,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+          <Search className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
           <input
             ref={inputRef}
             value={query}
@@ -203,17 +204,17 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
                   const isActive = idx === activeIdx;
                   const Icon = item.icon;
                   return (
-                    <button
+                    <Button
+                      variant="ghost"
                       key={item.id}
-                      type="button"
                       onMouseEnter={() => setActiveIdx(idx)}
                       onClick={() => item.action()}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left text-sm transition ${
+                      className={`h-auto border-0 font-normal bg-clip-border hover:text-inherit block whitespace-normal w-full flex items-center gap-3 px-3 py-2 rounded-md text-left text-sm transition ${
                         isActive ? 'bg-primary/15 text-foreground' : 'text-foreground/85 hover:bg-muted/40'
                       }`}
                     >
                       <Icon
-                        className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                        className={`size-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                         strokeWidth={1.75}
                       />
                       <span className="flex-1 truncate">{item.label}</span>
@@ -222,7 +223,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
                           {item.hint}
                         </span>
                       ) : null}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

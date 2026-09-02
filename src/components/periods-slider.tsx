@@ -14,6 +14,7 @@ import {
   toneForIndex,
   type PeriodTone,
 } from '@/lib/period-tones';
+import { Button } from '@/components/ui/button';
 
 /**
  * Reusable T-period slider — shared by template editors and live campaign
@@ -363,7 +364,7 @@ function PeriodRail({
             className={`group/name inline-flex items-center gap-1 rounded border border-dashed ${tone.thumb.split(' ').find((c) => c.startsWith('border-')) ?? 'border-current/40'} bg-background/60 px-1.5 py-0.5 hover:bg-background/90 focus-within:bg-background focus-within:border-solid ui-transition`}
             title="Klik, by zmienić nazwę okresu"
           >
-            <Pencil className={`w-3 h-3 ${tone.ink} opacity-60 group-hover/name:opacity-100 group-focus-within/name:opacity-100 shrink-0`} />
+            <Pencil className={`size-3 ${tone.ink} opacity-60 group-hover/name:opacity-100 group-focus-within/name:opacity-100 shrink-0`} />
             <input
               type="text"
               value={period.name ?? ''}
@@ -389,15 +390,15 @@ function PeriodRail({
           {lengthDays} {lengthDays === 1 ? 'dzień' : 'dni'}
         </span>
         {onRemove ? (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onRemove}
-            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
             title={`Usuń ${period.code}`}
             aria-label={`Usuń ${period.code}`}
           >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+            <Trash2 className="size-3.5" />
+          </Button>
         ) : null}
       </div>
 
@@ -414,18 +415,18 @@ function PeriodRail({
           onPointerDown={onPointerDownSpan}
           title="Przeciągnij, by przesunąć cały okres"
         />
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onPointerDown={onPointerDownStart}
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${startPct}%` }}
           aria-label={`${period.code} początek`}
           title={`Start: ${fmtDayMonth(startDate)} · ${describeOffset(period.startOffsetDays)}`}
         />
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onPointerDown={onPointerDownEnd}
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${endPct}%` }}
           aria-label={`${period.code} koniec`}
           title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
@@ -439,7 +440,7 @@ function PeriodRail({
         >
           <div className={`flex items-start gap-1.5 px-2 py-1.5`}>
             <Pencil
-              className={`w-3 h-3 mt-0.5 ${tone.ink} opacity-50 group-hover/desc:opacity-100 group-focus-within/desc:opacity-100 shrink-0`}
+              className={`size-3 mt-0.5 ${tone.ink} opacity-50 group-hover/desc:opacity-100 group-focus-within/desc:opacity-100 shrink-0`}
             />
             <textarea
               value={period.description ?? ''}

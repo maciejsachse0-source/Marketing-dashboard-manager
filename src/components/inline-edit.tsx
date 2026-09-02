@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type Props = {
   value: string;
@@ -106,10 +107,10 @@ export function InlineEdit({ value, onSave, multiline, placeholder, className, e
   const isEmpty = !value || value.trim() === '';
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={() => setEditing(true)}
-      className={`group text-left -mx-2 px-2 py-1 rounded-md hover:bg-muted/30 transition relative ${className ?? ''}`}
+      className={`h-auto border-0 text-[length:inherit] font-[inherit] tracking-[inherit] bg-clip-border hover:text-inherit inline-block group text-left -mx-2 px-2 py-1 rounded-md hover:bg-muted/30 transition relative ${className ?? ''}`}
       title="Kliknij, by edytować"
     >
       {isEmpty ? (
@@ -119,7 +120,7 @@ export function InlineEdit({ value, onSave, multiline, placeholder, className, e
       ) : (
         <span>{value}</span>
       )}
-      <Pencil className="inline-block ml-1.5 w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground transition" strokeWidth={1.5} />
-    </button>
+      <Pencil className="inline-block ml-1.5 size-3 text-muted-foreground/40 group-hover:text-muted-foreground transition" strokeWidth={1.5} />
+    </Button>
   );
 }

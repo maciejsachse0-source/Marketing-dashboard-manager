@@ -23,6 +23,7 @@ import {
 import type { AgentMeta } from '@/lib/agents/types';
 import { HelpDialog } from '@/components/help-dialog';
 import { logoutAction } from '@/server/actions/auth';
+import { Button } from '@/components/ui/button';
 
 type NavChild = { href: string; label: string; icon: LucideIcon };
 type NavItem = { href: string; label: string; icon: LucideIcon; children?: NavChild[] };
@@ -98,17 +99,17 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
     <>
       {/* Mobile top bar */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-30 h-12 bg-background/80 backdrop-blur border-b border-border flex items-center px-3">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={() => setMobileOpen(true)}
-          className="p-1.5 rounded hover:bg-muted transition"
+          className="h-auto border-0 font-normal bg-clip-border hover:text-inherit p-1.5 rounded hover:bg-muted transition"
           aria-label="Otwórz menu"
         >
-          <Menu className="w-5 h-5" />
-        </button>
+          <Menu className="size-5" />
+        </Button>
         <Link href="/" className="ml-2 flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-primary to-chart-2 grid place-items-center">
-            <Sparkles className="w-3 h-3 text-primary-foreground" strokeWidth={2.5} />
+          <div className="size-6 rounded-md bg-gradient-to-br from-primary to-chart-2 grid place-items-center">
+            <Sparkles className="size-3 text-primary-foreground" strokeWidth={2.5} />
           </div>
           <span className="text-sm font-semibold tracking-tight">Marketing Crew</span>
         </Link>
@@ -131,7 +132,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
         <div className="px-5 py-5 border-b border-sidebar-border relative overflow-hidden">
           <div
             aria-hidden
-            className="absolute -top-12 -right-8 w-32 h-32 rounded-full pointer-events-none"
+            className="absolute -top-12 -right-8 size-32 rounded-full pointer-events-none"
             style={{
               background:
                 'radial-gradient(circle, var(--accent-blue-soft) 0%, transparent 70%)',
@@ -141,8 +142,8 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
           />
           <div className="relative flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group min-w-0">
-              <div className="w-9 h-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform shrink-0">
-                <Sparkles className="w-4 h-4 text-background" strokeWidth={2.5} />
+              <div className="size-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform shrink-0">
+                <Sparkles className="size-4 text-background" strokeWidth={2.5} />
               </div>
               <div className="flex flex-col leading-tight min-w-0">
                 <span className="text-sm font-bold tracking-tight truncate">Marketing Crew</span>
@@ -151,14 +152,14 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
                 </span>
               </div>
             </Link>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setMobileOpen(false)}
-              className="lg:hidden p-1 rounded hover:bg-muted transition"
+              className="h-auto border-0 font-normal bg-clip-border hover:text-inherit lg:hidden p-1 rounded hover:bg-muted transition"
               aria-label="Zamknij menu"
             >
-              <X className="w-4 h-4" />
-            </button>
+              <X className="size-4" />
+            </Button>
           </div>
           <div className="relative mt-2 ml-[2.875rem]">
             <HelpDialog />
@@ -184,7 +185,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
                   }`}
                 >
                   <Icon
-                    className={`w-4 h-4 shrink-0 ${parentActive ? 'text-background' : ''}`}
+                    className={`size-4 shrink-0 ${parentActive ? 'text-background' : ''}`}
                     strokeWidth={parentActive ? 2.25 : 1.75}
                   />
                   <span className="truncate">{item.label}</span>
@@ -205,7 +206,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
                           }`}
                         >
                           <ChildIcon
-                            className={`w-3.5 h-3.5 shrink-0 ${cActive ? 'text-background' : ''}`}
+                            className={`size-3.5 shrink-0 ${cActive ? 'text-background' : ''}`}
                             strokeWidth={cActive ? 2.25 : 1.75}
                           />
                           <span className="truncate">{child.label}</span>
@@ -249,13 +250,14 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
             </kbd>
           </div>
           <form action={logoutAction} className="mt-1">
-            <button
+            <Button
+              variant="ghost"
               type="submit"
-              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60 transition"
+              className="justify-start h-auto border-0 font-normal bg-clip-border w-full flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60 transition"
             >
-              <LogOut className="w-3.5 h-3.5" strokeWidth={1.75} />
+              <LogOut className="size-3.5" strokeWidth={1.75} />
               <span>Wyloguj</span>
-            </button>
+            </Button>
           </form>
         </div>
       </aside>

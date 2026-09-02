@@ -54,7 +54,7 @@ export function ArtistsShell({ rows }: { rows: ArtistRow[] }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 justify-between">
         <div className="relative max-w-sm w-full">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Szukaj po nazwie, handlu, emailu..."
             value={query}
@@ -135,19 +135,19 @@ function ArtistCard({
               <h3 className="font-semibold text-base leading-tight truncate">{artist.name}</h3>
               {artist.handle ? (
                 <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
-                  <AtSign className="w-3 h-3 shrink-0" />
+                  <AtSign className="size-3 shrink-0" />
                   <span className="truncate">{artist.handle.replace(/^@/, '')}</span>
                 </p>
               ) : null}
             </div>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={onEdit}
               aria-label="Edytuj artystę"
-              className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 transition"
+              className="h-auto border-0 font-normal bg-clip-border shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100 transition"
             >
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
+              <Pencil className="size-3.5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -169,7 +169,7 @@ function ArtistCard({
               href={`mailto:${artist.email}`}
               className="flex items-center gap-1.5 hover:text-foreground truncate"
             >
-              <Mail className="w-3 h-3 shrink-0" />
+              <Mail className="size-3 shrink-0" />
               <span className="truncate">{artist.email}</span>
             </a>
           ) : null}
@@ -178,7 +178,7 @@ function ArtistCard({
               href={`tel:${artist.phone}`}
               className="flex items-center gap-1.5 hover:text-foreground"
             >
-              <Phone className="w-3 h-3 shrink-0" />
+              <Phone className="size-3 shrink-0" />
               <span>{artist.phone}</span>
             </a>
           ) : null}
@@ -187,18 +187,18 @@ function ArtistCard({
 
       <div className="mt-4 pt-3 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1" title="Liczba kolaborów w kalendarzu">
-          <Users className="w-3 h-3" />
+          <Users className="size-3" />
           <span className="tabular-nums font-medium text-foreground">{collabCount}</span>
           <span>kolab</span>
         </span>
         <span className="flex items-center gap-1" title="Drafty outreach">
-          <FileText className="w-3 h-3" />
+          <FileText className="size-3" />
           <span className="tabular-nums font-medium text-foreground">{outreachFiles.length}</span>
           <span>outreach</span>
         </span>
         {lastContact ? (
           <span className="flex items-center gap-1 ml-auto" title="Ostatni kontakt">
-            <Calendar className="w-3 h-3" />
+            <Calendar className="size-3" />
             <span>{lastContact}</span>
           </span>
         ) : null}

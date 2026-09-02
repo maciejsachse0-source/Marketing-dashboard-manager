@@ -822,7 +822,7 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   (30 znaczników po 82 piksele). Negatywne: `<div onClick>` i `<span onClick>` = 0,
   `npm run test` 21 zielonych, `npx playwright test` 8 zielonych, `npm run typecheck` kod 0.
 
-- [ ] **F3-05** `ui` Migracja guzików: reszta i zamknięcie reguły lintu
+- [x] **F3-05** `ui` Migracja guzików: reszta i zamknięcie reguły lintu
   CZYTAJ: `plan/05-ui-system.md` sekcje 2 do 6, `plan/01` zasada Z3
   AC:
   - `grep -r '<button' src/ | wc -l` zwraca `0` (dziś 89; po F3-02, F3-03 i F3-04
@@ -830,6 +830,30 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   - reguła lintu z `plan/05` sekcja 6 przełączona z ostrzeżenia na błąd, lista wyjątków
     pusta; `npm run lint` kod 0
   - negatywne: `grep -r '<div onClick\|<span onClick' src/ | wc -l` zwraca `0`
+  DOWÓD (2026-09-02): `grep -r '<button' src/ | wc -l` = **0** (start fazy: 89),
+  `grep -r '<Button' src/ | wc -l` = 146. W tym issue zmigrowane ostatnie 26 guzików
+  z jedenastu plików (analityka 4, szablony 11, artyści 1, kamerzyści 1, paleta poleceń 1,
+  okno pomocy 1, edycja w miejscu 1, suwak okresów 3, pasek boczny 3). Reguła lintu
+  przełączona na `error`, **lista wyjątków pusta** - zniknął także wyjątek na
+  `src/components/ui/**`, bo `button.tsx` opakowuje `Button` z Base UI, a nie surowy
+  `<button>`. Sprawdzone na żywym pliku, nie z konfiguracji: plik z `<button type="button">`
+  daje `error no-restricted-syntax`; `npm run lint` kod 0 (111 ostrzeżeń z grandfathera,
+  0 błędów). Wygląd, `node scripts/perf/pngdiff.mjs`, zrzuty `przed-F3-05-*` wobec
+  `po-F3-05-*` w `screenshots/F3/`: `/artists` 0, `/videographers` 0, `/templates` 0,
+  `/analytics` 0, paleta poleceń (Cmd+K) 0, okno pomocy 54, edycja szablonu 375,
+  `/` 1 664 (różnica to napis „przed chwilą" wobec „3 min temu", czyli upływ czasu,
+  nie styl). Komponenty współdzielone przemierzone osobno wobec stanu sprzed F3-05:
+  `/campaigns/1` 96, `/productions/31` 89, `/calendar?view=week` 2 805 - w kalendarzu
+  33 skupiska po 85 pikseli, czyli znana faza `animate-pulse`. Trzy nowe pułapki:
+  `text-sm` z klasy bazowej powiększał pigułki filtrów analityki (19 158 pikseli, naprawa
+  `text-xs`), `justify-center` przesuwał treść guzika „Wyloguj" na środek paska bocznego
+  (naprawa `justify-start`), a `text-sm font-medium` w `inline-edit.tsx` zmniejszał
+  nagłówek kampanii z tytułu do drobnego druku (naprawa `text-[length:inherit]
+  font-[inherit] tracking-[inherit]`). Wszystkie pięć pułapek spisane w `plan/05`
+  sekcja 6 jako tabela. Negatywne: `<div onClick>` i `<span onClick>` = 0,
+  `npm run test` 21 zielonych, `npx playwright test` 8 zielonych, `npm run perf` **kod 0**
+  (bundel `/calendar` 292,3 kB przy progu 301,6 kB - wirująca ikona z F3-01 kosztowała
+  0,3 kB).
 
 - [ ] **F3-06** `ui` Kanon typografii i ikon
   CZYTAJ: `plan/01` zasady Z4 do Z8

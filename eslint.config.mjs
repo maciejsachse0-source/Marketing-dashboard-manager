@@ -30,13 +30,12 @@ export default [
 
   {
     // Z3: every action element renders <Button> from src/components/ui/button.tsx.
-    // The rule ships as a WARNING in F0 on purpose: the 89 raw buttons inherited
-    // from before the rebuild would make `npm run lint` red from day one and the
-    // gate would then prove nothing. F3 migrates them and raises this to 'error'.
+    // F3 zmigrowalo wszystkie 89 zastanych guzikow, wiec od F3-05 regula jest
+    // bledem, bez listy wyjatkow. Nowy surowy <button> nie przejdzie `npm run lint`.
     files: ['src/**/*.tsx'],
     rules: {
       'no-restricted-syntax': [
-        'warn',
+        'error',
         {
           selector: 'JSXOpeningElement[name.name="button"]',
           message:
@@ -125,11 +124,5 @@ export default [
       'react/no-unescaped-entities': 'warn',
       '@next/next/no-html-link-for-pages': 'warn',
     },
-  },
-
-  {
-    // The primitive itself is the one place a raw <button> is legitimate.
-    files: ['src/components/ui/**/*.tsx'],
-    rules: { 'no-restricted-syntax': 'off' },
   },
 ];

@@ -129,6 +129,21 @@ Reguła lintu w `eslint.config.mjs`:
 }]
 ```
 
-Włączana z listą wyjątków na pliki zastane (`eslint-disable` z komentarzem i numerem
-issue z fazy F3), lista kurczy się w każdej fazie do zera. Licznik surowych guzików
-jest metryką raportowaną w każdym raporcie fazy: „89 → N".
+Od F3-05 reguła jest **błędem, bez listy wyjątków** (F3 zmigrowało wszystkie 89
+zastanych guzików, licznik: 89 → 0). Zniknął też wyjątek na `src/components/ui/**`,
+bo `button.tsx` opakowuje `Button` z Base UI, a nie surowy `<button>`. Sprawdzone na
+żywym pliku: plik z `<button type="button">` daje `error no-restricted-syntax`.
+
+Pięć pułapek, które wychodzą przy zamianie surowego `<button>` na `<Button>` (zmierzone
+w F3-02 do F3-05, każda widoczna na zrzucie jako różnica pikseli):
+
+| Co dokłada klasa bazowa | Objaw | Co dopisać do `className` |
+|---|---|---|
+| `[&_svg:not([class*='size-'])]:size-4` | ikona opisana `w-4 h-4` rośnie do 16 px | opisuj ikony `size-4`, nie `w-4 h-4` |
+| `border border-transparent` plus `bg-clip-padding` | guzik rośnie o 2 px, tło ucieka spod obwódki | `border-0` i `bg-clip-border`, gdy oryginał nie miał obwódki |
+| `px-2.5` z rozmiaru `default` | okrągły znacznik w kontenerze `grid` rozpycha się (`min-width: auto`) | `p-0` |
+| `h-8`, `text-sm`, `font-medium`, `justify-center` | inna wysokość, wielkość i grubość pisma, treść wyśrodkowana | `h-auto`, `text-xs`/`text-[length:inherit]`, `font-normal`/`font-[inherit]`, `justify-start` |
+| `disabled:opacity-50`, `hover:bg-muted` | zablokowany guzik gaśnie, na najechanie pojawia się tło | `disabled:opacity-100` (gdy oryginał nie miał `opacity-*`), `hover:bg-transparent` |
+
+Zamiana `display` z liniowego na `block` skraca wiersz o miejsce na wydłużenia dolne
+(4 px przy `text-sm`). Guzik, który był `inline-block`, ma zostać `inline-block`.

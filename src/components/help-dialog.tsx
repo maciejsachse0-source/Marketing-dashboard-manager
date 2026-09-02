@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Megaphone,
   Film,
@@ -31,18 +32,18 @@ export function HelpDialog() {
 
   return (
     <>
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => setOpen(true)}
         aria-label="Pomoc — instrukcja dyspozytorni"
         title="Pomoc — kliknij ?, żeby zobaczyć instrukcję"
-        className="group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/60 text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-foreground/40 transition"
+        className="h-auto font-normal bg-clip-border group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/60 text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-foreground/40 transition"
       >
         <span>Pomoc</span>
-        <span className="grid place-items-center w-3.5 h-3.5 rounded-full bg-muted/60 group-hover:bg-foreground group-hover:text-background transition">
-          <HelpCircle className="w-2.5 h-2.5" strokeWidth={2.5} />
+        <span className="grid place-items-center size-3.5 rounded-full bg-muted/60 group-hover:bg-foreground group-hover:text-background transition">
+          <HelpCircle className="size-2.5" strokeWidth={2.5} />
         </span>
-      </button>
+      </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[88vh] overflow-y-auto">
@@ -59,7 +60,7 @@ export function HelpDialog() {
           <div className="space-y-7 pt-2 text-sm leading-relaxed">
             <Section
               num={1}
-              icon={<Megaphone className="w-4 h-4" />}
+              icon={<Megaphone className="size-4" />}
               title="Założenie kampanii"
               path="/campaigns/list → „+ Nowa kampania”"
             >
@@ -98,7 +99,7 @@ export function HelpDialog() {
 
             <Section
               num={2}
-              icon={<Film className="w-4 h-4" />}
+              icon={<Film className="size-4" />}
               title="Dodanie produkcji"
               path="/productions/list → „+ Nowa produkcja” (skrót: P)"
             >
@@ -151,7 +152,7 @@ export function HelpDialog() {
 
             <Section
               num={3}
-              icon={<ChartGantt className="w-4 h-4" />}
+              icon={<ChartGantt className="size-4" />}
               title="Główny interfejs — Pipeline"
               path="/calendar (w sidebarze: „Pipeline”)"
             >
@@ -192,7 +193,7 @@ export function HelpDialog() {
               <SubHeader>Edycja w pipeline</SubHeader>
               <ul className="ml-4 list-disc text-muted-foreground space-y-1.5">
                 <li>
-                  <CircleDot className="inline w-3.5 h-3.5 -mt-0.5 mr-1 text-foreground" />
+                  <CircleDot className="inline size-3.5 -mt-0.5 mr-1 text-foreground" />
                   <b className="text-foreground">Klik w kropkę</b> — odhacza
                   krok (ustawia <Code>doneAt</Code>). Drugi klik cofa.
                 </li>
@@ -233,7 +234,7 @@ export function HelpDialog() {
 
             <Section
               num={4}
-              icon={<FolderOpen className="w-4 h-4" />}
+              icon={<FolderOpen className="size-4" />}
               title="Foldery produkcji — gdzie lądują pliki"
               path="OneDrive: Marketing Content / <Artysta> / <Tytuł> /"
             >
@@ -292,7 +293,7 @@ function Section({
   return (
     <section className="space-y-2.5">
       <div className="flex items-baseline gap-2.5">
-        <span className="grid place-items-center w-6 h-6 rounded-full bg-foreground text-background text-[11px] font-bold tabular-nums shrink-0">
+        <span className="grid place-items-center size-6 rounded-full bg-foreground text-background text-[11px] font-bold tabular-nums shrink-0">
           {num}
         </span>
         <div className="flex-1 min-w-0">
@@ -317,7 +318,7 @@ function Steps({ children }: { children: React.ReactNode }) {
 function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <li className="flex gap-2.5">
-      <span className="grid place-items-center w-5 h-5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold tabular-nums shrink-0 mt-0.5">
+      <span className="grid place-items-center size-5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold tabular-nums shrink-0 mt-0.5">
         {n}
       </span>
       <div className="flex-1 text-sm">{children}</div>
@@ -416,7 +417,7 @@ function FolderTreeExample() {
       <Row indent={5} icon={<FileText className="text-zinc-400" />} label="swit-tiktok-9x16.mp4" muted />
       <Row indent={5} icon={<FileText className="text-zinc-400" />} label="swit-shorts-9x16.mp4" muted />
       <div className="mt-2 pt-2 border-t border-emerald-300/40 text-[11px] font-sans text-muted-foreground flex items-center gap-1.5">
-        <Calendar className="w-3 h-3" />
+        <Calendar className="size-3" />
         Kropki <b className="text-foreground">nagrywanie</b> /{' '}
         <b className="text-foreground">obróbka</b> /{' '}
         <b className="text-foreground">publikacja</b> w pipeline pokazują
@@ -444,7 +445,7 @@ function Row({
       className={`flex items-center gap-1.5 ${muted ? 'text-muted-foreground' : 'text-foreground'}`}
       style={{ paddingLeft: `${indent * 14}px` }}
     >
-      <span className="w-3.5 h-3.5 inline-grid place-items-center shrink-0">
+      <span className="size-3.5 inline-grid place-items-center shrink-0">
         <span className="[&>svg]:w-3.5 [&>svg]:h-3.5">{icon}</span>
       </span>
       <span>{label}</span>

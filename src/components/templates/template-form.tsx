@@ -389,18 +389,18 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
           <Label>Typ produkcji</Label>
           <div className="flex gap-2">
             {PRODUCTION_TYPES.map((t) => (
-              <button
+              <Button
+                variant="ghost"
                 key={t}
-                type="button"
                 onClick={() => setType(t)}
-                className={`px-4 py-2 rounded-lg border text-sm font-semibold ui-transition active:scale-[0.97] ${
+                className={`h-auto bg-clip-border hover:bg-transparent hover:text-inherit px-4 py-2 rounded-lg border text-sm font-semibold ui-transition active:scale-[0.97] ${
                   type === t
                     ? 'border-primary bg-primary/10 text-foreground'
                     : 'border-border hover:border-foreground/30 text-muted-foreground'
                 }`}
               >
                 {TYPE_LABEL[t]}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -453,13 +453,13 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               nakładać.
             </p>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={resetPeriods}
-            className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition shrink-0"
+            className="h-auto border-0 p-0 font-normal hover:bg-transparent text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition shrink-0"
           >
             Przywróć domyślne
-          </button>
+          </Button>
         </header>
 
         <div className="flex flex-wrap items-end gap-3 pb-2 border-b border-border/40">
@@ -502,7 +502,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
             disabled={periods.length >= MAX_PERIODS}
             className="bg-card"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> Dodaj okres
+            <Plus className="size-3.5 mr-1" /> Dodaj okres
             {periods.length >= MAX_PERIODS ? ` (max ${MAX_PERIODS})` : ''}
           </Button>
         </div>
@@ -596,7 +596,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
                     type="button"
                     className="bg-card"
                   >
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Dodaj krok do {CATEGORY_LABEL[cat]}
+                    <Plus className="size-3.5 mr-1" /> Dodaj krok do {CATEGORY_LABEL[cat]}
                   </Button>
                 </div>
               </div>
@@ -627,7 +627,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               disabled={pending}
               className="border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-400"
             >
-              <Trash2 className="w-3.5 h-3.5 mr-1" />
+              <Trash2 className="size-3.5 mr-1" />
               Usuń
             </Button>
           ) : null}
@@ -1020,15 +1020,15 @@ function PeriodRail({
           {lengthDays} {lengthDays === 1 ? 'dzień' : 'dni'}
         </span>
         {onRemove ? (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onRemove}
-            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
             title={`Usuń ${period.code}`}
             aria-label={`Usuń ${period.code}`}
           >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+            <Trash2 className="size-3.5" />
+          </Button>
         ) : null}
       </div>
 
@@ -1049,19 +1049,19 @@ function PeriodRail({
           title="Przeciągnij, by przesunąć cały okres"
         />
         {/* Start thumb */}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onPointerDown={onPointerDownStart}
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${startPct}%` }}
           aria-label={`${period.code} początek`}
           title={`Start: ${fmtDayMonth(startDate)} · ${describeOffset(period.startOffsetDays)}`}
         />
         {/* End thumb */}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onPointerDown={onPointerDownEnd}
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
+          className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${endPct}%` }}
           aria-label={`${period.code} koniec`}
           title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
@@ -1103,7 +1103,7 @@ function StepRow({
     <li className={`group rounded-xl border-2 ${tone.border} bg-card transition`}>
       <div className="flex items-center gap-2 px-3 py-2">
         <span
-          className={`grid place-items-center w-5 h-5 rounded-full text-[10px] font-bold tabular-nums text-white shrink-0 ${tone.dot}`}
+          className={`grid place-items-center size-5 rounded-full text-[10px] font-bold tabular-nums text-white shrink-0 ${tone.dot}`}
         >
           {displayNumber}
         </span>
@@ -1115,46 +1115,46 @@ function StepRow({
           className="flex-1 bg-card h-8 text-sm"
         />
         <div className="flex items-center gap-0.5 shrink-0">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń wyżej"
             aria-label="Przesuń wyżej"
           >
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <ArrowUp className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed ui-transition"
             title="Przesuń niżej"
             aria-label="Przesuń niżej"
           >
-            <ArrowDown className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <ArrowDown className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={onRemove}
-            className="p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-rose-600 hover:bg-rose-50 ui-transition"
             title="Usuń krok"
             aria-label="Usuń krok"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+            <Trash2 className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setExpanded((v) => !v)}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted ui-transition"
+            className="h-auto border-0 font-normal bg-clip-border p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted ui-transition"
             aria-expanded={expanded}
             title={expanded ? 'Zwiń' : 'Ustawienia kroku'}
           >
             <ChevronDown
-              className={`w-3.5 h-3.5 ui-transition ${expanded ? 'rotate-180' : ''}`}
+              className={`size-3.5 ui-transition ${expanded ? 'rotate-180' : ''}`}
             />
-          </button>
+          </Button>
         </div>
       </div>
 
