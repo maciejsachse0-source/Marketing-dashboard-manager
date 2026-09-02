@@ -1554,6 +1554,29 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - negatywne: przy poprawnie wystawionym `npm run dev` przebieg nadal daje 8 zielonych
     i nie wydłuża się o więcej niż 2 sekundy
 
+- [ ] **F7-19** `znalezisko` `db` `import` Przeniesienie danych z `videographers.contact`
+  do `handle` i `email`
+  Znalezione przy F4-00. Migracja 0003 dołożyła kamerzystom `handle`, `email`, `phone`,
+  `location` i `status`, ale jest wyłącznie addytywna: stare pole `contact` zostaje
+  nietknięte i nadal trzyma wymieszaną treść (raz profil z Instagrama, raz adres pocztowy,
+  raz numer). Pomiar na bazie pomiarowej: 60 kamerzystów, z tego **36 z niepustym
+  `contact`**. Dopóki tego nie rozdzielimy, ekran kamerzystów pokazuje kontakt z jednego
+  pola, a import zapisuje do drugiego, więc ta sama osoba ma dwa kontakty i żaden nie jest
+  źródłem prawdy.
+  Waga: **ważne**. Szacunek: pół dnia.
+  AC:
+  - jednorazowy skrypt (`scripts/`, nie migracja SQL, bo decyzja jest heurystyczna)
+    czyta `contact`, rozpoznaje trzy kształty (handle z Instagrama, email, telefon)
+    i zapisuje do właściwej kolumny przez `normalizeRow` z `src/lib/import/normalize.ts`,
+    żeby reguły były jedne, a nie dwie
+  - skrypt jest odwracalny: nie kasuje `contact` w tym samym przebiegu, tylko wypełnia
+    puste pola docelowe; osobne uruchomienie z flagą czyści `contact`
+  - dowód: liczby przed i po (`ile contact niepustych`, `ile handle`, `ile email`,
+    `ile phone`) w raporcie, plus lista wierszy nierozpoznanych
+  - negatywne: wiersz, w którym `handle` albo `email` jest już wypełniony, nie jest
+    nadpisywany; wiersz o nierozpoznanym kształcie zostaje bez zmian i trafia na listę
+    do ręcznego przejrzenia
+
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
 
