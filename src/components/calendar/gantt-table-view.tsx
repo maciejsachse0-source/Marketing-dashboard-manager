@@ -33,9 +33,9 @@ const STAGE_COLUMNS: StageColumn[] = [
 ];
 
 function formatDate(iso: string | undefined | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return '-';
   return d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
@@ -139,7 +139,7 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
         </thead>
         <tbody>
           {rows.map((row, i) => {
-            const personLabel = row.artistName ?? (row.type === 'solo' ? 'Solo' : '—');
+            const personLabel = row.artistName ?? (row.type === 'solo' ? 'Solo' : '-');
             const platforms = row.platforms ?? [];
             return (
               <tr
@@ -168,7 +168,7 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
                   )}
                 </td>
                 <td className="px-3 py-2.5 border-b border-border/60 whitespace-nowrap">
-                  {row.videographerName ?? <span className="text-muted-foreground">—</span>}
+                  {row.videographerName ?? <span className="text-muted-foreground">-</span>}
                 </td>
                 <td className="px-3 py-2.5 border-b border-border/60 tabular-nums whitespace-nowrap font-medium">
                   {formatDateOnly(row.t0At)}
@@ -178,7 +178,7 @@ export function GanttTableView({ rows }: { rows: GanttRow[] }) {
                 </td>
                 <td className="px-3 py-2.5 border-b border-border/60 whitespace-nowrap">
                   {platforms.length === 0 ? (
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-muted-foreground">-</span>
                   ) : (
                     <span className="inline-flex flex-wrap gap-1">
                       {platforms.map((p) => (
@@ -242,7 +242,7 @@ function StatusCell({ row }: { row: GanttRow }) {
   }
 
   const category = STAGE_TO_CATEGORY[row.status];
-  const categoryLabel = category ? CATEGORY_LABEL[category] : '—';
+  const categoryLabel = category ? CATEGORY_LABEL[category] : '-';
   const categoryTone = category ? CATEGORY_TONE[category] : 'text-muted-foreground';
   const hint = STAGE_HINT[row.status];
   const subLabel = STATUS_LABEL[row.status];
@@ -262,7 +262,7 @@ function StatusCell({ row }: { row: GanttRow }) {
       {hint ? (
         <div
           className="text-[11px] text-muted-foreground max-w-[18rem] line-clamp-2"
-          title={`${subLabel} — ${hint}`}
+          title={`${subLabel} - ${hint}`}
         >
           {hint}
         </div>

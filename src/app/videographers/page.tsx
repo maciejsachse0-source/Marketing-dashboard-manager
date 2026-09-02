@@ -24,7 +24,7 @@ export default async function VideographersPage() {
   return (
     <PageShell
       title="Kamerzyści"
-      description="Baza kamerzystów na nagrania kolab — sprzęt, stawki, dostępność."
+      description="Baza kamerzystów na nagrania kolab - sprzęt, stawki, dostępność."
     >
       <VideographersShell rows={rows} />
     </PageShell>

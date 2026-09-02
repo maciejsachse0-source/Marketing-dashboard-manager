@@ -429,7 +429,7 @@ function CampaignSelector({
         className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold shadow-sm hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring max-w-[12rem] truncate"
         title="Wybierz kampanię, której narracja ma się wyświetlać w gancie"
       >
-        <option value="none">— brak —</option>
+        <option value="none">- brak -</option>
         {options.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}

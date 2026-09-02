@@ -64,7 +64,7 @@ export function NextStepIndicator({
       key={`${nextStep.kind}:${nextStep.stage ?? nextStep.customId}`}
       href={`/productions/${productionId}`}
       className="relative rounded-xl border-2 border-border bg-card pl-4 pr-3 py-2.5 flex items-center gap-3 hover:border-foreground/40 hover:shadow-lg hover:-translate-y-0.5 ui-transition group/next animate-fade-up no-underline"
-      title={`${nextStep.cat.label} · krok ${nextStep.n}/${totalSteps}: ${nextStep.label}`}
+      title={`${nextStep.cat.label}, krok ${nextStep.n}/${totalSteps}: ${nextStep.label}`}
     >
       <span
         aria-hidden

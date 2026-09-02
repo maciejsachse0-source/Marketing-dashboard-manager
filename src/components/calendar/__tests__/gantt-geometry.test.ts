@@ -43,7 +43,7 @@ function makeRow(over: Partial<GanttRow> = {}): GanttRow {
   };
 }
 
-describe('dayDiff — indeks dnia względem początku okna', () => {
+describe('dayDiff - indeks dnia względem początku okna', () => {
   it('liczy dni ignorując godzinę', () => {
     expect(dayDiff(new Date(2026, 5, 4, 23, 30), WINDOW_START)).toBe(3);
     expect(dayDiff(new Date(2026, 5, 1, 0, 0), WINDOW_START)).toBe(0);
@@ -77,7 +77,7 @@ describe('pozycja kroku względem okna', () => {
   });
 });
 
-describe('resolveStageDate — skąd bierze się data kamienia milowego', () => {
+describe('resolveStageDate - skąd bierze się data kamienia milowego', () => {
   it('data zapisana przez użytkownika wygrywa ze wszystkim', () => {
     const row = makeRow({ stepDates: { shooting: '2026-06-10T09:00:00.000Z' } });
     const r = resolveStageDate('shooting', row);
@@ -111,7 +111,7 @@ describe('resolveStageDate — skąd bierze się data kamienia milowego', () => 
   });
 });
 
-describe('computeFrameBands — pasy T1/T2/T3 przycięte do okna', () => {
+describe('computeFrameBands - pasy T1/T2/T3 przycięte do okna', () => {
   it('w oknie kwartału mieszczą się wszystkie trzy pasy, każdy po 7 dni', () => {
     const bands = computeFrameBands(makeRow().t0At, WINDOW_START, QUARTER_WINDOW, null);
     expect(bands.map((b) => b.code)).toEqual(['T1', 'T2', 'T3']);
@@ -135,7 +135,7 @@ describe('computeFrameBands — pasy T1/T2/T3 przycięte do okna', () => {
   });
 });
 
-describe('categoryState — stan kategorii wobec statusu produkcji', () => {
+describe('categoryState - stan kategorii wobec statusu produkcji', () => {
   const outreach = STAGE_CATEGORIES[0];
   const ustalenia = STAGE_CATEGORIES[1];
   const nagrywanie = STAGE_CATEGORIES[2];

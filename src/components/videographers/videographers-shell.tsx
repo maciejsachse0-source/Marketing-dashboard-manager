@@ -71,7 +71,7 @@ export function VideographersShell({ rows }: { rows: VideographerRow[] }) {
         <EmptyState
           icon={Camera}
           title="Brak kamerzystów w bazie"
-          description="Dodaj kamerzystę, którego polecasz na nagrania kolab — przy tworzeniu produkcji wybierzesz go z listy."
+          description="Dodaj kamerzystę, którego polecasz na nagrania kolab - przy tworzeniu produkcji wybierzesz go z listy."
         />
       ) : filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">

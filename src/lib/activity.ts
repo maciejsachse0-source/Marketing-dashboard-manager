@@ -33,14 +33,14 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
     ...calendar.map((e) => ({
       kind: 'calendar-entry' as const,
       title: e.title,
-      subtitle: `wpis kalendarza · ${e.type}`,
+      subtitle: `wpis kalendarza, ${e.type}`,
       at: e.createdAt,
       href: '/calendar',
     })),
     ...posts.map((p) => ({
       kind: 'post' as const,
       title: p.title,
-      subtitle: `post · ${p.platform}${p.reach ? ` · ${p.reach.toLocaleString('pl-PL')} reach` : ''}`,
+      subtitle: `post, ${p.platform}${p.reach ? `, ${p.reach.toLocaleString('pl-PL')} reach` : ''}`,
       at: p.createdAt,
       href: '/analytics',
     })),
@@ -54,7 +54,7 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
     ...campaigns.map((c) => ({
       kind: 'campaign' as const,
       title: c.name,
-      subtitle: `kampania · faza ${c.phase}`,
+      subtitle: `kampania, faza ${c.phase}`,
       at: c.createdAt,
       href: `/campaigns/${c.id}`,
     })),

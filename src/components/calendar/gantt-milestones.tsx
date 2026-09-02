@@ -180,14 +180,14 @@ export function PipelineMilestones({
 
         const stateLabel =
           state === 'passed'
-            ? '✓ zaliczone (klik = cofnij)'
+            ? 'zaliczone (klik = cofnij)'
             : state === 'active'
               ? 'w trakcie (klik = odhacz całą fazę)'
               : 'do zrobienia (klik = odhacz)';
         const dateLabel = tentative
-          ? 'brak daty — ustaw na produkcji'
+          ? 'brak daty - ustaw na produkcji'
           : cp.date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
-        const tooltip = `${cp.cat.label} · ${dateLabel}${cp.outOfWindow === 'before' ? ' (przed oknem)' : cp.outOfWindow === 'after' ? ' (po oknie)' : ''} · ${stateLabel}`;
+        const tooltip = `${cp.cat.label}, ${dateLabel}${cp.outOfWindow === 'before' ? ' (przed oknem)' : cp.outOfWindow === 'after' ? ' (po oknie)' : ''}, ${stateLabel}`;
 
         return (
           <Button

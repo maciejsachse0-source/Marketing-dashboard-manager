@@ -74,7 +74,7 @@ export function GanttAxisHeader({
           style={{ gridTemplateColumns: `22rem 1fr` }}
         >
           <div className="border-b border-r border-border/60 px-5 py-3 text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold sticky left-0 z-40 bg-background/95 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]">
-            Produkcja · pipeline
+            Produkcja, pipeline
           </div>
           <div>
             {showMonthBand ? (
@@ -117,7 +117,7 @@ export function GanttAxisHeader({
                       } truncate`}
                     >
                       {compact ? `T${isoWeek(w)}` : `Tydz. ${isoWeek(w)}`}
-                      {isCurrent && !compact ? ' · teraz' : ''}
+                      {isCurrent && !compact ? ', teraz' : ''}
                     </div>
                     {compact ? null : (
                       <div

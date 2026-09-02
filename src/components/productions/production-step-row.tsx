@@ -334,7 +334,7 @@ export function ProductionStepRow({
                 {date ? formatDate(date, withTime) : 'czeka na datę nagrań'}
               </span>
               <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70 ml-1">
-                · auto z nagrywki
+                , auto z nagrywki
               </span>
             </div>
           ) : !editingDate ? (
@@ -355,7 +355,7 @@ export function ProductionStepRow({
               </span>
               {dateMode === 'calendar' && date ? (
                 <span className="ml-1 text-[9px] uppercase tracking-[0.12em] text-[var(--accent-blue)] font-semibold">
-                  · w kalendarzu
+                  , w kalendarzu
                 </span>
               ) : null}
             </Button>

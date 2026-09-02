@@ -16,7 +16,7 @@ export default async function TemplatesPage() {
       eyebrow="biblioteka pipeline'ów"
       description={
         <>
-          Predefiniowane scenariusze produkcji — każdy zawiera fundament 9 kanonicznych kroków
+          Predefiniowane scenariusze produkcji - każdy zawiera fundament 9 kanonicznych kroków
           (od pierwszego maila do publikacji) plus opcjonalne kroki dodatkowe dopasowane do typu
           pracy. Edytuj istniejące lub stwórz własny.
         </>

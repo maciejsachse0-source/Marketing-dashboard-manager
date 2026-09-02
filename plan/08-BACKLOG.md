@@ -855,7 +855,7 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
   (bundel `/calendar` 292,3 kB przy progu 301,6 kB - wirująca ikona z F3-01 kosztowała
   0,3 kB).
 
-- [ ] **F3-06** `ui` Kanon typografii i ikon
+- [x] **F3-06** `ui` Kanon typografii i ikon
   CZYTAJ: `plan/01` zasady Z4 do Z8
   AC:
   - zero emoji w plikach `.tsx` w `src/` (dziś 5; komenda i wynik w raporcie)
@@ -868,6 +868,40 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
     uzasadnione w raporcie jako element funkcjonalny, nie ozdoba
   - negatywne: żadna zmiana nie zmienia treści komunikatu, tylko interpunkcję
     (dowód: `git diff` przejrzany pod tym kątem, potwierdzenie w raporcie)
+  DOWÓD (2026-09-02): metodą jest nowy skrypt `scripts/check-typography.mjs`, który
+  parsuje każdy plik `.ts`/`.tsx` w `src/` kompilatorem TypeScript i sprawdza wyłącznie
+  węzły tekstowe (literał tekstowy, tekst JSX, części szablonu). Komentarze są pomijane
+  z definicji, bo parser wie, czym są, a grep nie. Wynik przed: `TRAFIENIA: 234`
+  (5 emoji, 70 wyśrodkowanych kropek, 159 długich myślników), wynik po: `TRAFIENIA: 0`,
+  kod wyjścia 0. Emoji zastąpione: `✓ Skopiowano` ikoną `Check` z `lucide-react`
+  w `copy-button.tsx`, `⚠` ikoną `TriangleAlert` w `analytics/csv-dropzone.tsx`,
+  a trzy pozostałe stały w atrybutach `title`, gdzie ikona nie wchodzi, więc `✓` zniknęło
+  z tekstu podpowiedzi (`gantt-milestones.tsx`, `gantt-substep-bar.tsx`), a `✓`/`✗`
+  w `campaigns/timeline.tsx` zamienione na słowa „(zrobione)" i „(anulowane)".
+  Kropka wyśrodkowana zamieniona na przecinek, długi myślnik na krótki z odstępami
+  (Z7 wprost na to pozwala) - zamiana robiona przez ten sam parser, więc żaden komentarz
+  ani nazwa klasy nie została ruszona. Po zamianie usunięta spacja przed przecinkiem
+  w 8 plikach (`grep -rn '\S ,' src/ | wc -l` = 0).
+  `border-l-`: przed 5 trafień, po 4. Usunięte jedno i tylko jedno, ozdobne: lewy bursztynowy
+  pasek na kafelku „Wskazówka" w `help-dialog.tsx`, zastąpiony pełnym obramowaniem
+  (`border` plus `px-2.5 rounded`), zgodnie z Z8. Cztery zostają jako funkcjonalne,
+  sprawdzone jedno po drugim: `ui/scroll-area.tsx` (tor paska przewijania),
+  `calendar/gantt-header.tsx` (pionowa kreska rozdzielająca kolumny dni w nagłówku),
+  `calendar/gantt-row-guides.tsx` w dwóch miejscach (pionowe łączniki drzewka
+  milestone'ów, linia ciągła i przerywana). Żaden z nich nie jest ozdobą przy tekście.
+  Negatywne, treść komunikatów: `git diff` przepuszczony przez porównanie, które usuwa
+  z obu stron wyłącznie znaki interpunkcyjne (`— · , -` i białe znaki) i zestawia resztę
+  bajt w bajt. Dla wszystkich 65 plików objętych samą zamianą interpunkcji wynik to
+  `IDENTYCZNE PO ODJECIU INTERPUNKCJI: True` na 9 444 znakach. Sześć plików wyłączonych
+  z tego porównania to te z ikonami i pełnym obramowaniem, gdzie zmiana jest zamierzona
+  i wypisana wyżej. Wygląd: `screenshots/F3/przed-F3-06-*` wobec `po-F3-06-*` dla `/`,
+  `/productions/list`, `/campaigns/list` - piksele siłą rzeczy się różnią (przecinek jest
+  węższy od kropki, krótki myślnik od długiego), więc dowodem jest tu porównanie treści,
+  nie licznik pikseli. `npm run typecheck` kod 0, `npm run lint` kod 0 (111 ostrzeżeń
+  z grandfathera, 0 błędów), `npm run test` 21 zielonych.
+  Znalezisko: opisy agentów w `data/agents/*.json` nadal mają 29 długich myślników
+  i widać je na pulpicie, ale leżą poza dosłownym zakresem Z7 („literały w `src/`")
+  i w tych samych plikach stoją system prompty, więc poprawka to osobne issue **F7-17**.
 
 - [ ] **F3-07** `ui` `test` Rozbicie `template-form.tsx`
   CZYTAJ: `plan/01` zasada Z11, `plan/06-testy.md` sekcja 2
@@ -1345,6 +1379,25 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     zwraca liczbę większą od zera albo pliki nie istnieją
   - negatywne: wygląd ekranów `/`, `/productions`, `/campaigns` bez zmian
     (`node scripts/perf/pngdiff.mjs` poniżej progu szumu)
+
+- [ ] **F7-17** `znalezisko` `ui` Długie myślniki w treściach z `data/`, poza zakresem Z7
+  Znalezione przy F3-06. Zasada Z7 obejmuje dosłownie literały w `src/`, więc kanon
+  typografii wyzerował je tylko tam. Tymczasem opisy agentów i szablonów żyją w plikach
+  danych i trafiają na ekran bez zmiany: `grep -rno '—' data/agents/*.json | wc -l`
+  zwraca `29`, a napisy w rodzaju „Pisze maile do artystów — cold, zaproszenia, briefy"
+  widać na pulpicie (`screenshots/F3/po-F3-06-home.png`, karty agentów). Te same pliki
+  niosą jednak także system prompty agentów, więc masowa podmiana znaku zmieniłaby
+  tekst wysyłany do modelu, a nie tylko interpunkcję w interfejsie. Rozdzielenie pól
+  „widoczne w aplikacji" od „idące do modelu" to osobna robota, nie poprawka przy okazji.
+  Waga: **drobne**. Szacunek: dwie godziny.
+  AC:
+  - `grep -rno '—' data/agents/*.json data/templates/*.json | wc -l` liczony wyłącznie
+    dla pól renderowanych w interfejsie (`name`, `description`, `dashboardWidget`,
+    `sidePanel`) zwraca `0`; pola z promptem systemowym zostają nietknięte, co widać
+    w `git diff`
+  - zrzut pulpitu po zmianie nie pokazuje ani jednego długiego myślnika w kartach agentów
+  - negatywne: `npm run test` kod 0, treść promptów agentów bajt w bajt bez zmian
+    (`git diff -- data/agents | grep '"systemPrompt"' | wc -l` zwraca `0`)
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.

@@ -7,7 +7,7 @@ const schema = z.object({
   BLOB_READ_WRITE_TOKEN: z.preprocess(emptyToUndef, z.string().optional()),
   SESSION_SECRET: z.preprocess(
     emptyToUndef,
-    z.string().min(32, 'SESSION_SECRET must be at least 32 characters — generate with: openssl rand -base64 48'),
+    z.string().min(32, 'SESSION_SECRET must be at least 32 characters - generate with: openssl rand -base64 48'),
   ),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   // Rozmiar puli polaczen do Postgresa poza Vercelem. Na Vercelu wymuszamy 1

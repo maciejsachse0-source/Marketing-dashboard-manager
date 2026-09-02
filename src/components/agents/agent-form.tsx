@@ -30,7 +30,7 @@ import {
 } from '@/server/actions/agents';
 
 const SIDE_PANEL_LABELS: Record<AgentSidePanel, string> = {
-  'calendar-14': 'Kalendarz · 14 dni',
+  'calendar-14': 'Kalendarz, 14 dni',
   'recent-posts': 'Ostatnie posty',
   'artists-list': 'Lista artystów',
   'active-campaigns': 'Aktywne kampanie',
@@ -186,7 +186,7 @@ export function AgentForm({
             className="font-mono text-sm"
           />
           <p className="text-[11px] text-muted-foreground">
-            Plik: <code>data/agents/{state.slug || '<slug>'}.json</code> · wywołanie:{' '}
+            Plik: <code>data/agents/{state.slug || '<slug>'}.json</code>, wywołanie:{' '}
             <code>@agents/{state.slug || '<slug>'}.md</code>
           </p>
         </div>
@@ -264,7 +264,7 @@ export function AgentForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">— brak widgetu —</SelectItem>
+                <SelectItem value="__none__">- brak widgetu -</SelectItem>
                 {WIDGET_KINDS.map((k) => (
                   <SelectItem key={k} value={k}>
                     {WIDGET_KIND_LABELS[k]}
@@ -300,7 +300,7 @@ export function AgentForm({
             />
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Hint pod nazwą agenta na pulpicie. Wybierasz rodzaj — zapytanie do bazy jest gotowe;
+            Hint pod nazwą agenta na pulpicie. Wybierasz rodzaj - zapytanie do bazy jest gotowe;
             zmieniasz tylko tekst i (gdzie ma sens) okno czasowe.
           </p>
         </div>

@@ -358,7 +358,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Np. Premiera EP — pełna kolaba"
+            placeholder="Np. Premiera EP - pełna kolaba"
           />
         </div>
 
@@ -373,7 +373,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               pattern="[a-z0-9\-]*"
             />
             <p className="text-[10px] text-muted-foreground">
-              Tylko małe litery, cyfry i myślnik. Zostaw puste — wygenerujemy z nazwy.
+              Tylko małe litery, cyfry i myślnik. Zostaw puste - wygenerujemy z nazwy.
             </p>
           </div>
         ) : (
@@ -411,7 +411,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
             id="summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            placeholder="Jedno zdanie — co wyróżnia ten szablon"
+            placeholder="Jedno zdanie - co wyróżnia ten szablon"
             maxLength={160}
           />
           <p className="text-[10px] text-muted-foreground">
@@ -448,7 +448,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
             <p className="text-xs text-muted-foreground mt-1">
               Każdy okres to przedział dni od dnia startu produkcji (dzień 0).
               Wybierasz ile chcesz mieć okresów ({MIN_PERIODS}–{MAX_PERIODS}) i
-              jak długo każdy trwa — slidery dowolnie skracasz, wydłużasz,
+              jak długo każdy trwa - slidery dowolnie skracasz, wydłużasz,
               przesuwasz dzień po dniu. Warunek: kolejne okresy nie mogą się
               nakładać.
             </p>
@@ -479,7 +479,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
             />
           </div>
           <p className="text-[10px] text-muted-foreground max-w-md leading-relaxed pb-1">
-            Tylko do podglądu — nie zapisuje się w szablonie. Realną datę
+            Tylko do podglądu - nie zapisuje się w szablonie. Realną datę
             startu wybierasz przy tworzeniu produkcji z tego szablonu.
           </p>
         </div>
@@ -1055,7 +1055,7 @@ function PeriodRail({
           className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${startPct}%` }}
           aria-label={`${period.code} początek`}
-          title={`Start: ${fmtDayMonth(startDate)} · ${describeOffset(period.startOffsetDays)}`}
+          title={`Start: ${fmtDayMonth(startDate)}, ${describeOffset(period.startOffsetDays)}`}
         />
         {/* End thumb */}
         <Button
@@ -1064,7 +1064,7 @@ function PeriodRail({
           className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${endPct}%` }}
           aria-label={`${period.code} koniec`}
-          title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
+          title={`Koniec: ${fmtDayMonth(endDate)}, ${describeOffset(period.endOffsetDays)}`}
         />
       </div>
 
@@ -1110,7 +1110,7 @@ function StepRow({
         <Input
           value={step.label}
           onChange={(e) => onChange({ label: e.target.value })}
-          placeholder="Etykieta kroku — np. wysłanie maila"
+          placeholder="Etykieta kroku - np. wysłanie maila"
           maxLength={80}
           className="flex-1 bg-card h-8 text-sm"
         />
@@ -1235,7 +1235,7 @@ function StepRow({
                 className="h-8 text-xs"
               />
               <p className="text-[10px] text-muted-foreground">
-                0 = punkt w czasie (deadline). Inaczej — domyślny zakres na kalendarzu.
+                0 = punkt w czasie (deadline). Inaczej - domyślny zakres na kalendarzu.
               </p>
             </div>
           ) : null}

@@ -128,7 +128,7 @@ export function ProductionWizard({
       return;
     }
     if (artistId == null) {
-      setError('Wybierz artystę — produkcja musi mieć przypisanego artystę');
+      setError('Wybierz artystę - produkcja musi mieć przypisanego artystę');
       setStep(2);
       return;
     }
@@ -170,7 +170,7 @@ export function ProductionWizard({
           }
         }
         toast.success(
-          `Utworzono produkcję #${prod.id}${template ? ` · szablon: ${template.name}` : ''}`,
+          `Utworzono produkcję #${prod.id}${template ? `, szablon: ${template.name}` : ''}`,
         );
         router.push(`/productions/${prod.id}`);
         close(false);
@@ -282,13 +282,13 @@ function StepType({
             active={type === 'with-artist'}
             onClick={() => onChangeType('with-artist')}
             title="Z artystą"
-            description="Kolaba — outreach, briefing, nagranie z gościem, podziękowanie."
+            description="Kolaba - outreach, briefing, nagranie z gościem, podziękowanie."
           />
           <TypeCard
             active={type === 'solo'}
             onClick={() => onChangeType('solo')}
             title="Solo"
-            description="Twój content — szybki cykl, BTS, trending, refleksje."
+            description="Twój content - szybki cykl, BTS, trending, refleksje."
           />
         </div>
       </div>
@@ -428,11 +428,11 @@ function StepDetails({
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Np. Kolaba z Anią — singiel Świt"
+          placeholder="Np. Kolaba z Anią - singiel Świt"
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="t1week">Tydzień startowy (T-1) — outreach + ustalenia</Label>
+        <Label htmlFor="t1week">Tydzień startowy (T-1) - outreach + ustalenia</Label>
         <Input
           id="t1week"
           type="week"
@@ -443,7 +443,7 @@ function StepDetails({
           {t1Mon && t1Sun ? (
             <p className="tabular-nums">
               <span className="font-bold text-amber-700">T-1</span> {fmt(t1Mon)}–{fmt(t1Sun)}
-              <span className="opacity-70"> · outreach + ustalenia z kamerzystą</span>
+              <span className="opacity-70">, outreach + ustalenia z kamerzystą</span>
             </p>
           ) : (
             <p className="text-rose-600">Wybierz tydzień kalendarzowy.</p>
@@ -451,7 +451,7 @@ function StepDetails({
           {t0 && t3Sun ? (
             <p className="tabular-nums">
               <span className="font-bold text-emerald-700">T-0</span> {fmtFull(t0)}
-              <span className="opacity-70"> · publikacja w tygodniu {fmt(t0)}–{fmt(t3Sun)}</span>
+              <span className="opacity-70">, publikacja w tygodniu {fmt(t0)}–{fmt(t3Sun)}</span>
             </p>
           ) : null}
         </div>
@@ -602,7 +602,7 @@ function StepReview({
               <span>
                 {template.name}
                 <span className="text-muted-foreground ml-1.5 tabular-nums">
-                  · {template.steps.length}{' '}
+                  , {template.steps.length}{' '}
                   {template.steps.length === 1 ? 'krok' : 'kroków'}
                 </span>
               </span>
@@ -615,7 +615,7 @@ function StepReview({
           label="T-1 (start)"
           value={
             t1Mon && t1Sun
-              ? `${fmt(t1Mon)}–${fmt(t1Sun)} · outreach + ustalenia`
+              ? `${fmt(t1Mon)}–${fmt(t1Sun)}, outreach + ustalenia`
               : <span className="text-rose-600">brak</span>
           }
         />
@@ -624,16 +624,16 @@ function StepReview({
           value={
             t0
               ? t0.toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' })
-              : '—'
+              : '-'
           }
         />
-        <Row label="Artysta" value={artist ? `${artist.name}${artist.handle ? ' · ' + artist.handle : ''}` : 'brak'} />
+        <Row label="Artysta" value={artist ? `${artist.name}${artist.handle ? ', ' + artist.handle : ''}` : 'brak'} />
         {type === 'with-artist' ? (
           <Row
             label="Kamerzysta"
             value={
               videographer
-                ? `${videographer.name}${videographer.hourlyRate ? ` · ${videographer.hourlyRate}zł/h` : ''}`
+                ? `${videographer.name}${videographer.hourlyRate ? `, ${videographer.hourlyRate}zł/h` : ''}`
                 : 'brak / solo cam'
             }
           />
@@ -646,7 +646,7 @@ function StepReview({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Pusta produkcja zostanie utworzona — wpisy kalendarza dodasz ręcznie z poziomu kalendarza lub strony produkcji.
+        Pusta produkcja zostanie utworzona - wpisy kalendarza dodasz ręcznie z poziomu kalendarza lub strony produkcji.
       </p>
     </div>
   );

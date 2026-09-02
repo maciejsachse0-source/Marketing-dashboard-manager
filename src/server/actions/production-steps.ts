@@ -315,7 +315,7 @@ async function upsertCalendarEntryForStep(
   const startsAt = new Date(step.dateIso);
   const duration = step.durationMinutes ?? defaultDurationMinutes(step.dateMode);
   const endsAt = new Date(startsAt.getTime() + duration * 60_000);
-  const title = `${step.label} — ${productionTitle}`;
+  const title = `${step.label} - ${productionTitle}`;
   const description = `[step:${step.id}] ${step.description ?? ''}`.trim();
 
   if (existing) {

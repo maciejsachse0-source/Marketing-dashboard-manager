@@ -66,7 +66,7 @@ export function AnalyticsShell({
                   </span>
                   <span className="font-mono truncate flex-1">{u.filename}</span>
                   <span className="text-muted-foreground shrink-0">
-                    {u.source} · {u.rowCount}w
+                    {u.source}, {u.rowCount}w
                   </span>
                 </li>
               ))
@@ -184,11 +184,11 @@ export function AnalyticsShell({
                     <td className="px-3 py-2 text-muted-foreground text-xs">
                       {p.publishedAt.toLocaleDateString('pl-PL', { dateStyle: 'short' })}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">{p.reach?.toLocaleString('pl-PL') ?? '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">{p.engagementRate ? `${p.engagementRate}%` : '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">{p.completionRate ? `${p.completionRate}%` : '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">{p.saves?.toLocaleString('pl-PL') ?? '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">{p.followersGained ?? '—'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{p.reach?.toLocaleString('pl-PL') ?? '-'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{p.engagementRate ? `${p.engagementRate}%` : '-'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{p.completionRate ? `${p.completionRate}%` : '-'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{p.saves?.toLocaleString('pl-PL') ?? '-'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{p.followersGained ?? '-'}</td>
                   </tr>
                 ))}
               </tbody>

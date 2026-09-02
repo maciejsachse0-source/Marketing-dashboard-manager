@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function CopyButton({ text, label = 'Skopiuj' }: { text: string; label?: string }) {
@@ -30,7 +31,14 @@ export function CopyButton({ text, label = 'Skopiuj' }: { text: string; label?: 
 
   return (
     <Button size="sm" variant="outline" onClick={onClick}>
-      {copied ? '✓ Skopiowano' : label}
+      {copied ? (
+        <>
+          <Check className="size-4" aria-hidden="true" />
+          Skopiowano
+        </>
+      ) : (
+        label
+      )}
     </Button>
   );
 }

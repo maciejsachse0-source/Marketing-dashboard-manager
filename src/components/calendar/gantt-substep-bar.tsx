@@ -234,11 +234,11 @@ export function SubStepBar({
         const tooltipKindPrefix = isCustom ? `Krok ${s.n} (dodatkowy)` : `Krok ${s.n}`;
         const stateLabel =
           state === 'passed'
-            ? '✓ zaliczone — klik cofa ten i wszystkie kolejne'
+            ? 'zaliczone - klik cofa ten i wszystkie kolejne'
             : state === 'active'
-              ? 'w trakcie — klik kończy ten i wszystkie poprzednie'
-              : 'do zrobienia — klik kończy ten i wszystkie poprzednie';
-        const tooltip = `${tooltipKindPrefix}: ${s.label} (${s.cat.label}) · ${stateLabel}`;
+              ? 'w trakcie - klik kończy ten i wszystkie poprzednie'
+              : 'do zrobienia - klik kończy ten i wszystkie poprzednie';
+        const tooltip = `${tooltipKindPrefix}: ${s.label} (${s.cat.label}), ${stateLabel}`;
 
         const onClick = () => onStepClick(s);
 

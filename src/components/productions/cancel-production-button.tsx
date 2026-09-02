@@ -22,7 +22,7 @@ export function CancelProductionButton({
     if (cancelled) {
       if (!confirm('Wznowić produkcję?')) return;
     } else {
-      if (!confirm('Anulować produkcję?\n\nKroki zostaną zachowane — można wznowić później.')) return;
+      if (!confirm('Anulować produkcję?\n\nKroki zostaną zachowane - można wznowić później.')) return;
     }
     startTransition(async () => {
       await setProductionCancelled(productionId, !cancelled);

@@ -8,7 +8,7 @@ export default function NewTemplatePage() {
     <PageShell
       title="Nowy szablon"
       eyebrow="biblioteka pipeline'ów"
-      description="Zdefiniuj własny scenariusz produkcji — fundament 9 kanonicznych kroków + dowolna liczba kroków dodatkowych."
+      description="Zdefiniuj własny scenariusz produkcji - fundament 9 kanonicznych kroków + dowolna liczba kroków dodatkowych."
     >
       <TemplateForm mode={{ kind: 'create' }} />
     </PageShell>

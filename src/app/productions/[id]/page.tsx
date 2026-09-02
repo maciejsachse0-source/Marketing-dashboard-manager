@@ -52,14 +52,14 @@ const CATEGORIES: CategoryMeta[] = [
   {
     key: 'nagrywanie',
     label: 'Nagrywanie',
-    description: 'Nagrywki — w studio lub w terenie.',
+    description: 'Nagrywki - w studio lub w terenie.',
     hint: 'surówki, BTS, audio raw',
     week: 'T2',
   },
   {
     key: 'obrobka',
     label: 'Obróbka',
-    description: 'Montaż — następnego dnia po nagrywkach.',
+    description: 'Montaż - następnego dnia po nagrywkach.',
     hint: 'wersje robocze, master video',
     week: 'T2',
   },
@@ -214,10 +214,10 @@ export default async function ProductionDetailPage({
         <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
           <div className="flex-1 min-w-0">
             <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
-              Start produkcji {artist ? `· ${artist.name}` : ''}
+              Start produkcji {artist ? `, ${artist.name}` : ''}
             </div>
             <p className="text-sm text-foreground/80 mt-1.5 leading-relaxed">
-              Zmień datę startu — <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
+              Zmień datę startu - <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
             </p>
           </div>
           <T1StartEditor
@@ -331,7 +331,7 @@ export default async function ProductionDetailPage({
                                 ),
                                 right: (
                                   <span className="text-xs tabular-nums">
-                                    {p.reach ? p.reach.toLocaleString('pl-PL') : '—'}
+                                    {p.reach ? p.reach.toLocaleString('pl-PL') : '-'}
                                   </span>
                                 ),
                               }))}
@@ -416,8 +416,8 @@ function PersonHeader({
 }) {
   const fallbackBio =
     kind === 'artist'
-      ? 'Artysta — talent, którego twarz / głos pojawia się w wideo. Brief produkcyjny opisuje czego od niego potrzebujemy.'
-      : 'Kamerzysta — odpowiada za nagranie. Sprawdź dostępność i sprzęt przed potwierdzeniem terminu.';
+      ? 'Artysta - talent, którego twarz / głos pojawia się w wideo. Brief produkcyjny opisuje czego od niego potrzebujemy.'
+      : 'Kamerzysta - odpowiada za nagranie. Sprawdź dostępność i sprzęt przed potwierdzeniem terminu.';
 
   return (
     <section className="card-editorial p-6 relative overflow-hidden">

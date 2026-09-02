@@ -351,7 +351,7 @@ export function CampaignTemplateForm({
             Podstawy
           </h2>
           <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
-            {milestones.length} milestone&apos;ów · {totalSubs} sub.
+            {milestones.length} milestone&apos;ów, {totalSubs} sub.
           </span>
         </header>
 
@@ -361,7 +361,7 @@ export function CampaignTemplateForm({
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Np. Premiera EP — kampania pełna"
+            placeholder="Np. Premiera EP - kampania pełna"
           />
         </div>
 
@@ -376,7 +376,7 @@ export function CampaignTemplateForm({
               pattern="[a-z0-9\-]*"
             />
             <p className="text-[10px] text-muted-foreground">
-              Tylko małe litery, cyfry i myślnik. Zostaw puste — wygenerujemy z nazwy.
+              Tylko małe litery, cyfry i myślnik. Zostaw puste - wygenerujemy z nazwy.
             </p>
           </div>
         ) : (
@@ -394,7 +394,7 @@ export function CampaignTemplateForm({
             id="summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            placeholder="Jedno zdanie — co wyróżnia tę kampanię"
+            placeholder="Jedno zdanie - co wyróżnia tę kampanię"
             maxLength={200}
           />
           <p className="text-[10px] text-muted-foreground">
@@ -425,7 +425,7 @@ export function CampaignTemplateForm({
               Okresy kampanii (T1..Tn)
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Każdy okres definiuje fazę wizji kampanii — np. T1 build-up, T2 odkrywanie,
+              Każdy okres definiuje fazę wizji kampanii - np. T1 build-up, T2 odkrywanie,
               T3 reveal, T4 climax, T5 afterglow. Przeciągaj suwaki, by kształtować rytm
               opowieści. Możesz mieć od {MIN_PERIODS} do {MAX_PERIODS} okresów.
             </p>
@@ -453,7 +453,7 @@ export function CampaignTemplateForm({
 
         <div className="grid gap-1.5">
           <Label htmlFor="preview-start" className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            Podgląd dat — kotwica osi (nie zapisywana w szablonie)
+            Podgląd dat - kotwica osi (nie zapisywana w szablonie)
           </Label>
           <Input
             id="preview-start"
@@ -486,7 +486,7 @@ export function CampaignTemplateForm({
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
               Pod każdym okresem dodajesz milestone&apos;y wraz z opcjonalnymi
-              submilestone&apos;ami. To one budują napięcie — w T1 zapowiedzi, w środku
+              submilestone&apos;ami. To one budują napięcie - w T1 zapowiedzi, w środku
               odkrywanie, w finale climax i afterglow.
             </p>
           </div>
@@ -638,7 +638,7 @@ function MilestoneRow({
         <Input
           value={milestone.label}
           onChange={(e) => onChange({ label: e.target.value })}
-          placeholder="Etykieta milestone'u — np. Build-up: zapowiedź"
+          placeholder="Etykieta milestone'u - np. Build-up: zapowiedź"
           maxLength={120}
           className="flex-1 bg-card h-8 text-sm font-semibold"
         />
@@ -721,7 +721,7 @@ function MilestoneRow({
 
             {milestone.submilestones.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-3 text-center text-[11px] text-muted-foreground">
-                Brak submilestone&apos;ów. Możesz zostawić tak — milestone będzie pojedynczym checkboxem.
+                Brak submilestone&apos;ów. Możesz zostawić tak - milestone będzie pojedynczym checkboxem.
               </div>
             ) : (
               <ul className="space-y-1.5">
@@ -734,7 +734,7 @@ function MilestoneRow({
                       <Input
                         value={s.label}
                         onChange={(e) => onUpdateSub(sIdx, { label: e.target.value })}
-                        placeholder="Submilestone — np. Snippet audio gotowy"
+                        placeholder="Submilestone - np. Snippet audio gotowy"
                         maxLength={120}
                         className="flex-1 h-7 text-xs"
                       />

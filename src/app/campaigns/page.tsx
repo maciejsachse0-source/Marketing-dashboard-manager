@@ -21,7 +21,7 @@ export default async function CampaignsOverviewPage() {
     <PageShell
       title="Kampanie"
       eyebrow="dyspozytornia narracji + biblioteka szablonów"
-      description="Aktywne kampanie i szablony narracji — wszystko w jednym miejscu."
+      description="Aktywne kampanie i szablony narracji - wszystko w jednym miejscu."
       actions={
         <div className="flex items-center gap-2">
           <Link href="/campaigns/templates/new">

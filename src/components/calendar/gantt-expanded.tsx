@@ -77,10 +77,10 @@ export function ExpandedDetails({
         <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
           <div className="flex-1 min-w-0">
             <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
-              Start produkcji {row.artistName ? `· ${row.artistName}` : ''}
+              Start produkcji {row.artistName ? `, ${row.artistName}` : ''}
             </div>
             <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed">
-              Zmień datę startu — <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
+              Zmień datę startu - <strong>wszystkie kroki, daty i wpisy w kalendarzu</strong> przesuną się razem o tyle samo dni.
             </p>
           </div>
           <T1StartEditor

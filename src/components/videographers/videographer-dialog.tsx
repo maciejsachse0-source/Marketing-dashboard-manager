@@ -178,7 +178,7 @@ export function VideographerDialog({
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               rows={3}
-              placeholder="Krótki opis — styl, doświadczenie, czemu warto z nim pracować..."
+              placeholder="Krótki opis - styl, doświadczenie, czemu warto z nim pracować..."
             />
           </div>
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}

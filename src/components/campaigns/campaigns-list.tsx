@@ -14,7 +14,7 @@ export function CampaignsList({ campaigns }: { campaigns: Campaign[] }) {
         title="Brak kampanii"
         description={
           <>
-            Kliknij &bdquo;+ Nowa kampania&rdquo; — wybierz szablon, ustal kickoff i zacznij
+            Kliknij &bdquo;+ Nowa kampania&rdquo; - wybierz szablon, ustal kickoff i zacznij
             budować długofalową wizję.
           </>
         }
@@ -130,7 +130,7 @@ export function CampaignsList({ campaigns }: { campaigns: Campaign[] }) {
               </div>
             ) : (
               <p className="text-[11px] text-muted-foreground italic">
-                Bez szablonu — brak milestone&apos;ów.
+                Bez szablonu - brak milestone&apos;ów.
               </p>
             )}
           </Link>

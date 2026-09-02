@@ -104,7 +104,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
       {
         id: 'act:add-entry',
         label: 'Dodaj wpis kalendarza',
-        hint: 'kalendarz · nowy wpis',
+        hint: 'kalendarz, nowy wpis',
         group: 'Akcje',
         icon: Plus,
         action: go('/calendar'),
@@ -231,7 +231,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>↑↓ nawigacja · ↵ wybór</span>
+          <span>↑↓ nawigacja, ↵ wybór</span>
           <span>{flatList.length} {flatList.length === 1 ? 'wynik' : flatList.length < 5 ? 'wyniki' : 'wyników'}</span>
         </div>
       </div>

@@ -210,7 +210,7 @@ export function CampaignPeriodsEditor({
           </h2>
           <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
             Klik w nazwę przy każdym okresie, by ją zmienić (np. „Build-up", „Reveal");
-            klik w pole pod paskiem otwiera opis — co chcesz w tej fazie powiedzieć
+            klik w pole pod paskiem otwiera opis - co chcesz w tej fazie powiedzieć
             widzowi. Przeciągaj kotwice po osi, by kształtować rytm wizji.
             Wynik widać u góry na „Wspólnym planie kampanii".
           </p>
@@ -254,7 +254,7 @@ export function CampaignPeriodsEditor({
             Data startu kampanii (kotwica osi){' '}
             {kickoffSaving ? (
               <span className="ml-1 text-foreground normal-case tracking-normal">
-                · zapisuję…
+                , zapisuję…
               </span>
             ) : null}
           </Label>

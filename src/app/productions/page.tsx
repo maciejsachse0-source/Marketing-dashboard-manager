@@ -31,7 +31,7 @@ export default async function ProductionsOverviewPage() {
     <PageShell
       title="Produkcje"
       eyebrow="łańcuch produkcji + biblioteka pipeline'ów"
-      description="Aktywne produkcje i szablony — wszystko w jednym miejscu."
+      description="Aktywne produkcje i szablony - wszystko w jednym miejscu."
       actions={
         <div className="flex items-center gap-2">
           <Link href="/templates/new">

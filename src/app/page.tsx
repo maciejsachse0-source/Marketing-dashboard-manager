@@ -69,7 +69,7 @@ export default async function DashboardPage() {
     <PageShell
       title="Marketing Crew"
       eyebrow={`tydzień ${isoWeek}`}
-      description={`${today} · dyspozytornia kampanii short-form`}
+      description={`${today}, dyspozytornia kampanii short-form`}
     >
       <section className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
         <MetricCard
@@ -80,8 +80,8 @@ export default async function DashboardPage() {
         />
         <MetricCard
           icon={TrendingUp}
-          label="Średni ER · 30d"
-          value={avgER !== null ? `${avgER.toFixed(1)}%` : '—'}
+          label="Średni ER, 30d"
+          value={avgER !== null ? `${avgER.toFixed(1)}%` : '-'}
           hint={
             avgER === null
               ? 'brak metryk'
@@ -103,8 +103,8 @@ export default async function DashboardPage() {
         />
         <MetricCard
           icon={UserPlus}
-          label="Nowi followersi · 7d"
-          value={newFollowers > 0 ? `+${newFollowers.toLocaleString('pl-PL')}` : '—'}
+          label="Nowi followersi, 7d"
+          value={newFollowers > 0 ? `+${newFollowers.toLocaleString('pl-PL')}` : '-'}
           tone={newFollowers > 0 ? 'good' : 'neutral'}
         />
       </section>
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
         </div>
 
         <div>
-          <SectionHeader icon={TrendingUp} title="Top posty · 7 dni" />
+          <SectionHeader icon={TrendingUp} title="Top posty, 7 dni" />
           {topPosts.length === 0 ? (
             <EmptyState
               icon={TrendingUp}
@@ -205,8 +205,8 @@ export default async function DashboardPage() {
                   <PlatformPill platform={p.platform} />
                   <span className="flex-1 truncate">{p.title}</span>
                   <span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                    {p.reach ? p.reach.toLocaleString('pl-PL') : '—'}
-                    {p.engagementRate ? ` · ${p.engagementRate}%` : ''}
+                    {p.reach ? p.reach.toLocaleString('pl-PL') : '-'}
+                    {p.engagementRate ? `, ${p.engagementRate}%` : ''}
                   </span>
                 </li>
               ))}

@@ -16,9 +16,9 @@ export const STAGE_LABEL: Record<ProductionStatus, string> = {
 
 export const STAGE_HINT: Partial<Record<ProductionStatus, string>> = {
   'email-sent': 'Cold mail / DM z propozycją współpracy.',
-  'terms-accepted': 'Artysta zgodził się na warunki — termin, lokację, zakres.',
+  'terms-accepted': 'Artysta zgodził się na warunki - termin, lokację, zakres.',
   'cam-meeting-set': 'Ustalona konkretna data spotkania z kamerzystą.',
-  'cam-date-shared': 'Data przekazana kamerzyście — gotowy w terminarzu.',
+  'cam-date-shared': 'Data przekazana kamerzyście - gotowy w terminarzu.',
   'script-discussed': 'Omówienie scenariusza, ujęć, sprzętu.',
   'script-sent': 'Final scenariusz wysłany do kamerzysty + artysty.',
   shooting: 'W studio / w terenie. Nagranie głównego materiału + BTS.',

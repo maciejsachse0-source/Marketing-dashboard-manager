@@ -19,7 +19,7 @@ export default async function AgentPage({
   if (!agent) notFound();
 
   const promptFile = `agents/${agent.slug}.md`;
-  const invocation = `@${promptFile} ${agent.name} — działaj zgodnie z promptem.`;
+  const invocation = `@${promptFile} ${agent.name} - działaj zgodnie z promptem.`;
   const widgetHint = agent.dashboardWidget ? await runAgentWidget(agent.dashboardWidget) : null;
 
   return (
@@ -106,7 +106,7 @@ export default async function AgentPage({
           <div className="rounded-lg border border-dashed border-border p-4 text-xs text-muted-foreground">
             <div className="font-medium text-foreground mb-1">Workflow w Claude Code</div>
             Agent czyta kontekst (kalendarz/posty/artyści) bezpośrednio z SQLite. Po zmianach
-            odśwież stronę — dane są live z bazy.
+            odśwież stronę - dane są live z bazy.
           </div>
         </div>
       </div>

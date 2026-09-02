@@ -110,7 +110,7 @@ export function CampaignWizard({
           templateSlug,
         });
         toast.success(
-          `Utworzono kampanię #${row.id}${selectedTemplate ? ` · szablon: ${selectedTemplate.name}` : ''}`,
+          `Utworzono kampanię #${row.id}${selectedTemplate ? `, szablon: ${selectedTemplate.name}` : ''}`,
         );
         router.push(`/campaigns/${row.id}`);
         close(false);
@@ -219,7 +219,7 @@ function StepTemplate({
       <div className="space-y-1">
         <p className="text-sm text-muted-foreground">Szablon kampanii</p>
         <p className="text-[11px] text-muted-foreground/80">
-          Wybór jest ograniczony do <strong>jednego</strong> szablonu — staje się on
+          Wybór jest ograniczony do <strong>jednego</strong> szablonu - staje się on
           kręgosłupem narracji. Periody i milestone&apos;y możesz dalej kształtować
           sliderem na stronie kampanii.
         </p>
@@ -267,7 +267,7 @@ function TemplateCard({
             active ? 'text-primary font-bold' : 'text-muted-foreground'
           }`}
         >
-          {template.milestones.length} milestone&apos;ów · {totalSubs} sub.
+          {template.milestones.length} milestone&apos;ów, {totalSubs} sub.
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-snug mb-2">{template.summary}</p>
@@ -283,7 +283,7 @@ function TemplateCard({
             >
               <span className="font-bold tabular-nums tracking-wider">{p.code}</span>
               <span className="opacity-80">×{cnt}</span>
-              <span className="opacity-60 text-[9px]">· {length}d</span>
+              <span className="opacity-60 text-[9px]">, {length}d</span>
             </span>
           );
         })}
@@ -319,7 +319,7 @@ function StepDetails({
           id="cname"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Np. Wizja jesień&apos;26 — opowieść artystów"
+          placeholder="Np. Wizja jesień&apos;26 - opowieść artystów"
         />
       </div>
       <div className="grid gap-1.5">
@@ -342,7 +342,7 @@ function StepDetails({
           onChange={(e) => setKickoffAt(e.target.value)}
         />
         <p className="text-[10px] text-muted-foreground">
-          To data 0 osi czasu. Wszystkie okresy kampanii są od niej liczone — nie jest
+          To data 0 osi czasu. Wszystkie okresy kampanii są od niej liczone - nie jest
           to data premiery, tylko moment, w którym ruszasz z narracją.
         </p>
       </div>
@@ -405,7 +405,7 @@ function StepReview({
               <span>
                 {template.name}
                 <span className="text-muted-foreground ml-1.5 tabular-nums">
-                  · {template.milestones.length} milestone&apos;ów · {totalSubs} sub.
+                  , {template.milestones.length} milestone&apos;ów, {totalSubs} sub.
                 </span>
               </span>
             ) : (
@@ -437,7 +437,7 @@ function StepReview({
                   {length}d
                 </span>
                 <span className="text-muted-foreground">
-                  {inP.map((m) => m.label).join(' · ')}
+                  {inP.map((m) => m.label).join(', ')}
                 </span>
               </div>
             );

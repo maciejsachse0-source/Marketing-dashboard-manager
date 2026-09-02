@@ -21,7 +21,7 @@ export default async function CampaignsListPage() {
       eyebrow="dyspozytornia narracji"
       description={
         <>
-          Każda kampania to długofalowa wizja — opowieść, którą widz Twoich artystów ma
+          Każda kampania to długofalowa wizja - opowieść, którą widz Twoich artystów ma
           poczuć od pierwszej zapowiedzi po finałowy reveal i afterglow. To nie kalendarz
           jednej premiery, tylko szkielet narracji projektu, w którego ramach pracują
           artyści.

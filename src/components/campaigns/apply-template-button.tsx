@@ -40,7 +40,7 @@ export function ApplyTemplateButton({
     startTransition(async () => {
       try {
         await applyTemplateToCampaign(campaignId, selected);
-        toast.success('Zastosowano szablon — kampania ma teraz narrację.');
+        toast.success('Zastosowano szablon - kampania ma teraz narrację.');
         setOpen(false);
       } catch (e) {
         toast.error('Nie udało się zastosować szablonu', {
@@ -57,7 +57,7 @@ export function ApplyTemplateButton({
         <a href="/campaigns/templates/new" className="underline font-medium">
           /campaigns/templates/new
         </a>{' '}
-        — bez szablonu kampania nie ma narracji.
+        - bez szablonu kampania nie ma narracji.
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function ApplyTemplateButton({
         <Sparkles className="w-4 h-4 text-amber-700 shrink-0" />
         <div className="flex-1 min-w-0 text-xs text-amber-900">
           <span className="font-semibold">Brak narracji.</span>{' '}
-          Ta kampania powstała bez szablonu — nie ma nazwanych okresów ani
+          Ta kampania powstała bez szablonu - nie ma nazwanych okresów ani
           milestone&apos;ów. Zastosuj szablon by dostać gotowy łuk narracyjny
           (build-up → premiera → afterglow itd.).
         </div>
@@ -92,7 +92,7 @@ export function ApplyTemplateButton({
             <p className="text-xs text-muted-foreground">
               Szablon sklonuje swoje okresy (T1..Tn z nazwami) i milestone&apos;y
               do tej kampanii. Edytować będziesz mógł je sliderem na stronie
-              kampanii — zmiana w szablonie nie wpłynie później na tę kampanię.
+              kampanii - zmiana w szablonie nie wpłynie później na tę kampanię.
             </p>
             <div className="grid gap-2">
               {templates.map((t) => (
@@ -147,7 +147,7 @@ function TemplateOption({
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="font-semibold text-sm tracking-tight">{template.name}</span>
         <span className="text-[10px] uppercase tracking-[0.12em] tabular-nums text-muted-foreground">
-          {template.milestones.length} milestone&apos;ów · {totalSubs} sub.
+          {template.milestones.length} milestone&apos;ów, {totalSubs} sub.
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-snug mb-2">

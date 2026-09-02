@@ -50,7 +50,7 @@ export function ProductionPeopleStack({
       ) : orphanArtist ? (
         <PeopleAvatarTooltip
           title="Brak artysty"
-          meta={`Produkcja z artystą — ${crewSuffix}. Przypisz artystę w produkcji.`}
+          meta={`Produkcja z artystą - ${crewSuffix}. Przypisz artystę w produkcji.`}
         >
           <OrphanArtistAvatar size="sm" />
         </PeopleAvatarTooltip>
@@ -59,8 +59,8 @@ export function ProductionPeopleStack({
           title="Produkcja solo"
           meta={
             videographerName
-              ? `Bez artysty · z kamerzystą ${videographerName}`
-              : 'Bez artysty · bez kamerzysty'
+              ? `Bez artysty, z kamerzystą ${videographerName}`
+              : 'Bez artysty, bez kamerzysty'
           }
         >
           <SoloAvatar size="sm" />

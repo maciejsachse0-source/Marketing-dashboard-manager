@@ -35,8 +35,8 @@ export function HelpDialog() {
       <Button
         variant="ghost"
         onClick={() => setOpen(true)}
-        aria-label="Pomoc — instrukcja dyspozytorni"
-        title="Pomoc — kliknij ?, żeby zobaczyć instrukcję"
+        aria-label="Pomoc - instrukcja dyspozytorni"
+        title="Pomoc - kliknij ?, żeby zobaczyć instrukcję"
         className="h-auto font-normal bg-clip-border group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/60 text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-foreground/40 transition"
       >
         <span>Pomoc</span>
@@ -49,10 +49,10 @@ export function HelpDialog() {
         <DialogContent className="sm:max-w-3xl max-h-[88vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg">
-              Dyspozytornia · jak prowadzić zespół do nagrywek
+              Dyspozytornia, jak prowadzić zespół do nagrywek
             </DialogTitle>
             <DialogDescription>
-              Pełny obieg od pomysłu do publikacji — kampania, produkcja, pipeline
+              Pełny obieg od pomysłu do publikacji - kampania, produkcja, pipeline
               i foldery na pliki. Czytaj jak instrukcję zakładania własnej ekipy.
             </DialogDescription>
           </DialogHeader>
@@ -65,7 +65,7 @@ export function HelpDialog() {
               path="/campaigns/list → „+ Nowa kampania”"
             >
               <p>
-                Kampania to <b>parasol narracyjny</b> — np. „Singiel Świt”,
+                Kampania to <b>parasol narracyjny</b> - np. „Singiel Świt”,
                 „Trasa jesień 2026”. Trzyma cel (KPI), datę startu i kolejne fazy
                 (build-up → teaser → reveal → premiera → afterglow). Produkcje
                 podpinasz pod nią później.
@@ -76,23 +76,23 @@ export function HelpDialog() {
                   <Pill>+ Nowa kampania</Pill>.
                 </Step>
                 <Step n={2}>
-                  <b>Krok 1 — Szablon.</b> Wybierz szablon (np. „Singiel
+                  <b>Krok 1 - Szablon.</b> Wybierz szablon (np. „Singiel
                   premierowy”, „Trasa koncertowa”). Szablon ustawia gotową oś
                   faz: build-up, teaser, reveal, release, afterglow.
                 </Step>
                 <Step n={3}>
-                  <b>Krok 2 — Detale.</b> Wpisz nazwę, wizję / cel
+                  <b>Krok 2 - Detale.</b> Wpisz nazwę, wizję / cel
                   („dlaczego ta kampania istnieje”), datę startu (kickoff = T-0
                   całej kampanii) i opcjonalnie notatki.
                 </Step>
                 <Step n={4}>
-                  <b>Krok 3 — Podsumowanie</b> i <Pill>Utwórz kampanię</Pill>.
-                  Trafiasz na <Code>/campaigns/&lt;id&gt;</Code> — tutaj
+                  <b>Krok 3 - Podsumowanie</b> i <Pill>Utwórz kampanię</Pill>.
+                  Trafiasz na <Code>/campaigns/&lt;id&gt;</Code> - tutaj
                   edytujesz fazy, KPI i podpinasz produkcje.
                 </Step>
               </Steps>
               <Tip>
-                Kampanię możesz wybrać też w toolbarze pipeline’u — wtedy nad
+                Kampanię możesz wybrać też w toolbarze pipeline’u - wtedy nad
                 wierszami produkcji rysuje się pas narracyjny z fazami.
               </Tip>
             </Section>
@@ -115,29 +115,29 @@ export function HelpDialog() {
                   <Pill>+ Nowa produkcja</Pill> lub naciśnij <Kbd>P</Kbd>.
                 </Step>
                 <Step n={2}>
-                  <b>Krok 1 — Typ.</b>
+                  <b>Krok 1 - Typ.</b>
                   <ul className="mt-1 ml-4 list-disc text-muted-foreground space-y-0.5">
                     <li>
-                      <b className="text-foreground">Z artystą</b> — kolab:
+                      <b className="text-foreground">Z artystą</b> - kolab:
                       outreach, brief, nagranie z gościem, podziękowanie.
                     </li>
                     <li>
-                      <b className="text-foreground">Solo</b> — twój content
+                      <b className="text-foreground">Solo</b> - twój content
                       (BTS, trending, refleksje), artysta nagrywa się sam.
                     </li>
                   </ul>
                   Wybierz też <b>szablon kroków</b> (9-krokowy fundament +
-                  opcjonalne dodatki — wszystko edytujesz później).
+                  opcjonalne dodatki - wszystko edytujesz później).
                 </Step>
                 <Step n={3}>
-                  <b>Krok 2 — Detale.</b> Tytuł, <b>tydzień startowy T-1</b>{' '}
-                  (outreach / ustalenia — T-0 wyliczy się automatycznie 2
-                  tygodnie później, w południe), artysta (wymagany — także
+                  <b>Krok 2 - Detale.</b> Tytuł, <b>tydzień startowy T-1</b>{' '}
+                  (outreach / ustalenia - T-0 wyliczy się automatycznie 2
+                  tygodnie później, w południe), artysta (wymagany - także
                   dla solo), kamerzysta (tylko z artystą), platformy publikacji,
                   notatki.
                 </Step>
                 <Step n={4}>
-                  <b>Krok 3 — Podsumowanie</b> i <Pill>Utwórz produkcję</Pill>.
+                  <b>Krok 3 - Podsumowanie</b> i <Pill>Utwórz produkcję</Pill>.
                   Trafiasz na <Code>/productions/&lt;id&gt;</Code>: pełna karta
                   produkcji z krokami, plikami i akcjami (anuluj, usuń, dodaj
                   krok).
@@ -145,7 +145,7 @@ export function HelpDialog() {
               </Steps>
               <Tip>
                 Brakuje artysty / kamerzysty? Dodaj w <Code>/artists</Code> lub{' '}
-                <Code>/videographers</Code> i wróć do kreatora — lista
+                <Code>/videographers</Code> i wróć do kreatora - lista
                 odświeży się.
               </Tip>
             </Section>
@@ -153,38 +153,38 @@ export function HelpDialog() {
             <Section
               num={3}
               icon={<ChartGantt className="size-4" />}
-              title="Główny interfejs — Pipeline"
+              title="Główny interfejs - Pipeline"
               path="/calendar (w sidebarze: „Pipeline”)"
             >
               <p>
                 Pipeline to dyspozytornia wszystkich produkcji jednocześnie.
                 Każda produkcja = jeden wiersz z trzema pasami{' '}
-                <span className="font-mono">T1</span> ·{' '}
-                <span className="font-mono">T2</span> ·{' '}
+                <span className="font-mono">T1</span>,{' '}
+                <span className="font-mono">T2</span>,{' '}
                 <span className="font-mono">T3</span>. Kropki na pasach to
-                kolejne kroki — to tu dzieje się codzienna robota.
+                kolejne kroki - to tu dzieje się codzienna robota.
               </p>
 
               <SubHeader>Czytanie wiersza</SubHeader>
               <ul className="ml-4 list-disc text-muted-foreground space-y-1">
                 <li>
-                  <b className="text-foreground">Lewa kolumna</b> — artysta /
+                  <b className="text-foreground">Lewa kolumna</b> - artysta /
                   tytuł, status, kamerzysta, platformy.
                 </li>
                 <li>
-                  <b className="text-foreground">Pas T-1</b> (jasne) — outreach,
+                  <b className="text-foreground">Pas T-1</b> (jasne) - outreach,
                   potwierdzenie warunków, ustalenia z kamerzystą.
                 </li>
                 <li>
-                  <b className="text-foreground">Pas T-2</b> (środkowy) —
+                  <b className="text-foreground">Pas T-2</b> (środkowy) -
                   nagrywka i obróbka.
                 </li>
                 <li>
-                  <b className="text-foreground">Pas T-3</b> (prawy) —
+                  <b className="text-foreground">Pas T-3</b> (prawy) -
                   publikacja per platforma.
                 </li>
                 <li>
-                  <b className="text-foreground">T-0</b> — pionowa linia daty
+                  <b className="text-foreground">T-0</b> - pionowa linia daty
                   premiery; pas narracyjny kampanii rysuje się powyżej, jeśli
                   wybierzesz kampanię w toolbarze.
                 </li>
@@ -194,39 +194,39 @@ export function HelpDialog() {
               <ul className="ml-4 list-disc text-muted-foreground space-y-1.5">
                 <li>
                   <CircleDot className="inline size-3.5 -mt-0.5 mr-1 text-foreground" />
-                  <b className="text-foreground">Klik w kropkę</b> — odhacza
+                  <b className="text-foreground">Klik w kropkę</b> - odhacza
                   krok (ustawia <Code>doneAt</Code>). Drugi klik cofa.
                 </li>
                 <li>
-                  <b className="text-foreground">Hover na kropce</b> — karta
+                  <b className="text-foreground">Hover na kropce</b> - karta
                   szczegółu: nazwa, opis, data, załącznik. Z karty: edytujesz
                   opis, podpinasz plik, otwierasz pełną kartę produkcji.
                 </li>
                 <li>
-                  <b className="text-foreground">„+ krok”</b> w pasie —
+                  <b className="text-foreground">„+ krok”</b> w pasie -
                   inline-form dodający krok niestandardowy (np. „dogranie
                   saksofonu”, „korekta koloru”) bez wychodzenia z pipeline’u.
                 </li>
                 <li>
                   <b className="text-foreground">Drag &amp; drop pliku</b> na
-                  krok — wrzuca załącznik do odpowiedniego folderu T2/T3.
+                  krok - wrzuca załącznik do odpowiedniego folderu T2/T3.
                 </li>
                 <li>
-                  <b className="text-foreground">Toolbar nad osią</b> —
+                  <b className="text-foreground">Toolbar nad osią</b> -
                   przesunięcie tygodni, zoom (<Code>Tydzień</Code> /{' '}
                   <Code>Miesiąc</Code> / <Code>Kwartał</Code>), filtry status /
                   typ, sortowanie po dacie / statusie / nazwie, wybór kampanii
                   do nakładki narracyjnej.
                 </li>
                 <li>
-                  <b className="text-foreground">Klik w tytuł produkcji</b> —
+                  <b className="text-foreground">Klik w tytuł produkcji</b> -
                   wchodzisz na pełną kartę (<Code>/productions/&lt;id&gt;</Code>),
                   gdzie zmieniasz tytuł, T-0, artystę, kamerzystę, platformy,
                   reorganizujesz kroki, anulujesz lub usuwasz produkcję.
                 </li>
               </ul>
               <Tip>
-                Kropki są źródłem prawdy — kalendarz, lista produkcji i
+                Kropki są źródłem prawdy - kalendarz, lista produkcji i
                 analityka czytają z tej samej tabeli. Co odhaczysz w pipeline,
                 pojawia się wszędzie indziej w sekundę.
               </Tip>
@@ -235,27 +235,27 @@ export function HelpDialog() {
             <Section
               num={4}
               icon={<FolderOpen className="size-4" />}
-              title="Foldery produkcji — gdzie lądują pliki"
+              title="Foldery produkcji - gdzie lądują pliki"
               path="OneDrive: Marketing Content / <Artysta> / <Tytuł> /"
             >
               <p>
                 Każda produkcja dostaje gotowe drzewo folderów na dysku
-                (OneDrive — synchronizuje się między maszynami). Struktura jest{' '}
+                (OneDrive - synchronizuje się między maszynami). Struktura jest{' '}
                 <b>przyklejona do ram T-2 i T-3</b> z pipeline’u, więc plik
                 zawsze wie, do którego kroku należy. T-1 to czysta komunikacja
-                — nie ma folderu.
+                - nie ma folderu.
               </p>
 
               <SubHeader>Schemat drzewa (z ikonkami)</SubHeader>
               <FolderTree />
 
-              <SubHeader>Przykład — produkcja „Kolaba z Anią — singiel Świt”</SubHeader>
+              <SubHeader>Przykład - produkcja „Kolaba z Anią - singiel Świt”</SubHeader>
               <FolderTreeExample />
 
               <Tip>
                 Folder zakłada się sam przy tworzeniu produkcji (i przy
                 pierwszym zrzucie pliku). Kasowanie produkcji w aplikacji nie
-                kasuje plików — folder dostaje sufiks{' '}
+                kasuje plików - folder dostaje sufiks{' '}
                 <Code>(nieaktualne)</Code>, żeby nic nie zniknęło przez
                 przypadek.
               </Tip>
@@ -360,7 +360,7 @@ function SubHeader({ children }: { children: React.ReactNode }) {
 
 function Tip({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[12px] text-muted-foreground border-l-2 border-amber-400/60 bg-amber-50/30 dark:bg-amber-400/5 pl-2.5 py-1.5 rounded-r">
+    <p className="text-[12px] text-muted-foreground border border-amber-400/60 bg-amber-50/30 dark:bg-amber-400/5 px-2.5 py-1.5 rounded">
       <b className="text-foreground/80">Wskazówka: </b>
       {children}
     </p>
@@ -393,7 +393,7 @@ function FolderTreeExample() {
     <div className="rounded-md border border-emerald-300/60 bg-emerald-50/40 dark:bg-emerald-500/5 p-3 font-mono text-[12px] leading-6">
       <Row icon={<FolderOpen className="text-amber-600" />} label="Marketing Content/" muted />
       <Row indent={1} icon={<Folder className="text-sky-600" />} label="Ania Kowalska/" />
-      <Row indent={2} icon={<Folder className="text-sky-700" />} label="Kolaba z Anią — singiel Świt/" />
+      <Row indent={2} icon={<Folder className="text-sky-700" />} label="Kolaba z Anią - singiel Świt/" />
       <Row indent={3} icon={<Folder className="text-zinc-500" />} label="T2/" />
       <Row indent={4} icon={<Video className="text-rose-600" />} label="nagrywanie/" />
       <Row indent={5} icon={<Camera className="text-rose-500" />} label="raw/" />
@@ -451,7 +451,7 @@ function Row({
       <span>{label}</span>
       {note ? (
         <span className="text-[10.5px] font-sans italic text-muted-foreground/80">
-          — {note}
+          - {note}
         </span>
       ) : null}
     </div>

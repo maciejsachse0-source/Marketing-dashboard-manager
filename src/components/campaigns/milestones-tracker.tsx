@@ -161,8 +161,8 @@ export function MilestonesTracker({
             Kamienie milowe
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {doneMain}/{totalMain} milestone&apos;ów ·{' '}
-            {totalSubs > 0 ? `${doneSubs}/${totalSubs} kroków` : 'bez kroków'} · klik
+            {doneMain}/{totalMain} milestone&apos;ów,{' '}
+            {totalSubs > 0 ? `${doneSubs}/${totalSubs} kroków` : 'bez kroków'}, klik
             w nazwę aby edytować
           </p>
         </div>
@@ -292,13 +292,13 @@ function PeriodBucket({
             {name ? name : `Okres ${code}`}
             {orphan ? (
               <span className="ml-2 text-[9px] uppercase tracking-[0.12em] text-amber-700/80 normal-case">
-                (poza obecnym timeline&apos;m — usuń lub zmień period)
+                (poza obecnym timeline&apos;m - usuń lub zmień period)
               </span>
             ) : null}
           </span>
           {name ? (
             <span className={`text-[9px] tracking-[0.12em] ${tone.ink} opacity-60 tabular-nums`}>
-              {code} · faza {periodIndex + 1}
+              {code}, faza {periodIndex + 1}
             </span>
           ) : null}
         </div>

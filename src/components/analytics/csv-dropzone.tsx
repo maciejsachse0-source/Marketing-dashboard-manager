@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
@@ -155,7 +156,7 @@ export function CsvDropzone() {
             Wybierz plik
           </Button>
         </div>
-        {error ? <p className="mt-3 text-xs text-rose-600 text-left">⚠ {error}</p> : null}
+        {error ? <p className="mt-3 text-xs text-rose-600 text-left inline-flex items-center gap-1"><TriangleAlert className="size-3.5 shrink-0" aria-hidden="true" />{error}</p> : null}
       </div>
 
       <Dialog open={!!dry} onOpenChange={(open) => (!open ? cancel() : null)}>
@@ -165,7 +166,7 @@ export function CsvDropzone() {
               <span>Podgląd importu</span>
               {dry ? (
                 <span className="text-xs font-normal text-muted-foreground">
-                  {dry.source} · {dry.rowCount} wierszy
+                  {dry.source}, {dry.rowCount} wierszy
                 </span>
               ) : null}
             </DialogTitle>
@@ -209,11 +210,11 @@ export function CsvDropzone() {
                           {row.action === 'create' ? (
                             <span className="text-muted-foreground tabular-nums">
                               {row.reach ? `reach ${row.reach.toLocaleString('pl-PL')}` : ''}
-                              {row.engagementRate ? ` · ER ${row.engagementRate}%` : ''}
+                              {row.engagementRate ? `, ER ${row.engagementRate}%` : ''}
                             </span>
                           ) : row.action === 'update' ? (
                             <span className="text-muted-foreground tabular-nums">
-                              #{row.matchedPostId} · {Object.entries(row.changes).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                              #{row.matchedPostId}, {Object.entries(row.changes).map(([k, v]) => `${k}: ${v}`).join(', ')}
                             </span>
                           ) : null}
                         </td>

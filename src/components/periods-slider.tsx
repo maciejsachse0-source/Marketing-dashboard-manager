@@ -421,7 +421,7 @@ function PeriodRail({
           className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${startPct}%` }}
           aria-label={`${period.code} początek`}
-          title={`Start: ${fmtDayMonth(startDate)} · ${describeOffset(period.startOffsetDays)}`}
+          title={`Start: ${fmtDayMonth(startDate)}, ${describeOffset(period.startOffsetDays)}`}
         />
         <Button
           variant="ghost"
@@ -429,7 +429,7 @@ function PeriodRail({
           className={`p-0 font-normal hover:bg-transparent hover:text-inherit absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-7 rounded border-2 ${tone.thumb} cursor-ew-resize shadow-md hover:scale-110 ui-transition`}
           style={{ left: `${endPct}%` }}
           aria-label={`${period.code} koniec`}
-          title={`Koniec: ${fmtDayMonth(endDate)} · ${describeOffset(period.endOffsetDays)}`}
+          title={`Koniec: ${fmtDayMonth(endDate)}, ${describeOffset(period.endOffsetDays)}`}
         />
       </div>
 
@@ -445,7 +445,7 @@ function PeriodRail({
             <textarea
               value={period.description ?? ''}
               onChange={(e) => onChangeDescription(e.target.value)}
-              placeholder={`Opis okresu ${period.code} — co chcesz, żeby widz POCZUŁ w tej fazie`}
+              placeholder={`Opis okresu ${period.code} - co chcesz, żeby widz POCZUŁ w tej fazie`}
               maxLength={500}
               rows={3}
               aria-label={`Opis okresu ${period.code}`}

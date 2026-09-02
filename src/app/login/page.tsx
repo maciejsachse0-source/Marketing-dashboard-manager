@@ -4,7 +4,7 @@ import { LoginForm } from '@/components/auth/login-form';
 import { getSessionEmail } from '@/lib/auth';
 
 export const metadata: Metadata = {
-  title: 'Logowanie · Marketing Crew',
+  title: 'Logowanie, Marketing Crew',
 };
 
 export const dynamic = 'force-dynamic';

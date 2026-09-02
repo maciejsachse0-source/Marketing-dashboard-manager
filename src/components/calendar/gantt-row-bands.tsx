@@ -132,7 +132,7 @@ export function GanttRowBands({
               pin.description,
             ]
               .filter(Boolean)
-              .join(' — ');
+              .join(' - ');
             // Vertical offset for same-day pin stacks. 1.875rem ≈ pin
             // height (1.75rem) + 0.125rem gap so neighbours never touch.
             // We center the stack around 50% so a 2-pin stack reads as

@@ -18,7 +18,7 @@ export const OTHER_TEAM: OtherPerson[] = [
     name: 'Jan Sachse',
     role: 'Marketing & koordynacja',
     email: 'jan.sachse@assecods.pl',
-    description: 'Prowadzi dyspozytornię kampanii — kalendarz, produkcje, agenci AI.',
+    description: 'Prowadzi dyspozytornię kampanii - kalendarz, produkcje, agenci AI.',
   },
   {
     name: 'Maciej Sachse',

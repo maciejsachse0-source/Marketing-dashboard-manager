@@ -65,7 +65,7 @@ export function ProductionsList({
         title="Brak produkcji"
         description={
           emptyDescription ??
-          'Kliknij „+ Nowa produkcja" lub użyj skrótu p — utwórz produkcję od zera, wpisy kalendarza dodaj ręcznie.'
+          'Kliknij „+ Nowa produkcja" lub użyj skrótu p - utwórz produkcję od zera, wpisy kalendarza dodaj ręcznie.'
         }
       />
     );
@@ -95,7 +95,7 @@ export function ProductionsList({
       {showSoloSection && (videographerGroups.length > 0 || orphanSolo.length > 0) ? (
         <section>
           <ListSectionHeading
-            title="Solo · po kamerzyście"
+            title="Solo, po kamerzyście"
             count={
               videographerGroups.reduce((s, g) => s + g.prods.length, 0) + orphanSolo.length
             }

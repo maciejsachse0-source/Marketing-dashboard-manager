@@ -57,7 +57,7 @@ export async function openProductionFolder(
   if (!ctx.artist) {
     return {
       ok: false,
-      error: 'Produkcja nie ma przypisanego artysty — przypisz artystę, by używać folderu roboczego',
+      error: 'Produkcja nie ma przypisanego artysty - przypisz artystę, by używać folderu roboczego',
     };
   }
 

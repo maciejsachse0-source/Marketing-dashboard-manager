@@ -21,7 +21,7 @@ export default async function EditAgentPage({
       description={
         <>
           Zmiany zapisują plik <code>data/agents/{agent.slug}.json</code>. Plik{' '}
-          <code>agents/{agent.slug}.md</code> (persona dla Claude Code) zostaje bez zmian — jeśli
+          <code>agents/{agent.slug}.md</code> (persona dla Claude Code) zostaje bez zmian - jeśli
           chcesz, zsynchronizuj go ręcznie.
         </>
       }

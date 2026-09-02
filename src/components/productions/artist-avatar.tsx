@@ -108,7 +108,7 @@ export function OrphanArtistAvatar({ size = 'md' }: { size?: keyof typeof SIZE }
   return (
     <div
       aria-hidden
-      title="Brak przypisanego artysty — przypisz w produkcji"
+      title="Brak przypisanego artysty - przypisz w produkcji"
       className={`${cls.box} rounded-full grid place-items-center bg-amber-100 text-amber-900 ring-2 ring-amber-400 shrink-0 shadow-sm border border-dashed border-amber-500`}
     >
       <UserMinus

@@ -66,7 +66,7 @@ export function ArtistPicker({
           Artysta
           {variant === 'warning' && !current ? (
             <span className="ml-1 text-[10px] uppercase tracking-[0.14em] text-amber-900 font-bold">
-              · brak — przypisz
+              , brak - przypisz
             </span>
           ) : null}
         </span>

@@ -22,7 +22,7 @@ export async function AgentContextPanel({ kind }: { kind: AgentSidePanel }) {
       return (
         <PlaceholderPanel
           title="Bookmarki trendów"
-          hint="Zapisane trendy — będą tu w Fazie 2."
+          hint="Zapisane trendy - będą tu w Fazie 2."
         />
       );
   }
@@ -63,7 +63,7 @@ function PlaceholderPanel({ title, hint }: { title: string; hint: string }) {
 async function CalendarPanel() {
   const upcoming = await getUpcomingCalendar(14);
   return (
-    <PanelShell title="Kalendarz · 14 dni" count={upcoming.length}>
+    <PanelShell title="Kalendarz, 14 dni" count={upcoming.length}>
       {upcoming.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           Pusto. Dodaj wpisy w{' '}
@@ -114,8 +114,8 @@ async function RecentPostsPanel() {
               <div className="font-medium truncate">{p.title}</div>
               <div className="text-muted-foreground">
                 [{p.platform}] {p.publishedAt.toLocaleDateString('pl-PL')}
-                {p.reach ? ` · reach ${p.reach.toLocaleString('pl-PL')}` : ''}
-                {p.engagementRate ? ` · ER ${p.engagementRate}%` : ''}
+                {p.reach ? `, reach ${p.reach.toLocaleString('pl-PL')}` : ''}
+                {p.engagementRate ? `, ER ${p.engagementRate}%` : ''}
               </div>
             </li>
           ))}
@@ -145,9 +145,9 @@ async function ArtistsPanel() {
                 {a.name} <span className="text-muted-foreground/70">#{a.id}</span>
               </div>
               <div className="text-muted-foreground truncate">
-                {a.handle ?? '—'}
+                {a.handle ?? '-'}
                 {a.lastContactAt
-                  ? ` · ostatnio: ${a.lastContactAt.toLocaleDateString('pl-PL')}`
+                  ? `, ostatnio: ${a.lastContactAt.toLocaleDateString('pl-PL')}`
                   : ''}
               </div>
             </li>
@@ -170,7 +170,7 @@ async function CampaignsPanel() {
             <li key={c.id} className="text-xs">
               <div className="font-medium truncate">{c.name}</div>
               <div className="text-muted-foreground">
-                T-0 {c.releaseAt.toLocaleDateString('pl-PL')} · faza: {c.phase}
+                T-0 {c.releaseAt.toLocaleDateString('pl-PL')}, faza: {c.phase}
               </div>
             </li>
           ))}

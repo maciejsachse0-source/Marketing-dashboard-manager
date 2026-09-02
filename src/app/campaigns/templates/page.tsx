@@ -16,7 +16,7 @@ export default async function CampaignTemplatesPage() {
       eyebrow="biblioteka kampanii marketingowych"
       description={
         <>
-          Predefiniowane scenariusze narracji — każdy szablon zawiera konfigurowalny timeline
+          Predefiniowane scenariusze narracji - każdy szablon zawiera konfigurowalny timeline
           (T1..Tn) i kamienie milowe budujące napięcie. Wybierasz jeden szablon przy tworzeniu
           kampanii i staje się on jej kręgosłupem.
         </>

@@ -53,7 +53,7 @@ export default async function ProductionsListPage({
     <PageShell
       title="Lista produkcji"
       eyebrow="łańcuch produkcji"
-      description="Każde wideo to produkcja — od pomysłu, przez nagranie, po analizę. Pogrupowane: kogo dotyczy."
+      description="Każde wideo to produkcja - od pomysłu, przez nagranie, po analizę. Pogrupowane: kogo dotyczy."
       actions={
         <NewProductionButton
           artists={artistOptions}

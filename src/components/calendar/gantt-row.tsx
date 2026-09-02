@@ -79,7 +79,7 @@ export const GanttRowView = memo(function GanttRowView({
   const subtitle = row.artistName
     ? row.artistHandle ?? row.title
     : orphanWithArtist
-      ? 'bez artysty — przypisz w produkcji'
+      ? 'bez artysty - przypisz w produkcji'
       : 'solo';
   const cancelled = optimisticStatus === 'cancelled';
 

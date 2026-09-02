@@ -67,7 +67,7 @@ export function GanttRowRail({
                     <Link
                       href={`/productions/${row.id}`}
                       className="flex-1 block text-base font-bold tracking-tight truncate hover:text-[var(--accent-blue)] transition"
-                      title={`${displayName} — pełny widok produkcji`}
+                      title={`${displayName} - pełny widok produkcji`}
                     >
                       {displayName}
                     </Link>

@@ -353,7 +353,7 @@ export default async function CalendarPage({
     <PageShell
       title="Pipeline"
       eyebrow="Oś czasu"
-      description="Każda produkcja jako wiersz na osi czasu. Pasy T1 (outreach + ustalenia), T2 (nagrywka + obróbka) i T3 (publikacja) ułożone wokół T-0. Klikaj kropki aby odhaczać kroki — wszystko synchronizuje się z kartą produkcji."
+      description="Każda produkcja jako wiersz na osi czasu. Pasy T1 (outreach + ustalenia), T2 (nagrywka + obróbka) i T3 (publikacja) ułożone wokół T-0. Klikaj kropki aby odhaczać kroki - wszystko synchronizuje się z kartą produkcji."
     >
       <GanttToolbar
         weekStart={weekStart}

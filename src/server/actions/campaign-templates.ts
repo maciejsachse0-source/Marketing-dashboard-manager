@@ -70,7 +70,7 @@ export async function createMarketingTemplate(
   await requireSession();
   const parsed = formInputSchema.parse(input);
   const slug = (parsed.slug && parsed.slug.length > 0 ? parsed.slug : safeSlug(parsed.name)).trim();
-  if (!slug) throw new Error('Nie udało się wygenerować slug — uzupełnij ręcznie.');
+  if (!slug) throw new Error('Nie udało się wygenerować slug - uzupełnij ręcznie.');
   if (await getMarketingTemplate(slug)) throw new Error(`Szablon o slugu "${slug}" już istnieje.`);
   const def = marketingTemplateSchema.parse({ ...parsed, slug });
   await upsertTemplate(def);

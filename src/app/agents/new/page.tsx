@@ -24,7 +24,7 @@ export default async function NewAgentPage({
       title={cloneFrom ? `Klonuj: ${cloneFrom.name}` : 'Nowy agent'}
       description={
         cloneFrom
-          ? 'Edytuj kopię — zmień slug + nazwę, dostosuj system prompt.'
+          ? 'Edytuj kopię - zmień slug + nazwę, dostosuj system prompt.'
           : 'Każdy agent to persona dla Claude Code. Po zapisie pojawi się w sidebarze i na pulpicie.'
       }
     >

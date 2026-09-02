@@ -14,7 +14,7 @@ export function CampaignTemplatesList({ templates }: { templates: MarketingTempl
         title="Brak szablonów"
         description={
           <>
-            Kliknij &bdquo;+ Nowy szablon&rdquo; — zdefiniujesz strukturę narracji kampanii: ile
+            Kliknij &bdquo;+ Nowy szablon&rdquo; - zdefiniujesz strukturę narracji kampanii: ile
             okresów, jak długie, z jakimi milestone&apos;ami.
           </>
         }

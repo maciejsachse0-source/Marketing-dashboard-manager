@@ -150,7 +150,7 @@ export function CampaignTimeline({
           <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
             Tu zobaczysz jak narracja kampanii (góra) zazębia się z
             harmonogramem nagrywek i publikacji artystów (środek). Każdy pas
-            to jedna produkcja — wiesz na rzut oka kiedy kto nagrywa i kiedy
+            to jedna produkcja - wiesz na rzut oka kiedy kto nagrywa i kiedy
             wychodzi materiał.
           </p>
         </div>
@@ -158,7 +158,7 @@ export function CampaignTimeline({
           <span>{fmtDayMonth(minDate)} {minDate.getFullYear()}</span>
           <span>→</span>
           <span>{fmtDayMonth(maxDate)} {maxDate.getFullYear()}</span>
-          <span className="opacity-70">· {totalDays} dni</span>
+          <span className="opacity-70">, {totalDays} dni</span>
         </div>
       </header>
 
@@ -203,7 +203,7 @@ export function CampaignTimeline({
           <Link href="/productions" className="underline hover:text-foreground">
             /productions
           </Link>{' '}
-          i przypnij ją do tej kampanii — pojawi się tu jako wiersz nagrań,
+          i przypnij ją do tej kampanii - pojawi się tu jako wiersz nagrań,
           obróbki i publikacji.
         </div>
       )}
@@ -331,7 +331,7 @@ function PeriodsStrip({
        *  the description without truncating. */}
       <div
         className="relative h-24 rounded-lg border border-border bg-muted/30"
-        aria-label="Pas narracji kampanii — okresy T1..Tn"
+        aria-label="Pas narracji kampanii - okresy T1..Tn"
       >
         <div className="absolute inset-0 overflow-hidden rounded-lg">
           <WeekendShading minDate={minDate} totalDays={totalDays} />
@@ -352,7 +352,7 @@ function PeriodsStrip({
                 key={p.code}
                 className={`absolute top-0 bottom-0 ${tone.bg} border-r border-border/60 px-2 py-1.5 overflow-hidden`}
                 style={{ left: `${left}%`, width: `${width}%` }}
-                title={`${p.code} · ${phaseTitle}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(endDate)} · ${lengthDays} dni${p.description ? `\n\n${p.description}` : ''}`}
+                title={`${p.code}, ${phaseTitle}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(endDate)}, ${lengthDays} dni${p.description ? `\n\n${p.description}` : ''}`}
               >
                 <div className="flex items-center gap-1.5">
                   <span
@@ -646,7 +646,7 @@ function LooseEntriesLane({
             >
               <div
                 className={`w-3 h-3 rounded-sm border ${TYPE_COLOR[e.type]} cursor-help`}
-                title={`${TYPE_LABEL[e.type]}: ${e.title} · ${e.startsAt.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}${e.status === 'done' ? ' ✓' : e.status === 'cancelled' ? ' ✗' : ''}`}
+                title={`${TYPE_LABEL[e.type]}: ${e.title}, ${e.startsAt.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}${e.status === 'done' ? ' (zrobione)' : e.status === 'cancelled' ? ' (anulowane)' : ''}`}
               />
             </div>
           );
@@ -718,7 +718,7 @@ function Legend({ periods }: { periods: TemplatePeriod[] }) {
             <span className={`w-2 h-2 rounded-sm ${tone.bar}`} />
             <span className={`${tone.ink} font-medium`}>
               {p.code}
-              {p.name ? <span className="opacity-70 font-normal"> · {p.name}</span> : null}
+              {p.name ? <span className="opacity-70 font-normal">, {p.name}</span> : null}
             </span>
           </span>
         );

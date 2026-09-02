@@ -133,7 +133,7 @@ export default async function CampaignDetailPage({
           />
           <KpiCard
             label="Średni ER"
-            value={avgER === null ? '—' : `${avgER.toFixed(1)}%`}
+            value={avgER === null ? '-' : `${avgER.toFixed(1)}%`}
             target={targetER > 0 ? `${targetER}%` : undefined}
             progress={targetER > 0 && avgER !== null ? Math.min(100, (avgER / targetER) * 100) : undefined}
           />
@@ -188,8 +188,8 @@ export default async function CampaignDetailPage({
                     [{p.platform}] {p.publishedAt.toLocaleDateString('pl-PL', { dateStyle: 'short' })}
                   </span>
                   <span className="text-xs tabular-nums">
-                    {p.reach ? `reach ${p.reach.toLocaleString('pl-PL')}` : '—'}
-                    {p.engagementRate ? ` · ER ${p.engagementRate}%` : ''}
+                    {p.reach ? `reach ${p.reach.toLocaleString('pl-PL')}` : '-'}
+                    {p.engagementRate ? `, ER ${p.engagementRate}%` : ''}
                   </span>
                 </li>
               ))}

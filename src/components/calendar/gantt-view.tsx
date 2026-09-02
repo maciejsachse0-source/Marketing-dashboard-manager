@@ -82,7 +82,7 @@ export function GanttView({
           <LegendChip code="T3" tone={FRAME_TONE.T3.chip} label="Publikacja" />
           <span className="ml-auto inline-flex items-center gap-4 text-xs text-muted-foreground">
             <LegendDot variant="solid" label="data zapisana" />
-            <LegendDot variant="dashed" label="domyślna pozycja — ustaw datę" />
+            <LegendDot variant="dashed" label="domyślna pozycja - ustaw datę" />
           </span>
         </div>
 
@@ -126,7 +126,7 @@ export function GanttView({
             </div>
             <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
               Spróbuj rozszerzyć zoom, zmienić zakres tygodni, zresetować filtry albo
-              utworzyć nową produkcję — milestone&apos;y pojawią się jako pinezki na osi.
+              utworzyć nową produkcję - milestone&apos;y pojawią się jako pinezki na osi.
             </p>
           </div>
         ) : null}

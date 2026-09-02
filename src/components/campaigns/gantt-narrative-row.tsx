@@ -98,7 +98,7 @@ export function CampaignGanttNarrativeRow({
             <Link
               href={`/campaigns/${campaign.id}`}
               className="flex-1 block text-sm font-bold tracking-tight truncate hover:underline"
-              title={`Kampania ${campaign.name} — otwórz szczegóły`}
+              title={`Kampania ${campaign.name} - otwórz szczegóły`}
             >
               {campaign.name}
             </Link>
@@ -147,7 +147,7 @@ export function CampaignGanttNarrativeRow({
                   key={p.code}
                   className={`absolute top-1 bottom-1 ${tone.bar} ${tone.ink} border-r border-background/40 px-2 py-1.5 overflow-hidden rounded-sm shadow-sm`}
                   style={{ left: `${clippedLeft}%`, width: `${width}%` }}
-                  title={`${p.code}${p.name ? ` · ${p.name}` : ''}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}${p.description ? `\n\n${p.description}` : ''}`}
+                  title={`${p.code}${p.name ? `, ${p.name}` : ''}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}${p.description ? `\n\n${p.description}` : ''}`}
                 >
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-[10px] font-black tracking-[0.16em] tabular-nums opacity-90">
@@ -193,7 +193,7 @@ export function CampaignGanttNarrativeRow({
                     <span
                       key={`off-${p.code}`}
                       className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded ${tone.bar} ${tone.ink} text-[10px] font-bold tracking-tight`}
-                      title={`${p.code} · ${p.name ?? ''}${p.description ? `\n\n${p.description}` : ''}`}
+                      title={`${p.code}, ${p.name ?? ''}${p.description ? `\n\n${p.description}` : ''}`}
                     >
                       <span className="tabular-nums opacity-80">{p.code}</span>
                       {p.name ? <span>{p.name}</span> : null}

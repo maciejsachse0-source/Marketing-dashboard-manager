@@ -222,7 +222,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
 
         <div className="px-3 py-2 mt-auto overflow-y-auto">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 px-2 mb-1">
-            Agenci · Claude Code
+            Agenci, Claude Code
           </div>
           <ul className="flex flex-col gap-0.5 mb-2">
             {agents.map((a) => {

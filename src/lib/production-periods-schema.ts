@@ -61,7 +61,7 @@ export const periodsSchema = z
       if (a.endOffsetDays >= b.startOffsetDays) {
         ctx.addIssue({
           code: 'custom',
-          message: `${a.code} (koniec) i ${b.code} (start) nakładają się — okresy muszą być rozdzielone`,
+          message: `${a.code} (koniec) i ${b.code} (start) nakładają się - okresy muszą być rozdzielone`,
           path: [i + 1, 'startOffsetDays'],
         });
       }

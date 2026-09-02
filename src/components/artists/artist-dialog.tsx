@@ -143,7 +143,7 @@ export function ArtistDialog({
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               rows={4}
-              placeholder="Krótki opis artysty — gatunek, styl, czego szuka, czemu warto z nim współpracować..."
+              placeholder="Krótki opis artysty - gatunek, styl, czego szuka, czemu warto z nim współpracować..."
             />
           </div>
           {error ? <p className="text-xs text-rose-600">{error}</p> : null}

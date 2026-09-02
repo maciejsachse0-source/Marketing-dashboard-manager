@@ -90,7 +90,7 @@ export function MilestoneLabels({
                 </span>
                 {time ? (
                   <span className="text-[10px] tabular-nums text-muted-foreground/80">
-                    · {time}
+                    , {time}
                   </span>
                 ) : null}
               </div>

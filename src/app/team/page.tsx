@@ -54,7 +54,7 @@ export default async function TeamPage() {
     <PageShell
       title="Zespół"
       eyebrow="ludzie produkcji"
-      description="Artyści i kamerzyści — w jednym miejscu kontakty, kolaby, sprzęt."
+      description="Artyści i kamerzyści - w jednym miejscu kontakty, kolaby, sprzęt."
     >
       <div className="space-y-12">
         <section>

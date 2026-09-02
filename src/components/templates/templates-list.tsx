@@ -27,7 +27,7 @@ export function TemplatesList({ templates }: { templates: ProductionTemplate[] }
       <EmptyState
         icon={LayoutTemplate}
         title="Brak szablonów"
-        description='Kliknij „+ Nowy szablon" — zdefiniujesz własny scenariusz pipeline, a kreator nowej produkcji zaproponuje go do wyboru.'
+        description='Kliknij „+ Nowy szablon" - zdefiniujesz własny scenariusz pipeline, a kreator nowej produkcji zaproponuje go do wyboru.'
       />
     );
   }
