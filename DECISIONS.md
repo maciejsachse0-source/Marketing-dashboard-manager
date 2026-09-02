@@ -483,3 +483,30 @@ czasu; powód opisany wyżej we wpisie F2-04. Turbopack, trzynaście razy szybsz
 nie stał się domyślnym trybem deweloperskim, bo renderuje `/calendar` inaczej niż
 produkcja (F2-05, issue F7-14). Oba wnioski są zmierzone, nie wydedukowane.
 
+
+## F3-01 — stan pracy guzika i `prefers-reduced-motion`
+
+**Stan `loading` dobudowany, ale bez obietnicy stałej szerokości.** Tabela zdarzeń
+w `plan/05` sekcja 4 żądała „szerokość niezmieniona". Zbudowanie tego wprost wymaga
+albo ukrycia tekstu i wstawienia wirującej ikony na jego miejsce (łamie „tekst
+zachowany" z tego samego wiersza), albo zmierzenia guzika w JavaScripcie i przypięcia
+`min-width` (efekt uboczny: guzik przestaje reagować na zmianę treści). Wybrane
+rozwiązanie: wirująca ikona wjeżdża przed tekst, guzik dostaje `disabled` i
+`aria-busy="true"`, szerokość rośnie o ikonę i odstęp. Wiersz tabeli poprawiony na to,
+co faktycznie robi kod. Kto potrzebuje stałej szerokości, trzyma ją wypełnieniem
+zewnętrznym wokół guzika, nie w guziku.
+
+**`prefers-reduced-motion` był już zrobiony, tylko nie wiedzieliśmy o tym.**
+`src/app/globals.css` niesie regułę `@media (prefers-reduced-motion: reduce)` z
+`transition-duration: 1ms !important` dla `*`, więc guzik nie potrzebował własnej
+obsługi przejść. Brakowało jednego: ta sama reguła ustawia `animation-duration: 1ms`,
+co zamieniłoby wirującą ikonę w migotanie zamiast ją zatrzymać. Stąd
+`motion-reduce:animate-none` na ikonie. Zmierzone w przeglądarce (Playwright,
+`reducedMotion: 'reduce'`): przejście guzika 0,001 s, `animation-name` ikony `none`.
+Bez preferencji: 0,15 s i `spin / 1s`.
+
+**Czego F3-01 nie dodał i dlaczego.** Lista braków z `plan/05` sekcja 1 była w pięciu
+punktach na sześć nietrafiona; szczegóły w przepisanej sekcji 1. Nie powstał żaden nowy
+plik w `src/components/ui/`, bo żaden brakujący wzorzec nie wystąpił w dwóch miejscach.
+Dwa realne znaleziska poszły do backlogu jako F7-15 (mikro-etykieta sekcji, 90 kopii)
+i F7-16 (`card`, `badge` i `table` bez ani jednego użycia).

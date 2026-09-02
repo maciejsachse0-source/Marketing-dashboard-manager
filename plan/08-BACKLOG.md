@@ -708,7 +708,7 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
 
 ## F3 — Jeden wzorzec zamiast N kopii
 
-- [ ] **F3-01** `ui` Inwentaryzacja i uzupełnienie wzorca guzika
+- [x] **F3-01** `ui` Inwentaryzacja i uzupełnienie wzorca guzika
   CZYTAJ: `plan/05-ui-system.md` sekcje 1, 2, 3 i 4
   AC:
   - `plan/05` sekcja 1 uzupełniona o faktyczną listę powtarzających się wzorców
@@ -721,6 +721,19 @@ w `DECISIONS.md` z rekomendacją na bramkę F8; zrzuty ganta przed i po.
     `src/components/ui/`; wzorce jednorazowe zostawione lokalnie i wypisane w raporcie
     jako świadomie nieuogólnione
   - negatywne: `grep -rl 'PrimaryButton\|SmallButton\|IconButton' src/ | wc -l` zwraca `0`
+  DOWÓD (2026-09-02): sekcja 1 `plan/05` przepisana na zmierzony inwentarz z licznikami
+  (89 surowych `<button>` wobec 56 `<Button>`, 90 kopii mikro-etykiety, 16 wywołań
+  `confirm()`, `Card`/`Badge`/`Table` z zerem użyć). Oba zawieszone zachowania z tabeli
+  sekcji 4 rozstrzygnięte: `loading` zaimplementowany w `src/components/ui/button.tsx`
+  (wirująca ikona, `aria-busy`, `disabled`), `prefers-reduced-motion` udokumentowany jako
+  już istniejący w `globals.css` plus `motion-reduce:animate-none` na ikonie; uzasadnienie
+  odstępstwa od „szerokość niezmieniona" w `DECISIONS.md`. Weryfikacja na uruchomionej
+  aplikacji: zrzut `screenshots/F3-01-dev-button.png` (trzy warianty, każdy w stanie
+  spoczynku i pracy), pomiar w przeglądarce z `reducedMotion: 'reduce'`: przejście 0,001 s,
+  `animation-name: none`; bez preferencji 0,15 s i `spin / 1s`. Nowy komponent w `ui/`:
+  żaden, bo żaden brakujący wzorzec nie wystąpił w dwóch miejscach (znaleziska F7-15,
+  F7-16). `npm run test`: 2 testy `Button` zielone. Negatywne:
+  `grep -rl 'PrimaryButton\|SmallButton\|IconButton' src/ | wc -l` = 0.
 
 - [ ] **F3-02** `ui` Migracja guzików: kalendarz
   CZYTAJ: `plan/05-ui-system.md` sekcje 2, 3, 4 i 5
@@ -1208,6 +1221,43 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - po spełnieniu powyższego `dev` przełączone na turbopacka, `dev:alt` na webpacka,
     a pomiar `npm run perf:dev` powtórzony i dopisany do `DECISIONS.md`
   - negatywne: `npm run build` kod 0, pełny zestaw e2e zielony
+
+- [ ] **F7-15** `znalezisko` `ui` Mikro-etykieta sekcji powielona 90 razy w pięciu wariantach
+  Znalezione przy F3-01. Nagłówek sekcji „małe wersaliki z rozstrzeloną spacją" jest
+  wpisywany ręcznie w klasach: `text-[10px] uppercase tracking-[0.12em] text-muted-foreground
+  tabular-nums` (13 razy), `... tracking-[0.14em] text-muted-foreground` (10),
+  to samo z `font-medium` (9), z `font-semibold` (7), z `font-bold` (6), plus warianty
+  z `text-[11px] tracking-[0.16em]`. Razem 90 wystąpień, różnica między nimi to wyłącznie
+  grubość pisma i rozstrzelenie. To jest dokładnie „N kopii", przed którym stoi faza F3,
+  tylko że w typografii, nie w guziku. Naturalne miejsce naprawy to F3-06 (kanon typografii),
+  dlatego F3-01 tego nie migrował: 90 podmian w kilkunastu plikach nie zmieściłoby się
+  w jednym issue razem z inwentaryzacją i nie dałoby się uczciwie sprawdzić zrzutami.
+  Waga: **drobne** — nic nie psuje, kosztuje przy każdej zmianie stylu nagłówków.
+  Szacunek: pół dnia.
+  AC:
+  - komponent `src/components/ui/section-label.tsx` z wariantami CVA pokrywającymi
+    pięć zmierzonych kształtów, wpisany do katalogu w `plan/05` sekcja 3
+  - `grep -rnoE 'text-\[1[01]px\] uppercase tracking-\[0\.1[0-9]em\]' src --include='*.tsx' | wc -l`
+    zwraca `0`
+  - wygląd niezmieniony: zrzuty przed i po dla `/`, `/productions` i `/campaigns`,
+    każdy poniżej progu szumu (`node scripts/perf/pngdiff.mjs`, próg 1 680 pikseli)
+  - negatywne: `npm run test` i `npm run e2e` zielone
+
+- [ ] **F7-16** `znalezisko` `ui` Trzy komponenty z `ui/` nie mają ani jednego użycia
+  Znalezione przy F3-01. `src/components/ui/card.tsx`, `badge.tsx` i `table.tsx` nie są
+  importowane nigdzie w `src/` (`grep -rn "ui/card\|ui/badge\|ui/table" src --include='*.tsx' | wc -l`
+  zwraca `0`), a równolegle w kodzie stoi 11 plików z ręcznie składaną kartą
+  (`rounded-xl border border-border`) i 4 surowe `<table>`. Albo komponenty mają zostać
+  użyte, albo mają zniknąć; dziś są martwym kodem, który udaje istniejący wzorzec
+  i psuje inwentarz z `plan/05` sekcja 1.
+  Waga: **drobne**. Szacunek: pół dnia (decyzja) plus migracja, jeśli decyzja brzmi „użyć".
+  AC:
+  - dyspozycja zapisana w `DECISIONS.md`: dla każdego z trzech plików „migrujemy do niego"
+    albo „kasujemy"
+  - po wykonaniu dyspozycji `grep -rn "ui/card\|ui/badge\|ui/table" src --include='*.tsx' | wc -l`
+    zwraca liczbę większą od zera albo pliki nie istnieją
+  - negatywne: wygląd ekranów `/`, `/productions`, `/campaigns` bez zmian
+    (`node scripts/perf/pngdiff.mjs` poniżej progu szumu)
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
