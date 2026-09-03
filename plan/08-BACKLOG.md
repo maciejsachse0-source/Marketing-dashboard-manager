@@ -1958,7 +1958,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `npm run typecheck` kod 0, `npm run lint` kod 0,
     `node scripts/check-trust-boundaries.mjs` kod 0, **73 punkty wejścia** bez zmiany.
 
-- [ ] **F7-10** `znalezisko` `perf` Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny
+- [x] **F7-10** `znalezisko` `perf` Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny
   Waga: **ważne**. Szacunek: godzina.
   Znalezione przy F1-03. W bazie pomiarowej `marketing_perf` tabele
   `production_templates`, `marketing_templates` i `agents` mają **0 wierszy**
@@ -1977,6 +1977,40 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     `/templates` i `/agents`, czyli strony, które te katalogi renderują
   - negatywne: liczby dla siedmiu dotychczasowych stron nie zmieniają się
     o więcej niż 10%, bo dosiane katalogi ich nie dotyczą
+  DOWÓD (2026-09-03): **ZROBIONE.**
+  - `scripts/perf/seed-large.ts` sieje teraz **5 szablonów produkcji, 5 szablonów
+    kampanii i 6 agentów** (`COUNTS.productionTemplates`, `.marketingTemplates`,
+    `.agents`), z pełnym kształtem JSON: kroki szablonu, okresy T1/T2/T3, kamienie
+    milowe z podkrokami, `dashboard_widget`. Trzy tabele doszły do `truncate`,
+    więc generator dalej jest deterministyczny i powtarzalny.
+    Wstawianie przez nowy `insertChunkedNoIds`, bo te trzy tabele mają klucz
+    tekstowy `slug` i nie mają kolumny `id`, na której stoi `insertChunked`.
+  - `npm run pg:info` po dosianiu: `agents 6`, `marketing_templates 5`,
+    `production_templates 5` (przed: po zerze w każdej). Reszta bez zmian:
+    artists 200, campaigns 40, productions 500, calendar_entries 3000, posts 5000,
+    csv_rows 12000.
+  - `scripts/perf/measure-page.mjs` mierzy dodatkowo `/templates` i `/agents`,
+    a `perf/budget.json` dostał dla nich progi 600 ms, jak dla innych list.
+    Zmierzone: `/templates` p50 8,1 ms i p95 9,3 ms, `/agents` p50 5,2 ms
+    i p95 5,8 ms (mediany z trzech przebiegów).
+  - Strony naprawdę renderują dane, nie pustkę: `/templates` pokazuje 5 kart
+    „Szablon produkcji N", `/agents` 6 pozycji „Agent N”; zrzuty
+    `screenshots/F7/f7-10-templates.png` i `f7-10-agents.png`.
+  - `perf/baseline.json` uzupełniony o oba wpisy z jawną adnotacją, że zmierzono je
+    2026-09-03, czyli PO fazach F1 do F6, więc są punktem odniesienia dla F7-11,
+    a nie pomiarem sprzed optymalizacji. Siedmiu starszych stron świadomie NIE
+    przemierzam: to jedyny zapis stanu „przed", a nadpisanie go dzisiejszymi
+    liczbami zamieniłoby go w „po". Powód zapisany w polu `_f7_10` tego pliku.
+  - Negatywne kryterium spełnione: mediana **p50** z trzech przebiegów przed
+    dosianiem i trzech po — home -1%, calendar -2%, calendar-table -2%,
+    productions -1%, production-detail -2%, campaign-detail 0%, analytics -1%.
+    Na p95 calendar wyszło +24%, ale to ogon szumu, nie skutek dosiania: p95
+    calendar skacze między 70,7 a 94,6 ms w dziewięciu kolejnych przebiegach przy
+    p50 stabilnym w przedziale 67,8 do 71,5 ms.
+  BRAMKI: `typecheck` 0, `lint` 0, `test` 0, `check-typography` 0,
+  `check-trust-boundaries` 0, `perf` 0 (nowe progi trzymają).
+  **Odblokowuje F7-11**: katalogi w bazie pomiarowej są niepuste, a obie strony,
+  które je renderują, mają zmierzone „przed".
 
 - [ ] **F7-11** `znalezisko` `perf` `arch` Cache Components: wrócić do P3 na danych, które istnieją
   Waga: **drobne**. Szacunek: pół dnia. **Zależy od F7-10.**

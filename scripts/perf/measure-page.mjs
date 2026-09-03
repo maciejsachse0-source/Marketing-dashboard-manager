@@ -45,6 +45,11 @@ const PATHS = {
   'production-detail': `/productions/${ids.productionId}`,
   'campaign-detail': `/campaigns/${ids.campaignId}`,
   analytics: '/analytics',
+  // F7-10: strony katalogów. Do zestawu mierzonych wchodzą dopiero teraz, bo
+  // wcześniej zestaw L nie zasiewał `production_templates`, `marketing_templates`
+  // ani `agents`, więc obie renderowały pustkę i nie było czego mierzyć.
+  templates: '/templates',
+  agents: '/agents',
 };
 
 function fail(msg) {

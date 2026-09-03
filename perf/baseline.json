@@ -62,6 +62,22 @@
         "p95Ms": 31.7,
         "bytes": 267336,
         "status": 200
+      },
+      "templates": {
+        "url": "/templates",
+        "p50Ms": 8.1,
+        "p95Ms": 9.3,
+        "bytes": 134531,
+        "status": 200,
+        "_uwaga": "Zmierzone 2026-09-03 (F7-10), czyli PO fazach F1 do F6. To nie jest pomiar sprzed optymalizacji, tylko punkt odniesienia dla F7-11: mediana p50/p95 z trzech przebiegów na dosianym zestawie L."
+      },
+      "agents": {
+        "url": "/agents",
+        "p50Ms": 5.2,
+        "p95Ms": 5.8,
+        "bytes": 43495,
+        "status": 200,
+        "_uwaga": "Zmierzone 2026-09-03 (F7-10), czyli PO fazach F1 do F6. To nie jest pomiar sprzed optymalizacji, tylko punkt odniesienia dla F7-11: mediana p50/p95 z trzech przebiegów na dosianym zestawie L."
       }
     }
   },
@@ -131,5 +147,6 @@
     "method": "suma gzip wszystkich /_next/static/*.js linkowanych przez /calendar; next build w 16.2.4 nie drukuje już kolumny First Load JS",
     "targetKb": 350,
     "enforcedKb": 301.6
-  }
+  },
+  "_f7_10": "F7-10: zestaw L nie zasiewał katalogów, więc production_templates, marketing_templates i agents miały w bazie pomiarowej zero wierszy, a strony /templates i /agents renderowały pustkę. Generator sieje teraz 5 szablonów produkcji, 5 szablonów kampanii i 6 agentów, a obie strony weszły do zestawu mierzonego. Liczby siedmiu starszych stron zostają nietknięte celowo: to pomiar SPRZED optymalizacji z F1 do F6 i przemierzenie ich dzisiaj zamieniłoby „przed\" w „po\". Kontrola, że dosianie ich nie ruszyło: mediana p50 z trzech przebiegów przed dosianiem i trzech po, żadna strona nie zmienia się o więcej niż 2 procent (home -1, calendar -2, calendar-table -2, productions -1, production-detail -2, campaign-detail 0, analytics -1)."
 }

@@ -7,7 +7,9 @@
     "calendar": { "p95Ms": 900 },
     "calendar-table": { "p95Ms": 900 },
     "campaign-detail": { "p95Ms": 900 },
-    "production-detail": { "p95Ms": 900 }
+    "production-detail": { "p95Ms": 900 },
+    "templates": { "p95Ms": 600 },
+    "agents": { "p95Ms": 600 }
   },
   "db": {
     "_kazdeZapytanie": { "p95Ms": 120 },

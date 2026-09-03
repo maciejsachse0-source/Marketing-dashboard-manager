@@ -24,6 +24,11 @@ const COUNTS = {
   posts: 5000,
   csvUploads: 20,
   csvRows: 12000,
+  // Katalogi. Bez nich strony /templates i /agents renderowały pustkę, więc krok
+  // P3 (cache katalogów) nie miał czego mierzyć — znalezisko F7-10.
+  productionTemplates: 5,
+  marketingTemplates: 5,
+  agents: 6,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -144,6 +149,59 @@ async function insertChunked(
   return ids;
 }
 
+/** Jak `insertChunked`, ale dla tabel z kluczem tekstowym (`slug`), które nie
+ *  mają kolumny `id`, więc nie ma czego zwracać. */
+async function insertChunkedNoIds(
+  sql: postgres.Sql,
+  table: string,
+  rows: Array<Record<string, unknown>>,
+  size = 500,
+): Promise<void> {
+  for (let i = 0; i < rows.length; i += size) {
+    const chunk = rows.slice(i, i + size) as never;
+    await sql`insert into ${sql(table)} ${sql(chunk)}`;
+  }
+}
+
+const SIDE_PANELS = ['calendar-14', 'recent-posts', 'artists-list', 'active-campaigns', 'trend-bookmarks'] as const;
+const WIDGET_KINDS = ['stale-artists', 'upcoming-campaigns', 'overdue-calendar-entries', 'recent-csv-uploads'] as const;
+
+/** Trzy okresy T1/T2/T3 po siedem dni, licząc od startu. */
+const PERIODS_3 = [
+  { code: 'T1', startOffsetDays: 0, endOffsetDays: 6 },
+  { code: 'T2', startOffsetDays: 7, endOffsetDays: 13 },
+  { code: 'T3', startOffsetDays: 14, endOffsetDays: 20 },
+];
+
+/** Kroki szablonu produkcji — ten sam kształt, co `TemplateStep`. */
+function templateSteps(count: number) {
+  return Array.from({ length: count }, (_, i) => {
+    const category = STAGES[Math.min(Math.floor((i / count) * STAGES.length), STAGES.length - 1)];
+    return {
+      id: `ts${i}`,
+      category,
+      label: `${category} ${i + 1}`,
+      description: `Opis kroku ${i + 1}`,
+      dateMode: 'record',
+      durationMinutes: 60,
+    };
+  });
+}
+
+/** Kamienie milowe szablonu kampanii — kształt `MarketingMilestone`. */
+function templateMilestones(count: number) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `m${i}`,
+    period: PERIODS_3[i % PERIODS_3.length].code,
+    label: `Kamień ${i + 1}`,
+    description: `Opis kamienia ${i + 1}`,
+    submilestones: Array.from({ length: 3 }, (_, j) => ({
+      id: `m${i}s${j}`,
+      label: `Podkrok ${j + 1}`,
+    })),
+  }));
+}
+
 async function main() {
   const perfUrl = process.env.PERF_DATABASE_URL;
   const workUrl = process.env.DATABASE_URL;
@@ -164,6 +222,7 @@ async function main() {
   console.log('[seed-large] czyszczenie bazy pomiarowej');
   await sql`truncate table posts, csv_rows, csv_uploads, calendar_entries, productions,
             campaigns, videographers, artists restart identity cascade`;
+  await sql`truncate table production_templates, marketing_templates, agents cascade`;
 
   console.log(`[seed-large] artists: ${COUNTS.artists}`);
   const artistIds = await insertChunked(
@@ -302,6 +361,60 @@ async function main() {
       ...postMetrics(),
       raw_csv_row_id: chance(0.5) ? pick(csvRowIds) : null,
       created_at: at(-int(1, 400)),
+    })),
+  );
+
+  console.log(
+    `[seed-large] katalogi: production_templates ${COUNTS.productionTemplates}, ` +
+      `marketing_templates ${COUNTS.marketingTemplates}, agents ${COUNTS.agents}`,
+  );
+  await insertChunkedNoIds(
+    sql,
+    'production_templates',
+    Array.from({ length: COUNTS.productionTemplates }, (_, i) => ({
+      slug: `szablon-produkcji-${i + 1}`,
+      name: `Szablon produkcji ${i + 1}`,
+      type: i % 2 === 0 ? 'with-artist' : 'solo',
+      summary: `Skrót szablonu ${i + 1}`,
+      description: `Opis szablonu produkcji ${i + 1}`,
+      steps: sql.json(templateSteps(9 + i)),
+      periods: sql.json(PERIODS_3),
+      created_at: at(-int(1, 400)),
+      updated_at: at(-int(1, 200)),
+    })),
+  );
+
+  await insertChunkedNoIds(
+    sql,
+    'marketing_templates',
+    Array.from({ length: COUNTS.marketingTemplates }, (_, i) => ({
+      slug: `szablon-kampanii-${i + 1}`,
+      name: `Szablon kampanii ${i + 1}`,
+      summary: `Skrót szablonu kampanii ${i + 1}`,
+      description: `Opis szablonu kampanii ${i + 1}`,
+      periods: sql.json(PERIODS_3),
+      milestones: sql.json(templateMilestones(4 + i)),
+      created_at: at(-int(1, 400)),
+      updated_at: at(-int(1, 200)),
+    })),
+  );
+
+  await insertChunkedNoIds(
+    sql,
+    'agents',
+    Array.from({ length: COUNTS.agents }, (_, i) => ({
+      slug: `agent-${i + 1}`,
+      name: `Agent ${i + 1}`,
+      description: `Co robi agent ${i + 1} i kiedy go uruchomić.`,
+      system_prompt: `Jesteś agentem numer ${i + 1}.\n`.repeat(40),
+      side_panel: SIDE_PANELS[i % SIDE_PANELS.length],
+      dashboard_widget: sql.json({
+        kind: WIDGET_KINDS[i % WIDGET_KINDS.length],
+        days: 14,
+        template: `Wynik: {{count}}`,
+      }),
+      created_at: at(-int(1, 400)),
+      updated_at: at(-int(1, 200)),
     })),
   );
 

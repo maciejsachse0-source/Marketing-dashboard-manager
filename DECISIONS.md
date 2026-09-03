@@ -906,3 +906,15 @@ przepływu agentów; skasowanie wymagałoby przepisania dwóch person agentów, 
 produktem usera, nie kodem infrastruktury. Przycisku nie dokładam, bo to nowa funkcja,
 nie sprzątanie znaleziska. Rozbieżność między przepisami w personach a rzeczywistością
 zapisana jako **F7-30**.
+
+**F7-10, baseline uzupełniony, nie przemierzony w całości.** Kryterium mówiło
+„`perf/baseline.json` przemierzony po dosianiu". Przemierzenie wszystkiego dzisiaj
+skasowałoby jedyny w repozytorium zapis stanu sprzed optymalizacji z faz F1 do F6 —
+plik nazywa się baseline i tym właśnie jest. Dołożone zostały więc wyłącznie dwa nowe
+wpisy, `/templates` i `/agents`, każdy z adnotacją, że zmierzono go 2026-09-03, czyli
+po tych fazach, i że służy jako punkt odniesienia dla F7-11, a nie jako pomiar sprzed
+optymalizacji. Że dosianie katalogów nie ruszyło siedmiu starszych stron, sprawdzone
+medianą p50 z trzech przebiegów przed i trzech po: największa zmiana to 2 procent.
+Mierzone p50, nie p95, bo p95 na `/calendar` skacze w dziewięciu kolejnych przebiegach
+między 70,7 a 94,6 ms przy p50 stabilnym w przedziale 67,8 do 71,5 ms — to ogon szumu
+maszyny, a nie sygnał.
