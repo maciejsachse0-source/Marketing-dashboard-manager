@@ -493,13 +493,14 @@ Raport blokuje też przy dryfie: potrzeba jednocześnie ≥30% pogorszenia i pog
 większego niż 10% limitu metryki, bo sam procent zapala się na szumie maszyny
 (zmierzone 242% między kolejnymi przebiegami tej samej metryki).
 
-**Bundler: `dev` zostaje na webpacku, i to jest decyzja, nie zaniedbanie** (F2-05).
-Turbopack wygrywa każdą metrykę czasu (HMR 157 ms wobec 2017 ms, czyli 13x), ale
-jego obraz strony różni się od produkcyjnego o 82 921 pikseli z 7 823 808, przy
-webpacku 6 306 pikseli — czyli tryb deweloperski na turbopacku pokazuje co innego
-niż `next start`. `npm run dev:alt` uruchamia turbopacka dla kogoś, kto świadomie
-wybiera szybkość zamiast wierności. Przyczyna różnicy siedzi jako issue **F7-14**.
-Pomiary: `DECISIONS.md`, wpis F2-05.
+**Bundler: `dev` to turbopack** (F7-14; wcześniej, od F2-05, był webpack).
+Turbopack wygrywa każdą metrykę czasu — HMR 466 ms wobec 1961 ms, czyli 4x —
+a różnica wyglądu, przez którą F2-05 go odrzucił, przestała występować: pas T
+z siatką dni jest na turbopacku **piksel w piksel taki sam jak na `next start`**
+(0 różnych pikseli na zrzucie elementu), a cała strona `/calendar?view=week`
+różni się od produkcyjnej o 6 832 piksele, czyli **mniej niż webpack** (7 417).
+`npm run dev:alt` uruchamia webpacka dla kogoś, kto chce starego zachowania.
+Pomiary: `DECISIONS.md`, wpisy F2-05 i F7-14.
 
 Pomiar stron wymaga kolejności: najpierw `npm run perf:serve` w jednym terminalu,
 potem `npm run perf` w drugim. Bez tego `measure-page.mjs` mierzy albo serwer
@@ -615,7 +616,7 @@ Wykonane **2026-09-03**, na tej maszynie, przy kontenerze `mc-pg` w biegu
 | 7 | Baza robocza ma 102 artystów, 19 kampanii, 67 produkcji (sekcja 4) | `node scripts/perf/table-counts.mjs --work --json` | dokładnie te liczby, reszta tabel zero |
 | 8 | Każdy z 73 punktów wejścia waliduje wejście Zodem (sekcja 6) | `node scripts/check-trust-boundaries.mjs` | `Punktów wejścia: 73. Bez schematu mimo argumentów: 0.`, kod 0 |
 | 9 | W repozytorium nie ma sekretów ani arkuszy (sekcja 7) | `git ls-files \| grep -E '\.env\|\.xlsx\|\.db$' \| grep -v '^\.env\.example$' \| wc -l` | `0` |
-| 10 | `npm run dev` to webpack, turbopack siedzi pod `dev:alt` (sekcja 8) | `node -p "require('./package.json').scripts.dev"` | `node scripts/dev-prestart.mjs && next dev --webpack` |
+| 10 | `npm run dev` to turbopack, webpack siedzi pod `dev:alt` (sekcja 8) | `node -p "require('./package.json').scripts.dev"` | `node scripts/dev-prestart.mjs && next dev --turbopack` |
 
 Dodatkowo, jako kontrola bramek z sekcji 8: `npm run typecheck` kod 0,
 `npm run lint` 0 błędów i 108 ostrzeżeń, `npm run test` 216 zielonych w 20 plikach,

@@ -960,3 +960,55 @@ teoretycznie, jest złym interesem.
 ułamka ms) albo katalog urośnie o dwa rzędy wielkości — wtedy odczyt przestaje być
 4,8 procent żądania i pomiar ma co pokazać. Przepis techniczny leży we wpisie F1-03
 i pozostaje ważny.
+
+## F7-14 — objaw zniknął, `dev` przełączone na turbopacka (2026-09-03)
+
+**Co miało być przyczyną.** F2-05 zmierzył, że `/calendar?view=week` z dev-turbopacka
+różni się od zrzutu produkcyjnego o **82 921** pikseli z 7 823 808 (dev-webpack:
+6 306), a gołym okiem wyglądało to jak brak pionowych kresek siatki dni wewnątrz
+kolorowych pasów T1/T2/T3. Podejrzany numer jeden: modyfikator alfa Tailwinda v4
+(`bg-amber-100/55`) przetwarzany inaczej przez turbopacka.
+
+**Podejrzany okazał się niewinny.** Porównanie wyliczonych stylów tego samego
+elementu w obu bundlerach (Playwright, `getComputedStyle`, ta sama baza, ta sama
+trasa):
+
+| co | dev-webpack | dev-turbopack |
+|---|---|---|
+| tło pasa T1 | `oklab(0.962 -0.0058 0.0587 / 0.55)` | `oklab(0.962 -0.0058 0.0587 / 0.55)` |
+| ramka pasa T1 | `oklab(0.828 0.0183 0.1881 / 0.55)` | `oklab(0.828 0.0183 0.1881 / 0.55)` |
+| `--border` | `oklch(0.90 0.01 255)` | `lab(88.3796% -.806093 -3.66544)` |
+| siatka dni | `repeating-linear-gradient` z `oklch` | ten sam gradient z `lab` |
+
+Alfa jest identyczna. **Jedyna zmierzona różnica to przestrzeń barw**: turbopack
+przepuszcza CSS przez lightningcss, który przepisuje wartości `oklch()` na
+równoważne `lab()`. Kolor wychodzi ten sam, zmienia się tylko zapis.
+
+**Objaw nie występuje na dzisiejszym kodzie.** Zrzut samego pasa T (element
+`div.h-[5.5rem]`, czyli warstwa z gradientem siatki i pasami) z dev-turbopacka wobec
+`next start`: **0 różnych pikseli**. Kreski siatki dni są na miejscu, widoczne wewnątrz
+T2 i T3. Cała strona `/calendar?view=week`, zrzut pełnej wysokości, 1440 px szerokości:
+turbopack wobec produkcji **6 832** piksele, webpack wobec produkcji **7 417** —
+czyli turbopack jest dziś *bliżej* produkcji niż webpack, a obie liczby to szum
+antyaliasingu na tekście. Kryterium F7-14 („mniej niż 10 000") spełnione.
+
+Czego nie wiem i nie zgaduję: który commit z F1 do F6 usunął objaw. Kod pasa
+(`gantt-row-bands.tsx`) i tabela `FRAME_TONE` zmieniały się w F2 i F7-08, a same
+kolory przeniosły się do `FRAME_STYLE`. Odtwarzanie stanu sprzed pięciu faz, żeby
+nazwać winowajcę usuniętej usterki, kosztuje więcej niż jest warte.
+
+**Przełączenie.** `dev` = turbopack, `dev:alt` = webpack. Pomiar `npm run perf:dev`
+powtórzony na dzisiejszym kodzie, ta sama maszyna, ta sama baza:
+
+| metryka | webpack (F2-05) | turbopack (dziś) | limit |
+|---|---|---|---|
+| `readyMs` | 444 | 475 | 8000 |
+| `firstCompileMs` | 2748 | 1162 | 15000 |
+| `warmP50Ms` | 130 | 205 | 1200 |
+| `hmrMs` | **1961** | **466** | 3000 |
+| `peakRssMb` | 1556 | 1602 | 2500 |
+
+HMR, czyli ból zgłoszony przez usera, jest **4,2x krótszy**. Ciepłe żądanie jest
+o 75 ms wolniejsze, co przy limicie 1200 ms nie jest ceną, o której warto rozmawiać.
+Liczby z F2-05 mówiły o 13x — nie potwierdzam ich na dzisiejszym kodzie i nie
+przepisuję: obowiązuje pomiar dzisiejszy.

@@ -16,8 +16,12 @@ function runsOfKind(prefix) {
   if (!existsSync('perf/runs')) return [];
   return readdirSync('perf/runs')
     .filter((f) => f.startsWith(`${prefix}-`) && f.endsWith('.json'))
-    .sort()
-    .map((f) => JSON.parse(readFileSync(`perf/runs/${f}`, 'utf8')));
+    .map((f) => JSON.parse(readFileSync(`perf/runs/${f}`, 'utf8')))
+    // F7-14: sortowanie po NAZWIE pliku mieszało kolejność, bo przebiegi trybu
+    // deweloperskiego mają w nazwie bundler przed datą (`dev-turbopack-...`
+    // sortuje się przed `dev-webpack-...`) — raport pokazywał wtedy starszy
+    // przebieg jako najnowszy. Sortujemy po polu `at`, czyli po czasie pomiaru.
+    .sort((a, b) => String(a.at).localeCompare(String(b.at)));
 }
 
 const breaches = [];

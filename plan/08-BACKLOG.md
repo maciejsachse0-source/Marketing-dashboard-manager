@@ -2118,7 +2118,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   ponad swój rozmiar sprzed zmiany (`gantt-toolbar.tsx` 442 = 442),
   żaden nie przekracza 300 linii poza zastanym `gantt-toolbar.tsx`.
 
-- [ ] **F7-14** `znalezisko` `ui` `tooling` Turbopack w trybie deweloperskim gubi siatkę dni w pasach T
+- [x] **F7-14** `znalezisko` `ui` `tooling` Turbopack w trybie deweloperskim gubi siatkę dni w pasach T
   Znalezione przy F2-05. `npm run dev:alt` (turbopack) renderuje `/calendar` inaczej niż
   `next build` + `next start` i inaczej niż `npm run dev` (webpack): wewnątrz kolorowych
   pasów T1/T2/T3 znikają pionowe kreski siatki dni. Siatka jest rysowana inline stylem
@@ -2138,6 +2138,33 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - po spełnieniu powyższego `dev` przełączone na turbopacka, `dev:alt` na webpacka,
     a pomiar `npm run perf:dev` powtórzony i dopisany do `DECISIONS.md`
   - negatywne: `npm run build` kod 0, pełny zestaw e2e zielony
+  **DYSPOZYCJA: ZROBIONE (2026-09-03), ale objaw był już nieaktualny.**
+  Podejrzany z treści znaleziska — modyfikator alfa Tailwinda v4 — jest niewinny:
+  wyliczone tło pasa T1 to `oklab(0.962 -0.0058 0.0587 / 0.55)` w OBU bundlerach
+  (Playwright, `getComputedStyle`, ta sama baza, ta sama trasa). Jedyna zmierzona
+  różnica CSS: turbopack przepuszcza arkusz przez lightningcss, który przepisuje
+  `--border` z `oklch(0.90 0.01 255)` na równoważne `lab(88.3796% -.806093 -3.66544)`;
+  gradient siatki dni dostaje więc ten sam kolor w innym zapisie.
+  **Siatka dni nie znika.** Zrzut samego pasa (element `div.h-[5.5rem]`) z dev-turbopacka
+  wobec `next start`: **0 różnych pikseli**. Cała `/calendar?view=week`, zrzut pełnej
+  wysokości: turbopack wobec produkcji **6 832** piksele, webpack wobec produkcji
+  **7 417** — turbopack jest dziś bliżej produkcji niż webpack, kryterium „mniej niż
+  10 000" spełnione z zapasem. Którego commitu z F1–F6 to zasługa, nie ustalam:
+  odtwarzanie stanu sprzed pięciu faz kosztuje więcej niż warte jest nazwisko winowajcy.
+  **Przełączone:** `dev` = turbopack, `dev:alt` = webpack. `npm run perf:dev`
+  powtórzony: `hmrMs` **1961 → 466 ms** (4,2x), `firstCompileMs` 2748 → 1162,
+  `warmP50Ms` 130 → 205, `readyMs` 444 → 475, `peakRssMb` 1556 → 1602 — wszystko
+  z zapasem pod limitami. Liczby z F2-05 (13x) nie potwierdzają się na dzisiejszym
+  kodzie i nie są przepisywane. Dopisane do `DECISIONS.md` (wpis „F7-14"),
+  `docs/ARCHITEKTURA.md` sekcja 8 i wiersz 10 tabeli weryfikacji,
+  `plan/01-analiza-i-zasady.md` tabela stosu.
+  **Przy okazji naprawiony błąd raportu perf**: `runsOfKind` sortowało przebiegi
+  po nazwie pliku, a nazwa trybu deweloperskiego ma bundler przed datą
+  (`dev-turbopack-…` < `dev-webpack-…`), więc sekcja DEV pokazywała starszy przebieg
+  jako najnowszy. Sortuje po polu `at`.
+  Bramki po zmianie: `typecheck` 0, `lint` 0 (37 ostrzeżeń), `test` 219 zielonych,
+  `check-typography` 0, `check-trust-boundaries` 0, `perf` 0, `npx playwright test`
+  22 zielone na `next start`.
 
 - [ ] **F7-15** `znalezisko` `ui` Mikro-etykieta sekcji powielona 90 razy w pięciu wariantach
   Znalezione przy F3-01. Nagłówek sekcji „małe wersaliki z rozstrzeloną spacją" jest

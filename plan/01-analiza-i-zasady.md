@@ -19,7 +19,7 @@ persony agentów AI (pliki markdown czytane przez Claude Code, nie przez apkę).
 | Warstwa | Co jest |
 |---|---|
 | Framework | Next.js **16.2.4**, App Router, React **19.2.4**, TypeScript 5 |
-| Bundler dev | **webpack** (`next dev --webpack`) + `NODE_OPTIONS=--max-old-space-size=4096` |
+| Bundler dev | **turbopack** (`next dev --turbopack`) od F7-14; webpack został pod `dev:alt` |
 | Baza | **PostgreSQL** przez `postgres` 3.4.5 (postgres-js) + Drizzle ORM 0.45.2 |
 | UI | Tailwind v4, shadcn/ui (14 komponentów w `src/components/ui/`), Base UI 1.4.1, lucide-react |
 | Formularze | react-hook-form 7.74 + zod 4.3 + @hookform/resolvers |
