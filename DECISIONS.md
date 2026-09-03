@@ -1102,3 +1102,34 @@ Dla akcji serwerowych ta sama bramka od początku miała regułę „bez argumen
 czego walidować". Wyrównałem: handler bez parametru jest opisany jako „brak wejścia",
 handler z parametrem i bez schematu nadal jest błędem. Punktów wejścia 73 → 74,
 błędów 0.
+
+## F7-19: skrypt gotowy, danych do przeniesienia w bazie roboczej nie ma
+
+**Prawdziwych danych jeszcze nie ma.** Liczba „36 kamerzystów z niepustym `contact`"
+z treści znaleziska pochodzi z baz syntetycznych (`marketing_perf`,
+`marketing_preview`). Baza robocza `marketing` ma **zero** kamerzystów — prawdziwy
+plik z osobami czeka na usera (F4-06). Skrypt jest więc gotowy i sprawdzony, ale
+jego przebieg na prawdziwych danych dopiero nastąpi.
+
+**Sprawdzone na kopii, nie na oryginale.** Klon `marketing_perf` pod nazwą
+`marketing_f719` plus siedem wierszy dosypanych ręcznie, żeby trafić w każdą gałąź
+rozpoznawania. Wynik: 43 wiersze, **email 36, handle 2, phone 2, konflikt 1,
+nierozpoznane 2**. Po `--apply` liczba niepustych `contact` nadal 43 — zapis nie
+kasuje źródła. Po osobnym `--apply --clear-contact` zostają 3: dwa wiersze
+o nierozpoznanym kształcie („ul. Długa 5, Gdańsk", „kamerzysta") i jeden konflikt,
+w którym `email` miał już inną treść niż `contact`.
+
+**Rozpoznanie kształtu nie zgaduje.** `contactField` w `src/lib/import/normalize.ts`:
+małpa w środku to email, małpa na początku albo adres Instagrama to handle, sam
+zapis cyfrowy to telefon, **cokolwiek innego to `null`**. Kusiło, żeby gołe słowo
+bez małpy („kamerzysta") uznać za profil z Instagrama — nie robimy tego, bo równie
+dobrze może być urwanym adresem albo nazwiskiem. Wiersz nierozpoznany zostaje
+w `contact` i trafia na listę do ręcznego przejrzenia.
+
+**Czego świadomie NIE zrobiłem: `--clear-contact` na prawdziwej bazie.** Interfejs
+kamerzystów nadal czyta wyłącznie `contact` (`videographers-shell.tsx`,
+`videographer-dialog.tsx`, `productions/[id]/page.tsx`, `productions-list.tsx`),
+więc wyczyszczenie kolumny opróżniłoby karty, mimo że dane leżałyby w bazie obok.
+To jest osobne issue **F7-32** i dopóki nie jest zamknięte, flagi czyszczącej
+się nie odpala. Przebieg wypełniający jest bezpieczny i odwracalny, bo `contact`
+zostaje.

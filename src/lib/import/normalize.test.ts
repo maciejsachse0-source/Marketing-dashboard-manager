@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeRow } from './normalize';
+import { contactField, normalizeRow } from './normalize';
 
 const artist = { role: 'artist' as const };
 const videographer = { role: 'videographer' as const };
@@ -146,5 +146,29 @@ describe('normalizeRow - komórki nietekstowe z arkusza', () => {
 
   it('obiekt w komórce to błąd wiersza, nie wyjątek', () => {
     expect(errors({ name: 'A', handle: { text: 'x' } })).toContain('nieobsługiwana zawartość komórki');
+  });
+});
+
+describe('contactField - rozdzielenie starego pola contact (F7-19)', () => {
+  it('adres pocztowy idzie do email', () => {
+    expect(contactField('pawel-kaminski-0@kamera.pl')).toBe('email');
+    expect(contactField('  ANNA@Kamera.pl ')).toBe('email');
+  });
+
+  it('profil z małpą i adres Instagrama idą do handle', () => {
+    expect(contactField('@kamerzysta')).toBe('handle');
+    expect(contactField('instagram.com/kamerzysta')).toBe('handle');
+    expect(contactField('https://www.instagram.com/kamerzysta/')).toBe('handle');
+  });
+
+  it('numer idzie do phone, także w zapisie z odstępami', () => {
+    expect(contactField('+48 601 234 567')).toBe('phone');
+    expect(contactField('601-234-567')).toBe('phone');
+  });
+
+  it('kształt nierozpoznany daje null, bo zgadywanie jest gorsze niż ręczne przejrzenie', () => {
+    expect(contactField('kamerzysta')).toBeNull();
+    expect(contactField('ul. Długa 5, Gdańsk')).toBeNull();
+    expect(contactField('')).toBeNull();
   });
 });

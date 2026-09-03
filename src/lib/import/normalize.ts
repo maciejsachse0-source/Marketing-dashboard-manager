@@ -111,6 +111,21 @@ function toPerson(cells: Cells, role: PersonRole, email: string | null, phone: s
   };
 }
 
+/**
+ * Do którego pola należy jednolinijkowy kontakt (F7-19, `videographers.contact`).
+ * Kolejność ma znaczenie: email i telefon mają niżej własne wzorce, więc mogą się
+ * jeszcze same odrzucić. `handle` wzorca nie ma i przyjąłby wszystko, dlatego
+ * wymaga jawnego znaku: małpy na początku albo adresu Instagrama. Cokolwiek innego
+ * to `null`, czyli „nie zgaduję" — wiersz zostaje do ręcznego przejrzenia.
+ */
+export function contactField(raw: string): 'email' | 'phone' | 'handle' | null {
+  const t = raw.trim();
+  if (t.includes('@') && !t.startsWith('@')) return 'email';
+  if (t.startsWith('@') || /(^|\/\/|\.)instagram\.com\//i.test(t)) return 'handle';
+  if (/^[+0-9][0-9\s\-()./]{7,}$/.test(t)) return 'phone';
+  return null;
+}
+
 export function normalizeRow(raw: Record<string, unknown>, role: PersonRole): RowResult {
   const parsed = rowSchema.safeParse(raw);
   if (!parsed.success) return { kind: 'error', errors: ['nieobsługiwana zawartość komórki'] };

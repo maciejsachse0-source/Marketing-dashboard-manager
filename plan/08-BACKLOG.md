@@ -2321,7 +2321,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   `Request`, więc nie ma w nim wejścia do walidacji. Punktów wejścia 73 → **74**, bez
   schematu mimo argumentów **0**.
 
-- [ ] **F7-19** `znalezisko` `db` `import` Przeniesienie danych z `videographers.contact`
+- [x] **F7-19** `znalezisko` `db` `import` Przeniesienie danych z `videographers.contact`
   do `handle` i `email`
   Znalezione przy F4-00. Migracja 0003 dołożyła kamerzystom `handle`, `email`, `phone`,
   `location` i `status`, ale jest wyłącznie addytywna: stare pole `contact` zostaje
@@ -2343,6 +2343,29 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - negatywne: wiersz, w którym `handle` albo `email` jest już wypełniony, nie jest
     nadpisywany; wiersz o nierozpoznanym kształcie zostaje bez zmian i trafia na listę
     do ręcznego przejrzenia
+
+  **DYSPOZYCJA: ZROBIONE (skrypt), z jawnym ograniczeniem co do danych.**
+  `scripts/split-videographer-contact.ts`. Reguła „do którego pola" mieszka
+  w `src/lib/import/normalize.ts` jako `contactField` i ma cztery testy jednostkowe
+  (219 → **223** zielonych); samą normalizację robi `normalizeRow`, więc reguły są jedne.
+  Domyślnie sucha próba, zapis pod `--apply`, czyszczenie `contact` wyłącznie pod
+  osobnym `--apply --clear-contact`, i tylko dla wierszy, których treść naprawdę
+  wylądowała w kolumnie docelowej.
+  Dowód na kopii `marketing_f719` (klon `marketing_perf` plus siedem wierszy dosypanych
+  ręcznie, żeby trafić w każdą gałąź): 43 wiersze z niepustym `contact` →
+  **email 36, handle 2, phone 2, konflikt 1, nierozpoznane 2**. Po `--apply`
+  `contact` niepusty nadal **43** (odwracalność), kolumny docelowe wypełnione.
+  Po osobnym `--clear-contact` zostają **3** wiersze z `contact`: dwa nierozpoznane
+  („ul. Długa 5, Gdańsk", „kamerzysta") i jeden konflikt (`email` miał inną treść).
+  Wiersz nierozpoznany i wiersz z konfliktem nie zostały nadpisane ani wyczyszczone.
+  **Dane produkcyjne:** baza robocza `marketing` ma **zero** kamerzystów, więc
+  do przeniesienia nie ma tam nic (przebieg `--apply` wypisuje same zera). Liczba 36
+  z treści znaleziska pochodzi z baz syntetycznych. `marketing_preview` przeniesione
+  (**36 email**, `contact` nietknięty); `marketing_perf` celowo pominięte, bo na niej
+  stoi punkt odniesienia pomiarów.
+  **`--clear-contact` nie zostało uruchomione na żadnej prawdziwej bazie** i nie
+  powinno, dopóki nie zamknie się **F7-32**: ekran kamerzystów i karta produkcji nadal
+  czytają wyłącznie `contact`.
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
@@ -2570,6 +2593,29 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - nowe pole opisane komentarzem w `FRAME_STYLE` i użyte przez `accentBorderFor`
   - negatywne: wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs`,
     zrzut 1280x720 przed i po, poniżej progu 1 680 pikseli), `npm run test` kod 0
+
+- [ ] **F7-32** `znalezisko` `ui` `db` Ekran kamerzystów czyta wyłącznie stare `contact`
+  Znalezione przy F7-19. Migracja 0003 dołożyła `handle`, `email`, `phone`, a
+  `scripts/split-videographer-contact.ts` umie już przenieść do nich treść ze starego
+  pola — ale interfejs tych kolumn nie zna. `src/components/videographers/videographers-shell.tsx`
+  filtruje i renderuje `v.contact` (i robi na nim własną heurystykę `contact.includes('@')`,
+  czyli drugą kopię reguły z `normalizeRow`), `videographer-dialog.tsx` edytuje `contact`,
+  `src/app/productions/[id]/page.tsx:258` podaje `contact` jako `email`, a
+  `productions-list.tsx:177` bierze `contact` na podpis pod osobą.
+  Skutek: dopóki to stoi, uruchomienie `--clear-contact` opróżni karty kamerzystów,
+  mimo że dane są w bazie. Dlatego flaga nie została odpalona na żadnej prawdziwej bazie.
+  Waga: **ważne** (blokuje domknięcie F7-19). Szacunek: pół dnia.
+  CZYTAJ: `src/components/videographers/videographers-shell.tsx`,
+  `src/components/videographers/videographer-dialog.tsx`,
+  `src/app/productions/[id]/page.tsx`, `src/components/productions/productions-list.tsx`
+  AC:
+  - ekran kamerzystów pokazuje `handle`, `email` i `phone` z ich własnych kolumn;
+    `contact` renderuje się już tylko jako pole zapasowe dla wierszy nierozpoznanych
+  - `grep -rn "contact?.includes('@')" src` zwraca `0` — reguła „co to za kształt"
+    zostaje jedna, ta z `contactField`
+  - dowód: po `--apply --clear-contact` na kopii bazy karta kamerzysty nadal pokazuje
+    kontakt (zrzut 1280x720 przed i po czyszczeniu, różnica poniżej progu szumu)
+  - negatywne: `npm run test` kod 0, formularz kamerzysty nadal zapisuje wszystkie pola
 
 ---
 
