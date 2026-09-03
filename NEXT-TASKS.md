@@ -1,7 +1,7 @@
 # NEXT-TASKS - przekazanie do kolejnego workera
 
-Stan na 2026-09-03, po **F7-27, F7-28, F7-29, F7-30, F7-31, F7-32**. To była ostatnia
-paczka fazy F7. Wcześniej zamknięte: F0 do F6 w całości oraz F7-01 do F7-26.
+Stan na 2026-09-03, po **F7-45 i F7-44** (obie czekały na decyzję usera, user ją
+podjął). Wcześniej: F0 do F6 w całości oraz F7-01 do F7-43.
 
 ## Co zostaje otwarte i dlaczego
 
@@ -9,9 +9,6 @@ Wyłącznie sprawy czekające na usera. Żadna nie jest robotą do wzięcia:
 
 - **F7-23** — czyszczenie historii gita z dwóch prawdziwych handle z Instagrama.
   Czeka na decyzję usera, bo przepisanie historii jest jednokierunkowe.
-- **F7-44** — wiersze arkusza bez imienia, znane wyłącznie z handle na Instagramie.
-  Dwie drogi opisane w issue, rekomendacja: podstawiać handle jako nazwę.
-- **F7-45** — kolumna statusu w arkuszu twórców nie ma odpowiednika w `artists`.
 - **F7-29** — czy czas oglądania i CTR z arkuszy mają być widoczne na `/analytics`.
   Koszt obu wariantów opisany w `DECISIONS.md`. W `src/lib/csv-mappers.ts` stoi już
   komentarz mówiący wprost, których kolumn nie czytamy — samo znalezisko nie szkodzi.
@@ -50,12 +47,35 @@ walidacja schemą Zod z `src/server/actions/schemas.ts`, zapis przez `db.insert`
 0003; `contact` to już tylko pole zapasowe, a jego kształt rozpoznaje `contactField`.
 `--clear-contact` jest odtąd bezpieczne — F7-19 domknięte.
 
+## Co doszło w tej paczce (F7-45, F7-44)
+
+**`artists` ma kolumnę `status`** (F7-45). Migracja `0004_whole_flatman.sql`, jedno
+zdanie `ALTER TABLE "artists" ADD COLUMN "status" text`, addytywna, dopuszcza `null`.
+Przepuszczona na `marketing`, `marketing_perf`, `marketing_test`, `marketing_preview`.
+**Produkcja nie ma jeszcze `0003` ani `0004`, a wdrożenie NIE robi migracji samo**
+(`build` to samo `next build`) — przed wdrożeniem trzeba tam wykonać
+`DATABASE_URL=<produkcyjny> npm run db:migrate`.
+
+Po tej zmianie **obie role importu mają identyczny zestaw pól**, więc `autoMap`
+i `normalizeRow` **przestały brać rolę jako argument**, a `insertValues` w `save.ts`
+buduje jeden obiekt zamiast dwóch. Jeśli szukasz rozgałęzienia „a dla twórcy inaczej",
+już go nie ma. Status widać na karcie osoby na `/artists` i na `/videographers`, tym
+samym blokiem co „Sprzęt" i „Dostępność". W oknie edycji osoby statusu świadomie nie
+ma — to okno nie edytuje też `location` ani `avatarUrl`.
+
+**Puste imię plus handle daje nazwę z handle** (F7-44). `normalizeRow` bierze wtedy
+znormalizowany handle razem z małpą, a wynik niesie flagę `nameFromHandle`, którą
+podgląd zamienia na dopisek „nazwa z handle" w kolumnie szczegółów. Flaga siedzi na
+wyniku, nie na osobie — do `dedup`, `save` ani do bazy nie przecieka. Wiersz bez imienia
+I bez handle nadal jest błędem. **Fixture daje teraz `Dodano 970`, nie 960** — dziesięć
+wierszy bez imienia przestało lecieć jako błąd, więc scenariusze e2e mają nowe liczby.
+
 ## Liczby, do których porównujesz
 
-`npm run typecheck` kod 0. `npm run lint` kod 0, **36 ostrzeżeń**, 0 błędów.
-`npm run test` **224 zielone w 20 plikach**. `node scripts/check-typography.mjs` kod 0.
-`node scripts/check-trust-boundaries.mjs` kod 0, **73** punkty wejścia.
-`npm run perf` kod 0, bundel `/calendar` **293,3 kB** przy progu 301,6 kB.
+`npm run typecheck` kod 0. `npm run lint` kod 0, **35 ostrzeżeń**, 0 błędów.
+`npm run test` **230 zielonych w 20 plikach**. `node scripts/check-typography.mjs` kod 0.
+`node scripts/check-trust-boundaries.mjs` kod 0, **72** punkty wejścia.
+`npm run perf` kod 0, bundel `/calendar` **293,4 kB** przy progu 301,6 kB.
 `npx playwright test` **22 zielone + 1 pominięty** w 1,6 min.
 `node scripts/a11y-audit.mjs` **0 naruszeń**.
 
