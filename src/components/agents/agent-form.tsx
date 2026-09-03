@@ -58,6 +58,9 @@ const WIDGET_KIND_LABELS: Record<WidgetKind, string> = {
   'recent-csv-uploads': 'CSV uploady w ostatnich N dniach',
 };
 
+/** Pozycja „bez widgetu". Base UI nie przyjmuje pustego `value`, stąd klucz-wartownik. */
+const BRAK_WIDGETU = '- brak widgetu -';
+
 function widgetTakesDays(kind: WidgetKind | ''): boolean {
   return kind === 'stale-artists' || kind === 'recent-csv-uploads';
 }
@@ -236,7 +239,9 @@ export function AgentForm({
           onValueChange={(v) => set('sidePanel', v as AgentSidePanel)}
         >
           <SelectTrigger id="sidePanel">
-            <SelectValue />
+            {/* Base UI renderuje domyślnie `value`, czyli surowy klucz. Formatter
+                pokazuje w zwiniętym polu tę samą etykietę co na liście (F7-20). */}
+            <SelectValue>{(v: AgentSidePanel) => SIDE_PANEL_LABELS[v]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {AGENT_SIDE_PANELS.map((p) => (
@@ -278,10 +283,14 @@ export function AgentForm({
               onValueChange={(v) => set('widgetKind', v === '__none__' ? '' : (v as WidgetKind))}
             >
               <SelectTrigger id="widgetKind">
-                <SelectValue />
+                <SelectValue>
+                  {(v: WidgetKind | '__none__') =>
+                    v === '__none__' ? BRAK_WIDGETU : WIDGET_KIND_LABELS[v]
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">- brak widgetu -</SelectItem>
+                <SelectItem value="__none__">{BRAK_WIDGETU}</SelectItem>
                 {WIDGET_KINDS.map((k) => (
                   <SelectItem key={k} value={k}>
                     {WIDGET_KIND_LABELS[k]}

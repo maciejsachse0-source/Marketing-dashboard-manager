@@ -2371,7 +2371,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
 
 
-- [ ] **F7-20** `znalezisko` `ui` Pole wyboru pokazuje surową wartość zamiast etykiety
+- [x] **F7-20** `znalezisko` `ui` Pole wyboru pokazuje surową wartość zamiast etykiety
   Znalezione przy F4-04. `SelectValue` z Base UI renderuje domyślnie `value`, a nie tekst
   wybranej pozycji, więc formularz agenta pokazuje w zwiniętym polu `sidePanel` i
   `widgetKind` surowe klucze, mimo że lista rozwinięta ma polskie etykiety. Ekran importu
@@ -2384,6 +2384,21 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - `grep -rn 'SelectValue />' src/components | wc -l` zwraca `0` albo każde pozostałe
     wystąpienie ma wartość równą etykiecie i jest to napisane w komentarzu obok
   - negatywne: żaden inny tekst na formularzu agenta się nie zmienia
+
+  **DYSPOZYCJA: ZROBIONE.** Oba pola w `src/components/agents/agent-form.tsx` dostały
+  formatter, ten sam wzorzec co na ekranie importu. Zmierzone na `/agents/new`
+  (dev, okno 1280x900): zwinięte „Panel kontekstu" pokazywało `calendar-14`, teraz
+  **„Kalendarz, 14 dni"**; zwinięty „Widget na pulpicie" pokazywał `__none__`, teraz
+  **„- brak widgetu -"**. Po wyborze z listy: `Zaległe wpisy kalendarza`
+  i `Lista artystów` — dokładnie te napisy, które stoją w rozwiniętej liście
+  (odczyt `innerText` z `#sidePanel` i `#widgetKind`, zrzuty stanu zwiniętego
+  i obu list rozwiniętych).
+  `grep -rn 'SelectValue />' src/components | wc -l` zwraca **0**.
+  Wartownik `__none__` ma teraz jedną nazwę (`BRAK_WIDGETU`), więc etykieta pozycji
+  na liście i etykieta w zwiniętym polu nie mogą się już rozjechać.
+  Negatywne: różnica zrzutu 1280x720 to **930** pikseli i cała leży w samym polu
+  wyboru, które zrobiło się szersze od dłuższego napisu; reszta formularza bez zmian.
+  `npm run test` 223 zielone.
 
 - [ ] **F7-21** `znalezisko` `test` `tooling` Testy e2e importu piszą do bazy roboczej
   Znalezione przy F4-05. `playwright.config.ts` nie ustawia bazy, więc scenariusz pełnego
