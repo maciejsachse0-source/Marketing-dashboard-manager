@@ -6,6 +6,34 @@ import { PersonAvatar } from '@/components/productions/artist-avatar';
 import { ProductionStepTracker } from '@/components/productions/production-step-tracker';
 import type { Artist, Production, Videographer } from '../../../drizzle/schema';
 
+/** Produkcje w kubełkach: po artyście, po operatorze, reszta bez przypisania. */
+function groupByPerson(productions: Production[]) {
+  const byArtist = new Map<number, Production[]>();
+  const byVideographer = new Map<number, Production[]>();
+  const orphanSolo: Production[] = [];
+
+  const push = (map: Map<number, Production[]>, key: number, p: Production) => {
+    const arr = map.get(key) ?? [];
+    arr.push(p);
+    map.set(key, arr);
+  };
+
+  for (const p of productions) {
+    if (p.type === 'with-artist' && p.artistId != null) push(byArtist, p.artistId, p);
+    else if (p.videographerId != null) push(byVideographer, p.videographerId, p);
+    else orphanSolo.push(p);
+  }
+  return { byArtist, byVideographer, orphanSolo };
+}
+
+/** Które sekcje listy pokazujemy przy danym filtrze typu. */
+function visibleSections(typeFilter?: 'with-artist' | 'solo') {
+  return {
+    artists: !typeFilter || typeFilter === 'with-artist',
+    solo: !typeFilter || typeFilter === 'solo',
+  };
+}
+
 export function ProductionsList({
   productions,
   artists,
@@ -22,23 +50,7 @@ export function ProductionsList({
   const artistById = new Map(artists.map((a) => [a.id, a]));
   const videographerById = new Map(videographers.map((v) => [v.id, v]));
 
-  const byArtist = new Map<number, Production[]>();
-  const byVideographer = new Map<number, Production[]>();
-  const orphanSolo: Production[] = [];
-
-  for (const p of productions) {
-    if (p.type === 'with-artist' && p.artistId != null) {
-      const arr = byArtist.get(p.artistId) ?? [];
-      arr.push(p);
-      byArtist.set(p.artistId, arr);
-    } else if (p.videographerId != null) {
-      const arr = byVideographer.get(p.videographerId) ?? [];
-      arr.push(p);
-      byVideographer.set(p.videographerId, arr);
-    } else {
-      orphanSolo.push(p);
-    }
-  }
+  const { byArtist, byVideographer, orphanSolo } = groupByPerson(productions);
 
   const artistGroups = [...byArtist.entries()]
     .map(([id, prods]) => ({ person: artistById.get(id), prods, kind: 'artist' as const }))
@@ -55,8 +67,7 @@ export function ProductionsList({
     )
     .sort((a, b) => (b.prods[0]?.t0At.getTime() ?? 0) - (a.prods[0]?.t0At.getTime() ?? 0));
 
-  const showArtistSection = !typeFilter || typeFilter === 'with-artist';
-  const showSoloSection = !typeFilter || typeFilter === 'solo';
+  const { artists: showArtistSection, solo: showSoloSection } = visibleSections(typeFilter);
 
   if (productions.length === 0) {
     return (

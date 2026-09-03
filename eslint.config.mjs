@@ -62,7 +62,8 @@ export default [
   // zlozonosc cyklomatyczna (F7-06).
 
   {
-    // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
+    // GRANDFATHER Z11 (F7-06): 40 zastanych funkcji ponad progiem 10 w 29 plikach
+    // (bylo 58 w 43 plikach). Lista ma sie kurczyc.
     // Sciezki `calendar/gantt-*` NIE sa nowym dlugiem — to ten sam zastany kod,
     // ktory w F2-02 przeniosl sie z `gantt-view.tsx` (2545 linii) do jedenastu
     // plikow. Wypisujemy sie z tego przez F7-13.
@@ -78,15 +79,12 @@ export default [
       'src/components/agents/agent-form.tsx',
       'src/components/analytics/analytics-shell.tsx',
       'src/components/analytics/csv-dropzone.tsx',
-      'src/components/artists/artist-dialog.tsx',
       'src/components/artists/artists-shell.tsx',
       'src/components/calendar/gantt-milestone-labels.tsx',
       'src/components/calendar/gantt-milestones.tsx',
-      'src/components/calendar/gantt-row-model.ts',
       'src/components/calendar/gantt-row.tsx',
       'src/components/calendar/gantt-substep-bar.tsx',
       'src/components/calendar/gantt-toolbar.tsx',
-      'src/components/campaigns/campaign-template-form.tsx',
       'src/components/campaigns/campaign-wizard.tsx',
       'src/components/campaigns/campaigns-list.tsx',
       'src/components/campaigns/gantt-narrative-row.tsx',
@@ -94,22 +92,11 @@ export default [
       'src/components/campaigns/timeline.tsx',
       'src/components/inline-edit.tsx',
       'src/components/periods-slider.tsx',
-      'src/components/productions/artist-avatar.tsx',
       'src/components/productions/artist-picker.tsx',
       'src/components/productions/production-drawer.tsx',
       'src/components/productions/production-step-row.tsx',
       'src/components/productions/production-step-tracker.tsx',
       'src/components/productions/production-wizard.tsx',
-      'src/components/productions/productions-list.tsx',
-      'src/components/templates/template-form.tsx',
-      'src/components/videographers/videographer-dialog.tsx',
-      'src/lib/agents/widget.ts',
-      'src/lib/csv-mappers.ts',
-      'src/lib/dates.ts',
-      'src/lib/production-work-folder.ts',
-      'src/server/actions/production-folder.ts',
-      'src/server/actions/production-steps.ts',
-      'src/server/actions/productions.ts',
     ],
     rules: { 'complexity': 'warn' },
   },

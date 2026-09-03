@@ -30,6 +30,7 @@ import {
   nextMonday,
   parseIsoDate,
 } from './template-form-utils';
+import { fieldText } from '@/lib/utils';
 import { PeriodsSlider } from './template-periods-slider';
 import { StepRow } from './template-step-row';
 
@@ -40,14 +41,15 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState(initial?.name ?? '');
-  const [slug, setSlug] = useState(initial?.slug ?? '');
-  const [type, setType] = useState<ProductionType>(initial?.type ?? 'with-artist');
-  const [summary, setSummary] = useState(initial?.summary ?? '');
-  const [description, setDescription] = useState(initial?.description ?? '');
-  const [steps, setSteps] = useState<TemplateStep[]>(initial?.steps ?? []);
+  const src: Partial<ProductionTemplate> = initial ?? {};
+  const [name, setName] = useState(fieldText(src.name));
+  const [slug, setSlug] = useState(fieldText(src.slug));
+  const [type, setType] = useState<ProductionType>(src.type ?? 'with-artist');
+  const [summary, setSummary] = useState(fieldText(src.summary));
+  const [description, setDescription] = useState(fieldText(src.description));
+  const [steps, setSteps] = useState<TemplateStep[]>(src.steps ?? []);
   const [periods, setPeriods] = useState<TemplatePeriod[]>(() =>
-    migrateLegacyPeriods(initial?.periods),
+    migrateLegacyPeriods(src.periods),
   );
   // Preview-only anchor date: drives slider axis labels (months + day numbers
   // + concrete dates per period). NOT persisted — templates are reusable, so

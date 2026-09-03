@@ -34,6 +34,7 @@ import {
   newId,
   nextMonday,
 } from './campaign-template-form-utils';
+import { fieldText } from '@/lib/utils';
 import { MilestoneRow } from './campaign-milestone-row';
 
 type Mode = { kind: 'create' } | { kind: 'edit'; slug: string };
@@ -49,15 +50,14 @@ export function CampaignTemplateForm({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState(initial?.name ?? '');
-  const [slug, setSlug] = useState(initial?.slug ?? '');
-  const [summary, setSummary] = useState(initial?.summary ?? '');
-  const [description, setDescription] = useState(initial?.description ?? '');
-  const [milestones, setMilestones] = useState<MarketingMilestone[]>(
-    initial?.milestones ?? [],
-  );
+  const src: Partial<MarketingTemplate> = initial ?? {};
+  const [name, setName] = useState(fieldText(src.name));
+  const [slug, setSlug] = useState(fieldText(src.slug));
+  const [summary, setSummary] = useState(fieldText(src.summary));
+  const [description, setDescription] = useState(fieldText(src.description));
+  const [milestones, setMilestones] = useState<MarketingMilestone[]>(src.milestones ?? []);
   const [periods, setPeriods] = useState<TemplatePeriod[]>(() =>
-    migrateLegacyPeriods(initial?.periods),
+    migrateLegacyPeriods(src.periods),
   );
   const [previewStart, setPreviewStart] = useState<Date>(() => nextMonday());
 

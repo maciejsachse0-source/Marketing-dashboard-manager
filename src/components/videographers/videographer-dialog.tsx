@@ -15,6 +15,7 @@ import {
 } from '@/server/actions/videographers';
 import type { Videographer } from '../../../drizzle/schema';
 import { useResetOnChange } from '@/lib/use-reset-on-change';
+import { fieldText } from '@/lib/utils';
 
 type FormState = {
   name: string;
@@ -27,14 +28,15 @@ type FormState = {
 };
 
 function initial(v?: Videographer | null): FormState {
+  const d: Partial<Videographer> = v ?? {};
   return {
-    name: v?.name ?? '',
-    contact: v?.contact ?? '',
-    hourlyRate: v?.hourlyRate?.toString() ?? '',
-    equipment: v?.equipment ?? '',
-    availabilityNotes: v?.availabilityNotes ?? '',
-    avatarUrl: v?.avatarUrl ?? '',
-    notes: v?.notes ?? '',
+    name: fieldText(d.name),
+    contact: fieldText(d.contact),
+    hourlyRate: fieldText(d.hourlyRate),
+    equipment: fieldText(d.equipment),
+    availabilityNotes: fieldText(d.availabilityNotes),
+    avatarUrl: fieldText(d.avatarUrl),
+    notes: fieldText(d.notes),
   };
 }
 

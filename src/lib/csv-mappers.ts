@@ -55,6 +55,30 @@ function str(v: unknown): string | undefined {
   return s ? s : undefined;
 }
 
+/** Suma metryk zaangazowania; brakujaca metryka liczy sie jako zero. */
+function engSum(...vals: (number | undefined)[]): number {
+  return vals.reduce<number>((acc, v) => acc + (v ?? 0), 0);
+}
+
+/** Udzial a w b w procentach; puste albo niedodatnie b daje undefined. */
+function pct(a: number, b: number | undefined): number | undefined {
+  return !b || b <= 0 ? undefined : (a / b) * 100;
+}
+
+/** Procent obejrzenia materialu, przyciety do 100 i zaokraglony do pelnych. */
+function watchedPct(part: number | undefined, whole: number | undefined): number | undefined {
+  const p = pct(part ?? 0, whole);
+  return p === undefined || !part ? undefined : Math.min(100, Math.round(p));
+}
+
+function round1(v: number | undefined): number | undefined {
+  return v === undefined ? undefined : Math.round(v * 10) / 10;
+}
+
+function round0(v: number | undefined): number | undefined {
+  return v === undefined ? undefined : Math.round(v);
+}
+
 function mapMetaRow(row: Record<string, unknown>): NormalizedPost | null {
   const title = str(pick(row, 'Title', 'Tytuł', 'Post Title', 'Description', 'Opis', 'Treść postu'));
   const publishedAt = date(pick(row, 'Posted', 'Date', 'Data publikacji', 'Publication Time', 'Czas publikacji', 'Posted at', 'Opublikowano'));
@@ -67,12 +91,10 @@ function mapMetaRow(row: Record<string, unknown>): NormalizedPost | null {
   const shares = num(pick(row, 'Shares', 'Udostępnienia'));
   const saves = num(pick(row, 'Saves', 'Zapisane', 'Saved'));
   const followersGained = num(pick(row, 'Follows', 'New followers', 'Nowi obserwujący'));
-  // Engagement rate: if not given, compute from reach
-  let engagementRate = num(pick(row, 'Engagement rate', 'Wskaźnik zaangażowania', 'ER'));
-  if (engagementRate === undefined && reach && reach > 0) {
-    const eng = (reactions ?? 0) + (comments ?? 0) + (shares ?? 0) + (saves ?? 0);
-    engagementRate = (eng / reach) * 100;
-  }
+  // Engagement rate: gdy CSV go nie podaje, liczymy go z zasiegu.
+  const engagementRate =
+    num(pick(row, 'Engagement rate', 'Wskaźnik zaangażowania', 'ER')) ??
+    pct(engSum(reactions, comments, shares, saves), reach);
 
   // Platform: Meta CSVs cover IG/FB. Fall back to facebook unless permalink hints instagram.
   const permalink = str(pick(row, 'Permalink', 'URL', 'Link'));
@@ -84,7 +106,7 @@ function mapMetaRow(row: Record<string, unknown>): NormalizedPost | null {
     publishedAt,
     reach,
     impressions,
-    engagementRate: engagementRate !== undefined ? Math.round(engagementRate * 10) / 10 : undefined,
+    engagementRate: round1(engagementRate),
     saves,
     shares,
     comments,
@@ -105,23 +127,13 @@ function mapTikTokRow(row: Record<string, unknown>): NormalizedPost | null {
   const totalPlay = num(pick(row, 'Total play time'));
   const reach = num(pick(row, 'Reach', 'Reached audience', 'Zasięg'));
   const followersGained = num(pick(row, 'New followers', 'Followers gained'));
-
-  // Completion rate from avg watch / video duration if available
   const duration = num(pick(row, 'Video duration', 'Duration'));
-  let completionRate: number | undefined;
-  if (avgWatch && duration && duration > 0) {
-    completionRate = Math.min(100, (avgWatch / duration) * 100);
-  }
-  // Sometimes provided directly
-  const directCompletion = num(pick(row, 'Completion rate', 'Wskaźnik ukończenia'));
-  if (directCompletion !== undefined) completionRate = directCompletion;
 
-  // ER for TikTok: (likes + comments + shares) / views
-  let engagementRate: number | undefined;
-  if (views && views > 0) {
-    const eng = (likes ?? 0) + (comments ?? 0) + (shares ?? 0);
-    engagementRate = (eng / views) * 100;
-  }
+  // Wskaznik ukonczenia podany wprost wygrywa z policzonym ze sredniego czasu ogladania.
+  const completionRate =
+    num(pick(row, 'Completion rate', 'Wskaźnik ukończenia')) ?? watchedPct(avgWatch, duration);
+  // ER dla TikToka: (polubienia + komentarze + udostepnienia) / wyswietlenia.
+  const engagementRate = pct(engSum(likes, comments, shares), views);
 
   return {
     title,
@@ -129,8 +141,8 @@ function mapTikTokRow(row: Record<string, unknown>): NormalizedPost | null {
     publishedAt,
     reach: reach ?? views,
     impressions: views,
-    engagementRate: engagementRate !== undefined ? Math.round(engagementRate * 10) / 10 : undefined,
-    completionRate: completionRate !== undefined ? Math.round(completionRate) : undefined,
+    engagementRate: round1(engagementRate),
+    completionRate: round0(completionRate),
     saves: undefined,
     shares,
     comments,
@@ -141,11 +153,11 @@ function mapTikTokRow(row: Record<string, unknown>): NormalizedPost | null {
 function mapYouTubeRow(row: Record<string, unknown>): NormalizedPost | null {
   // Skip totals/summary rows
   const content = str(pick(row, 'Content', 'Video', 'Title'));
-  if (!content || content === 'Total' || /^total/i.test(content)) return null;
+  if (!content || /^total/i.test(content)) return null;
 
   const title = str(pick(row, 'Video title', 'Title', 'Tytuł', 'Content')) ?? content;
   const publishedAt = date(pick(row, 'Video publish time', 'Publish time', 'Date', 'Data publikacji'));
-  if (!title || !publishedAt) return null;
+  if (!publishedAt) return null;
 
   const views = num(pick(row, 'Views', 'Wyświetlenia'));
   const watchHours = num(pick(row, 'Watch time (hours)', 'Watch time'));
@@ -157,16 +169,8 @@ function mapYouTubeRow(row: Record<string, unknown>): NormalizedPost | null {
   const avgViewDur = num(pick(row, 'Average view duration', 'Avg view duration'));
   const videoDur = num(pick(row, 'Video duration', 'Duration'));
 
-  let completionRate: number | undefined;
-  if (avgViewDur && videoDur && videoDur > 0) {
-    completionRate = Math.min(100, (avgViewDur / videoDur) * 100);
-  }
-
-  let engagementRate: number | undefined;
-  if (views && views > 0) {
-    const eng = (likes ?? 0) + (comments ?? 0) + (shares ?? 0);
-    engagementRate = (eng / views) * 100;
-  }
+  const completionRate = watchedPct(avgViewDur, videoDur);
+  const engagementRate = pct(engSum(likes, comments, shares), views);
 
   return {
     title,
@@ -174,8 +178,8 @@ function mapYouTubeRow(row: Record<string, unknown>): NormalizedPost | null {
     publishedAt,
     reach: views,
     impressions: views,
-    engagementRate: engagementRate !== undefined ? Math.round(engagementRate * 10) / 10 : undefined,
-    completionRate: completionRate !== undefined ? Math.round(completionRate) : undefined,
+    engagementRate: round1(engagementRate),
+    completionRate: round0(completionRate),
     shares,
     comments,
     followersGained: subsGained,

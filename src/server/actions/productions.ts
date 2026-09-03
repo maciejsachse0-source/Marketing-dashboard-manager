@@ -28,6 +28,20 @@ function safeSlug(input: string, fallback: string): string {
   return s || fallback;
 }
 
+/**
+ * Zakłada układ folderu roboczego w OneDrive (tylko lokalnie). Wiersz w bazie
+ * już istnieje, więc chwilowy błąd `mkdir` nie może blokować produkcji.
+ * Na Vercelu pomijane: system plików jest tylko do odczytu i ścieżka nie istnieje.
+ */
+function ensureWorkFolderQuietly(artistName: string, row: Production): void {
+  if (process.env.VERCEL) return;
+  try {
+    ensureWorkFolderStructure(artistName, row.title, (row.periods ?? []).map((p) => p.code));
+  } catch (err) {
+    console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
+  }
+}
+
 export async function createProduction(input: ProductionInput): Promise<Production> {
   await requireSession();
   const parsed = productionInputSchema.parse(input);
@@ -63,18 +77,7 @@ export async function createProduction(input: ProductionInput): Promise<Producti
   // only). DB row is already persisted, so a transient mkdir failure
   // shouldn't block the production. Skipped on Vercel where the FS is
   // read-only and the path doesn't exist.
-  if (!process.env.VERCEL) {
-    try {
-      const codes = (row.periods ?? []).map((p) => p.code);
-      ensureWorkFolderStructure(
-        artist.name,
-        row.title,
-        codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
-      );
-    } catch (err) {
-      console.warn(`[createProduction] ensureWorkFolderStructure failed for "${row.title}":`, err);
-    }
-  }
+  ensureWorkFolderQuietly(artist.name, row);
   revalidatePath('/productions');
   revalidatePath('/productions/list');
   revalidatePath('/calendar');

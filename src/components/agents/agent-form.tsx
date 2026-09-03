@@ -28,6 +28,7 @@ import {
   deleteAgent,
   cloneAgent,
 } from '@/server/actions/agents';
+import { fieldText } from '@/lib/utils';
 
 const SIDE_PANEL_LABELS: Record<AgentSidePanel, string> = {
   'calendar-14': 'Kalendarz, 14 dni',
@@ -62,16 +63,40 @@ function widgetTakesDays(kind: WidgetKind | ''): boolean {
 }
 
 function fromAgent(agent: AgentDef | undefined, defaultSlug = ''): State {
+  const a: Partial<AgentDef> = agent ?? {};
+  const w = a.dashboardWidget;
   return {
-    slug: agent?.slug ?? defaultSlug,
-    name: agent?.name ?? '',
-    description: agent?.description ?? '',
-    sidePanel: agent?.sidePanel ?? 'calendar-14',
-    systemPrompt: agent?.systemPrompt ?? '',
-    widgetKind: agent?.dashboardWidget?.kind ?? '',
-    widgetDays: agent?.dashboardWidget?.days?.toString() ?? '',
-    widgetTemplate: agent?.dashboardWidget?.template ?? '',
+    slug: a.slug ?? defaultSlug,
+    name: fieldText(a.name),
+    description: fieldText(a.description),
+    sidePanel: a.sidePanel ?? 'calendar-14',
+    systemPrompt: fieldText(a.systemPrompt),
+    widgetKind: w?.kind ?? '',
+    widgetDays: fieldText(w?.days),
+    widgetTemplate: fieldText(w?.template),
   };
+}
+
+/** Pierwszy komunikat bledu formularza albo null, gdy payload jest kompletny. */
+function validationError(
+  p: {
+    slug: string;
+    name: string;
+    description: string;
+    systemPrompt: string;
+    dashboardWidgetKind?: string;
+    dashboardWidgetTemplate?: string;
+  },
+  mode: Mode,
+): string | null {
+  if (!p.name) return 'Nazwa wymagana.';
+  if (!p.description) return 'Opis wymagany.';
+  if (!p.systemPrompt.trim()) return 'System prompt wymagany.';
+  if (mode === 'create' && !p.slug) return 'Slug wymagany.';
+  if (Boolean(p.dashboardWidgetKind) !== Boolean(p.dashboardWidgetTemplate)) {
+    return 'Widget wymaga rodzaju i template (albo zostaw oba puste).';
+  }
+  return null;
 }
 
 export function AgentForm({
@@ -106,16 +131,8 @@ export function AgentForm({
       dashboardWidgetDays: daysParsed && Number.isFinite(daysParsed) ? daysParsed : undefined,
       dashboardWidgetTemplate: state.widgetTemplate.trim() || undefined,
     };
-    if (!payload.name) return setError('Nazwa wymagana.');
-    if (!payload.description) return setError('Opis wymagany.');
-    if (!payload.systemPrompt.trim()) return setError('System prompt wymagany.');
-    if (mode === 'create' && !payload.slug) return setError('Slug wymagany.');
-    if (
-      (payload.dashboardWidgetKind && !payload.dashboardWidgetTemplate) ||
-      (!payload.dashboardWidgetKind && payload.dashboardWidgetTemplate)
-    ) {
-      return setError('Widget wymaga rodzaju i template (albo zostaw oba puste).');
-    }
+    const invalid = validationError(payload, mode);
+    if (invalid) return setError(invalid);
     startTransition(async () => {
       try {
         if (mode === 'create') {

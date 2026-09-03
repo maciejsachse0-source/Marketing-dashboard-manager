@@ -46,6 +46,16 @@ async function loadProductionWithArtist(productionId: number) {
  *
  * spawn() with `detached: true` so the child outlives the action call.
  */
+/** Menedżer plików per system; reszta świata dostaje `xdg-open`. */
+const FILE_MANAGER: Partial<Record<NodeJS.Platform, string>> = {
+  win32: 'explorer.exe',
+  darwin: 'open',
+};
+
+function errMsg(err: unknown, fallback: string): string {
+  return err instanceof Error ? err.message : fallback;
+}
+
 export async function openProductionFolder(
   productionId: number,
   stage: WorkStage,
@@ -66,31 +76,24 @@ export async function openProductionFolder(
   let target: string;
   try {
     const codes = (ctx.production.periods ?? []).map((p) => p.code);
-    ensureWorkFolderStructure(
-      ctx.artist.name,
-      ctx.production.title,
-      codes.length > 0 ? codes : ['T1', 'T2', 'T3'],
-    );
+    ensureWorkFolderStructure(ctx.artist.name, ctx.production.title, codes);
     target = resolveSafeStagePath(ctx.artist.name, ctx.production.title, stage);
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Nie można utworzyć folderu' };
+    return { ok: false, error: errMsg(err, 'Nie można utworzyć folderu') };
   }
   if (!existsSync(target)) {
     return { ok: false, error: `Folder nie istnieje: ${target}` };
   }
 
   try {
-    const { command, args } =
-      process.platform === 'win32'
-        ? { command: 'explorer.exe', args: [target] }
-        : process.platform === 'darwin'
-          ? { command: 'open', args: [target] }
-          : { command: 'xdg-open', args: [target] };
-    const child = spawn(command, args, { detached: true, stdio: 'ignore' });
+    const child = spawn(FILE_MANAGER[process.platform] ?? 'xdg-open', [target], {
+      detached: true,
+      stdio: 'ignore',
+    });
     child.unref();
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Nie udało się otworzyć folderu' };
+    return { ok: false, error: errMsg(err, 'Nie udało się otworzyć folderu') };
   }
 }
 

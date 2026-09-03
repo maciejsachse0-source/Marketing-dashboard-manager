@@ -24,40 +24,45 @@ export async function runAgentWidget(widget: DashboardWidget): Promise<string | 
   return widget.template.replace(/\{\{count\}\}/g, String(value));
 }
 
+/** Wynik zapytania `select({ c: count() })`: brak wiersza znaczy zero. */
+function firstCount(rows: { c: number }[]): number {
+  return Number(rows[0]?.c ?? 0);
+}
+
 async function runQuery(widget: DashboardWidget): Promise<number> {
   const days = widget.days ?? defaultDays(widget.kind);
   switch (widget.kind) {
     case 'stale-artists': {
       const cutoff = new Date(Date.now() - days * 86_400_000);
-      const [row] = await db
+      const rows = await db
         .select({ c: count() })
         .from(schema.artists)
         .where(or(isNull(schema.artists.lastContactAt), lt(schema.artists.lastContactAt, cutoff)));
-      return Number(row?.c ?? 0);
+      return firstCount(rows);
     }
     case 'upcoming-campaigns': {
-      const [row] = await db
+      const rows = await db
         .select({ c: count() })
         .from(schema.campaigns)
         .where(and(ne(schema.campaigns.phase, 'done'), gte(schema.campaigns.releaseAt, new Date())));
-      return Number(row?.c ?? 0);
+      return firstCount(rows);
     }
     case 'overdue-calendar-entries': {
-      const [row] = await db
+      const rows = await db
         .select({ c: count() })
         .from(schema.calendarEntries)
         .where(
           sql`${schema.calendarEntries.startsAt} < now() AND ${schema.calendarEntries.status} = 'planned'`,
         );
-      return Number(row?.c ?? 0);
+      return firstCount(rows);
     }
     case 'recent-csv-uploads': {
       const cutoff = new Date(Date.now() - days * 86_400_000);
-      const [row] = await db
+      const rows = await db
         .select({ c: count() })
         .from(schema.csvUploads)
         .where(gte(schema.csvUploads.uploadedAt, cutoff));
-      return Number(row?.c ?? 0);
+      return firstCount(rows);
     }
     default: {
       const _exhaustive: never = widget.kind;

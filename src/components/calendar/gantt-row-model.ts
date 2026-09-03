@@ -17,6 +17,99 @@ import {
 import { buildDraft } from './gantt-row-placement';
 import type { SubStepInfo } from './gantt-substep-bar';
 
+type StagePin = {
+  stepId: string;
+  label: string;
+  description: string | null;
+  frame: WeekFrameCode;
+  dayIdx: number;
+  dateLabel: string;
+  n: number;
+  /** Index within the same-day stack (0 = topmost). */
+  stackIdx: number;
+  /** Total pins sharing this dayIdx — used to center the stack. */
+  stackSize: number;
+};
+
+/** Kroki po identyfikatorze: kanoniczne po nazwie etapu, własne po `customId`. */
+function indexSubSteps(subSteps: SubStepInfo[]): Map<string, SubStepInfo> {
+  const byId = new Map<string, SubStepInfo>();
+  for (const s of subSteps) {
+    const id = s.kind === 'canonical' && s.stage ? (s.stage as string) : s.customId;
+    if (id) byId.set(id, s);
+  }
+  return byId;
+}
+
+function pinDateLabel(date: Date, withTime: boolean): string {
+  if (withTime) return date.toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' });
+  return date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
+}
+
+/**
+ * Pinezki na tej samej kolumnie dnia rysowałyby się jedna na drugiej. Grupujemy
+ * je i nadajemy pozycje w stosie, żeby każdą dało się zobaczyć i najechać.
+ * Kolejność w stosie idzie po numerze kroku `n`, więc stos czyta się z góry na dół.
+ */
+function stackPins(pins: StagePin[]): void {
+  const byDay = new Map<number, StagePin[]>();
+  for (const pin of pins) {
+    const list = byDay.get(pin.dayIdx);
+    if (list) list.push(pin);
+    else byDay.set(pin.dayIdx, [pin]);
+  }
+  for (const list of byDay.values()) {
+    if (list.length <= 1) continue;
+    list.sort((a, b) => a.n - b.n);
+    list.forEach((pin, i) => {
+      pin.stackIdx = i;
+      pin.stackSize = list.length;
+    });
+  }
+}
+
+/**
+ * Sub-step pins on the colored T1/T2/T3 bands — every step (canonical OR
+ * custom) whose user-entered `dateIso` falls inside the visible window
+ * becomes a numbered chip ON its category's band. The chip carries the
+ * global step number; hover surfaces label + date + description.
+ *
+ * Auto-derived dates (editing = shoot+1) and the production-level T-0 are
+ * intentionally NOT pinned — they don't represent a date the user typed
+ * *into a step row*, and the milestone tick / T3 band already telegraph
+ * those anchors.
+ */
+function buildStagePins(
+  row: GanttRow,
+  firstDay: Date,
+  totalDays: number,
+  allSubSteps: SubStepInfo[],
+): StagePin[] {
+  const subStepById = indexSubSteps(allSubSteps);
+  const pins: StagePin[] = [];
+  for (const step of row.steps ?? []) {
+    if (!step.dateIso) continue;
+    const date = new Date(step.dateIso);
+    const idx = dayDiff(date, firstDay);
+    if (idx < 0 || idx >= totalDays) continue;
+    const sub = subStepById.get(step.id);
+    if (!sub) continue;
+    pins.push({
+      stepId: step.id,
+      label: step.label,
+      description: step.description?.trim() || null,
+      frame: sub.frame,
+      dayIdx: idx,
+      dateLabel: pinDateLabel(date, sub.withTime),
+      n: sub.n,
+      stackIdx: 0,
+      stackSize: 1,
+    });
+  }
+  stackPins(pins);
+  return pins;
+}
+
 export function buildRowModel(
   row: GanttRow,
   firstDay: Date,
@@ -121,69 +214,7 @@ export function buildRowModel(
   // intentionally NOT pinned — they don't represent a date the user typed
   // *into a step row*, and the milestone tick / T3 band already telegraph
   // those anchors.
-  const subStepById = new Map<string, SubStepInfo>();
-  for (const s of allSubSteps) {
-    const id = s.kind === 'canonical' && s.stage ? (s.stage as string) : s.customId;
-    if (id) subStepById.set(id, s);
-  }
-  const stagePins: {
-    stepId: string;
-    label: string;
-    description: string | null;
-    frame: WeekFrameCode;
-    dayIdx: number;
-    dateLabel: string;
-    n: number;
-    /** Index within the same-day stack (0 = topmost). */
-    stackIdx: number;
-    /** Total pins sharing this dayIdx — used to center the stack. */
-    stackSize: number;
-  }[] = [];
-  for (const step of row.steps ?? []) {
-    if (!step.dateIso) continue;
-    const date = new Date(step.dateIso);
-    const idx = dayDiff(date, firstDay);
-    if (idx < 0 || idx >= totalDays) continue;
-    const sub = subStepById.get(step.id);
-    if (!sub) continue;
-    const dateLabel = sub.withTime
-      ? date.toLocaleString('pl-PL', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        })
-      : date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
-    stagePins.push({
-      stepId: step.id,
-      label: step.label,
-      description: step.description?.trim() ? step.description.trim() : null,
-      frame: sub.frame,
-      dayIdx: idx,
-      dateLabel,
-      n: sub.n,
-      stackIdx: 0,
-      stackSize: 1,
-    });
-  }
-  // Pins sharing the same dayIdx would render on top of each other. Group
-  // them and assign vertical stack positions so the user can see and hover
-  // each one individually. Order within the stack follows step number `n`
-  // so the visual stack reads top→bottom in step order.
-  {
-    const byDay = new Map<number, typeof stagePins>();
-    for (const pin of stagePins) {
-      const list = byDay.get(pin.dayIdx);
-      if (list) list.push(pin);
-      else byDay.set(pin.dayIdx, [pin]);
-    }
-    for (const list of byDay.values()) {
-      if (list.length <= 1) continue;
-      list.sort((a, b) => a.n - b.n);
-      list.forEach((pin, i) => {
-        pin.stackIdx = i;
-        pin.stackSize = list.length;
-      });
-    }
-  }
+  const stagePins = buildStagePins(row, firstDay, totalDays, allSubSteps);
 
   return { frameBands, checkpoints, allSubSteps, subSteps, stagePins };
 }

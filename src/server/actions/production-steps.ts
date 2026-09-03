@@ -26,7 +26,11 @@ import {
   uploadedFileSchema,
 } from './schemas';
 import { z } from 'zod';
-import { periodsRelativeToT0Mon, resolvePeriods } from '@/lib/production-periods';
+import {
+  periodsRelativeToT0Mon,
+  resolvePeriods,
+  type TemplatePeriod,
+} from '@/lib/production-periods';
 import { startOfWeek } from '@/lib/dates';
 import type {
   CalendarType,
@@ -382,6 +386,47 @@ async function upsertCalendarEntryForStep(
  *  - dateMode: 'record' → just save dateIso, no calendar.
  *  - dateMode: 'none' → reject.
  */
+/**
+ * Blad zakresu tygodnia dla kroku albo null, gdy data mieści się w ramce T.
+ * Każdy krok jest przypięty do tygodnia kalendarzowego swojej ramki
+ * (outreach/ustalenia → T-2, nagrywanie/obróbka → T-1, publikacja → T-0).
+ * `derived-from-shooting` ustawia system z kotwicy T-0, więc go pomijamy.
+ */
+function weekRangeError(
+  t0At: Date,
+  periods: TemplatePeriod[] | null | undefined,
+  step: ProductionStep,
+  dateIso: string | null,
+): string | null {
+  if (!dateIso || step.dateMode === 'derived-from-shooting') return null;
+  const { start, end } = getStepWeekRange(t0At, step.category, periods);
+  const candidate = new Date(dateIso);
+  if (candidate >= start && candidate <= end) return null;
+  const fmt = (d: Date) => d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
+  return `Data musi mieścić się w tygodniu ${fmt(start)}–${fmt(end)}`;
+}
+
+/** Kroki, których datę wylicza system z kotwicy T-0. */
+function derivedSteps(steps: ProductionStep[]): ProductionStep[] {
+  return steps.filter((s) => s.dateMode === 'derived-from-shooting');
+}
+
+/**
+ * Nowa lista kroków z datą ustawioną na kroku `idx`. Gdy to kotwica T-0,
+ * zmiana kaskaduje na wszystkie kroki `derived-from-shooting`.
+ */
+function withDerivedCascade(
+  steps: ProductionStep[],
+  idx: number,
+  dateIso: string | null,
+): ProductionStep[] {
+  const next = steps.slice();
+  next[idx] = { ...steps[idx], dateIso: dateIso ?? undefined };
+  if (!steps[idx].isT0Anchor) return next;
+  const derived = dateIso ? deriveFromShootingIso(dateIso) : undefined;
+  return next.map((s) => (s.dateMode === 'derived-from-shooting' ? { ...s, dateIso: derived } : s));
+}
+
 export async function setStepDate(
   productionId: number,
   stepId: string,
@@ -401,34 +446,10 @@ export async function setStepDate(
     return { ok: false, error: 'Ten krok nie ma daty' };
   }
 
-  // Range guard — every step is locked to the calendar week of its T-frame
-  // (outreach/ustalenia → T-2, nagrywanie/obrobka → T-1, publikacja → T-0).
-  // 'derived-from-shooting' is system-set from the T-0 anchor and skipped.
-  if (dateIso && step.dateMode !== 'derived-from-shooting') {
-    const { start, end } = getStepWeekRange(prod.t0At, step.category, prod.periods);
-    const candidate = new Date(dateIso);
-    if (candidate < start || candidate > end) {
-      const fmt = (d: Date) =>
-        d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' });
-      return {
-        ok: false,
-        error: `Data musi mieścić się w tygodniu ${fmt(start)}–${fmt(end)}`,
-      };
-    }
-  }
+  const rangeError = weekRangeError(prod.t0At, prod.periods, step, dateIso);
+  if (rangeError) return { ok: false, error: rangeError };
 
-  const next = steps.slice();
-  next[idx] = { ...step, dateIso: dateIso ?? undefined };
-
-  // T-0 anchor change cascades to every step with dateMode: 'derived-from-shooting'.
-  if (step.isT0Anchor) {
-    for (let i = 0; i < next.length; i++) {
-      if (next[i].dateMode === 'derived-from-shooting') {
-        const derived = dateIso ? deriveFromShootingIso(dateIso) : undefined;
-        next[i] = { ...next[i], dateIso: derived };
-      }
-    }
-  }
+  const next = withDerivedCascade(steps, idx, dateIso);
 
   await saveSteps(productionId, next);
 
@@ -440,18 +461,8 @@ export async function setStepDate(
     prod.artistId,
     prod.campaignId,
   );
-  if (step.isT0Anchor) {
-    for (const s of next) {
-      if (s.dateMode === 'derived-from-shooting') {
-        await upsertCalendarEntryForStep(
-          productionId,
-          s,
-          prod.title,
-          prod.artistId,
-          prod.campaignId,
-        );
-      }
-    }
+  for (const s of step.isT0Anchor ? derivedSteps(next) : []) {
+    await upsertCalendarEntryForStep(productionId, s, prod.title, prod.artistId, prod.campaignId);
   }
 
   return { ok: true };

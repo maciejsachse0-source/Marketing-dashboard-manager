@@ -127,31 +127,32 @@ export function getStagePath(
  * Falls back to T1/T2/T3 for legacy productions persisted before the
  * flexible-periods migration.
  */
+/** `mkdir -p`: istniejący katalog nie jest błędem, więc test `existsSync` jest zbędny. */
+function ensureDir(path: string): string {
+  mkdirSync(path, { recursive: true });
+  return path;
+}
+
 export function ensureWorkFolderStructure(
   artistName: string,
   productionTitle: string,
   frameCodes: readonly string[] = ['T1', 'T2', 'T3'],
 ): string {
-  const root = getProductionFolderRoot(artistName, productionTitle);
-  if (!existsSync(root)) mkdirSync(root, { recursive: true });
+  const root = ensureDir(getProductionFolderRoot(artistName, productionTitle));
+  // Produkcje sprzed migracji na elastyczne okresy mają pustą listę ramek.
+  const codes = frameCodes.length > 0 ? frameCodes : ['T1', 'T2', 'T3'];
 
-  for (const code of frameCodes) {
+  for (const code of codes) {
     if (code === 'T1') continue;
-    const framePath = join(root, code);
-    if (!existsSync(framePath)) mkdirSync(framePath, { recursive: true });
+    const framePath = ensureDir(join(root, code));
 
     if (code === 'T2') {
       for (const stage of ['nagrywanie', 'obrobka'] as const) {
-        const stagePath = join(framePath, stage);
-        if (!existsSync(stagePath)) mkdirSync(stagePath, { recursive: true });
-        for (const sub of STAGE_SUBFOLDERS[stage]) {
-          const subPath = join(stagePath, sub);
-          if (!existsSync(subPath)) mkdirSync(subPath, { recursive: true });
-        }
+        const stagePath = ensureDir(join(framePath, stage));
+        for (const sub of STAGE_SUBFOLDERS[stage]) ensureDir(join(stagePath, sub));
       }
     } else if (code === 'T3') {
-      const stagePath = join(framePath, 'publikacja');
-      if (!existsSync(stagePath)) mkdirSync(stagePath, { recursive: true });
+      ensureDir(join(framePath, 'publikacja'));
     }
     // T4+ stays as an empty placeholder
   }

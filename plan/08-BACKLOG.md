@@ -1771,7 +1771,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   AC:
   - `npx eslint . -f json | grep -c 'no-unescaped-entities'` zwraca `0`
 
-- [ ] **F7-06** `znalezisko` `tooling` 63 funkcje ponad progiem złożoności 10
+- [x] **F7-06** `znalezisko` `tooling` 63 funkcje ponad progiem złożoności 10
   Waga: **ważne**. Szacunek: rozłożone na F2 i F3, nie w jednym podejściu.
   Z11 chroni NOWY kod, więc zastane funkcje są świadomie zgrandfatherowane, ale
   lista ma się kurczyć. Najgorsze: `setStepDate` 18, `resolveCategorySequence` 18,
@@ -1781,6 +1781,45 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     (dowód: `npx eslint . -f json | grep -c '\"complexity\"'` przed i po, obie liczby
     w raporcie fazy)
   - żadna funkcja dotknięta w F1 do F6 nie zostaje z złożonością wyższą niż zastana
+  DYSPOZYCJA (2026-09-03): **ZROBIONE CZĘŚCIOWO, reszta ODŁOŻONA z liczbą.**
+  Kryterium „spadek o co najmniej połowę" NIE jest spełnione i nie udaję, że jest.
+  Licznik przed: **58** trafień reguły `complexity` w 43 plikach (nie 63 — pięć
+  wcześniejszych trafień zniknęło przy F7-01 do F7-05, uczciwy licznik to
+  `npx eslint . -f json | jq '[.[].messages[]|select(.ruleId=="complexity")]|length'`,
+  bo `grep -c` liczy pole `source`, nie komunikaty). Licznik po: **40** trafień
+  w 29 plikach, czyli spadek o 31%. Ostrzeżeń lintu ogółem: 78 → 60, 0 błędów.
+  Naprawione 18 funkcji w 14 plikach, każda przez wydzielenie nazwanego pomocnika,
+  nie przez wyłączenie reguły: `csv-mappers.ts` (3 mappery, wspólne `engSum`, `pct`,
+  `watchedPct`, `round0/round1`), `dates.ts` (`timeUntil` → `joinUnits`),
+  `artist-dialog.tsx` i `videographer-dialog.tsx` (`initial` → `Partial<T>` plus nowy
+  `fieldText` z `src/lib/utils.ts`), `agent-form.tsx` (`fromAgent`, `submit` →
+  `validationError`), `artist-avatar.tsx` (tablica `KIND` zamiast łańcucha ternarnych),
+  `agents/widget.ts` (`firstCount`), `production-steps.ts` (`setStepDate` →
+  `weekRangeError` + `withDerivedCascade` + `derivedSteps`), `production-work-folder.ts`
+  (`ensureDir`, bo `mkdirSync({recursive:true})` i tak jest idempotentny — pięć testów
+  `existsSync` zniknęło), `production-folder.ts` (`FILE_MANAGER`, `errMsg`),
+  `productions.ts` (`ensureWorkFolderQuietly`), `gantt-row-model.ts` (`buildRowModel`
+  20 → 3, wydzielone `buildStagePins`, `indexSubSteps`, `stackPins`, `pinDateLabel`),
+  `productions-list.tsx` (`groupByPerson`, `visibleSections`), `template-form.tsx`
+  i `campaign-template-form.tsx` (`Partial<T>` + `fieldText`).
+  Przy okazji naprawiony korzeń dublowanej logiki: pusta lista ramek produkcji
+  ustawia się na `T1/T2/T3` w jednym miejscu, w `ensureWorkFolderStructure`,
+  zamiast u dwóch wywołujących.
+  ZOSTAJE **40 trafień w 29 plikach**, najwyższe: `ProductionStepRow` **46**
+  (`production-step-row.tsx:75`) i `CalendarPage` **43** (`app/calendar/page.tsx:75`).
+  Te dwie to nie łańcuchy `??` — to komponenty po kilkaset linii, w których złożoność
+  siedzi w JSX i w gałęziach stanu; ich rozbicie to osobne zadanie z własnym dowodem
+  wizualnym, nie „przy okazji". Reszta zostających to głównie kreatory
+  (`production-wizard`, `campaign-wizard`), gant (`gantt-row`, `gantt-milestones`,
+  `gantt-substep-bar`, `gantt-milestone-labels` — wypisujemy się z nich przez F7-13)
+  i strony serwerowe. Lista grandfather w `eslint.config.mjs` skurczona z 43 do 29
+  pozycji; z list się wypisujemy, nigdy nie dopisujemy.
+  DOWÓD REGRESJI: `node scripts/perf/pngdiff.mjs` w oknie 1280×720 dla `/calendar`,
+  `/productions/list`, `/templates` i `/artists` — **0 różnych pikseli** na każdym
+  z czterech ekranów (zrzut przed z `git stash push -- src/ eslint.config.mjs`).
+  BRAMKI: `typecheck` 0, `lint` 0 (0 błędów, 60 ostrzeżeń), `test` 0 (216/20),
+  `check-typography` 0, `check-trust-boundaries` 0, `perf` 0, bundel `/calendar`
+  292,8 kB przy progu 301,6 kB (bez zmiany).
 
 - [ ] **F7-07** `znalezisko` `tooling` 17 nieużywanych zmiennych i importów
   Waga: **drobne**. Szacunek: 1 godzina.

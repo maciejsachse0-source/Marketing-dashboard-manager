@@ -78,21 +78,30 @@ export function isoWeekToMonday(week: string): Date | null {
  * Returns `null` when target is more than `maxDays` away (callers usually want to
  * suppress the badge entirely for far-future events).
  */
+/** "za 3h 20min" gdy reszta jest niezerowa i glowna jednostka mala, inaczej "za 3h". */
+function joinUnits(
+  big: number,
+  bigUnit: string,
+  small: number,
+  smallUnit: string,
+  detailBelow: number,
+): string {
+  return small > 0 && big < detailBelow
+    ? `za ${big}${bigUnit} ${small}${smallUnit}`
+    : `za ${big}${bigUnit}`;
+}
+
 export function timeUntil(target: Date, now: Date = new Date(), maxDays = 30): string | null {
   const ms = target.getTime() - now.getTime();
-  if (ms <= 0) {
-    if (ms > -60 * 60 * 1000) return 'TERAZ';
-    return null;
-  }
+  if (ms <= 0) return ms > -60 * 60 * 1000 ? 'TERAZ' : null;
+
   const minutes = Math.floor(ms / 60000);
   if (minutes < 60) return `za ${minutes} min`;
+
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    const remMin = minutes % 60;
-    return remMin > 0 && hours < 6 ? `za ${hours}h ${remMin}min` : `za ${hours}h`;
-  }
+  if (hours < 24) return joinUnits(hours, 'h', minutes % 60, 'min', 6);
+
   const days = Math.floor(hours / 24);
   if (days > maxDays) return null;
-  const remHours = hours % 24;
-  return remHours > 0 && days < 7 ? `za ${days}d ${remHours}h` : `za ${days}d`;
+  return joinUnits(days, 'd', hours % 24, 'h', 7);
 }

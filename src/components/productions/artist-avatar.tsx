@@ -21,6 +21,16 @@ const SIZE = {
   xl: { box: 'w-20 h-20', text: 'text-xl', badge: 'w-5 h-5', icon: 'w-3 h-3' },
 } as const;
 
+// Artists get a wider hue range (vivid palette across the spectrum).
+// Videographers stay in cool blues/teals so they read as "crew, not talent".
+// "Other" (internal team) lands in warm amber/orange so management/staff
+// visually separate from the people they coordinate.
+const KIND = {
+  artist: { icon: Mic, hue: (h: number) => h },
+  videographer: { icon: Camera, hue: (h: number) => 180 + (h % 80) },
+  other: { icon: Briefcase, hue: (h: number) => 30 + (h % 30) },
+} as const;
+
 export function PersonAvatar({
   name,
   seed,
@@ -39,20 +49,10 @@ export function PersonAvatar({
   const baseSeed = seed ?? name;
   const hue = hashHue(baseSeed);
   const cls = SIZE[size];
+  const { icon: Icon, hue: hueOf } = KIND[kind];
 
-  // Artists get a wider hue range (vivid palette across the spectrum).
-  // Videographers stay in cool blues/teals so they read as "crew, not talent".
-  // "Other" (internal team) lands in warm amber/orange so management/staff
-  // visually separate from the people they coordinate.
-  const finalHue =
-    kind === 'videographer'
-      ? 180 + (hue % 80)
-      : kind === 'other'
-        ? 30 + (hue % 30)
-        : hue;
+  const finalHue = hueOf(hue);
   const bg = `linear-gradient(135deg, oklch(0.75 0.16 ${finalHue}) 0%, oklch(0.55 0.18 ${(finalHue + 30) % 360}) 100%)`;
-
-  const Icon = kind === 'videographer' ? Camera : kind === 'other' ? Briefcase : Mic;
 
   return (
     <div className="relative shrink-0">

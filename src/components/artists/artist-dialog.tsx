@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { createArtist, updateArtist, deleteArtist } from '@/server/actions/artists';
 import type { Artist } from '../../../drizzle/schema';
 import { useResetOnChange } from '@/lib/use-reset-on-change';
+import { fieldText } from '@/lib/utils';
 
 type FormState = {
   name: string;
@@ -22,13 +23,14 @@ type FormState = {
 };
 
 function initial(artist?: Artist | null): FormState {
+  const a: Partial<Artist> = artist ?? {};
   return {
-    name: artist?.name ?? '',
-    handle: artist?.handle ?? '',
-    email: artist?.email ?? '',
-    phone: artist?.phone ?? '',
-    avatarUrl: artist?.avatarUrl ?? '',
-    notes: artist?.notes ?? '',
+    name: fieldText(a.name),
+    handle: fieldText(a.handle),
+    email: fieldText(a.email),
+    phone: fieldText(a.phone),
+    avatarUrl: fieldText(a.avatarUrl),
+    notes: fieldText(a.notes),
   };
 }
 
