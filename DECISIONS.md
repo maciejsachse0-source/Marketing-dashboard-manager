@@ -890,3 +890,19 @@ Przy okazji zniknęła lokalna mapa kolorów wpisana wprost w komponencie: karta
 `FRAME_STYLE` z `src/lib/category-colors.ts`, czyli tę samą tabelę, co pasy ganta
 i strona szablonów. Pole `rail` z tej tabeli usunięte, bo jedynym jego odbiorcą był
 zakazany pasek; doszły `faint` i `glow`, które wcześniej istniały tylko lokalnie.
+
+**F7-09, `calendar_entries` zostaje kanałem agentowym, ale premisa issue była
+częściowo fałszywa.** Issue zakładało wybór: albo przycisk w interfejsie, albo trzy
+akcje jako kanał agentowy wołany z `tsx`. Weryfikacja pokazała, że drugi wariant nie
+działa tak, jak go opisano: import `createCalendarEntry` do skryptu `tsx` kończy się
+wyjątkiem, bo `requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet `server-only`.
+Agent zapisuje wpis kalendarza przez `db.insert(schema.calendarEntries)` i to działa
+(sprawdzone: wiersz `id=1` utworzony i skasowany). Interfejs też pisze do tej tabeli,
+tylko przez `upsertCalendarEntryForStep` w `production-steps.ts`, jako skutek uboczny
+ustawienia daty kroku. Czyli tabela ma pisarzy, nie ma formularza.
+Akcje zostają nieskasowane z trzech powodów, każdy sprawdzalny: są jedyną ścieżką
+zapisu z walidacją Zod i sesją; `CLAUDE.md` opisuje ręczne planowanie jako część
+przepływu agentów; skasowanie wymagałoby przepisania dwóch person agentów, które są
+produktem usera, nie kodem infrastruktury. Przycisku nie dokładam, bo to nowa funkcja,
+nie sprzątanie znaleziska. Rozbieżność między przepisami w personach a rzeczywistością
+zapisana jako **F7-30**.

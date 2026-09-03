@@ -1907,7 +1907,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   `check-trust-boundaries` 0, `perf` 0, bundel `/calendar` **292,7 kB** przy progu 301,6
   (o 0,1 kB mniej niż przed zmianą, bo zniknął jeden węzeł).
 
-- [ ] **F7-09** `znalezisko` `arch` Server action `createCalendarEntry` bez wywołania z UI
+- [x] **F7-09** `znalezisko` `arch` Server action `createCalendarEntry` bez wywołania z UI
   Waga: **ważne**. Szacunek: pół dnia albo 15 minut, zależnie od dyspozycji.
   Znalezione przy pisaniu sekcji 6 dokumentu architektury w F0-06.
   `grep -rn 'createCalendarEntry' src/ | wc -l` zwraca `1`, czyli samą definicję
@@ -1927,6 +1927,36 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     mówiący wprost, że wywołuje je Claude Code, nie interfejs, a `docs/ARCHITEKTURA.md`
     sekcja 6 zmienia zdanie o brakującym przycisku na opis świadomego wyboru
   - negatywne: `npm run typecheck` i `npm run lint` kończą się kodem 0 w obu wariantach
+  DOWÓD (2026-09-03): **ZROBIONE, wariant „kanał agentowy"** — z poprawką, bo przy
+  weryfikacji okazało się, że premisa wariantu była częściowo fałszywa.
+  Zmierzone na uruchomionym środowisku, nie wyczytane z kodu:
+  1. `grep -rn 'createCalendarEntry' src/ | wc -l` zwraca **1** — sama definicja.
+     To samo dla `updateCalendarEntry`, `deleteCalendarEntry` i `listCalendarEntries`.
+  2. **Import tych akcji do skryptu `tsx` NIE działa.** Skrypt
+     `import { createCalendarEntry } from './src/server/actions/calendar'` kończy się
+     wyjątkiem `This module cannot be imported from a Client Component module`,
+     bo `requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet `server-only`.
+     Przepisy w `agents/schedule-manager.md:54`, `agents/campaign-strategist.md:58`
+     i `CLAUDE.md:31` pokazują ten import jako działający — kłamią. Zapisane jako **F7-30**.
+  3. **Droga, która działa**, sprawdzona tym samym skryptem:
+     `db.insert(schema.calendarEntries).values({...}).returning()` — utworzyła wiersz
+     `id=1` i skasowała go po pomiarze (tabela wróciła do 0 wierszy). To jest sekcja
+     „Kiedy potrzebujesz ad-hoc query" z `CLAUDE.md`.
+  4. Interfejs **zapisuje** wpisy kalendarza, tylko inną drogą:
+     `upsertCalendarEntryForStep` w `src/server/actions/production-steps.ts:332`,
+     wołane wyłącznie z `setStepDate`. Czyli `calendar_entries` nie jest tabelą
+     bez pisarza, jest tabelą bez formularza.
+  DYSPOZYCJA: akcje **zostają**. Nie kasuję ich, bo są jedyną ścieżką zapisu wpisu
+  kalendarza z walidacją Zod i sesją, a `CLAUDE.md` opisuje ręczne planowanie jako
+  część przepływu agentów; skasowanie wymagałoby też przepisania dwóch person agentów,
+  które są produktem usera, a nie kodem infrastruktury. Nie podpinam też przycisku,
+  bo to nowa funkcja, nie sprzątanie znaleziska.
+  - Nagłówek `src/server/actions/calendar.ts` mówi wprost, że akcji nie woła interfejs,
+    którędy naprawdę idzie zapis i że importu z `tsx` się nie da.
+  - `docs/ARCHITEKTURA.md` sekcja 6b: zdanie „czego brakuje: przycisku" zamienione
+    na opis obu działających dróg zapisu plus pomiar z punktu 2.
+  - `npm run typecheck` kod 0, `npm run lint` kod 0,
+    `node scripts/check-trust-boundaries.mjs` kod 0, **73 punkty wejścia** bez zmiany.
 
 - [ ] **F7-10** `znalezisko` `perf` Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny
   Waga: **ważne**. Szacunek: godzina.
@@ -2305,6 +2335,28 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - wariant „nie zbieramy": komentarz w `csv-mappers.ts` mówiący wprost, których
     kolumn arkusza nie czytamy i dlaczego
   - negatywne: `npm run test` kod 0, osiem testów `csv-mappers.test.ts` nadal zielonych
+
+- [ ] **F7-30** `znalezisko` `docs` Persony agentów pokazują wywołanie, które rzuca wyjątkiem
+  Waga: **ważne**. Szacunek: pół godziny. Znalezione przy F7-09.
+  Trzy miejsca uczą Claude Code importu server action do skryptu `tsx`:
+  `agents/schedule-manager.md:54` i `:70`, `agents/campaign-strategist.md:58` i `:78`
+  oraz `CLAUDE.md:31`. Zmierzone 2026-09-03: taki import kończy się wyjątkiem
+  `This module cannot be imported from a Client Component module`, bo
+  `requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet `server-only`, który
+  poza kontekstem żądania rzuca natychmiast. Agent, który pójdzie za przepisem,
+  dostanie ścianę i będzie improwizował. Działa `db.insert(schema.calendarEntries)`.
+  Dotyczy prawdopodobnie także innych akcji cytowanych w personach — do sprawdzenia.
+  CZYTAJ: `agents/schedule-manager.md`, `agents/campaign-strategist.md`, `CLAUDE.md`
+  sekcja „Jak czytać/pisać do bazy", `src/lib/auth.ts`
+  AC:
+  - żaden przepis w `agents/*.md` ani w `CLAUDE.md` nie pokazuje importu z
+    `src/server/actions/` do skryptu `tsx`; dowód: `grep -rn "from './src/server/actions"
+    agents/ CLAUDE.md | wc -l` zwraca `0`
+  - w miejsce przepisu wchodzi wywołanie, które przechodzi; dowód: skrypt z nowego
+    przepisu wykonany z terminala tworzy wiersz i kończy się kodem 0
+  - sprawdzone, które jeszcze akcje cytowane w personach są nieosiągalne z `tsx`,
+    lista w `DECISIONS.md`
+  - negatywne: `npm run test` kod 0
 
 ---
 

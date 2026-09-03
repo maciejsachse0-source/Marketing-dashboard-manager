@@ -387,10 +387,27 @@ Ekran ma siedem kroków (`plan/04-import-excel.md` sekcja 2), komponenty w
 
 Import **nigdy nie usuwa** osób nieobecnych w arkuszu.
 
-**Czego w ścieżce zapisu wpisu kalendarza brakuje: przycisku.** `grep -rn 'createCalendarEntry' src/`
-zwraca jedno trafienie, czyli samą definicję. Żaden komponent tej akcji nie woła.
-Dziś wpis kalendarza dodaje się wyłącznie skryptem `tsx` z terminala albo ręką
-agenta. Dyspozycja tego długu: issue **F7-09**.
+**W ścieżce zapisu wpisu kalendarza nie ma przycisku i to jest decyzja, nie luka.**
+`grep -rn 'createCalendarEntry' src/` zwraca jedno trafienie, czyli samą definicję.
+Wpisy kalendarza powstają dziś dwiema drogami, żadna nie prowadzi przez formularz:
+
+1. **Z interfejsu, ubocznie.** Ustawienie daty kroku produkcji woła
+   `upsertCalendarEntryForStep` z `src/server/actions/production-steps.ts`, które
+   zakłada albo aktualizuje wpis dla tego kroku (`production-steps.ts`, funkcja
+   `upsertCalendarEntryForStep`, wołana wyłącznie z `setStepDate`).
+2. **Od agenta, skryptem.** Claude Code pisze do `calendar_entries` przez
+   `db.insert(schema.calendarEntries)` w skrypcie `tsx`, zgodnie z sekcją
+   „Kiedy potrzebujesz ad-hoc query" w `CLAUDE.md`.
+
+Czego droga druga **nie** robi: nie importuje `createCalendarEntry`. Zmierzone
+2026-09-03: import tej akcji do skryptu `tsx` kończy się wyjątkiem, bo
+`requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet `server-only`, który
+poza kontekstem żądania rzuca od razu. Przepisy w `agents/schedule-manager.md`
+i `agents/campaign-strategist.md` pokazują ten import jako działający, więc kłamią;
+zapisane jako **F7-30**. Same akcje zostają: to jedyna ścieżka zapisu z walidacją
+Zod i sesją, gotowa pod przycisk, gdy user go zamówi. Nagłówek
+`src/server/actions/calendar.ts` mówi to wprost, żeby nikt nie skasował ich jako
+„martwego kodu". Rozstrzygnięte w **F7-09**, uzasadnienie w `DECISIONS.md`.
 
 ---
 
@@ -514,7 +531,7 @@ kompletna: każdy otwarty dług ma numer, żaden nie żyje wyłącznie w akapici
 | 63 funkcje ponad progiem złożoności 10 | F7-06 |
 | 17 nieużywanych zmiennych i importów | F7-07 |
 | Lewy pasek akcentu wbrew zasadzie Z8 | F7-08 |
-| `createCalendarEntry` nie ma wywołania z interfejsu | F7-09 |
+| `createCalendarEntry` nie ma wywołania z interfejsu, świadomie | F7-09 |
 | Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny | F7-10 |
 | Powrót do Cache Components na danych, które istnieją | F7-11 |
 | Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy | F7-12 |
