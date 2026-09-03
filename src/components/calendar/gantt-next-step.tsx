@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { FRAME_STYLE } from '@/lib/category-colors';
 import { type SubStepInfo } from './gantt-substep-bar';
 
 
@@ -7,11 +8,11 @@ import { type SubStepInfo } from './gantt-substep-bar';
  * Next-step indicator card — the "what do I do next?" answer at a glance.
  * Three states: cancelled (rose), all-done (emerald), next-step (frame-tinted).
  *
- * Visual: card with a thin colored left rail (frame T1/T2/T3 = amber/violet/
- * emerald). Focal point is the step name in the dark accent ink — not the
- * band background. A small numbered dot (frame-colored) on the left tells the
- * user which step in the sequence is up. Frame label is demoted to a single-
- * line caption to avoid the "label-over-label" feel of the prior pill stack.
+ * Visual: card with a full frame-tinted border (T1/T2/T3). Zasada Z8 zakazuje
+ * lewego paska akcentu, więc pasmo koduje pełne obramowanie, kolor kropki
+ * z numerem kroku i kolor podpisu kategorii. Kolory idą z `FRAME_STYLE`
+ * (`src/lib/category-colors.ts`), jedynego źródła prawdy o barwach T1/T2/T3,
+ * a nie z klas `amber-500` wpisanych na miejscu.
  */
 export function NextStepIndicator({
   productionId,
@@ -50,28 +51,19 @@ export function NextStepIndicator({
   }
   if (!nextStep) return null;
 
-  // Frame-keyed accents — left rail + numbered dot tinted to T1/T2/T3 so the
-  // user can spot which band the upcoming step lives in without reading the
-  // caption.
-  const frameAccent = {
-    T1: { rail: 'bg-amber-500', dot: 'bg-amber-500 text-white', ink: 'text-amber-950', faint: 'text-amber-700', glow: 'shadow-amber-200/70' },
-    T2: { rail: 'bg-violet-500', dot: 'bg-violet-500 text-white', ink: 'text-violet-950', faint: 'text-violet-700', glow: 'shadow-violet-200/70' },
-    T3: { rail: 'bg-emerald-500', dot: 'bg-emerald-500 text-white', ink: 'text-emerald-950', faint: 'text-emerald-700', glow: 'shadow-emerald-200/70' },
-  }[nextStep.frame];
+  // Frame-keyed accents — obramowanie, kropka i podpis kategorii tinted do
+  // T1/T2/T3, żeby użytkownik rozpoznał pasmo bez czytania podpisu.
+  const frame = FRAME_STYLE[nextStep.frame];
 
   return (
     <Link
       key={`${nextStep.kind}:${nextStep.stage ?? nextStep.customId}`}
       href={`/productions/${productionId}`}
-      className="relative rounded-xl border-2 border-border bg-card pl-4 pr-3 py-2.5 flex items-center gap-3 hover:border-foreground/40 hover:shadow-lg hover:-translate-y-0.5 ui-transition group/next animate-fade-up no-underline"
+      className={`relative rounded-xl border-2 ${frame.border} bg-card px-3 py-2.5 flex items-center gap-3 hover:border-foreground/40 hover:shadow-lg hover:-translate-y-0.5 ui-transition group/next animate-fade-up no-underline`}
       title={`${nextStep.cat.label}, krok ${nextStep.n}/${totalSteps}: ${nextStep.label}`}
     >
       <span
-        aria-hidden
-        className={`absolute left-0 top-1.5 bottom-1.5 w-[4px] rounded-full ${frameAccent.rail} ui-transition group-hover/next:top-1 group-hover/next:bottom-1`}
-      />
-      <span
-        className={`grid place-items-center w-10 h-10 rounded-full text-base font-bold tabular-nums shrink-0 ${frameAccent.dot} shadow-md ${frameAccent.glow} ui-transition group-hover/next:scale-105`}
+        className={`grid place-items-center w-10 h-10 rounded-full text-base font-bold tabular-nums shrink-0 ${frame.dot} text-white shadow-md ${frame.glow} ui-transition group-hover/next:scale-105`}
       >
         {nextStep.n}
       </span>
@@ -84,15 +76,15 @@ export function NextStepIndicator({
             {nextStep.n}/{totalSteps}
           </span>
         </div>
-        <div className={`text-base font-bold leading-tight truncate ${frameAccent.ink}`}>
+        <div className={`text-base font-bold leading-tight truncate ${frame.accent}`}>
           {nextStep.label}
         </div>
-        <div className={`text-xs leading-tight mt-1 truncate font-medium ${frameAccent.faint}`}>
+        <div className={`text-xs leading-tight mt-1 truncate font-medium ${frame.faint}`}>
           {nextStep.cat.label}
         </div>
       </div>
       <ArrowRight
-        className={`w-5 h-5 shrink-0 ${frameAccent.faint} ui-transition group-hover/next:translate-x-0.5`}
+        className={`w-5 h-5 shrink-0 ${frame.faint} ui-transition group-hover/next:translate-x-0.5`}
         strokeWidth={2.5}
       />
     </Link>

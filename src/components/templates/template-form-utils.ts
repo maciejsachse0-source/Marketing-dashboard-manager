@@ -105,7 +105,8 @@ export type Tone = {
   badge: string;
   chip: string;
   dot: string;
-  rail: string;
+  faint: string;
+  glow: string;
 };
 
 export const PERIOD_TONES: Array<{ bg: string; bar: string; thumb: string; ink: string }> = [

@@ -1857,7 +1857,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   BRAMKI: `typecheck` 0, `lint` 0, `test` 0 (216/20), `check-typography` 0,
   `check-trust-boundaries` 0, `perf` 0.
 
-- [ ] **F7-08** `znalezisko` `ui` Lewy pasek akcentu, zakazany zasadą Z8
+- [x] **F7-08** `znalezisko` `ui` Lewy pasek akcentu, zakazany zasadą Z8
   Waga: **ważne**. Szacunek: 1 godzina.
   Znalezione przy zrzucie ekranu do F0-05: karta „Następny krok" w gancie ma pionowy
   pasek koloru przyklejony do lewej krawędzi
@@ -1877,6 +1877,35 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - kolory brane z tokenów, nie z klas `amber-500`, `violet-500`, `emerald-500` wprost
     (zasada Z4)
   - negatywne: `npm run e2e` kod 0, czyli usunięcie paska nie zbiło żadnego selektora
+  DOWÓD (2026-09-03): **ZROBIONE.**
+  Numery linii z treści były sprzed podziału ganta, więc szukane po treści. Znaleziony
+  jeden prawdziwy pasek: `src/components/calendar/gantt-next-step.tsx`, `<span>`
+  z `absolute left-0 top-1.5 bottom-1.5 w-[4px]`. Cytat w `help-dialog.tsx` z tym
+  `border-l-2 border-amber-400/60` **już nie istnieje** (`grep -n 'border-l'
+  src/components/help-dialog.tsx` nie zwraca nic) — zniknął przy wcześniejszych fazach.
+  Pasek zastąpiony pełnym obramowaniem karty w kolorze pasma, zgodnie ze zdaniem Z8
+  „wyróżnienie robimy tłem lub obramowaniem pełnym"; kropka z numerem kroku i podpis
+  kategorii nadal niosą kolor pasma.
+  - `grep -rn 'border-l-2\|border-l-4\|left-0 top-1.5 bottom-1.5' src/ | wc -l` zwraca
+    **2** — obie linie to `gantt-row-guides.tsx:53` i `:77`, czyli linie drzewa łączące
+    kroki, opisane w treści jako fałszywe trafienia.
+  - Kolory zdjęte z klas wpisanych na miejscu: lokalna mapa `frameAccent`
+    z `amber-500`/`violet-500`/`emerald-500` skasowana, karta czyta `FRAME_STYLE`
+    z `src/lib/category-colors.ts`, czyli tę samą tabelę, z której żyją pasy ganta
+    i strona szablonów. Do tabeli doszły pola `faint` i `glow`, wypadło pole `rail`,
+    bo jego jedynym odbiorcą był zakazany pasek.
+  - Trzy pasma nadal rozróżnialne: `/calendar?week=2026-09-07`, 75 kart „Następny krok",
+    rozkład obramowań `{amber: 73, violet: 1, emerald: 1}` (odczytane z DOM w Playwright).
+    Zrzuty pojedynczych kart: `screenshots/F7/f7-08-nastepny-krok-T1.png`, `-T2.png`,
+    `-T3.png`. Żeby wywołać pasma T2 i T3, dwie produkcje (19 i 27) dostały tymczasowo
+    odhaczone wcześniejsze kroki i zostały przywrócone z kopii po zrzucie (kontrola:
+    produkcja 19 ma znów 5 odhaczonych kroków, produkcja 27 jeden).
+  - `npm run e2e` **22 zielone** na budowaniu produkcyjnym (`npm run build` + `next start`).
+    Na serwerze deweloperskim 21 zielonych i `gantt-filter.spec.ts` czerwony — to
+    znane **F7-28**, nie skutek tej zmiany.
+  BRAMKI: `typecheck` 0, `lint` 0, `test` 0 (216/20), `check-typography` 0,
+  `check-trust-boundaries` 0, `perf` 0, bundel `/calendar` **292,7 kB** przy progu 301,6
+  (o 0,1 kB mniej niż przed zmianą, bo zniknął jeden węzeł).
 
 - [ ] **F7-09** `znalezisko` `arch` Server action `createCalendarEntry` bez wywołania z UI
   Waga: **ważne**. Szacunek: pół dnia albo 15 minut, zależnie od dyspozycji.

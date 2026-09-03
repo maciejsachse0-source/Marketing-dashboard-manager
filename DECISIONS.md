@@ -880,3 +880,13 @@ zniknęło razem z nimi. Pozostałe trzynaście trafień to martwe importy, mart
 refaktorach (`rangeStart`, `rangeEnd`, `stamp`); żadne z nich nic nie gubiło. Dowód, że
 usunięcie propów nic nie zmieniło w obrazie: pngdiff 0 pikseli na `/calendar`, na
 `/analytics` i na `/calendar` z rozwiniętym panelem produkcji.
+
+**F7-08, pasek akcentu zamieniony na pełne obramowanie, nie na nic.** Zasada Z8
+zakazuje lewego paska, ale karta „Następny krok" musi dalej mówić, w którym paśmie
+(T1, T2, T3) siedzi kolejny krok. Zdanie drugie Z8 podpowiada wyjście: wyróżnienie
+robimy tłem albo obramowaniem pełnym. Karta dostała więc obramowanie w kolorze pasma,
+a kropka z numerem kroku i podpis kategorii, które i tak już były kolorowane, zostały.
+Przy okazji zniknęła lokalna mapa kolorów wpisana wprost w komponencie: karta czyta
+`FRAME_STYLE` z `src/lib/category-colors.ts`, czyli tę samą tabelę, co pasy ganta
+i strona szablonów. Pole `rail` z tej tabeli usunięte, bo jedynym jego odbiorcą był
+zakazany pasek; doszły `faint` i `glow`, które wcześniej istniały tylko lokalnie.

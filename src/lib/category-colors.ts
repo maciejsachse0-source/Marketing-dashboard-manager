@@ -31,7 +31,8 @@ export const CATEGORY_LABEL: Record<ProductionStage, string> = {
  *   - accent        — strong category text colour (uppercase headings)
  *   - chip          — soft pill for "custom step" badges, sits on bg
  *   - dot           — saturated solid colour for marker dots
- *   - rail          — solid left rail (matches NextStepIndicator rail)
+ *   - faint         — przygaszony tekst kategorii, czytelny na jasnym tle
+ *   - glow          — kolorowy cień pod kropką z numerem kroku
  */
 export const FRAME_STYLE: Record<
   WeekFrame,
@@ -44,7 +45,8 @@ export const FRAME_STYLE: Record<
     accent: string;
     chip: string;
     dot: string;
-    rail: string;
+    faint: string;
+    glow: string;
   }
 > = {
   T1: {
@@ -56,7 +58,8 @@ export const FRAME_STYLE: Record<
     accent: 'text-amber-900',
     chip: 'bg-amber-100 text-amber-900 border-amber-300/60',
     dot: 'bg-amber-500',
-    rail: 'bg-amber-500',
+    faint: 'text-amber-700',
+    glow: 'shadow-amber-200/70',
   },
   T2: {
     code: 'T2',
@@ -67,7 +70,8 @@ export const FRAME_STYLE: Record<
     accent: 'text-violet-900',
     chip: 'bg-violet-100 text-violet-900 border-violet-300/60',
     dot: 'bg-violet-500',
-    rail: 'bg-violet-500',
+    faint: 'text-violet-700',
+    glow: 'shadow-violet-200/70',
   },
   T3: {
     code: 'T3',
@@ -78,6 +82,7 @@ export const FRAME_STYLE: Record<
     accent: 'text-emerald-900',
     chip: 'bg-emerald-100 text-emerald-900 border-emerald-300/60',
     dot: 'bg-emerald-500',
-    rail: 'bg-emerald-500',
+    faint: 'text-emerald-700',
+    glow: 'shadow-emerald-200/70',
   },
 };
