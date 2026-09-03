@@ -1,123 +1,104 @@
 # NEXT-TASKS - przekazanie do kolejnego workera
 
-Stan na 2026-09-03, po **F7-21, F7-22, F7-24, F7-25, F7-26**. Wcześniej zamknięte:
-F0 do F6 w całości oraz F7-01 do F7-20. Poza F7 otwarte są tylko dwa issues czekające
-na usera: **F4-06** (prawdziwy plik `.xlsx`) i publiczny adres w **F5-04**.
-Nie ruszać żadnego z nich. **F7-23 stoi nietknięty** — czeka na decyzję usera
-o czyszczeniu historii gita.
+Stan na 2026-09-03, po **F7-27, F7-28, F7-29, F7-30, F7-31, F7-32**. To była ostatnia
+paczka fazy F7. Wcześniej zamknięte: F0 do F6 w całości oraz F7-01 do F7-26.
+
+## Co zostaje otwarte i dlaczego
+
+Wyłącznie sprawy czekające na usera. Żadna nie jest robotą do wzięcia:
+
+- **F7-23** — czyszczenie historii gita z dwóch prawdziwych handle z Instagrama.
+  Czeka na decyzję usera, bo przepisanie historii jest jednokierunkowe.
+- **F7-29** — czy czas oglądania i CTR z arkuszy mają być widoczne na `/analytics`.
+  Koszt obu wariantów opisany w `DECISIONS.md`. W `src/lib/csv-mappers.ts` stoi już
+  komentarz mówiący wprost, których kolumn nie czytamy — samo znalezisko nie szkodzi.
+- **F4-06** — prawdziwy plik `.xlsx` od usera.
+- **F5-04** — publiczny adres środowiska podglądowego.
+- **F8-01 do F8-03** — bramka decyzyjna, pętla ma tu stanąć i zapytać.
+
+**DoD F7 spełnione:** każde znalezisko ma issue, każde issue ma dyspozycję.
 
 ## Co zastajesz po tej paczce
 
-**Testy e2e nie dotykają już bazy roboczej** (F7-21). To najważniejsza zmiana.
-`playwright.config.ts` uruchamia `scripts/e2e-serve.mjs`, a ten: podmienia
-`DATABASE_URL` na `TEST_DATABASE_URL` (odmawia, gdy równy roboczej, pomiarowej albo
-podglądowej), migruje schemat, zasiewa **zestaw L** (`scripts/perf/seed-large.ts`, sam
-robi `truncate`, więc czyszczenie jest PRZED przebiegiem) plus prawdziwy katalog
-(`drizzle/seed-catalog.ts`, bo kreator kampanii szuka szablonu po nazwie z katalogu),
-i dopiero potem stawia `next dev`. Dowód: `marketing` ma `152|97|29` (artyści,
-produkcje, kampanie) przed pełnym przebiegiem i po nim.
+**Uchwyt „Start produkcji" jest dokładny co do dnia** (F7-27). `getFirstPeriodStart`
+liczy się od DNIA `t0At`, nie od poniedziałku jego tygodnia, a `shiftProductionT1Start`
+woła tę samą funkcję zamiast liczyć po swojemu. Wcześniej przesunięcie o 1..6 dni
+zmieniało bazę, ale nie zmieniało pola, więc każde powtórzenie dokładało kolejną deltę
+(zmierzone: cztery „nic nie robiące" edycje przesunęły produkcję o 8 dni). Pas ganta
+zostaje tygodniowy — `getStepWeekRange` bez zmian, uchwyt jest jedynym miejscem
+liczonym dziennie. Scenariusz `e2e/f7-27-start-produkcji.spec.ts` pilnuje n = 1, 2, 3
+i powtórki; jego nazwa zaczyna się od `f7`, żeby biegł PRZED `import-osoby.spec.ts`,
+który kaskadą kasuje produkcje.
 
-Wynika z tego kilka rzeczy praktycznych:
-- **Ubij własny `npm run dev` przed `npx playwright test`.** Serwer na porcie 3000
-  stojący na bazie roboczej zostanie odrzucony przez `e2e/global-setup.ts`
-  z komunikatem, jaka baza siedzi na porcie.
-- Każdy przebieg trwa ok. **1,5 min** (wcześniej 25 s), bo zasiew i kompilacja
-  idą na zimno.
-- Scenariusze, które zaglądają do bazy, robią to przez `e2e/db.ts` (`connectTestDb`),
-  nie przez `process.env.DATABASE_URL`.
-- `import-osoby.spec.ts` przywraca stan przez `truncate table artists restart identity
-  cascade`. To wolno TYLKO dlatego, że baza jest wyłącznie testowa, i zakłada, że
-  `f5-scenariusze.spec.ts` (potrzebuje zasianych artystów) biegnie wcześniej —
-  kolejność alfabetyczna plików to dziś zapewnia.
-- Na zimnym serwerze pierwsze kliknięcie potrafi trafić w stronę przed hydracją.
-  `f5-scenariusze.spec.ts` ma na to `expect(...).toPass()` wokół otwarcia kreatora.
-  Jeśli zobaczysz podobny miganie-flake w innym scenariuszu, to ta sama przyczyna.
+**Pomiar ganta biegnie tylko na budowaniu produkcyjnym** (F7-28). `/api/health` oddaje
+teraz `dev`, a `e2e/gantt-filter.spec.ts` robi `test.skip` na serwerze deweloperskim.
+**Pełny `npx playwright test` daje więc `22 passed, 1 skipped`, nie 23 zielone.**
+Żeby zmierzyć: `npm run perf:serve` w jednym terminalu i
+`E2E_EXPECTED_DB=marketing_perf npx playwright test e2e/gantt-filter.spec.ts` w drugim.
 
-**Tytuł produkcji jest widoczny** (F7-24). W `H1` strony `/productions/<id>` stoi
-`production.title`, nazwa artysty poszła do wiersza pod tytułem. `ProductionCard`
-straciło przełącznik `showHeader` i rysuje tytuł na każdej karcie listy. Tytuły były
-w bazie zapisane i niepuste (`504|504` w zestawie L, `97|97` na roboczej) — problemem
-było wyłącznie wyświetlanie.
+**Przepisy dla agentów wreszcie działają** (F7-30). Server actions są nieosiągalne
+z `tsx` — wszystkie cztery moduły plus `src/lib/files.ts`. Do tego `npx tsx -e` z
+`await` na najwyższym poziomie **nigdy** nie działał (CJS). Wzorzec, który przechodzi,
+stoi w `CLAUDE.md` i w każdej personie: heredoc do pliku `.ts`, `async function main()`,
+walidacja schemą Zod z `src/server/actions/schemas.ts`, zapis przez `db.insert`.
 
-**Halo dotyku ma własną stałą** — `HALO_DOTYK` w `src/lib/utils.ts`. Każdy nowy
-odnośnik nawigacyjny ma ją dostać. Wiersze ganta są świadomym wyjątkiem oznaczonym
-`data-dense` (halo 44 px przy wierszu 20-24 px zachodziłoby na sąsiada i przechwytywało
-jego kliknięcia); `scripts/a11y-audit.mjs` te elementy pomija.
+**Kolory pasm T mają jedno źródło** (F7-31). `FRAME_STYLE` dostała pole `accentBorder`.
 
-**`production-drawer.tsx` i `getProductionByEntryId` nie istnieją** (F7-26).
-Punktów wejścia 73, nie 74.
+**Kamerzyści czytają własne kolumny** (F7-32). `handle`, `email`, `phone` z migracji
+0003; `contact` to już tylko pole zapasowe, a jego kształt rozpoznaje `contactField`.
+`--clear-contact` jest odtąd bezpieczne — F7-19 domknięte.
 
 ## Liczby, do których porównujesz
 
-`npm run typecheck` kod 0. `npm run lint` kod 0, **36 ostrzeżeń** (było 37; jedno
-zniknęło razem z martwą szufladą), 0 błędów. `npm run test` **223 zielone w 20 plikach**.
-`node scripts/check-typography.mjs` kod 0. `node scripts/check-trust-boundaries.mjs`
-kod 0, **73** punkty wejścia. `npm run perf` kod 0, bundel `/calendar` **293,3 kB**
-przy progu 301,6 kB. `npx playwright test` **22 zielone w 1,5 min**.
+`npm run typecheck` kod 0. `npm run lint` kod 0, **36 ostrzeżeń**, 0 błędów.
+`npm run test` **224 zielone w 20 plikach**. `node scripts/check-typography.mjs` kod 0.
+`node scripts/check-trust-boundaries.mjs` kod 0, **73** punkty wejścia.
+`npm run perf` kod 0, bundel `/calendar` **293,3 kB** przy progu 301,6 kB.
+`npx playwright test` **22 zielone + 1 pominięty** w 1,6 min.
 `node scripts/a11y-audit.mjs` **0 naruszeń**.
 
 Uczciwy licznik ostrzeżeń, `grep` kłamie:
 `npx eslint . -f json | jq '[.[].messages[]|.ruleId]|group_by(.)|map({r:.[0],n:length})'`.
 
-## Znaleziska w F7
-
-Zamknięte: **F7-01 do F7-22** oraz **F7-24, F7-25, F7-26**.
-Otwarte: **F7-23** (czeka na decyzję usera), **F7-27 do F7-32**.
-Nowych znalezisk ta paczka nie wniosła.
-
 ## Pułapki
 
-1. **Ubij `npm run dev` przed `npx playwright test`** (patrz wyżej). Ubij też
-   `npm run perf:serve`.
-2. **Nie da się zaimportować server action do `tsx`** (F7-30). Do ad-hoc zapisów
-   `set -a; . ./.env.local; set +a; npx tsx skrypt.ts`.
-3. **`git stash push -u` zabiera Twoje skrypty pomocnicze.** Używaj `git stash push -- src/`.
-4. **Zrzuty do porównań rób w oknie 1280x720**, nie `fullPage`.
-   Porównanie: `node scripts/perf/pngdiff.mjs a.png b.png`. Dwa przebiegi na tym samym
-   kodzie dają **0** różnych pikseli.
-5. **`npx prettier --write` przeformatuje plik na cudzysłowy podwójne.** Nie uruchamiaj.
-6. **Do złożoności cyklomatycznej liczą się `?.` i `??`.** Skrypty w `scripts/` też.
+1. **Ubij `npm run dev` przed `npx playwright test`.** Ubij też `npm run perf:serve`.
+2. **Server actions nie importują się do `tsx`** — patrz `CLAUDE.md`, sekcja o bazie.
+3. **`npx tsx -e "...await..."` pada na CJS.** Pisz do pliku `.ts` z `async main()`.
+   `.mts` nie pomaga: nie widzi nazwanych eksportów z modułów `.ts`.
+4. **`git stash push -u` zabiera Twoje skrypty pomocnicze.** Używaj `git stash push -- src/`.
+5. **Zrzuty do porównań rób w oknie 1280x720**, nie `fullPage`. Dwa przebiegi na tym
+   samym kodzie dają **0** różnych pikseli, więc każdy niezerowy wynik jest realny.
+6. **Do złożoności cyklomatycznej liczą się `?.` i `??`.** Ciąg `a ?? b ?? c` w JSX-ie
+   potrafi wywalić bramkę lintu — wynoś do czystej funkcji od razu.
 7. **`npm run perf:dev` kasuje `.next`.** Kolejność: perf:dev, potem `npm run perf:serve`.
-8. **`npm run perf:serve` robi `next build`** (ok. 90 s). Przed startem sprawdź
-   `lsof -nP -iTCP:3000 -sTCP:LISTEN`.
+8. **`npm run perf:serve` robi `next build`** (ok. 90 s, gotowy po ~150 s razem ze startem).
+   Przed startem sprawdź `lsof -nP -iTCP:3000 -sTCP:LISTEN`.
 9. **Własne utility CSS musi trafić do `extendTailwindMerge`** (`src/lib/utils.ts`).
-   **A `@utility` z zagnieżdżonym `@media (pointer: coarse)` Tailwind v4 w ogóle nie
-   wygenerował** — klasa siedziała w DOM, a `::after` miało `content: none`. Halo
-   dotyku stoi więc na zwykłych klasach wariantowych, nie na własnym utility (F7-25).
+   `@utility` z zagnieżdżonym `@media (pointer: coarse)` Tailwind v4 nie generuje wcale.
 10. **Zrzuty `screenshots/F5/*.png` zmieniają się przy każdym przebiegu e2e.**
-    Przed commitem `git checkout screenshots/F5`. Od F7-21 pochodzą z bazy testowej
-    (zestaw L), więc nie ma na nich żadnych prawdziwych danych.
-11. **`perf/baseline.json` jest jedynym zapisem stanu „przed"** dla siedmiu starszych stron.
-12. **Skrypty pomocnicze trzymaj w katalogu repozytorium** i kasuj przed commitem.
-13. **`dotenv` nie nadpisuje kluczy już obecnych w `process.env`** — dlatego
-    `DATABASE_URL=... npx tsx skrypt.ts` działa mimo `config({ path: '.env.local' })`.
+    Przed commitem `git checkout screenshots/F5`. To dane z bazy testowej.
+11. **`npx prettier --write` przeformatuje plik na cudzysłowy podwójne.** Nie uruchamiaj.
+12. **`dotenv` nie nadpisuje kluczy już obecnych w `process.env`.**
 
 ## Jak uruchomić
 
 ```
 docker start mc-pg
 npm run dev                                  # turbopack, port 3000, baza robocza
-pkill -f "next dev" && npx playwright test   # 22 zielone, własna baza testowa
+pkill -f "next dev" && npx playwright test   # 22 zielone + 1 pominięty, własna baza testowa
 node scripts/check-trust-boundaries.mjs
 node scripts/check-typography.mjs
 node scripts/a11y-audit.mjs                  # wymaga serwera na 3000
 lsof -nP -iTCP:3000 -sTCP:LISTEN             # ZAWSZE przed perf:serve
 npm run perf:serve                           # terminal 1 (ubij przed e2e)
 npm run perf                                 # terminal 2, oczekiwany kod 0
-npm run pg:info                              # liczby wierszy w bazie pomiarowej
 ```
 
 ## Stan środowiska
 
 Kontener `mc-pg` na porcie 5433 z bazami `marketing`, `marketing_perf`,
-`marketing_test`, `marketing_preview`. `psql` tylko przez `docker exec`, brak
-`magick`, `compare` i `PIL`. `marketing_test` jest teraz w całości własnością e2e —
-zawartość po ostatnim przebiegu to zestaw L z artystami z importu. `marketing_perf`
-celowo nietknięta, bo na niej stoi punkt odniesienia pomiarów.
-
-## Decyzje w toku
-
-Bez zmian: publiczny adres środowiska podglądowego (F5-04), `DATABASE_URL` do
-prawdziwej bazy, hosting, plik `.xlsx` z osobami (F4-06), potwierdzenie
-`docs/ARCHITEKTURA.md` przez usera, czyszczenie historii gita z danych osobowych
-(F4-07, powiązane F7-23), kolumny na czas oglądania i CTR w `posts` (F7-29).
+`marketing_test`, `marketing_preview`. `psql` tylko przez `docker exec`.
+Baza robocza `marketing`: produkcja 80 ma `t0_at = 2026-09-14 10:00+00` (przywrócona
+po odtwarzaniu F7-27), kamerzystów zero, wpisów kalendarza i kampanii bez śmieci
+po weryfikacjach tej paczki. `marketing_perf` celowo nietknięta.
