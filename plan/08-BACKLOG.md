@@ -3253,6 +3253,50 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   przebieg fixture: 732 z 975 planów twórców ze statusem; prawdziwy arkusz twórców:
   179 wierszy ze statusem. `npm run perf` kod 0, bundel `/calendar` 293,4 kB.
 
+- [ ] **F7-46** `znalezisko` `ui` Pól z importu nie da się poprawić w oknie edycji osoby
+  Waga: **ważne**. Szacunek: godzina. Znalezione przy F7-45. Import wypełnia siedem pól
+  (`name`, `handle`, `email`, `phone`, `location`, `status`, `notes`), ale okno edycji
+  osoby edytuje tylko część z nich: `ArtistDialog` nie ma `location` ani `status`,
+  `VideographerDialog` też nie. Skutkiem jest ślepy zaułek: user widzi zły status albo
+  złą lokalizację na karcie, a jedyny sposób poprawienia to poprawić arkusz i wgrać go
+  jeszcze raz — przy czym import aktualizuje duplikat wyłącznie polami NIEpustymi, więc
+  skasowania wartości i tak tą drogą nie zrobi. Karta pokazuje więcej, niż okno pozwala
+  zmienić, i to się właśnie pogłębiło, bo F7-45 dołożyło na kartę status.
+  CZYTAJ: `src/components/artists/artist-dialog.tsx`,
+  `src/components/videographers/videographer-dialog.tsx`, `src/server/actions/schemas.ts`
+  AC:
+  - okno edycji twórcy i okno edycji kamerzysty mają pola `location` i `status`
+  - puste pole w oknie zapisuje `null`, czyli kasuje wartość — to jedyna droga do
+    skasowania wartości wstawionej importem
+  - schemy Zod w `src/server/actions/schemas.ts` przyjmują oba pola; bramka granic
+    zaufania nadal daje „bez schematu mimo argumentów: 0"
+  - dowód: na uruchomionej aplikacji zmiana statusu w oknie zmienia tekst na karcie
+    po zamknięciu okna, bez odświeżania strony
+  - negatywne: `npm run test` i `npx playwright test` bez nowych czerwonych
+
+- [ ] **F7-47** `znalezisko` `perf` `tooling` `npm run perf` mierzy to, co akurat stoi na porcie 3000
+  Waga: **ważne**. Szacunek: pół godziny. Zmierzone przy F7-45: przy podniesionym
+  `npm run dev` raport pokazał bundel `/calendar` **1012,3 kB** wobec progu 301,6 kB
+  i wypisał cztery przekroczone progi, w tym trzy „BLOKUJE" w sekcji dryfu. To nie był
+  regres, tylko pomiar budowania deweloperskiego podanego jako produkcyjne. Po ubiciu
+  `dev` i podniesieniu `npm run perf:serve` ten sam kod dał 293,4 kB i „Wszystkie progi
+  trzymają". Pułapka jest opisana w `NEXT-TASKS.md` i w `CLAUDE.md` jako kolejność
+  komend, ale nic jej nie pilnuje — a fałszywy alarm kosztuje pełny cykl budowania,
+  zanim ktoś zorientuje się, skąd wzięło się 1012 kB.
+  F7-28 dorobiło już do tego narzędzie: `/api/health` oddaje `dev` na serwerze
+  deweloperskim, a `e2e/gantt-filter.spec.ts` się na tym opiera. Skrypty pomiaru
+  z niego nie korzystają.
+  CZYTAJ: `scripts/perf/measure-page.mjs`, `scripts/perf/report.mjs`,
+  `e2e/gantt-filter.spec.ts` (wzorzec pytania o `/api/health`)
+  AC:
+  - `npm run perf` przy podniesionym serwerze deweloperskim kończy się komunikatem
+    wprost mówiącym, że mierzy tryb deweloperski, i NIE podaje wyniku jako
+    przekroczenia progu
+  - `npm run perf` przy `npm run perf:serve` działa dokładnie jak dotąd
+  - dowód: dwa przebiegi tej samej komendy, raz z `npm run dev`, raz z `npm run
+    perf:serve`; pierwszy nie pokazuje progu bundla jako przekroczonego
+  - negatywne: złożoność cyklomatyczna w `scripts/` nadal przechodzi lint
+
 ---
 
 ## F8 — Bramka decyzyjna (pętla STAJE przed tą fazą i pyta usera)
