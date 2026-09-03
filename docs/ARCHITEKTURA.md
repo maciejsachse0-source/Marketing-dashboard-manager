@@ -2,7 +2,9 @@
 
 Dokument kanoniczny. Każde zdanie ma obok metodę weryfikacji, którą da się wkleić
 do terminala. Gdy komenda przestanie zwracać to, co tu napisano, nieprawdziwy jest
-dokument, nie kod. Data ostatniej weryfikacji: 2026-09-02, commit `df91a7b`.
+dokument, nie kod. Data ostatniej weryfikacji: **2026-09-03**, po fazie F6
+(issue F6-03). Dziesięć twierdzeń tego dokumentu sprawdzono komendą tego samego dnia,
+lista komend i wyników jest w załączniku na końcu.
 
 Struktura sekcji jest narzucona przez `plan/02-architektura.md` sekcja 3.
 
@@ -149,7 +151,7 @@ wyżej, a `WERYFIKACJA.md` w korzeniu repozytorium czeka z gotowym szkieletem.
 ## 3. Baza
 
 Aplikacja gada z PostgreSQL przez `postgres-js` opakowany w Drizzle ORM
-(`src/lib/db.ts:32`).
+(`src/lib/db.ts:34`).
 
 Weryfikacja: `npm run pg:info`. Wynik z 2026-09-02:
 
@@ -167,8 +169,9 @@ strefa czasowa Etc/UTC
 | Provider | **kontener Docker na tej maszynie**, nie hosting | `docker ps --filter name=mc-pg` |
 | Region | brak, baza jest lokalna | jak wyżej |
 | Limit połączeń serwera | 100 | `npm run pg:info` |
-| Pula po stronie aplikacji | `1` gdy `process.env.VERCEL`, poza Vercelem `DB_POOL_MAX` z domyślną **10**; `idle_timeout: 20 s` | `src/lib/db.ts` |
+| Pula po stronie aplikacji | `1` gdy `process.env.VERCEL`, poza Vercelem `DB_POOL_MAX` z domyślną **10**; `idle_timeout: 20 s` | `src/lib/db.ts:25` i `:26` (ustawione w F1-02) |
 | Tryb poolera | `prepare: false`, czyli klient jest gotowy na pooler w trybie transakcyjnym (pgbouncer, Neon pooled, Supabase) | `src/lib/db.ts:20` |
+| Cache odczytów | **brak**, świadomie. Strony zostają przy `force-dynamic`, mechanizm Cache Components z Next 16 został w F1-03 wdrożony, zmierzony i cofnięty (żadna z siedmiu mierzonych stron nie poprawiła się o 10%). Powrót do tematu: F7-10 i F7-11 | `DECISIONS.md`, wpis F1-03 |
 
 Trzy bazy w tym samym kontenerze, rozdzielone po to, żeby generator zestawu L nie
 zasiał bazy roboczej:
@@ -178,11 +181,13 @@ zasiał bazy roboczej:
 | `marketing` | `DATABASE_URL` | robocza, z niej czyta `npm run dev` |
 | `marketing_perf` | `PERF_DATABASE_URL` | pomiarowa, mieszka w niej zestaw L (500 produkcji) |
 | `marketing_test` | `TEST_DATABASE_URL` | testowa, testy ją czyszczą między przebiegami |
+| `marketing_preview` | `PREVIEW_DATABASE_URL` | podglądowa dla zespołu (sekcja 2.1), też zestaw L |
 
 **Skąd 10.** Limit połączeń serwera to 100 (`npm run pg:info`, wiersz wyżej), a poza
 Vercelem aplikację obsługuje **jeden** długo żyjący proces `next start`. Dziesięć
 połączeń to dziesiąta część limitu, więc obok aplikacji mieszczą się jeszcze
-`npm run db:studio`, skrypty pomiarowe i `psql` w kontenerze, a jednocześnie strona
+`npm run db:studio`, skrypty pomiarowe i `psql` w kontenerze (`psql` **nie jest**
+zainstalowany na hoście, wchodzi się przez `docker exec mc-pg psql`), a jednocześnie strona
 z pięcioma równoległymi zapytaniami (`/campaigns/[id]`) nie stoi w kolejce po
 połączenie. Wartość jest do zmiany zmienną `DB_POOL_MAX` bez dotykania kodu.
 Na Vercelu wymuszamy 1, bo tam procesów jest tyle, ile ciepłych instancji funkcji,
@@ -198,15 +203,15 @@ wyboru: `DECISIONS.md`, wpis F0-01.
 
 ## 4. Rozmiar danych
 
-Baza robocza `marketing`, pomiar z 2026-09-02.
+Baza robocza `marketing`, pomiar z **2026-09-03** (data domknięcia dokumentu).
 Weryfikacja: `node scripts/perf/table-counts.mjs --work --json`.
 
 ```json
 {
-  "artists": 0,
+  "artists": 102,
   "videographers": 0,
-  "campaigns": 0,
-  "productions": 0,
+  "campaigns": 19,
+  "productions": 67,
   "calendar_entries": 0,
   "posts": 0,
   "csv_uploads": 0,
@@ -214,25 +219,32 @@ Weryfikacja: `node scripts/perf/table-counts.mjs --work --json`.
 }
 ```
 
-Baza robocza jest **pusta**, bo powstała od zera w F0-01 razem z kontenerem.
+Baza robocza powstała pusta w F0-01 razem z kontenerem. Wiersze, które w niej dziś
+są, zrobiły testy i ręczne klikanie w trakcie faz F1 do F6: 102 artystów (import
+z fixture'a w `e2e/import-osoby.spec.ts` i scenariusze odświeżania), 19 kampanii
+i 67 produkcji z e2e. Nie ma tam ani jednego prawdziwego nazwiska.
 Prawdziwe dane produkcyjne leżą w bazie, do której podpięte jest wdrożenie na
 Vercelu, i której nie mamy (sekcja 2). Rozmiaru produkcyjnego nie znamy.
 
 Dla porównania baza pomiarowa `marketing_perf` z zestawem L
-(`node scripts/perf/table-counts.mjs --json`):
+(`node scripts/perf/table-counts.mjs --json`, ten sam skrypt bez `--work`):
 
 ```json
 {
-  "artists": 200,
+  "artists": 209,
   "videographers": 60,
   "campaigns": 40,
-  "productions": 500,
+  "productions": 506,
   "calendar_entries": 3000,
   "posts": 5000,
   "csv_uploads": 20,
   "csv_rows": 12000
 }
 ```
+
+Zestaw L sieje 200 artystów i 500 produkcji; nadwyżka (209 i 506) to wiersze
+dopisane przez pomiary stron i scenariusze e2e puszczane na tej bazie.
+Baza podglądowa `marketing_preview` (sekcja 2.1) niesie ten sam zestaw L.
 
 Skala zestawu L jest celowo większa od realnej. Optymalizujemy z zapasem, a różnice
 między planem z indeksem i bez widać dopiero na takich liczbach.
@@ -261,13 +273,21 @@ Weryfikacja listy: `grep -n "= pgTable(" drizzle/schema.ts` zwraca 12 linii.
 
 Dziesięć kluczy obcych, wszystkie poza `csv_rows.upload_id` z `on delete set null`.
 
-**Indeksy: dziś są wyłącznie klucze główne.** Weryfikacja: `npm run pg:info`, sekcja
-„indeksy", 12 pozycji, każda to `<tabela>_pkey`. Żadna kolumna, po której aplikacja
-filtruje albo sortuje, nie ma indeksu. To jest wprost pogwałcenie zasady Z9
-i pierwsza pozycja do naprawy: issue **F1-01**. Pomiar potwierdza skutek: zapytanie
-okna kalendarza i zapytanie analityki idą przez Seq Scan po całych tabelach
-(`node scripts/perf/measure-db.mjs`, pole `seqScan` równe `true` dla
-`calendar-window` i `posts-analytics`).
+**Indeksy: 25 pozycji, z tego 12 kluczy głównych i 13 dołożonych w F1-01.**
+Weryfikacja: `npm run pg:info`, sekcja „indeksy". Stan zastany był inny — do F1-01
+istniały wyłącznie klucze główne, a zapytanie okna kalendarza i zapytanie analityki
+szły przez Seq Scan po całych tabelach.
+
+| Tabela | Indeksy poza kluczem głównym |
+|---|---|
+| `productions` | `productions_t0_at_idx`, `productions_artist_id_idx`, `productions_videographer_id_idx`, `productions_campaign_id_idx` |
+| `calendar_entries` | `calendar_entries_starts_at_idx`, `calendar_entries_artist_id_idx`, `calendar_entries_campaign_id_idx`, `calendar_entries_production_id_idx` |
+| `posts` | `posts_published_at_idx`, `posts_campaign_id_idx`, `posts_production_id_idx`, `posts_raw_csv_row_id_idx` |
+| `csv_rows` | `csv_rows_upload_id_idx` |
+
+Skutek zmierzony: `node scripts/perf/measure-db.mjs` daje dziś `seqScan: false`
+dla `calendar-window` i `posts-analytics`, a p95 czterech zapytań kontrolnych mieści
+się poniżej 1,5 ms przy limicie 120 ms (`npm run perf`, sekcja BAZA).
 
 Kolumny `jsonb` i ich kształty (typy w `drizzle/schema.ts` powyżej linii 165):
 
@@ -298,13 +318,15 @@ filtrujemy albo sortujemy, musi dostać osobną kolumnę i indeks.
 ### 6a. Wejście na stronę, na przykładzie „Pipeline"
 
 1. Przeglądarka wysyła `GET /calendar?week=2026-03-02`.
-2. `src/proxy.ts:4` czyta ciasteczko `mc_session`, weryfikuje podpis HMAC
-   (`src/lib/auth-token.ts:18`). Brak podpisu albo token starszy niż 30 dni oznacza
-   przekierowanie na `/login` z parametrem `next` (`src/proxy.ts:10`).
-3. `src/app/calendar/page.tsx:142` to komponent serwerowy. Czyta parametry zapytania
+2. `src/proxy.ts:6` czyta ciasteczko `mc_session`, weryfikuje podpis HMAC
+   (`verifySessionToken` z `src/lib/auth-token.ts`). Brak podpisu albo token starszy
+   niż 30 dni oznacza przekierowanie na `/login` z parametrem `next`
+   (`src/proxy.ts:17` i `:24`).
+3. `src/app/calendar/page.tsx:75` to komponent serwerowy. Czyta parametry zapytania
    (`view`, `mode`, `week`, `weeks`, `status`, `type`, `sort`, `campaign`),
    pobiera dane przez Drizzle i renderuje `GanttView` albo `GanttTableView`.
-4. Drizzle woła `postgres-js` z puli o rozmiarze 1 (`src/lib/db.ts:17`).
+4. Drizzle woła `postgres-js` z puli o rozmiarze `DB_POOL_MAX`, domyślnie 10
+   (`src/lib/db.ts:25`); na Vercelu 1.
 5. Gotowy HTML wraca do przeglądarki. Strona ma `force-dynamic`, więc nie ma tu
    cache'a: każde wejście to komplet zapytań do bazy.
 
@@ -312,23 +334,60 @@ filtrujemy albo sortujemy, musi dostać osobną kolumnę i indeks.
 
 Ścieżka zapisu istnieje w kodzie i jest kompletna:
 
-1. Wywołanie `createCalendarEntry(input)` z `src/server/actions/calendar.ts:17`.
+1. Wywołanie `createCalendarEntry(input)` z `src/server/actions/calendar.ts:18`.
    Plik ma dyrektywę `'use server'` (linia 1), więc to server action.
-2. `requireSession()` (`src/server/actions/calendar.ts:18`, definicja
-   `src/lib/auth.ts:41`) przerywa akcję wyjątkiem `UNAUTHORIZED`, gdy ciasteczko
-   sesji nie przechodzi weryfikacji.
-3. `calendarEntryInputSchema.parse(input)` (linia 19, schemat w
+2. `requireSession()` (linia 19, definicja `src/lib/auth.ts:41`) przerywa akcję
+   wyjątkiem `UNAUTHORIZED`, gdy ciasteczko sesji nie przechodzi weryfikacji.
+3. `calendarEntryInputSchema.parse(input)` (linia 20, schemat w
    `src/server/actions/schemas.ts`) waliduje wejście. Zod rzuca wyjątkiem przy
    złych danych, więc do bazy nie trafia nic niesprawdzonego.
-4. `db.insert(schema.calendarEntries).values({...}).returning()` (linie 20 do 34)
+4. `db.insert(schema.calendarEntries).values({...}).returning()` (linie 21 do 35)
    robi `INSERT` i oddaje zapisany wiersz. Daty przychodzą jako ISO string
-   i są zamieniane na `Date` w `toDate` (linia 13).
-5. `revalidatePath('/calendar')` i `revalidatePath('/')` (linie 35 i 36, opakowane
-   w `safeRevalidatePath` z `src/server/actions/revalidate.ts`) unieważniają cache
-   obu stron.
+   i są zamieniane na `Date` w `toDate` (linia 14).
+5. `revalidatePath('/calendar')` i `revalidatePath('/', 'page')` (linie 36 i 40,
+   opakowane w `safeRevalidatePath` z `src/server/actions/revalidate.ts`)
+   unieważniają cache obu stron.
 6. Akcja zwraca zapisany wiersz.
 
-**Czego w tej ścieżce brakuje: przycisku.** `grep -rn 'createCalendarEntry' src/`
+**Ten sam schemat obowiązuje na każdej granicy zaufania (zasada Z13, issue F6-02).**
+Punktów wejścia jest 73: cztery handlery w `src/app/api/` i 69 eksportowanych akcji
+serwerowych. Każdy, który bierze argumenty, parsuje je schematem Zod, zanim dotknie
+bazy. Lista „punkt wejścia — schemat" nie jest przepisywana ręcznie do tego dokumentu,
+bo rozjechałaby się z kodem; generuje ją komenda:
+
+```
+node scripts/check-trust-boundaries.mjs      # kod 0, „Bez schematu mimo argumentów: 0"
+```
+
+### 6c. Import osób z arkusza (`/import/osoby`)
+
+Ekran ma siedem kroków (`plan/04-import-excel.md` sekcja 2), komponenty w
+`src/components/import/`, logika czysta w `src/lib/import/`:
+
+1. **Plik** — `ImportDropzone`. Rozszerzenie i rozmiar sprawdza `checkFile`
+   jeszcze w przeglądarce, `POST /api/import/people` sprawdza je drugi raz na serwerze
+   (przeglądarce się nie ufa). Limity: 10 MB i 5 000 wierszy na arkusz
+   (`src/lib/import/limits.ts`). Arkusz **nie jest zapisywany** ani w repozytorium,
+   ani w `data/` — żyje w pamięci procesu.
+2. **Arkusz i rola** — który arkusz skoroszytu i czy to twórcy, czy kamerzyści.
+   Rola nigdy nie jest zgadywana z zawartości. Arkusz bez wierszy danych blokuje
+   przejście dalej.
+3. **Mapowanie** — kolumna arkusza na pole osoby, propozycja z `autoMap`.
+   Dwie kolumny na jedno pole to kolizja: oba pola dostają `aria-invalid`, komunikat
+   wskazuje kolidujące kolumny, guzik dalej jest zablokowany. Poniżej 768 px tabela
+   mapowania przechodzi w listę kart (F6-01).
+4. **Suchy przebieg** — `dryRun` liczy plan w przeglądarce z tych samych funkcji,
+   których serwer używa do zapisu, więc zmiana mapowania przelicza podgląd
+   **bez ponownego wysyłania pliku**.
+5. **Zatwierdzenie** — polityka duplikatów: pomiń albo zaktualizuj.
+6. **Zapis** — `POST /api/import/people/save` oddaje strumień NDJSON, po jednej linii
+   na zapisaną paczkę, całość w jednej transakcji. Serwer liczy plan od zera; to, co
+   policzyła przeglądarka, jest wyłącznie podglądem.
+7. **Podsumowanie** — liczby i odnośnik do `/artists` albo `/videographers`.
+
+Import **nigdy nie usuwa** osób nieobecnych w arkuszu.
+
+**Czego w ścieżce zapisu wpisu kalendarza brakuje: przycisku.** `grep -rn 'createCalendarEntry' src/`
 zwraca jedno trafienie, czyli samą definicję. Żaden komponent tej akcji nie woła.
 Dziś wpis kalendarza dodaje się wyłącznie skryptem `tsx` z terminala albo ręką
 agenta. Dyspozycja tego długu: issue **F7-09**.
@@ -352,11 +411,22 @@ Zmienne środowiskowe, wzorzec w `.env.example`, wartości wyłącznie w `.env.l
 | `SESSION_SECRET` | tak, minimum 32 znaki | podpis ciasteczka sesji, `openssl rand -base64 48` |
 | `AUTH_EMAIL`, `AUTH_PASSWORD` | tak | jedyna para logowania, domyślnie `admin@demo.pl` i `demo` |
 | `BLOB_READ_WRITE_TOKEN` | nie lokalnie | Vercel Blob, bez niego fallback na dysk |
-| `DB_POOL_MAX` | nie | rozmiar puli, puste znaczy wartość domyślna sterownika |
+| `PREVIEW_DATABASE_URL` | do środowiska podglądowego | baza `marketing_preview` (sekcja 2.1) |
+| `DB_POOL_MAX` | nie | rozmiar puli, puste znaczy wartość domyślna 10 |
 
 Gdzie sekretów **nie** ma być: w `README.md`, w `CLAUDE.md`, w plikach `plan/`,
 w treści issues i w komunikatach commitów. Weryfikacja: `git ls-files | grep -c '\.env'`
 zwraca `1`, i tym jednym plikiem jest `.env.example` z wartościami zastępczymi.
+
+**Arkusze i pliki danych też nie wchodzą do repozytorium** (zasada Z14, issue F6-02):
+
+```
+git ls-files | grep -E '\.env|\.xlsx|\.db$' | grep -v '^\.env\.example$' | wc -l   # 0
+```
+
+W `.gitignore` siedzą `/tests/fixtures/*.xlsx` i `/.data-import/`. Fixture do testów
+importu jest generowany deterministycznie (`npx tsx scripts/make-fixture-xlsx.ts`),
+a `e2e/import-osoby.spec.ts` odtwarza go sam, gdy pliku nie ma.
 
 ---
 
@@ -386,17 +456,33 @@ Komendy sprawdzające, wszystkie kończą się kodem 0 poza `perf` (patrz niżej
 | Komenda | Co robi |
 |---|---|
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | ESLint, dziś 0 błędów i 205 ostrzeżeń, każde ma issue w fazie F7 |
-| `npm run test` | testy jednostkowe, Vitest |
-| `npm run e2e` | test przeglądarkowy logowania, Playwright |
+| `npm run lint` | ESLint, dziś **0 błędów i 108 ostrzeżeń**, każde ma issue w fazie F7. Reguła `no-restricted-syntax` na surowym `<button>` jest błędem, lista wyjątków jest pusta |
+| `npm run test` | 216 testów jednostkowych w 20 plikach, Vitest |
+| `npm run e2e` | 22 scenariusze przeglądarkowe, Playwright (`reuseExistingServer: true`, więc bierze serwer stojący na porcie 3000) |
 | `npm run pg:info` | wersja bazy, indeksy, liczby wierszy |
 | `npm run perf` | pomiar bazy i stron plus raport progów |
 | `npm run perf:dev` | pomiar trybu deweloperskiego, wymaga zimnego `.next` |
 | `npm run perf:serve` | build i serwer produkcyjny wpięty w bazę pomiarową |
+| `node scripts/check-typography.mjs` | bramka zasad Z5, Z6 i Z7 (typografia, zero emoji) |
+| `node scripts/check-trust-boundaries.mjs` | lista punktów wejścia i ich schematów Zod (Z13) |
+| `node scripts/a11y-audit.mjs` | audyt dostępności na uruchomionej aplikacji (F6-01) |
+| `node scripts/perf/drift-selftest.mjs` | reguła dryfu przepuszczona przez całą historię przebiegów |
+| `npm run preview:setup`, `npm run preview:serve` | środowisko podglądowe dla zespołu (sekcja 2.1) |
 
-`npm run perf` kończy się dziś kodem **1** i to jest stan oczekiwany: raport wypisuje
-trzy przekroczone progi (dwa Seq Scany i rozmiar JavaScriptu strony `/calendar`).
-Ich naprawa to fazy F1 i F2.
+`npm run perf` kończy się dziś kodem **0**. Stan zastany był inny: raport wypisywał
+trzy przekroczone progi (dwa Seq Scany i rozmiar JavaScriptu `/calendar`), naprawiły
+je fazy F1 i F2. Bundel `/calendar` waży dziś 292,6 kB po gzip przy progu 301,6 kB.
+Raport blokuje też przy dryfie: potrzeba jednocześnie ≥30% pogorszenia i pogorszenia
+większego niż 10% limitu metryki, bo sam procent zapala się na szumie maszyny
+(zmierzone 242% między kolejnymi przebiegami tej samej metryki).
+
+**Bundler: `dev` zostaje na webpacku, i to jest decyzja, nie zaniedbanie** (F2-05).
+Turbopack wygrywa każdą metrykę czasu (HMR 157 ms wobec 2017 ms, czyli 13x), ale
+jego obraz strony różni się od produkcyjnego o 82 921 pikseli z 7 823 808, przy
+webpacku 6 306 pikseli — czyli tryb deweloperski na turbopacku pokazuje co innego
+niż `next start`. `npm run dev:alt` uruchamia turbopacka dla kogoś, kto świadomie
+wybiera szybkość zamiast wierności. Przyczyna różnicy siedzi jako issue **F7-14**.
+Pomiary: `DECISIONS.md`, wpis F2-05.
 
 Pomiar stron wymaga kolejności: najpierw `npm run perf:serve` w jednym terminalu,
 potem `npm run perf` w drugim. Bez tego `measure-page.mjs` mierzy albo serwer
@@ -414,18 +500,48 @@ Czego aplikacja nie robi:
 - nie ma kont, ról ani zespołów, logowanie to jedna para z `.env.local`,
 - nie wykonuje agentów, persony z `agents/` i `data/agents/` czyta Claude Code.
 
-Długi zapisane jako issues w `plan/08-BACKLOG.md`:
+Długi zapisane jako issues w `plan/08-BACKLOG.md`, faza **F7-ZNALEZISKA**. Lista jest
+kompletna: każdy otwarty dług ma numer, żaden nie żyje wyłącznie w akapicie
+(zasada Z15). Stan na 2026-09-03: **25 otwartych issues**, żadne blokujące.
 
 | Dług | Issue |
 |---|---|
-| Zero indeksów poza kluczami głównymi, dwa Seq Scany na tabelach powyżej 1000 wierszy | F1-01 |
-| Rozmiar JavaScriptu pierwszego ładowania `/calendar`: 354.8 kB po gzip przy celu 350 kB | faza F2 |
-| Brak `DATABASE_URL` do bazy produkcyjnej, pomiary robione na kontenerze lokalnym | F0-01, wpis w `DECISIONS.md` |
-| Ostatnie wdrożenie produkcyjne na Vercelu padło 2026-05-03, nikt tego nie tknął | sekcja 2, czeka na decyzję usera |
-| 11 wywołań `setState` w efekcie, 6 naruszeń czystości renderu, 63 funkcje ponad progiem złożoności, 17 martwych zmiennych | F7-01 do F7-07 |
+| `setState` wołany wprost w `useEffect` w 10 komponentach (11 trafień) | F7-01 |
+| Naruszenia `react-hooks/purity` w 6 plikach, w tym w gancie | F7-02 |
+| `react-hooks/immutability` i `react-hooks/refs` | F7-03 |
+| Dwa `<a href>` na trasy wewnętrzne zamiast `<Link>` | F7-04 |
+| Pięć niezaescapowanych apostrofów i cudzysłowów w JSX | F7-05 |
+| 63 funkcje ponad progiem złożoności 10 | F7-06 |
+| 17 nieużywanych zmiennych i importów | F7-07 |
 | Lewy pasek akcentu wbrew zasadzie Z8 | F7-08 |
-| `createCalendarEntry` nie ma żadnego wywołania z interfejsu | F7-09 |
-| `videographers` nie ma kolumn `handle`, `email`, `phone`, żadna z tabel osób nie ma `location`, co blokuje import z Excela | F4-00 |
+| `createCalendarEntry` nie ma wywołania z interfejsu | F7-09 |
+| Zestaw L nie zasiewa katalogów, więc krok P3 był niemierzalny | F7-10 |
+| Powrót do Cache Components na danych, które istnieją | F7-11 |
+| Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy | F7-12 |
+| Gant nadal na liście grandfather w ESLint | F7-13 |
+| Turbopack gubi siatkę dni w pasach T (82 921 pikseli różnicy) | F7-14 |
+| Mikro-etykieta sekcji powielona 90 razy w pięciu wariantach | F7-15 |
+| Trzy komponenty z `ui/` bez ani jednego użycia | F7-16 |
+| Długie myślniki w treściach z `data/`, poza zakresem Z7 | F7-17 |
+| `npx playwright test` po cichu bierze stojący serwer i jego bazę | F7-18 |
+| Przeniesienie danych z `videographers.contact` do `handle` i `email` | F7-19 (dawniej F4-00) |
+| Pole wyboru pokazuje surową wartość zamiast etykiety | F7-20 |
+| Testy e2e importu piszą do bazy roboczej | F7-21 |
+| `AGENTS.md` wskazuje nieistniejący plik planu | F7-22 |
+| Dwa prawdziwe handle z Instagrama zostały w historii gita | F7-23 |
+| Tytułu produkcji nie widać na jej stronie ani na liście | F7-24 |
+| Odnośniki nawigacji poniżej 44 px obszaru dotyku | F7-25 |
+
+Poza fazą F7 czekają jeszcze:
+
+| Sprawa | Gdzie |
+|---|---|
+| Brak `DATABASE_URL` do bazy produkcyjnej; wszystkie pomiary z kontenera lokalnego | F0-01, `DECISIONS.md` |
+| Ostatnie wdrożenie na Vercelu padło 2026-05-03, nikt tego nie tknął | sekcja 2, decyzja usera |
+| Publiczny adres środowiska podglądowego (`tailscale funnel` kontra hosting) | F5-04, `BLOCKED-ASK-USER`, sekcja 2.1 |
+| Import listy osób z prawdziwego pliku `.xlsx`, którego user jeszcze nie dostarczył | F4-06, ⏳ |
+| Wyczyszczenie historii gita z danych osobowych | F4-07, F7-23, decyzja usera |
+| Potwierdzenie treści tego dokumentu przez usera | F8-01 |
 
 Kształt zastany, który wygląda na dług, a nim nie jest:
 
@@ -462,3 +578,47 @@ nie istnieje od migracji na PostgreSQL. Dwa pliki `*.bak.db` w repozytorium to
 pozostałość po tamtej wersji i zostały usunięte w issue F0-07; opisy w `README.md`
 i `CLAUDE.md`, które mówiły o SQLite, tam samo zostały zastąpione odesłaniem do tego
 dokumentu.
+
+---
+
+## Załącznik: dziesięć twierdzeń tego dokumentu sprawdzonych komendą
+
+Wykonane **2026-09-03**, na tej maszynie, przy kontenerze `mc-pg` w biegu
+(issue F6-03, kryterium „weryfikacja zgodności z kodem wykonana TERAZ").
+Żadne z dziesięciu nie okazało się fałszywe po poprawkach opisanych niżej.
+
+| # | Twierdzenie | Komenda | Wynik |
+|---|---|---|---|
+| 1 | Baza to PostgreSQL 17.11, limit połączeń 100 (sekcja 3) | `npm run pg:info` | `postgres 17.11 (Debian 17.11-1.pgdg13+2)`, `max_connections 100` |
+| 2 | Indeksów jest 25, z tego 13 poza kluczami głównymi (sekcja 5) | `npm run pg:info \| sed -n '/^indeksy/,/^$/p' \| grep -c '_idx'` | `13`, nagłówek sekcji mówi `indeksy (25)` |
+| 3 | Tabel jest dwanaście (sekcja 5) | `grep -c '= pgTable(' drizzle/schema.ts` | `12` |
+| 4 | Pula połączeń: 1 na Vercelu, poza nim `DB_POOL_MAX` (sekcja 3) | `grep -n 'max: process.env.VERCEL' src/lib/db.ts` | `25:    max: process.env.VERCEL ? 1 : env.DB_POOL_MAX,` |
+| 5 | Cache odczytów nie ma, strony zostają dynamiczne (sekcja 3) | `grep -rn 'force-dynamic' src/app \| wc -l` | `28` deklaracji, żadnego `use cache` w kodzie |
+| 6 | Zapytania kontrolne nie idą przez Seq Scan (sekcja 5) | `node scripts/perf/measure-db.mjs` | `seqScan: nie` dla wszystkich czterech; p95 od 0,74 do 1,28 ms przy limicie 120 ms |
+| 7 | Baza robocza ma 102 artystów, 19 kampanii, 67 produkcji (sekcja 4) | `node scripts/perf/table-counts.mjs --work --json` | dokładnie te liczby, reszta tabel zero |
+| 8 | Każdy z 73 punktów wejścia waliduje wejście Zodem (sekcja 6) | `node scripts/check-trust-boundaries.mjs` | `Punktów wejścia: 73. Bez schematu mimo argumentów: 0.`, kod 0 |
+| 9 | W repozytorium nie ma sekretów ani arkuszy (sekcja 7) | `git ls-files \| grep -E '\.env\|\.xlsx\|\.db$' \| grep -v '^\.env\.example$' \| wc -l` | `0` |
+| 10 | `npm run dev` to webpack, turbopack siedzi pod `dev:alt` (sekcja 8) | `node -p "require('./package.json').scripts.dev"` | `node scripts/dev-prestart.mjs && next dev --webpack` |
+
+Dodatkowo, jako kontrola bramek z sekcji 8: `npm run typecheck` kod 0,
+`npm run lint` 0 błędów i 108 ostrzeżeń, `npm run test` 216 zielonych w 20 plikach,
+`npx playwright test` 22 zielone, `npm run perf` kod 0 z bundlem `/calendar`
+292,6 kB przy progu 301,6 kB.
+
+**Co się nie zgadzało i zostało poprawione w tym samym issue** (dokument kłamał,
+nie kod):
+
+1. Sekcja 5 twierdziła, że indeksami są wyłącznie klucze główne i że
+   `calendar-window` oraz `posts-analytics` idą przez Seq Scan. Nieprawda od F1-01:
+   indeksów jest 25, `seqScan` jest `nie`. Tabela indeksów dopisana.
+2. Sekcja 4 podawała bazę roboczą jako pustą (same zera). Nieprawda: 102 artystów,
+   19 kampanii, 67 produkcji od testów i klikania w fazach F1 do F6.
+3. Sekcja 8 twierdziła, że `npm run perf` kończy się kodem 1 i że to stan oczekiwany.
+   Nieprawda od F2: kod 0. Poprawione razem z liczbą ostrzeżeń ESLint (było 205,
+   jest 108) i liczbami testów.
+4. Numery linii w sekcjach 3 i 6 wskazywały na kod sprzed faz F1 i F2
+   (`db.ts:32` i `:17`, `calendar/page.tsx:142`, `proxy.ts:4` i `:10`,
+   `calendar.ts:17` do `:36`). Wszystkie przeliczone na stan bieżący.
+5. Sekcja 9 wymieniała osiem długów bez numerów albo ze starymi numerami
+   (F4-00 stało się F7-19). Przepisana na komplet 25 issues z fazy F7 plus tabelę
+   spraw czekających na decyzję usera.

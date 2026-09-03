@@ -711,3 +711,66 @@ poza tę maszynę — a w historii gita nadal siedzą prawdziwe dane osobowe (F4
 **Zrzuty scenariuszy e2e nie są `fullPage`.** Pełna strona `/calendar` w zestawie
 roboczym ma 16 854 px wysokości; na takim zrzucie nie widać niczego. Zrzuty F5 to widok
 okna 1280×720.
+
+## F6 — raport fazy (2026-09-03)
+
+**F6-01, dostępność.** Audyt zrobiony na uruchomionej aplikacji, nie z kodu: nowy
+`scripts/a11y-audit.mjs` loguje się parą z `.env.local`, wchodzi na `/calendar`,
+`/productions/list` i `/import/osoby`, przechodzi je tabulatorem i mierzy. Wynik:
+przejście Tabem osiąga **każdy** widoczny element akcji (1544 z 1544, 88 z 88,
+24 z 24), zero elementów bez obwódki ogniskowania, zero guzików bez tekstu i bez
+nazwy. Skrypt kończy się kodem 1 przy pierwszym naruszeniu, więc jest bramką,
+nie jednorazowym pomiarem.
+
+**Obszar dotyku 44 px tylko na wskaźniku gruboziarnistym, i to jest decyzja.**
+Rozmiary `xs` (24 px), `sm` (28 px), `icon-xs` (24 px) i `icon-sm` (28 px) są mniejsze
+niż zalecane 44 px. Halo dokłada pseudoelement `::after` z `min-h-11 min-w-11`
+w bazie `buttonVariants`, ale pod wariantem `pointer-coarse:`. Powód: halo jest
+przezroczystym prostokątem, który przechwytuje kliknięcia dla swojego guzika, a gant
+ma paski, w których guziki 16 px stoją co kilka pikseli. Na myszy takie halo
+zabierałoby kliknięcia sąsiadom — czyli naprawa dostępności na ekranie dotykowym
+psułaby precyzję na ekranie z myszą. `pointer: coarse` rozdziela te dwa światy.
+Pomiar: 1400 / 308 / 3 guziki poniżej 44 px przed zmianą, 0 / 0 / 0 po.
+
+**Pułapka pomiaru: CDP nie umie udawać `pointer: coarse`.**
+`Emulation.setEmulatedMedia` z cechą `pointer` przechodzi bez błędu, a `matchMedia`
+w stronie dalej zwraca `false` — sprawdzone. Działa dopiero kontekst Playwrighta
+z `hasTouch: true` i `isMobile: true`. Audyt robi więc drugą kartę wyłącznie do
+pomiaru obszaru dotyku.
+
+**Nawigacja została poza halo, świadomie.** Pozycje paska bocznego to zwykłe `<a>`
+(215 x 36 px, podpozycje 178 x 31 px, odnośniki agentów 215 x 24 px), a kryterium
+F6-01 mówi o rozmiarach guzika. Zapisane jako **F7-25**, nie naprawione po cichu.
+
+**F6-02, granice zaufania.** Zasada Z13 była spełniona w kształcie „duże wejścia mają
+schemat, argumenty proste nie mają". 40 akcji serwerowych brało `productionId`,
+`stepId`, `slug` albo `mode` prosto z przeglądarki bez żadnego sprawdzenia; typ
+TypeScriptu nie jest walidacją, bo po drugiej stronie server action stoi HTTP.
+Dołożone prymitywy w `schemas.ts` i po jednej linii parsowania na argument — 73 punkty
+wejścia, zero bez schematu, sprawdzane komendą `node scripts/check-trust-boundaries.mjs`.
+
+**`slugSchema` to nie kosmetyka.** Slug agenta i szablonu trafia do ścieżki pliku
+w `data/agents/` i `data/templates/`. Wzorzec `^[a-z0-9][a-z0-9-]*$` wycina ukośnik
+i kropkę, więc `../etc/passwd` odpada na granicy, a nie w warstwie plików.
+
+**Fixture `.xlsx` wyjęty z gita.** `git ls-files | grep -E '\.env|\.xlsx|\.db$'`
+zwracał `tests/fixtures/osoby.xlsx`. Plik jest syntetyczny, więc nie był wyciekiem,
+ale Z14 mówi o arkuszach w repozytorium bez wyjątku, a generator jest deterministyczny.
+Rozwiązanie: `git rm --cached`, wpis w `.gitignore`, odtwarzanie w `test.beforeAll`
+w `e2e/import-osoby.spec.ts`. Sprawdzone przez skasowanie pliku i przebieg testów.
+
+**Ostrzał na uruchomionej aplikacji.** Pięć granic ostrzelanych złym wejściem przez
+`curl` z ciasteczkiem sesji: brak pliku, `dryRun=zle`, `category=../../etc`, CSV
+podany jako xlsx, JSON z `role: "kot"` i `rows: "nie tablica"`. Wszystkie 400, żadne
+500. Osiem żądań z popsutymi parametrami URL (`week=nie-data`, `view=<script>`,
+`weeks=-99`, `mode=../../etc/passwd`, `sort=DROP TABLE`, `status=%00`, `/productions/abc`,
+`/campaigns/-1`) daje pięć 200 i trzy 404, żadnego 500.
+
+**F6-03, dokument architektury.** Pięć twierdzeń `docs/ARCHITEKTURA.md` okazało się
+fałszywych przy sprawdzeniu komendą i zostało poprawionych: indeksy i Seq Scany
+(sekcja 5, nieaktualne od F1-01), pusta baza robocza (sekcja 4), „`npm run perf`
+kończy się kodem 1" i 205 ostrzeżeń ESLint (sekcja 8), numery linii w sekcjach 3 i 6,
+lista długów w sekcji 9. To jest argument za tym, żeby każdą liczbę w dokumencie
+trzymać razem z komendą, która ją odtwarza: pięć zdań zestarzało się w dwa dni pracy.
+Dziesięć sprawdzeń stoi w załączniku dokumentu, razem z komendą i wynikiem przy każdym.
+

@@ -1546,7 +1546,7 @@ userowi.
   `node scripts/check-typography.mjs` 0, `npm run perf` 0 (bundel `/calendar` 292,6 kB
   przy progu 301,6 kB), `node scripts/perf/drift-selftest.mjs` 0.
 
-- [ ] **F6-03** `docs` Domknięcie dokumentu architektury
+- [x] **F6-03** `docs` Domknięcie dokumentu architektury
   CZYTAJ: `plan/02-architektura.md` sekcja 3
   AC:
   - `docs/ARCHITEKTURA.md` uzupełniony o ustalenia z F1 do F5: pulę połączeń, indeksy,
@@ -1557,6 +1557,47 @@ userowi.
     dokumentu i przy każdym zapisz komendę oraz jej wynik potwierdzający
   - negatywne: żadne z 10 sprawdzanych twierdzeń nie okazuje się fałszywe; gdy okaże
     się, dokument jest poprawiany w tym samym issue
+  DOWÓD (2026-09-03): `docs/ARCHITEKTURA.md` uzupełniony o ustalenia F1 do F5.
+  Pula połączeń: wiersz tabeli w sekcji 3 wskazuje `src/lib/db.ts:25` i `:26`
+  (`process.env.VERCEL ? 1 : env.DB_POOL_MAX`, `idle_timeout: 20`). Indeksy: sekcja 5
+  miała twierdzenie „dziś są wyłącznie klucze główne" — nieprawdziwe od F1-01, wstawiona
+  tabela 13 indeksów poza kluczami głównymi (`productions`, `calendar_entries`, `posts`,
+  `csv_rows`) i wynik `seqScan: nie` z `measure-db.mjs`. Cache: dopisany wiersz „Cache
+  odczytów — **brak**, świadomie", z odesłaniem do wpisu F1-03 w `DECISIONS.md` (Cache
+  Components wdrożony, zmierzony i cofnięty) oraz do F7-10 i F7-11. Bundler: nowy akapit
+  w sekcji 8 — `dev` na webpacku mimo 13x szybszego HMR turbopacka, bo obraz strony
+  z turbopacka różni się od produkcyjnego o 82 921 pikseli wobec 6 306 przy webpacku,
+  `dev:alt` dla świadomego wyboru, przyczyna jako F7-14. Ekran importu: nowa sekcja 6c,
+  siedem kroków, limity 10 MB i 5 000 wierszy, walidacja dwa razy (przeglądarka i serwer),
+  suchy przebieg bez ponownego wysyłania pliku, strumień NDJSON przy zapisie, zakaz
+  kasowania osób spoza arkusza. Adres środowiska testowego: sekcja 2.1 zostaje bez zmian
+  (F5-04), dopisana baza `marketing_preview` do tabeli baz w sekcji 3 i zmienna
+  `PREVIEW_DATABASE_URL` do tabeli zmiennych w sekcji 7.
+  Sekcja 9 przepisana: wymienia **wszystkie 25 otwartych issues F7** z numerem przy
+  każdym (F7-01 do F7-25) plus osobną tabelę sześciu spraw czekających na decyzję usera
+  (F0-01, wdrożenie na Vercelu, F5-04, F4-06, F4-07 z F7-23, F8-01).
+  Sekcja 4 ma liczby wierszy z daty domknięcia: baza robocza 102 artystów, 19 kampanii,
+  67 produkcji, reszta zero (`node scripts/perf/table-counts.mjs --work --json`), baza
+  pomiarowa 209/60/40/506/3000/5000/20/12000 z wyjaśnieniem nadwyżki nad zestawem L.
+  DZIESIĘĆ TWIERDZEŃ SPRAWDZONYCH KOMENDĄ (tabela w załączniku dokumentu, wykonane
+  2026-09-03): (1) `npm run pg:info` → `postgres 17.11`, `max_connections 100`;
+  (2) `npm run pg:info | sed -n '/^indeksy/,/^$/p' | grep -c '_idx'` → `13`, nagłówek
+  `indeksy (25)`; (3) `grep -c '= pgTable(' drizzle/schema.ts` → `12`;
+  (4) `grep -n 'max: process.env.VERCEL' src/lib/db.ts` → linia 25;
+  (5) `grep -rn 'force-dynamic' src/app | wc -l` → `28`, a `grep -rn 'use cache' src/`
+  → `0`; (6) `node scripts/perf/measure-db.mjs` → `seqScan: nie` cztery razy, p95 0,74
+  do 1,28 ms; (7) `node scripts/perf/table-counts.mjs --work --json` → 102/0/19/67/0/0/0/0;
+  (8) `node scripts/check-trust-boundaries.mjs` → „Punktów wejścia: 73. Bez schematu
+  mimo argumentów: 0", kod 0; (9) `git ls-files | grep -E '\.env|\.xlsx|\.db$' |
+  grep -v '^\.env\.example$' | wc -l` → `0`; (10) `node -p
+  "require('./package.json').scripts.dev"` → `... next dev --webpack`.
+  NEGATYWNE: pięć twierdzeń dokumentu okazało się fałszywych i zostało poprawionych
+  w tym samym issue (lista na końcu załącznika): indeksy i Seq Scany w sekcji 5, pusta
+  baza robocza w sekcji 4, „`npm run perf` kończy się kodem 1" i 205 ostrzeżeń ESLint
+  w sekcji 8, numery linii w sekcjach 3 i 6 (`db.ts:32` i `:17`, `calendar/page.tsx:142`,
+  `proxy.ts:4` i `:10`, `calendar.ts:17` do `:36`), lista długów w sekcji 9 bez numerów
+  i ze starym F4-00 zamiast F7-19. Po poprawkach żadne z dziesięciu sprawdzanych
+  twierdzeń nie jest fałszywe.
 
 **DoD F6:** audyt dostępności zapisany; zero sekretów i danych osobowych w repozytorium;
 10 twierdzeń dokumentu potwierdzonych komendami.

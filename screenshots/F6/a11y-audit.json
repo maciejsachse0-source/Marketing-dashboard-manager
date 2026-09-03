@@ -12353,6 +12353,1206 @@
         "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
         "testid": "",
         "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394114801",
+        "label": "Artysta F1-04 1788394114801 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394126266",
+        "label": "Artysta F1-04 1788394126266 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "2 NASTĘPNY KROK 2/14 brief konceptu do a",
+        "label": "Outreach, krok 2/14: brief konceptu do artysty",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394135546",
+        "label": "Artysta F1-04 1788394135546 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394777838",
+        "label": "Artysta F1-04 1788394777838 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394789359",
+        "label": "Artysta F1-04 1788394789359 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "2 NASTĘPNY KROK 2/14 brief konceptu do a",
+        "label": "Outreach, krok 2/14: brief konceptu do artysty",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394799344",
+        "label": "Artysta F1-04 1788394799344 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace"
       }
     ],
     "trasa": [
@@ -13376,8 +14576,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|5|Krok 5: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -13408,8 +14608,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|7|Krok 7: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -14528,8 +15728,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -14864,8 +16064,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -16416,8 +17616,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -16432,8 +17632,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -19040,8 +20240,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -20016,8 +21216,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -20032,8 +21232,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -27856,7 +29056,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -28256,7 +29456,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -30960,8 +32160,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -37059,6 +38259,2406 @@
         "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394114801",
+        "label": "Artysta F1-04 1788394114801 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394114801|Artysta F1-04 1788394114801 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|1 NASTĘPNY KROK 1/14 mail wysłany Outrea|Outreach, krok 1/14: mail wysłany||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394114801||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394114801||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394114801",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394114801||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 2px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394126266",
+        "label": "Artysta F1-04 1788394126266 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394126266|Artysta F1-04 1788394126266 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "2 NASTĘPNY KROK 2/14 brief konceptu do a",
+        "label": "Outreach, krok 2/14: brief konceptu do artysty",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|2 NASTĘPNY KROK 2/14 brief konceptu do a|Outreach, krok 2/14: brief konceptu do artysty||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394126266||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394126266||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394126266",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394126266||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394135546",
+        "label": "Artysta F1-04 1788394135546 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394135546|Artysta F1-04 1788394135546 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|1 NASTĘPNY KROK 1/14 mail wysłany Outrea|Outreach, krok 1/14: mail wysłany||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394135546||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394135546||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394135546",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394135546||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394777838",
+        "label": "Artysta F1-04 1788394777838 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394777838|Artysta F1-04 1788394777838 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|1 NASTĘPNY KROK 1/14 mail wysłany Outrea|Outreach, krok 1/14: mail wysłany||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394777838||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394777838||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394777838",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394777838||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394789359",
+        "label": "Artysta F1-04 1788394789359 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394789359|Artysta F1-04 1788394789359 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "2 NASTĘPNY KROK 2/14 brief konceptu do a",
+        "label": "Outreach, krok 2/14: brief konceptu do artysty",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|2 NASTĘPNY KROK 2/14 brief konceptu do a|Outreach, krok 2/14: brief konceptu do artysty||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394789359||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394789359||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394789359",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394789359||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Artysta F1-04 1788394799344",
+        "label": "Artysta F1-04 1788394799344 - pełny widok produkcji",
+        "testid": "",
+        "cls": "flex-1 block text-base font-bold tracking-tight truncate hov",
+        "box": {
+          "w": 227,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Artysta F1-04 1788394799344|Artysta F1-04 1788394799344 - pełny widok produkcji||flex-1 block text-base font-bold tracking-tight truncate hov"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Rozwiń szczegóły",
+        "testid": "",
+        "cls": "group/button relative inline-flex items-center justify-cente",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "1 NASTĘPNY KROK 1/14 mail wysłany Outrea",
+        "label": "Outreach, krok 1/14: mail wysłany",
+        "testid": "",
+        "cls": "relative rounded-xl border-2 border-border bg-card pl-4 pr-3",
+        "box": {
+          "w": 315,
+          "h": 82
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|1 NASTĘPNY KROK 1/14 mail wysłany Outrea|Outreach, krok 1/14: mail wysłany||relative rounded-xl border-2 border-border bg-card pl-4 pr-3"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder nagrywanie dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder nagrywanie dla Artysta F1-04 1788394799344||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder obróbka dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder obróbka dla Artysta F1-04 1788394799344||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Otwórz folder publikacja dla Artysta F1-04 1788394799344",
+        "testid": "",
+        "cls": "group/button relative shrink-0 items-center justify-center t",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+        "klucz": "BUTTON||Otwórz folder publikacja dla Artysta F1-04 1788394799344||group/button relative shrink-0 items-center justify-center t"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 29,
+          "h": 29
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "",
+        "label": "Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center text-sm fo",
+        "box": {
+          "w": 20,
+          "h": 20
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "1",
+        "label": "Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center border-tra",
+        "box": {
+          "w": 31,
+          "h": 31
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "2",
+        "label": "Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "3",
+        "label": "Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "4",
+        "label": "Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "5",
+        "label": "Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "6",
+        "label": "Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "7",
+        "label": "Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "8",
+        "label": "Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "9",
+        "label": "Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "10",
+        "label": "Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "11",
+        "label": "Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "12",
+        "label": "Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "13",
+        "label": "Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
+      },
+      {
+        "tag": "button",
+        "role": "",
+        "text": "14",
+        "label": "Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie",
+        "testid": "",
+        "cls": "group/button shrink-0 items-center justify-center whitespace",
+        "box": {
+          "w": 24,
+          "h": 24
+        },
+        "obwodka": true,
+        "outline": "none 3px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 ",
+        "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       }
     ],
     "bezObwodki": [],
@@ -37263,7 +40863,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Wszystkie (61)",
+        "text": "Wszystkie (67)",
         "label": "",
         "testid": "",
         "cls": "px-3 py-1.5 rounded-full border text-xs font-medium transiti"
@@ -37279,7 +40879,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Solo (61)",
+        "text": "Solo (67)",
         "label": "",
         "testid": "",
         "cls": "px-3 py-1.5 rounded-full border text-xs font-medium transiti"
@@ -37287,7 +40887,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393287778 OUTREACH 1/4 kr",
+        "text": "Prod F1-04 1788394801210 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -37423,7 +41023,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788392691280 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788394128090 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -37431,7 +41031,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788392682287 OUTREACH 1/4 kr",
+        "text": "Prod F1-04 1788394137338 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -37439,7 +41039,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393279256 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788394781460 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -37447,7 +41047,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393296750 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788394791175 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -37728,6 +41328,54 @@
         "tag": "a",
         "role": "",
         "text": "Prod F1-04 1788392673238 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788392691280 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788392682287 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393279256 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393296750 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393287778 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788394118131 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -38161,18 +41809,18 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Wszystkie (61)",
+        "text": "Wszystkie (67)",
         "label": "",
         "testid": "",
         "cls": "px-3 py-1.5 rounded-full border text-xs font-medium transiti",
         "box": {
-          "w": 109,
+          "w": 110,
           "h": 30
         },
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Wszystkie (61)|||px-3 py-1.5 rounded-full border text-xs font-medium transiti"
+        "klucz": "A|Wszystkie (67)|||px-3 py-1.5 rounded-full border text-xs font-medium transiti"
       },
       {
         "tag": "a",
@@ -38193,34 +41841,34 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Solo (61)",
+        "text": "Solo (67)",
         "label": "",
         "testid": "",
         "cls": "px-3 py-1.5 rounded-full border text-xs font-medium transiti",
         "box": {
-          "w": 76,
+          "w": 77,
           "h": 30
         },
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Solo (61)|||px-3 py-1.5 rounded-full border text-xs font-medium transiti"
+        "klucz": "A|Solo (67)|||px-3 py-1.5 rounded-full border text-xs font-medium transiti"
       },
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393287778 OUTREACH 1/4 kr",
+        "text": "Prod F1-04 1788394801210 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
         "box": {
           "w": 960,
-          "h": 215
+          "h": 207
         },
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788393287778 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+        "klucz": "A|Prod F1-04 1788394801210 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
@@ -38481,23 +42129,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788392691280 OUTREACH 0/4 kr",
-        "label": "",
-        "testid": "",
-        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
-        "box": {
-          "w": 960,
-          "h": 207
-        },
-        "obwodka": true,
-        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
-        "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788392691280 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
-      },
-      {
-        "tag": "a",
-        "role": "",
-        "text": "Prod F1-04 1788392682287 OUTREACH 1/4 kr",
+        "text": "Prod F1-04 1788394128090 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
@@ -38508,12 +42140,12 @@
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788392682287 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+        "klucz": "A|Prod F1-04 1788394128090 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393279256 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788394137338 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
@@ -38524,12 +42156,12 @@
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788393279256 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+        "klucz": "A|Prod F1-04 1788394137338 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788393296750 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788394781460 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
@@ -38540,7 +42172,23 @@
         "obwodka": true,
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788393296750 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+        "klucz": "A|Prod F1-04 1788394781460 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788394791175 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 215
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788394791175 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
@@ -39101,6 +42749,102 @@
         "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
         "boxShadow": "none",
         "klucz": "A|Prod F1-04 1788392673238 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788392691280 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 207
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788392691280 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788392682287 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 215
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788392682287 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393279256 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 207
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788393279256 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393296750 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 207
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788393296750 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788393287778 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 215
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788393287778 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788394118131 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 207
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.62 -0.0618033 -0.190211 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788394118131 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
