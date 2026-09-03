@@ -673,6 +673,14 @@ tabela przed i po w raporcie fazy.
     (dowód: wyjście `next build` w raporcie)
   - negatywne: pełny zestaw e2e zielony, żaden interaktywny element nie przestaje działać
 
+  POPRAWKA DOWODU 2026-09-03 (**F7-40**): liczba **50** nie jest już prawdziwa —
+  ta sama komenda zwraca dziś **64** (65 przed sprzątaniem z F7-36). Doszły w fazach
+  F3 do F7 między innymi widoki kamerzystów, kreatory kampanii i produkcji, formularze
+  szablonów, paleta poleceń i pasy ganta kampanii. Bundel nadal mieści się w budżecie
+  (`/calendar` 293,3 kB przy progu 301,6 kB), więc to nie regres wydajności, ale
+  kryterium przestało być pilnowane. Od F7-40 pilnuje go `npm run perf`:
+  `perf/budget.json` klucz `clientComponents.maxFiles`, próg 64, ma maleć nie rosnąć.
+
   DOWÓD (2026-09-02):
   - `grep -rl "'use client'" src/components | wc -l` spada z **58 do 50**
     (kryterium mówi „z 47", ale F2-02 dołożył jedenaście plików ganta; spadek
@@ -2858,7 +2866,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - specyfikacja zestawu L stoi w JEDNYM miejscu w kodzie, nie jest przepisana dwa razy
   - negatywne: `npm run perf` na zgodnej bazie kończy kodem 0
 
-- [ ] **F7-35** `znalezisko` `perf` `db` Generator zestawu L nie zasiewa nowych kolumn kamerzysty
+- [x] **F7-35** `znalezisko` `perf` `db` Generator zestawu L nie zasiewa nowych kolumn kamerzysty
   Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej, zależne od F7-32.
   `scripts/perf/seed-large.ts:253` daje kamerzystom wyłącznie `contact`, mimo że migracja
   0003 dołożyła `handle`, `email`, `phone`, `location`, `status`, a F7-32 przepisał na te
@@ -2866,6 +2874,17 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   niepustych `email`, `handle`, `phone`. Skutek: ścieżka kodu z F7-32 nie jest wykonywana
   ani w pomiarze wydajności, ani w środowisku podglądowym dla zespołu — mierzymy i
   pokazujemy gałąź zapasową, nie tę, którą zobaczy użytkownik.
+  ZROBIONE 2026-09-03. Generator wypełnia kamerzystom `handle`, `email`, `phone`,
+  a przy okazji `location` i `status`, które migracja 0003 też dołożyła, a których
+  nikt nie zasiewał. Prawdopodobieństwa jak dla artystów (handle 0,75; email 0,6;
+  phone 0,4), `location` 0,7 („część bez lokalizacji" z plan/03 sekcja 2), `status` 0,5.
+  `contact` zszedł z 0,7 na 0,3, żeby zostać tym, czym jest po F7-32: polem zastanym
+  dla wierszy nierozpoznanych, a nie głównym kontaktem.
+  Dowód AC: po `npx tsx scripts/perf/seed-large.ts` w `marketing_perf` jest
+  `email 35`, `handle 47`, `phone 24`, `location 37`, `status 28`, `contact 20`
+  (przed zmianą: `email 0`, `handle 0`, `phone 0`, `contact 36`).
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, perf 0 (zestaw L zgodny co do
+  wiersza, `/calendar` 293,4 kB przy progu 301,6 kB).
   CZYTAJ: `scripts/perf/seed-large.ts` (linie 235 do 237 pokazują wzorzec dla artystów)
   AC:
   - generator wypełnia `handle`, `email` i `phone` kamerzystów tak jak robi to dla artystów

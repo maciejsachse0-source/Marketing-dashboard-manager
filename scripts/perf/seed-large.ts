@@ -69,6 +69,10 @@ const CALENDAR_STATUSES = ['planned', 'done', 'cancelled'] as const;
 const CAMPAIGN_PHASES = ['build-up', 'teaser', 'reveal', 'release', 'afterglow', 'done'] as const;
 const STAGES = ['outreach', 'ustalenia', 'nagrywanie', 'obrobka', 'publikacja'] as const;
 const CSV_SOURCES = ['meta', 'tiktok', 'youtube'] as const;
+// F7-35: dane kamerzysty poza `contact`. Miasta i statusy krótkie, bo mierzymy
+// czas zapytania, nie realizm treści.
+const CITIES = ['Warszawa', 'Kraków', 'Gdańsk', 'Wrocław', 'Poznań', 'Katowice'] as const;
+const VIDEOGRAPHER_STATUSES = ['wolny', 'zajęty do marca', 'tylko weekendy'] as const;
 
 /** Punkt zero osi czasu. Data stała, nie `new Date()`, inaczej generator
  *  przestałby być deterministyczny między dniami. */
@@ -250,7 +254,17 @@ async function main() {
       const name = personName();
       return {
         name,
-        contact: chance(0.7) ? `${slugify(name, i)}@kamera.pl` : null,
+        // F7-35: `contact` to pole zastane. Migracja 0003 rozbiła je na `handle`,
+        // `email`, `phone`, `location` i `status`, a F7-32 przepisał na nie cały
+        // ekran kamerzystów — generator o tym nie wiedział, więc pomiar i podgląd
+        // dla zespołu chodziły wyłącznie gałęzią zapasową.
+        contact: chance(0.3) ? `${slugify(name, i)}@kamera.pl` : null,
+        handle: chance(0.75) ? `@${slugify(name, i)}` : null,
+        email: chance(0.6) ? `${slugify(name, i)}@kamera.pl` : null,
+        phone: chance(0.4) ? `+48${int(500000000, 899999999)}` : null,
+        // plan/03 sekcja 2: „część bez lokalizacji".
+        location: chance(0.7) ? pick(CITIES) : null,
+        status: chance(0.5) ? pick(VIDEOGRAPHER_STATUSES) : null,
         hourly_rate: chance(0.8) ? int(80, 400) : null,
         equipment: chance(0.6) ? 'Sony FX3, 24-70' : null,
         availability_notes: chance(0.5) ? null : 'weekendy',
