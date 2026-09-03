@@ -55,8 +55,9 @@ przez usera: F8-01 (czy wdrażamy na produkcję), F8-02 (czy zmieniamy stack; bu
 spełnione, więc rekomendacja brzmi „nie"), F8-03 (opcjonalne, logowanie i role, praca
 nieplanowana).
 
-`BLOCKED-ASK-USER: F4-06` — plik `.xlsx` z twórcami i kamerzystami. Import działa
-na fixture syntetycznym, dopasowanie do prawdziwych nagłówków czeka.
+`F4-06` zamknięte 2026-09-03: prawdziwy arkusz dostarczony, import przeszedł od pliku
+do bazy roboczej bez ręcznego przestawiania kolumn. Zostały z tego dwie decyzje dla
+usera: `F7-44` (wiersze bez imienia) i `F7-45` (status twórcy bez kolumny w bazie).
 
 `BLOCKED-ASK-USER: F5-04` — publiczny adres środowiska podglądowego. Środowisko działa
 lokalnie i w sieci lokalnej. Wybór: `tailscale funnel` (zajmuje port 443, na którym stoi

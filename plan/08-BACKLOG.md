@@ -1212,15 +1212,66 @@ przechodzi; zrzuty przed i po dla czterech ekranów.
   `npm run test` 130 zielonych, `node scripts/check-typography.mjs` kod 0, `npm run perf`
   kod 0, bundel `/calendar` 292,5 kB przy progu 301,6 kB.
 
-- [ ] **F4-06** `import` ⏳ ZABLOKOWANE: czeka na plik `.xlsx` od usera — dopasowanie do prawdziwego arkusza
+- [x] **F4-06** `import` Dopasowanie importu do prawdziwego arkusza
   CZYTAJ: `plan/04-import-excel.md` sekcje 1 i 4
   AC:
   - prawdziwy arkusz przechodzi suchy przebieg; raport podaje liczby: nowych,
     duplikatów, błędnych
   - aliasy kolumn uzupełnione o nazwy faktycznie występujące w pliku
-  - `git status --porcelain | grep -c 'xlsx'` zwraca `0`; plik żyje w `.data-import/`
+  - `git status --porcelain | grep -c 'xlsx'` zwraca `0`; plik żyje poza repozytorium
   - negatywne: żadne prawdziwe imię, handle ani telefon nie trafia do repozytorium,
     do testów ani do zrzutów ekranu
+  DOWÓD (2026-09-03): plik od usera przeczytany ze ścieżki poza repozytorium, nigdzie
+  nie kopiowany. Skoroszyt ma pięć arkuszy; nagłówki są w wierszu 1; arkusz twórców ma
+  28 kolumn, arkusz kamerzystów 12, mały arkusz kontaktów 5, dwa arkusze robocze
+  (szablony wiadomości, lista do weryfikacji) nie zawierają osób.
+  ROZJAZDY wobec `plan/04` sekcja 4: nieznane były nagłówki `Imię i nazwisko`,
+  `Nr telefonu` i `Notatka` (mały arkusz kontaktów) — doszły jako aliasy do
+  `FIELD_ALIASES` w `src/lib/import/mapping.ts`. W drugą stronę: arkusz twórców
+  **nie ma kolumny telefonu** (jest tylko w małym arkuszu kontaktów), a arkusz
+  kamerzystów nie ma ani telefonu, ani emaila. Kolumny robocze arkusza (priorytet,
+  etap produkcji, legendy, kolumny liczone formułą, kolumny bez nagłówka) nie mają
+  odpowiednika w bazie i zostają pomijane — świadomie, nie przez brak aliasu.
+  SUCHY PRZEBIEG I ZAPIS NA URUCHOMIONEJ APLIKACJI (`/import/osoby`, baza robocza
+  `marketing` w kontenerze `mc-pg`): arkusz twórców 294 wiersze → 148 nowych,
+  0 aktualizacji, 2 duplikaty (pary wewnątrz pliku), 32 wiersze z błędem, wszystkie
+  z powodem „brak nazwy", 112 wierszy pustych (mają wypełnione wyłącznie kolumny
+  robocze). Ekran po zapisie: „Dodano 148, zaktualizowano 0, pominięto 2. Wierszy
+  z błędem, nieprzepisanych do bazy: 32". `select count(*) from artists` 152 → 300.
+  Arkusz kamerzystów 17 wierszy → 14 nowych, 0 duplikatów, 3 z błędem „brak nazwy";
+  po zapisie `videographers` ma 14 wierszy, w tym 12 z handle i 14 ze statusem.
+  Mały arkusz kontaktów: 5 kolumn na 5 zmapowanych automatycznie, 1 nowa osoba,
+  0 błędów (sam suchy przebieg, bez zapisu).
+  MAPOWANIE BEZ RĘCZNEGO PRZESTAWIANIA: na ekranie kroku 3 dla arkusza twórców
+  proponuje się `Imię→Nazwa`, `Instagram→Handle`, `E-mail→Email`,
+  `Lokalizacja→Lokalizacja`, `Notatki→Notatki`; dla kamerzystów dodatkowo
+  `Status→Status`. Ani jedna kolumna nie wymagała ręcznej zmiany.
+  NORMALIZACJA SPRAWDZONA NA ZAPISANYCH DANYCH (zapytania zliczające, bez treści):
+  `handle` bez wiodącej małpy 0, `handle` z ukośnikiem albo z adresem instagram.com 0,
+  `email` bez kropki 0, `location` z małej litery 0, duplikaty `handle` w tabeli 0,
+  duplikaty `email` 0. W samym arkuszu handle bywa zapisany bez małpy (arkusz twórców:
+  171 wartości, wszystkie gołą nazwą) — normalizacja dokłada małpę.
+  DUPLIKATY W OBRĘBIE PLIKU: prawdziwy arkusz ma parę wierszy o tym samym handle
+  i dwie pary o tej samej nazwie z lokalizacją. `dryRun` znał wcześniej wyłącznie
+  stan bazy, więc obie strony pary wchodziły do bazy jako osobne osoby. Poprawione
+  w `src/lib/import/dry-run.ts`: wiersz porównuje się także z wierszami zaplanowanymi
+  wcześniej w tym samym przebiegu, a zderzenie jest zawsze pominięciem z podanym
+  numerem tamtego wiersza. Test: `src/lib/import/dry-run.test.ts`, „drugi wiersz
+  o tym samym handle jest duplikatem w pliku, nie nową osobą".
+  FIXTURE: `scripts/make-fixture-xlsx.ts` generuje teraz skoroszyt o **tych samych
+  nagłówkach i tej samej kolejności arkuszy** co prawdziwy plik, z danymi wyłącznie
+  wymyślonymi (1141 wierszy: 1000 twórców, 121 kamerzystów, 20 kontaktów).
+  DANE OSOBOWE, NEGATYWNE: `git ls-files | grep -c '\.xlsx$'` zwraca `0`, fixture
+  jest ignorowany wpisem `/tests/fixtures/*.xlsx`, a jedyne trafienie na `xlsx`
+  w `git status` to nazwa skryptu `scripts/make-fixture-xlsx.ts`. Pod katalogiem
+  roboczym nie ma kopii pliku usera (`find . -name '*.xlsx'` daje wyłącznie fixture).
+  416 unikalnych wartości osobowych z arkusza (imiona, handle, emaile, telefony)
+  sprawdzono skryptem jednorazowym przeciw KAŻDEMU plikowi śledzonemu przez gita:
+  w danych fixture'a 0 trafień (jedyne trafienie rozwiązuje się do nazwy kolumny,
+  a nazwy kolumn danymi osobowymi nie są). Zrzutów ekranu z prawdziwego pliku
+  nie ma — przebieg dowodowy zapisywał wyłącznie liczby.
+  ZNALEZISKA: **F7-44** (wiersze bez imienia, znane tylko z handle) i **F7-45**
+  (kolumna statusu arkusza twórców nie ma gdzie wejść).
 
 - [x] **F4-07** `import` `security` Wycofanie skryptu z danymi na sztywno
   CZYTAJ: `scripts/import-people.ts`, `plan/01` zasada Z14
@@ -3145,6 +3196,41 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - dowód: `node scripts/perf/drift-selftest.mjs` kod 0, a `npm run perf` na przebiegu
     z poprawą pokazuje `poprawa`, nie `ostrzeżenie`
   - negatywne: `npm run perf` kod 0, próg blokujący zachowuje się jak przed zmianą
+
+- [ ] **F7-44** `znalezisko` `import` Wiersz znany wyłącznie z Instagrama jest odrzucany
+  Waga: **ważne**. Szacunek: godzina plus decyzja usera. Znalezione w F4-06 na prawdziwym
+  arkuszu. `plan/04` sekcja 5 wymaga niepustego `name`, więc wiersz, który ma handle,
+  lokalizację i notatkę, ale nie ma imienia, kończy jako błąd „brak nazwy" i nie wchodzi
+  do bazy. W prawdziwym arkuszu to 32 wiersze twórców na 182 z jakąkolwiek treścią
+  i 3 wiersze kamerzystów na 17, a osobny arkusz roboczy ma kolejnych 38 takich pozycji.
+  To nie jest brud w danych, tylko sposób pracy usera: część osób prowadzi się po samym
+  Instagramie.
+  DO DECYZJI USERA, dwie drogi: (a) gdy `name` jest puste, a `handle` nie, import
+  podstawia handle jako nazwę i oznacza wiersz w podglądzie; (b) zostaje jak jest,
+  a user uzupełnia imiona w arkuszu. Rekomendacja: (a), bo alternatywa to ręczne
+  przepisanie 35 wierszy przy każdym imporcie.
+  CZYTAJ: `plan/04-import-excel.md` sekcja 5, `src/lib/import/normalize.ts`
+  AC:
+  - decyzja usera zapisana w `DECISIONS.md`
+  - przy wariancie (a): wiersz z samym handle daje osobę o nazwie równej handle,
+    podgląd oznacza go osobno, a test jednostkowy w `normalize.test.ts` to pilnuje
+  - dowód: suchy przebieg prawdziwego arkusza pokazuje 0 wierszy z błędem „brak nazwy"
+    tam, gdzie handle jest niepusty
+  - negatywne: wiersz bez imienia I bez handle nadal jest błędem, nie osobą bez nazwy
+
+- [ ] **F7-45** `znalezisko` `import` `db` Status twórcy z arkusza nie ma gdzie wejść
+  Waga: **drobne**. Szacunek: godzina. Znalezione w F4-06. Arkusz twórców ma kolumnę
+  statusu wypełnioną w 181 wierszach na 294 (siedem różnych wartości, tekst opisowy),
+  ale tabela `artists` nie ma kolumny `status` — ma ją tylko `videographers`
+  (migracja `0003`). Ekran importu świadomie nie proponuje pola `status` dla roli
+  twórcy, więc ta kolumna po prostu ginie i user nie dostaje o tym żadnego sygnału.
+  CZYTAJ: `plan/04-import-excel.md` sekcje 3 i 4, `drizzle/schema.ts`
+  AC:
+  - albo `artists` dostaje `status text` migracją addytywną i import go wypełnia,
+    albo ekran mówi wprost, że dla twórcy kolumna statusu zostanie pominięta
+  - dowód: suchy przebieg prawdziwego arkusza pokazuje status u twórców albo komunikat
+    o jego pominięciu; zrzut z fixture'a syntetycznego
+  - negatywne: `npm run perf` kod 0 (zmiana dotyka warstwy danych)
 
 ---
 

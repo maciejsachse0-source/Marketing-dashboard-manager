@@ -7,13 +7,13 @@ export const PERSON_FIELDS = ['name', 'handle', 'email', 'phone', 'location', 's
 export type PersonField = (typeof PERSON_FIELDS)[number];
 
 export const FIELD_ALIASES: Record<PersonField, readonly string[]> = {
-  name: ['imie', 'imię', 'nazwa', 'osoba', 'name', 'artysta', 'kamerzysta', 'twórca'],
+  name: ['imie', 'imię', 'imię i nazwisko', 'nazwa', 'osoba', 'name', 'artysta', 'kamerzysta', 'twórca'],
   handle: ['insta', 'instagram', 'ig', 'handle', 'profil', 'nick'],
   email: ['email', 'mail', 'e-mail', 'kontakt'],
-  phone: ['telefon', 'tel', 'phone', 'numer', 'komorka'],
+  phone: ['telefon', 'nr telefonu', 'tel', 'phone', 'numer', 'komorka'],
   location: ['lokalizacja', 'miasto', 'location', 'city', 'region'],
   status: ['status', 'dostepnosc', 'uwagi o statusie'],
-  notes: ['notatki', 'uwagi', 'komentarz', 'notes'],
+  notes: ['notatki', 'notatka', 'uwagi', 'komentarz', 'notes'],
 };
 
 /** Małe litery, bez znaków diakrytycznych, bez wszystkiego poza literami i cyframi. */

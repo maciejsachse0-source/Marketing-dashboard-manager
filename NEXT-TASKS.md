@@ -9,10 +9,12 @@ Wyłącznie sprawy czekające na usera. Żadna nie jest robotą do wzięcia:
 
 - **F7-23** — czyszczenie historii gita z dwóch prawdziwych handle z Instagrama.
   Czeka na decyzję usera, bo przepisanie historii jest jednokierunkowe.
+- **F7-44** — wiersze arkusza bez imienia, znane wyłącznie z handle na Instagramie.
+  Dwie drogi opisane w issue, rekomendacja: podstawiać handle jako nazwę.
+- **F7-45** — kolumna statusu w arkuszu twórców nie ma odpowiednika w `artists`.
 - **F7-29** — czy czas oglądania i CTR z arkuszy mają być widoczne na `/analytics`.
   Koszt obu wariantów opisany w `DECISIONS.md`. W `src/lib/csv-mappers.ts` stoi już
   komentarz mówiący wprost, których kolumn nie czytamy — samo znalezisko nie szkodzi.
-- **F4-06** — prawdziwy plik `.xlsx` od usera.
 - **F5-04** — publiczny adres środowiska podglądowego.
 - **F8-01 do F8-03** — bramka decyzyjna, pętla ma tu stanąć i zapytać.
 

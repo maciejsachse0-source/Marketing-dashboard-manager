@@ -36,6 +36,22 @@ describe('dryRun', () => {
     expect(wynik.empty).toBe(1);
   });
 
+  // F4-06: prawdziwy arkusz ma dwa wiersze o tym samym handle. Bez tego oba
+  // wchodziły do bazy jako osobne osoby.
+  it('drugi wiersz o tym samym handle jest duplikatem w pliku, nie nową osobą', () => {
+    const rows = [
+      ['Bea Nowa 0002', 'atrapa_0002', '', 'Kraków'],
+      ['Bea Nowa 0002 (kopia)', '@atrapa_0002', '', 'Kraków'],
+    ];
+
+    const wynik = dryRun(rows, MAPPING, 'artist', ISTNIEJACY, 'update');
+
+    expect(wynik.inserts).toBe(1);
+    expect(wynik.updates).toBe(0);
+    expect(wynik.skips).toBe(1);
+    expect(wynik.preview[1].detail).toBe('duplikat w pliku, ten sam co wiersz 2');
+  });
+
   it('polityka update zamienia pominięcie duplikatu pewnego na aktualizację', () => {
     const rows = [['Ala Kopia', '@atrapa_0001', 'nowy@przyklad.test', 'Warszawa']];
 

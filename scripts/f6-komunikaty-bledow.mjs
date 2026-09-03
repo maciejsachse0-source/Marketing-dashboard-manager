@@ -53,8 +53,11 @@ const raport = {};
   await zaloguj(page);
   await page.goto(`${BASE}/import/osoby`);
   await page.setInputFiles('input[type=file]', FIXTURE);
+  // Fixture ma układ prawdziwego skoroszytu: twórcy w arkuszu „Artyści" (F4-06).
+  await page.getByLabel('Arkusz', { exact: true }).click();
+  await page.getByRole('option', { name: /^Artyści/ }).click();
   await page.getByTestId('import-do-mapowania').click();
-  await page.getByLabel('Pole dla kolumny Uwagi').click();
+  await page.getByLabel('Pole dla kolumny Notatki').click();
   await page.getByRole('option', { name: 'Email' }).click();
   await page.getByTestId('import-mapping-conflict').waitFor();
   raport.kolizja = await page.evaluate(opisAlertow);

@@ -2,7 +2,8 @@
 
 Wypełnione przez agenta recenzenta 2026-09-03, po zamknięciu fazy F7, przed bramką F8.
 Lista jest zbudowana z issues, które naprawdę są skończone. Pozycje zablokowane
-(F4-06, F5-04 w części publicznego adresu, F7-23, F7-29, cała faza F8) nie mają tu wpisu,
+(F5-04 w części publicznego adresu, F7-23, F7-29, F7-44, F7-45, cała faza F8) nie mają
+tu wpisu,
 bo nie ma czego klikać.
 
 Aktualizacja 2026-09-03, po naprawie znalezisk recenzji: jedenaście uwag z końca
@@ -197,17 +198,19 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
 - [ ] **Arkusz syntetyczny powstaje jedną komendą i nie ma w nim prawdziwych osób**
       (F4-03, zasada Z14), terminal
   Uruchamiasz: `npx tsx scripts/make-fixture-xlsx.ts`, potem
-  `git status --porcelain | grep -c xlsx`.
+  `git ls-files | grep -c '\.xlsx$'`.
   Oczekujesz: plik `tests/fixtures/osoby.xlsx` powstaje, a licznik zwraca `0`,
-  czyli arkusz nie wchodzi do repozytorium. W arkuszu 1131 wierszy, wszystkie nazwy
-  to atrapy z licznika, domena `przyklad.test`.
+  czyli arkusz nie wchodzi do repozytorium. W arkuszu 1141 wierszy, wszystkie nazwy
+  to atrapy z licznika, domena `przyklad.test`. Od F4-06 fixture ma nagłówki i układ
+  arkuszy zdjęte z prawdziwego pliku, ale dane nadal wyłącznie wymyślone.
 
 - [ ] **Ekran importu prowadzi przez kroki od 1 do 4** (F4-04), `/import/osoby`
   Klikasz: przeciągnij `tests/fixtures/osoby.xlsx` na strefę zrzutu, wybierz arkusz
-  twórców i rolę, sprawdź mapowanie kolumn, przejdź do suchego przebiegu.
+  `Artyści` i rolę `Twórcy`, sprawdź mapowanie kolumn, przejdź do suchego przebiegu.
   Oczekujesz kolejno: strefa podświetla się przy przeciąganiu; po wgraniu widać nazwy
-  arkuszy i liczby wierszy; mapowanie ma wypełnione pola `Nazwa`, `Handle`, `E-mail`,
-  `Telefon`, `Lokalizacja`, `Uwagi`; podgląd podaje liczby nowych, duplikatów i błędnych.
+  arkuszy i liczby wierszy; mapowanie ma wypełnione pola `Nazwa` (kolumna `Imię`),
+  `Handle` (`Instagram`), `Email` (`E-mail`), `Lokalizacja` i `Notatki`, a kolumny
+  robocze arkusza zostają pomijane; podgląd podaje liczby nowych, duplikatów i błędnych.
   Zmiana mapowania przelicza podgląd bez ponownego wysyłania pliku.
 
 - [ ] **Ekran importu odrzuca zły plik komunikatem, nie awarią** (F4-04, zasada Z13),
@@ -256,10 +259,24 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   Do decyzji, świadomie otwarte: dane zostały w historii gita, jej czyszczenie
   to Twoja decyzja, opis w `docs/ARCHITEKTURA.md` sekcja 9 (issue F7-23).
 
+- [ ] **Import wczytuje prawdziwy arkusz bez ręcznego przestawiania kolumn** (F4-06),
+      `/import/osoby`
+  Klikasz: wgraj SWÓJ arkusz (ten sam, który dostał agent), wybierz arkusz z twórcami
+  i rolę `Twórcy`, obejrzyj krok mapowania, przejdź do suchego przebiegu.
+  Oczekujesz: `Imię`, `Instagram`, `E-mail`, `Lokalizacja` i `Notatki` mają już wybrane
+  pola, nic nie trzeba poprawiać ręcznie; suchy przebieg pokazuje 148 nowych,
+  2 duplikaty i 32 wiersze z błędem „brak nazwy". Te 32 wiersze to osoby, które w Twoim
+  arkuszu mają sam Instagram bez imienia — co z nimi zrobić, pyta issue **F7-44**.
+  Dla arkusza kamerzystów i roli `Kamerzyści`: 14 nowych i 3 wiersze z tym samym błędem.
+  Uwaga: zapis wpisuje prawdziwe osoby do bazy roboczej i to jest w porządku, ale plik
+  nigdy nie ma trafić do repozytorium.
+
 - [ ] **Cały import od pliku do bazy przechodzi automatem** (definicja ukończenia F4), terminal
   Uruchamiasz: `npx playwright test e2e/import-osoby.spec.ts`.
-  Oczekujesz: 16 zielonych scenariuszy, czas poniżej minuty. Testy chodzą po osobnej
+  Oczekujesz: 12 zielonych scenariuszy, czas poniżej minuty. Testy chodzą po osobnej
   bazie testowej, więc nic nie wchodzi do bazy roboczej.
+  (Poprzednia wersja tej pozycji mówiła o 16 scenariuszach — licznik był nieaktualny,
+  plik ma 12 testów i miał tyle również przed F4-06.)
 
 ---
 

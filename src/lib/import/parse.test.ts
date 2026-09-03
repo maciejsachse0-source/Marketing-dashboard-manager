@@ -19,29 +19,49 @@ async function fixtureSheets() {
 describe('parseWorkbook - fixture', () => {
   it('czyta wszystkie arkusze i ponad 1000 wierszy danych', async () => {
     const sheets = await fixtureSheets();
-    expect(sheets.map((s) => s.name)).toEqual(['Twórcy', 'Kamerzyści', 'Pusty']);
+    // Nazwy i kolejność arkuszy jak w prawdziwym skoroszycie (F4-06).
+    expect(sheets.map((s) => s.name)).toEqual([
+      'Kamerzyści',
+      'Arkusz1',
+      'Artyści',
+      'Szablony',
+      'Do weryfikacji',
+    ]);
     const rows = sheets.reduce((sum, s) => sum + s.rows.length, 0);
     expect(rows).toBeGreaterThanOrEqual(1000);
   });
 
-  it('nagłówki fixture mapują się automatycznie na wszystkie pola roli', async () => {
-    const [tworcy, kamerzysci] = await fixtureSheets();
-    expect(autoMap(tworcy.headers, 'artist')).toEqual(['name', 'handle', 'email', 'phone', 'location', 'notes']);
-    expect(autoMap(kamerzysci.headers, 'videographer')).toEqual([
+  it('nagłówki fixture mapują się automatycznie, bez ręcznego przestawiania', async () => {
+    const [kamerzysci, arkusz1, artysci] = await fixtureSheets();
+    // Prawdziwe nagłówki: reszta kolumn nie ma odpowiednika w bazie i zostaje pomijana.
+    expect(autoMap(artysci.headers, 'artist').filter(Boolean)).toEqual([
       'name',
       'handle',
       'email',
-      'phone',
       'location',
+      'notes',
+    ]);
+    expect(autoMap(kamerzysci.headers, 'videographer').filter(Boolean)).toEqual([
+      'name',
+      'handle',
       'status',
+      'location',
+      'notes',
+    ]);
+    // Arkusz z nagłówkami „Imię i nazwisko", „Nr telefonu" i „Notatka".
+    expect(autoMap(arkusz1.headers, 'artist').filter(Boolean)).toEqual([
+      'name',
+      'location',
+      'handle',
+      'phone',
       'notes',
     ]);
   });
 
   it('fixture zawiera wiersze błędne, puste i duplikaty', async () => {
-    const [tworcy] = await fixtureSheets();
-    const mapping = autoMap(tworcy.headers, 'artist');
-    const wyniki = tworcy.rows.map((cells) => normalizeRow(toRawRow(cells, mapping), 'artist'));
+    const [, , artysci] = await fixtureSheets();
+    const mapping = autoMap(artysci.headers, 'artist');
+    const wyniki = artysci.rows.map((cells) => normalizeRow(toRawRow(cells, mapping), 'artist'));
     expect(wyniki.filter((w) => w.kind === 'error').length).toBeGreaterThan(0);
     expect(wyniki.filter((w) => w.kind === 'empty').length).toBeGreaterThan(0);
     const handles = wyniki.flatMap((w) => (w.kind === 'ok' && w.person.handle ? [w.person.handle] : []));
@@ -97,7 +117,7 @@ describe('parseWorkbook - odrzucenia', () => {
 describe('parseWorkbook - arkusz bez danych', () => {
   it('arkusz z samym nagłówkiem daje zero wierszy, nie błąd', async () => {
     const sheets = await fixtureSheets();
-    const pusty = sheets.find((s) => s.name === 'Pusty');
+    const pusty = sheets.find((s) => s.name === 'Szablony');
     expect(pusty?.rows).toEqual([]);
   });
 });

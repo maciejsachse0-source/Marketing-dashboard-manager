@@ -659,11 +659,28 @@ pliku 10,0 MB (5000 wierszy): **50,5 MB** przy progu 300 MB. Pomiar zapisu wycof
 transakcję, więc nie zostawia w bazie ani jednego wiersza
 (`npx tsx scripts/perf/measure-import-save.ts`).
 
-**F4-06 świadomie odłożone.** Dopasowanie do prawdziwego arkusza czeka na plik `.xlsx`
-od usera. Nie było go, więc issue zostaje niezaznaczone. Zastępczego „prawdziwego"
-arkusza nie wymyślono: fixture syntetyczny (`scripts/make-fixture-xlsx.ts`, 3 arkusze,
-1131 wierszy z błędami i duplikatami) pokrywa całą resztę fazy, ale nie zastąpi
-sprawdzenia, jak naprawdę nazywają się kolumny w arkuszu usera.
+**F4-06 zamknięte 2026-09-03, po dostarczeniu pliku przez usera.** Prawdziwy arkusz
+czytany ze ścieżki poza repozytorium, nigdzie nie kopiowany, wczytany do bazy roboczej.
+Trzy decyzje z tego przebiegu.
+
+*Fixture przejmuje nagłówki prawdziwego arkusza, nie jego dane.* `scripts/make-fixture-xlsx.ts`
+generuje skoroszyt o tych samych nazwach arkuszy, tych samych nagłówkach i tej samej
+kolejności kolumn co plik usera, ale wypełnia je danymi wymyślonymi z licznika. To jedyny
+sposób utrwalenia wiedzy o formacie bez utrwalania osób: test end-to-end sprawdza teraz
+kształt, który naprawdę wchodzi do importu, a w repozytorium nie ma ani jednego prawdziwego
+imienia. Alternatywa — trzymanie prawdziwego pliku w `.data-import/` i celowanie w niego
+testem — odpada, bo test przestałby być odtwarzalny na innej maszynie.
+
+*Duplikat wewnątrz jednego pliku jest pomijany, nie aktualizowany.* Prawdziwy arkusz ma
+parę wierszy o tym samym handle. `dryRun` porównywał wiersz wyłącznie ze stanem bazy, więc
+obie strony pary wchodziły jako osobne osoby. Teraz wiersz porównuje się także z wierszami
+zaplanowanymi wcześniej w tym samym przebiegu, a zderzenie zawsze kończy się pominięciem
+z numerem tamtego wiersza w podglądzie. Aktualizacja odpada świadomie: przy dwóch wierszach
+tego samego pliku nie ma jak rozstrzygnąć, który jest nowszy.
+
+*Braku imienia nie zgadujemy z handle bez pytania usera.* 32 wiersze twórców i 3 kamerzystów
+mają handle, ale nie mają imienia. Podstawienie handle jako nazwy byłoby zmianą reguły
+z `plan/04` sekcja 5, więc idzie do usera jako **F7-44**, a nie jako cicha poprawka.
 
 **Dane osobowe.** `scripts/import-people.ts` usunięty (F4-07). Dane zostają w historii
 gita i wyjmie je stamtąd każdy, kto sklonuje repozytorium; czyszczenie historii to
@@ -1110,6 +1127,9 @@ z treści znaleziska pochodzi z baz syntetycznych (`marketing_perf`,
 `marketing_preview`). Baza robocza `marketing` ma **zero** kamerzystów — prawdziwy
 plik z osobami czeka na usera (F4-06). Skrypt jest więc gotowy i sprawdzony, ale
 jego przebieg na prawdziwych danych dopiero nastąpi.
+POPRAWKA 2026-09-03 (F4-06): baza robocza ma już 14 kamerzystów z prawdziwego arkusza,
+ale każdy wszedł przez import, czyli od razu do kolumn `handle`, `email` i `phone`.
+Ich `contact` jest puste, więc skrypt nadal nie ma tam nic do przeniesienia.
 
 **Sprawdzone na kopii, nie na oryginale.** Klon `marketing_perf` pod nazwą
 `marketing_f719` plus siedem wierszy dosypanych ręcznie, żeby trafić w każdą gałąź

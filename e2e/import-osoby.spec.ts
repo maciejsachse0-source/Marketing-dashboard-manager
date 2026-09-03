@@ -29,8 +29,15 @@ async function wgrajFixture(page: Page) {
   await expect(page.getByLabel('Arkusz', { exact: true })).toBeVisible();
 }
 
+/** Fixture ma układ prawdziwego skoroszytu: twórcy siedzą w arkuszu „Artyści". */
+async function wybierzArtystow(page: Page) {
+  await page.getByLabel('Arkusz', { exact: true }).click();
+  await page.getByRole('option', { name: /^Artyści/ }).click();
+}
+
 /** Krok 2 na 3: arkusz twórców, rola twórcy, propozycja mapowania. */
 async function doMapowania(page: Page) {
+  await wybierzArtystow(page);
   await page.getByTestId('import-do-mapowania').click();
   await expect(page.getByTestId('import-podsumowanie-na-zywo')).toBeVisible();
 }
@@ -92,7 +99,7 @@ test.describe('import osób, kroki 1 do 4', () => {
     await page.goto('/import/osoby');
     await wgrajFixture(page);
     await page.getByLabel('Arkusz', { exact: true }).click();
-    await page.getByRole('option', { name: /^Pusty/ }).click();
+    await page.getByRole('option', { name: /^Szablony/ }).click();
     await expect(page.getByTestId('import-pusty-arkusz')).toHaveText(
       'Arkusz nie zawiera wierszy z danymi',
     );
@@ -127,15 +134,15 @@ test.describe('import osób, kroki 1 do 4', () => {
     await wgrajFixture(page);
     await doMapowania(page);
 
-    await page.getByLabel('Pole dla kolumny Uwagi').click();
+    await page.getByLabel('Pole dla kolumny Notatki').click();
     await page.getByRole('option', { name: 'Email' }).click();
 
     const komunikat = page.getByTestId('import-mapping-conflict');
     await expect(komunikat).toContainText('E-mail');
-    await expect(komunikat).toContainText('Uwagi');
+    await expect(komunikat).toContainText('Notatki');
     await expect(page.getByTestId('import-do-podgladu')).toBeDisabled();
     await expect(page.getByLabel('Pole dla kolumny E-mail')).toHaveAttribute('aria-invalid', 'true');
-    await expect(page.getByLabel('Pole dla kolumny Uwagi')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByLabel('Pole dla kolumny Notatki')).toHaveAttribute('aria-invalid', 'true');
   });
 
   // Tabela zdarzeń: Tab przez mapowanie idzie w kolejności kolumn.
@@ -145,7 +152,7 @@ test.describe('import osób, kroki 1 do 4', () => {
     await doMapowania(page);
 
     await page.getByLabel('Pole dla kolumny Imię').focus();
-    const kolejnosc = ['Instagram', 'E-mail', 'Telefon', 'Miasto', 'Uwagi'];
+    const kolejnosc = ['Instagram', 'E-mail', 'W trakcie', 'Link', 'Lokalizacja'];
     for (const naglowek of kolejnosc) {
       await page.keyboard.press('Tab');
       await expect(page.getByLabel(`Pole dla kolumny ${naglowek}`)).toBeFocused();
@@ -171,7 +178,7 @@ test('fixture jest syntetyczny, bez prawdziwych danych', () => {
 });
 
 test.describe('import osób, kroki 5 do 7', () => {
-  // Ten blok wsypuje do bazy 975 osób. Od F7-21 idzie to do bazy TESTOWEJ,
+  // Ten blok wsypuje do bazy 960 osób. Od F7-21 idzie to do bazy TESTOWEJ,
   // czyszczonej i zasiewanej przed przebiegiem przez `scripts/e2e-serve.mjs`,
   // więc zamiast sprzątania po znaczniku `max(id)` po prostu opróżniamy tabelę.
   // Kolejność plików ma znaczenie: scenariusze, które potrzebują zasianych
@@ -229,7 +236,7 @@ test.describe('import osób, kroki 5 do 7', () => {
 
     const podsumowanie = page.getByTestId('import-podsumowanie');
     await expect(podsumowanie).toBeVisible({ timeout: 30_000 });
-    await expect(podsumowanie).toContainText('Dodano 975');
+    await expect(podsumowanie).toContainText('Dodano 960');
     const link = page.getByTestId('import-link-lista');
     await expect(link).toHaveText('Przejdź do artystów');
     await expect(link).toHaveAttribute('href', '/artists');

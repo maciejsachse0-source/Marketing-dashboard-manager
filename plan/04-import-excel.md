@@ -10,8 +10,19 @@ wpisane na sztywno w kodzie (160 linii, w tym pełne imiona i handle z Instagram
 pracujemy na fixture `tests/fixtures/osoby.xlsx`, generowanym skryptem
 `scripts/make-fixture-xlsx.ts` z danych syntetycznych (bez prawdziwych osób).
 
-Zakładany kształt, do potwierdzenia pierwszym prawdziwym plikiem (issue F4-06): jeden skoroszyt,
-osobne arkusze albo osobne bloki kolumn dla twórców i kamerzystów, nagłówki w wierszu 1.
+Kształt potwierdzony na prawdziwym pliku (issue F4-06, 2026-09-03): jeden skoroszyt,
+pięć arkuszy, nagłówki w wierszu 1, osobny arkusz dla twórców i osobny dla kamerzystów,
+plus trzy arkusze robocze (mały arkusz kontaktów, szablony wiadomości, lista do
+weryfikacji). Arkusz twórców ma 28 kolumn, z czego import dotyka pięciu; arkusz
+kamerzystów 12 kolumn, z czego import dotyka pięciu. Reszta to kolumny robocze
+(priorytet, etap produkcji, legendy, kolumny obliczane formułą, kolumny bez nagłówka)
+— import je pomija.
+
+Trzy rzeczy z prawdziwego pliku, których nie było w założeniu: (1) arkusz twórców
+nie ma kolumny telefonu, ma ją tylko mały arkusz kontaktów; (2) handle na Instagramie
+bywa zapisany bez małpy, samą nazwą; (3) część wierszy ma wyłącznie handle, bez imienia
+— dla importu to błąd „brak nazwy", bo `name` jest wymagane (znalezisko F7-44).
+
 Import NIE zakłada stałych nazw kolumn, tylko je proponuje (sekcja 3).
 
 Biblioteka: `exceljs`. Uzasadnienie względem zasady Z16: żadna z obecnych zależności
@@ -80,14 +91,18 @@ Propozycja automatyczna: dopasowanie nagłówka po znormalizowanej formie
 do listy aliasów:
 
 ```
-name      ← imie, imię, nazwa, osoba, name, artysta, kamerzysta, twórca
+name      ← imie, imię, imię i nazwisko, nazwa, osoba, name, artysta, kamerzysta, twórca
 handle    ← insta, instagram, ig, handle, profil, nick
 email     ← email, mail, e-mail, kontakt
-phone     ← telefon, tel, phone, numer, komorka
+phone     ← telefon, nr telefonu, tel, phone, numer, komorka
 location  ← lokalizacja, miasto, location, city, region
 status    ← status, dostepnosc, uwagi o statusie
-notes     ← notatki, uwagi, komentarz, notes
+notes     ← notatki, notatka, uwagi, komentarz, notes
 ```
+
+Aliasy „imię i nazwisko", „nr telefonu" i „notatka" doszły po pierwszym prawdziwym pliku
+(F4-06). Po nich wszystkie kolumny prawdziwego arkusza, dla których w bazie jest
+odpowiednik, dopasowują się same i nic nie trzeba przestawiać ręcznie.
 
 Nagłówek bez dopasowania trafia jako „pomijana" i wymaga świadomego wyboru usera.
 Kolumna zmapowana dwa razy do tego samego pola to błąd blokujący przejście dalej.
@@ -113,6 +128,12 @@ dla wiersza r:
              rola twórcy → pole ignorowane
   notes    = trim
 ```
+
+Duplikatów szukamy w dwóch zbiorach: wśród osób już w bazie oraz wśród wierszy
+zaplanowanych do wstawienia wcześniej w tym samym pliku. Drugi zbiór doszedł w F4-06,
+bo prawdziwy arkusz ma parę wierszy o tym samym handle i bez tego obie wchodziły
+do bazy jako osobne osoby. Wiersz zderzony z wcześniejszym wierszem pliku jest zawsze
+pomijany, nigdy aktualizowany, a podgląd podaje numer tamtego wiersza.
 
 Wykrywanie duplikatu, w tej kolejności, zawsze w obrębie jednej tabeli:
 1. `handle` niepuste i identyczne z istniejącym → duplikat pewny

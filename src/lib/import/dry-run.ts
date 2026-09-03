@@ -4,7 +4,7 @@
  * Ten sam kod liczy podgląd w przeglądarce i plan zapisu na serwerze, więc
  * podsumowanie nie może rozjechać się z tym, co faktycznie wejdzie do bazy.
  */
-import { planRow, type DuplicatePolicy, type ExistingPerson, type RowPlan } from './dedup';
+import { findDuplicate, planRow, type DuplicatePolicy, type ExistingPerson, type RowPlan } from './dedup';
 import type { PersonField } from './mapping';
 import { toRawRow } from './mapping';
 import { normalizeRow, type NormalizedPerson, type PersonRole } from './normalize';
@@ -42,6 +42,7 @@ const REASON_TEXT: Record<string, string> = {
 
 function planDetail(plan: RowPlan): string {
   if (plan.action === 'insert') return 'nowa osoba';
+  if (plan.reason === 'file') return `duplikat w pliku, ten sam co wiersz ${plan.id}`;
   const powod = REASON_TEXT[plan.reason] ?? plan.reason;
   if (plan.action === 'update') return `aktualizacja #${plan.id}, ${powod}`;
   const pewnosc = plan.level === 'certain' ? 'duplikat pewny' : 'duplikat prawdopodobny';
@@ -67,6 +68,10 @@ export function dryRun(
     plans: [],
   };
 
+  // Osoby zaplanowane do wstawienia w tym samym przebiegu, z `id` równym
+  // numerowi wiersza arkusza — służą wyłącznie do wykrycia duplikatu w pliku.
+  const planned: ExistingPerson[] = [];
+
   rows.forEach((cells, index) => {
     const line = index + 2;
     const result = normalizeRow(toRawRow(cells, mapping), role);
@@ -83,7 +88,15 @@ export function dryRun(
       return;
     }
 
-    const plan = planRow(result.person, role, existing, policy);
+    // Duplikat wewnątrz samego pliku: dwa wiersze arkusza o tym samym handle
+    // albo emailu. Bez tego oba trafiały do bazy jako nowe osoby, bo `existing`
+    // zna wyłącznie stan bazy sprzed importu (F4-06, prawdziwy arkusz ma taką parę).
+    const wPliku = findDuplicate(result.person, role, planned);
+    const plan: RowPlan =
+      wPliku.level === 'none'
+        ? planRow(result.person, role, existing, policy)
+        : { action: 'skip', id: wPliku.existing.id, level: 'certain', reason: 'file' };
+    if (plan.action === 'insert') planned.push({ ...result.person, id: line, role });
     out.plans.push({ line, person: result.person, plan });
     if (plan.action === 'insert') out.inserts += 1;
     else if (plan.action === 'update') out.updates += 1;
