@@ -1133,3 +1133,14 @@ więc wyczyszczenie kolumny opróżniłoby karty, mimo że dane leżałyby w baz
 To jest osobne issue **F7-32** i dopóki nie jest zamknięte, flagi czyszczącej
 się nie odpala. Przebieg wypełniający jest bezpieczny i odwracalny, bo `contact`
 zostaje.
+
+
+## F7-22 — znalezisko o złej ścieżce w `AGENTS.md` odrzucone jako nieaktualne
+
+Znalezisko mówiło, że wiersz „Import osób z arkusza" w `AGENTS.md` kieruje do
+nieistniejącego `plan/04-import-osob.md`. Na dzień rozliczania wiersz wskazuje
+`plan/04-import-excel.md` — poprawka weszła ubocznie przy F4-07
+(`git show 202e9c7 -- AGENTS.md`). Sprawdzenie całej tabeli (`test -e` dla każdej
+ścieżki w cudzysłowach odwrotnych) nie znajduje ani jednego brakującego pliku,
+więc nie ma czego naprawiać. Koszt utrzymania issue przy życiu byłby wyższy niż
+jego wartość: każda kolejna paczka czytałaby je i powtarzała ten sam grep.

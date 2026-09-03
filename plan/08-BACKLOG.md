@@ -2443,7 +2443,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   `npm run lint` 0 błędów i 37 ostrzeżeń, `npm run test` 223 zielone,
   `check-typography` 0, `check-trust-boundaries` 0 (74 punkty wejścia).
 
-- [ ] **F7-22** `znalezisko` `docs` `AGENTS.md` wskazuje nieistniejący plik planu
+- [x] **F7-22** `znalezisko` `docs` `AGENTS.md` wskazuje nieistniejący plik planu
   Znalezione przy F4-04. Wiersz „Import osób z arkusza" w `AGENTS.md` kieruje do
   `plan/04-import-osob.md`, a plik nazywa się `plan/04-import-excel.md`. Router, który
   wysyła w nieistniejące miejsce, kosztuje każdego agenta jedno zmarnowane szukanie.
@@ -2452,6 +2452,15 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - każda ścieżka wymieniona w tabeli `AGENTS.md` istnieje (dowód: pętla po ścieżkach
     z tabeli, `test -e` dla każdej, zero brakujących)
   - negatywne: treść wierszy tabeli poza ścieżkami nie zmienia się
+  ŚWIADOMIE ODRZUCONE, bo znalezisko jest nieaktualne — problem naprawił się przy
+  F4-07. Dowód: `git show 202e9c7 -- AGENTS.md` pokazuje podmianę
+  `plan/04-import-osob.md` na `plan/04-import-excel.md` w tym samym wierszu tabeli
+  (przy okazji usuwania `scripts/import-people.ts`). Kryterium sprawdzone dziś na
+  stanie drzewa: pętla po wszystkich ścieżkach w cudzysłowach odwrotnych z `AGENTS.md`
+  z `test -e` dla każdej daje **zero brakujących plików**; jedyny wynik negatywny to
+  skrót prozą `migrations/` w zdaniu „W `migrations/` nie grzeb ręcznie", w komórce,
+  która pełną ścieżkę `drizzle/migrations/` podaje wiersz wcześniej — to nie jest
+  wpis nawigacyjny, więc zostaje bez zmian.
 
 - [ ] **F7-23** `znalezisko` `security` Dwa prawdziwe handle z Instagrama zostały
   w kryterium akceptacji F4-07
