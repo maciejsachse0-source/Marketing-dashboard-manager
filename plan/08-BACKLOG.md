@@ -2727,7 +2727,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     lista w `DECISIONS.md`
   - negatywne: `npm run test` kod 0
 
-- [ ] **F7-31** `znalezisko` `ui` Kolory pasów T wpisane wprost, obok tabeli `FRAME_STYLE`
+- [x] **F7-31** `znalezisko` `ui` Kolory pasów T wpisane wprost, obok tabeli `FRAME_STYLE`
   Waga: **drobne**. Szacunek: godzina. Znalezione przy F7-13.
   `accentBorderFor` w `src/components/calendar/gantt-frames.tsx` zwraca
   `border-amber-400`, `border-violet-400` i `border-emerald-400` wpisane wprost,
@@ -2738,6 +2738,18 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   Trzeci kolor obramowania kółka podkroku nie ma dziś odpowiednika w `FRAME_STYLE`
   (jest `border` w odcieniu 400/55, potrzebny 400 bez przezroczystości), więc naprawa
   to dołożenie jednego pola do tabeli, nie samo podstawienie.
+  ZROBIONE 2026-09-03. `FRAME_STYLE` dostała pole `accentBorder` (odcień 400 bez
+  przezroczystości) z komentarzem, dlaczego nie wystarczy istniejące `border`
+  (400/70 jest za blade na kółku 24 px). `accentBorderFor` to teraz jedna linia:
+  `FRAME_STYLE[frame].accentBorder`.
+  Dowód AC: `grep -n "amber-400\|violet-400\|emerald-400" src/components/calendar/gantt-frames.tsx`
+  zwraca 6 linii, wszystkie z `FRAME_TONE` (pola `border` i `chip`), żadnej
+  z `accentBorderFor`. Wygląd bez zmian: zrzuty 1280x720 `/calendar?view=quarter`
+  przed i po, **0 różnych pikseli** (`scripts/perf/pngdiff.mjs`), w tym drugi zrzut
+  z rozwiniętym wierszem ganta, gdzie widać 1192 elementy z tą klasą — czyli ścieżka
+  kodu naprawdę była na obrazku. Bramki: typecheck 0, lint 0 błędów / 36 ostrzeżeń,
+  test 224 zielone, typografia 0, granice zaufania 0, perf 0 (`/calendar` 293,3 kB),
+  a11y 0 naruszeń.
   CZYTAJ: `src/components/calendar/gantt-frames.tsx`, `src/lib/category-colors.ts`
   AC:
   - `grep -n "amber-400\|violet-400\|emerald-400" src/components/calendar/gantt-frames.tsx`

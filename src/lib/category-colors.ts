@@ -47,6 +47,10 @@ export const FRAME_STYLE: Record<
     dot: string;
     faint: string;
     glow: string;
+    /** F7-31: obramowanie kółka podkroku na gancie — odcień 400 BEZ
+     *  przezroczystości. `border` (400/70 albo 400/55) jest za blady na
+     *  kółku 24 px, więc to osobne pole, nie wariant `border`. */
+    accentBorder: string;
   }
 > = {
   T1: {
@@ -60,6 +64,7 @@ export const FRAME_STYLE: Record<
     dot: 'bg-amber-500',
     faint: 'text-amber-700',
     glow: 'shadow-amber-200/70',
+    accentBorder: 'border-amber-400',
   },
   T2: {
     code: 'T2',
@@ -72,6 +77,7 @@ export const FRAME_STYLE: Record<
     dot: 'bg-violet-500',
     faint: 'text-violet-700',
     glow: 'shadow-violet-200/70',
+    accentBorder: 'border-violet-400',
   },
   T3: {
     code: 'T3',
@@ -84,5 +90,6 @@ export const FRAME_STYLE: Record<
     dot: 'bg-emerald-500',
     faint: 'text-emerald-700',
     glow: 'shadow-emerald-200/70',
+    accentBorder: 'border-emerald-400',
   },
 };

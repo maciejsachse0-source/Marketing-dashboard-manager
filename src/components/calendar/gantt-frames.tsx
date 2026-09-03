@@ -51,8 +51,7 @@ export const FRAME_TONE: Record<
 // samym rodzajem wiedzy — jak pas T wygląda — i bo `gantt-substep-bar.tsx`
 // nie może urosnąć ponad swoje 293 linie (zasada Z11).
 export function accentBorderFor(frame: WeekFrameCode): string {
-  if (frame === 'T1') return 'border-amber-400';
-  return frame === 'T2' ? 'border-violet-400' : 'border-emerald-400';
+  return FRAME_STYLE[frame].accentBorder;
 }
 
 export function stepCircleClass(args: {
