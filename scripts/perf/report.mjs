@@ -126,12 +126,14 @@ console.log(lines.join('\n'));
 const blockingDrifts = drifts.filter((d) => d.blocking);
 if (drifts.length > 0) {
   console.log(
-    `\nDRYF względem poprzedniego przebiegu (ostrzeżenie ${budget.driftPct}%, blokada ${budget.driftFailPct}% razem z ${budget.driftAbsFloorPct}% limitu):`,
+    `\nDRYF względem poprzedniego przebiegu (ostrzeżenie od ${budget.driftPct}% w górę, blokada od ${budget.driftFailPct}% razem z ${budget.driftAbsFloorPct}% limitu; zmiana w dół to poprawa):`,
   );
+  // F7-43: `driftVerdict` liczy wartość bezwzględną, więc na liście ląduje też
+  // POPRAWA. Słowo „ostrzeżenie" zostaje wyłącznie dla pogorszenia — ostrzeżenie
+  // o tym, że jest szybciej, uczy przewijać całą sekcję.
   for (const d of drifts) {
-    console.log(
-      `  ${d.blocking ? 'BLOKUJE' : 'ostrzeżenie'} ${d.label}: ${d.before} -> ${d.now} (${d.pct > 0 ? '+' : ''}${d.pct}%)`,
-    );
+    const slowo = d.blocking ? 'BLOKUJE' : d.pct < 0 ? 'poprawa    ' : 'ostrzeżenie';
+    console.log(`  ${slowo} ${d.label}: ${d.before} -> ${d.now} (${d.pct > 0 ? '+' : ''}${d.pct}%)`);
   }
 } else {
   console.log(`\nDRYF: brak zmian powyżej ${budget.driftPct}% względem poprzedniego przebiegu.`);

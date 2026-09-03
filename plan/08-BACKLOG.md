@@ -2989,12 +2989,21 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - negatywne: `npx playwright test` 22 zielone i 1 pominięty, `node scripts/a11y-audit.mjs`
     0 naruszeń
 
-- [ ] **F7-43** `znalezisko` `perf` `tooling` Dryf ostrzega także wtedy, gdy jest szybciej
+- [x] **F7-43** `znalezisko` `perf` `tooling` Dryf ostrzega także wtedy, gdy jest szybciej
   Waga: **drobne**. Szacunek: pół godziny. Znalezione w recenzji końcowej.
   `scripts/perf/drift.mjs` liczy `Math.abs(pct)`, więc do listy dryfu trafia również
   POPRAWA, a `report.mjs` wypisuje ją słowem `ostrzeżenie`
   (zaobserwowane: `hmrMs 1961 -> 466 (-76%)`). Ostrzeżenie o tym, że jest szybciej, uczy
   czytelnika przewijać całą sekcję, a wtedy prawdziwe ostrzeżenie też przepada.
+  ZROBIONE 2026-09-03. Wypis dryfu w `report.mjs` rozróżnia znak: `poprawa` dla zmiany
+  w dół, `ostrzeżenie` wyłącznie w górę, `BLOKUJE` bez zmian (i tak liczone tylko dla
+  znaku dodatniego, `driftVerdict` tego nie zmienia). Nagłówek sekcji mówi teraz
+  „ostrzeżenie od 15% w górę [...] zmiana w dół to poprawa".
+  Dowód AC: `node scripts/perf/report.mjs` na zastanych przebiegach wypisuje dokładnie
+  ten przypadek z recenzji jako `poprawa     hmrMs: 1961 -> 466 (-76%)`, a obok
+  `ostrzeżenie p95 home: 16.8 -> 20.6 (+23%)`; kod wyjścia 0.
+  `node scripts/perf/drift-selftest.mjs` kod 0 (866 par, 0 fałszywych alarmów,
+  0 przepuszczonych regresji) — reguła blokowania nietknięta.
   CZYTAJ: `scripts/perf/drift.mjs`, `scripts/perf/report.mjs`, `scripts/perf/drift-selftest.mjs`
   AC:
   - zmiana ujemna wypisuje się jako `poprawa`, słowo `ostrzeżenie` zostaje wyłącznie
