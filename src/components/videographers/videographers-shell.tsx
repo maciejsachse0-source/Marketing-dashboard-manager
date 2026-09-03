@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Wallet, Calendar, Pencil, Search, Film, Mail } from 'lucide-react';
+import { Camera, Wallet, Calendar, Pencil, Search, Film, Mail, Phone, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/empty-state';
@@ -10,6 +10,7 @@ import { VideographerDialog } from './videographer-dialog';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
 import { InlineEdit } from '@/components/inline-edit';
 import { useShortcut } from '@/lib/use-shortcut';
+import { contactField } from '@/lib/import/normalize';
 import { updateVideographer } from '@/server/actions/videographers';
 import type { Videographer } from '../../../drizzle/schema';
 
@@ -39,15 +40,7 @@ export function VideographersShell({ rows }: { rows: VideographerRow[] }) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return rows;
-    return rows.filter(({ videographer: v }) => {
-      return (
-        v.name.toLowerCase().includes(q) ||
-        v.contact?.toLowerCase().includes(q) ||
-        v.equipment?.toLowerCase().includes(q) ||
-        v.availabilityNotes?.toLowerCase().includes(q) ||
-        v.notes?.toLowerCase().includes(q)
-      );
-    });
+    return rows.filter(({ videographer: v }) => pasuje(v, q));
   }, [rows, query]);
 
   return (
@@ -99,6 +92,36 @@ export function VideographersShell({ rows }: { rows: VideographerRow[] }) {
   );
 }
 
+/** Czy którekolwiek pole tekstowe kamerzysty zawiera szukaną frazę. Wyniesione
+ *  z `useMemo`, bo osiem alternatyw to osiem gałęzi w liczniku złożoności. */
+function pasuje(v: Videographer, q: string): boolean {
+  const pola = [
+    v.name,
+    v.handle,
+    v.email,
+    v.phone,
+    v.contact,
+    v.equipment,
+    v.availabilityNotes,
+    v.notes,
+  ];
+  return pola.some((pole) => pole?.toLowerCase().includes(q));
+}
+
+/** Kontakty do pokazania na karcie (F7-32). Kolumny własne mają pierwszeństwo;
+ *  zastane `contact` wchodzi tylko wtedy, gdy żadna z nich nic nie ma, a o jego
+ *  kształt pyta `contactField` — tę samą regułę co import, nie drugą jej kopię. */
+function kontaktyDla(v: Videographer): { klucz: string; Ikona: typeof Mail; tekst: string }[] {
+  const out: { klucz: string; Ikona: typeof Mail; tekst: string }[] = [];
+  if (v.email) out.push({ klucz: 'email', Ikona: Mail, tekst: v.email });
+  if (v.phone) out.push({ klucz: 'phone', Ikona: Phone, tekst: v.phone });
+  if (v.handle) out.push({ klucz: 'handle', Ikona: AtSign, tekst: v.handle });
+  if (out.length > 0 || !v.contact) return out;
+  const IKONY = { email: Mail, phone: Phone, handle: AtSign } as const;
+  const rodzaj = contactField(v.contact);
+  return [{ klucz: 'contact', Ikona: rodzaj ? IKONY[rodzaj] : Camera, tekst: v.contact }];
+}
+
 function VideographerCard({
   videographer: v,
   productionCount,
@@ -110,8 +133,7 @@ function VideographerCard({
   onEdit: () => void;
   onSaveNotes: (next: string) => Promise<void>;
 }) {
-  const isEmail = v.contact?.includes('@');
-  const ContactIcon = isEmail ? Mail : Camera;
+  const kontakty = kontaktyDla(v);
 
   return (
     <div className="group rounded-xl border border-border bg-card p-5 hover:shadow-md hover:border-foreground/20 transition flex flex-col">
@@ -156,12 +178,14 @@ function VideographerCard({
         />
       </div>
 
-      {v.contact ? (
+      {kontakty.length > 0 ? (
         <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5 truncate">
-            <ContactIcon className="size-3 shrink-0" />
-            <span className="truncate">{v.contact}</span>
-          </span>
+          {kontakty.map(({ klucz, Ikona, tekst }) => (
+            <span key={klucz} className="flex items-center gap-1.5 truncate">
+              <Ikona className="size-3 shrink-0" />
+              <span className="truncate">{tekst}</span>
+            </span>
+          ))}
         </div>
       ) : null}
 

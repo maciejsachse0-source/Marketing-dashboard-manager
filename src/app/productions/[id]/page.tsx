@@ -258,9 +258,10 @@ export default async function ProductionDetailPage({
           <PersonHeader
             kind="videographer"
             name={videographer.name}
-            email={videographer.contact}
-            phone={null}
-            handle={null}
+            // F7-32: własne kolumny z migracji 0003, `contact` tylko awaryjnie.
+            email={videographer.email ?? videographer.contact}
+            phone={videographer.phone}
+            handle={videographer.handle}
             bio={videographer.notes}
             equipment={videographer.equipment}
             campaignName={campaign?.name}

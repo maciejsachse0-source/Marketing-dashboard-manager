@@ -19,6 +19,9 @@ import { fieldText } from '@/lib/utils';
 
 type FormState = {
   name: string;
+  handle: string;
+  email: string;
+  phone: string;
   contact: string;
   hourlyRate: string;
   equipment: string;
@@ -31,12 +34,33 @@ function initial(v?: Videographer | null): FormState {
   const d: Partial<Videographer> = v ?? {};
   return {
     name: fieldText(d.name),
+    handle: fieldText(d.handle),
+    email: fieldText(d.email),
+    phone: fieldText(d.phone),
     contact: fieldText(d.contact),
     hourlyRate: fieldText(d.hourlyRate),
     equipment: fieldText(d.equipment),
     availabilityNotes: fieldText(d.availabilityNotes),
     avatarUrl: fieldText(d.avatarUrl),
     notes: fieldText(d.notes),
+  };
+}
+
+/** Formularz na kształt akceptowany przez akcję. Wyniesione z `submit`, bo
+ *  dziesięć `trim() || null` to dziesięć gałęzi i lint liczy je do złożoności. */
+function doZapisu(form: FormState) {
+  const t = (v: string) => v.trim() || null;
+  return {
+    name: form.name.trim(),
+    handle: t(form.handle),
+    email: t(form.email),
+    phone: t(form.phone),
+    contact: t(form.contact),
+    hourlyRate: form.hourlyRate ? Number(form.hourlyRate) : null,
+    equipment: t(form.equipment),
+    availabilityNotes: t(form.availabilityNotes),
+    avatarUrl: t(form.avatarUrl),
+    notes: t(form.notes),
   };
 }
 
@@ -63,15 +87,7 @@ export function VideographerDialog({
 
   const submit = () => {
     setError(null);
-    const payload = {
-      name: form.name.trim(),
-      contact: form.contact.trim() || null,
-      hourlyRate: form.hourlyRate ? Number(form.hourlyRate) : null,
-      equipment: form.equipment.trim() || null,
-      availabilityNotes: form.availabilityNotes.trim() || null,
-      avatarUrl: form.avatarUrl.trim() || null,
-      notes: form.notes.trim() || null,
-    };
+    const payload = doZapisu(form);
     if (!payload.name) {
       setError('Imię nie może być puste');
       return;
@@ -126,14 +142,45 @@ export function VideographerDialog({
             <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="contact">Kontakt</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="contact"
-              value={form.contact}
-              onChange={(e) => setForm({ ...form, contact: e.target.value })}
-              placeholder="email / telefon / IG handle"
+              id="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="np. anna@kamera.pl"
             />
           </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="phone">Telefon</Label>
+            <Input
+              id="phone"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="np. +48 601 234 567"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="handle">Nick / Instagram</Label>
+            <Input
+              id="handle"
+              value={form.handle}
+              onChange={(e) => setForm({ ...form, handle: e.target.value })}
+              placeholder="np. @kamerzysta"
+            />
+          </div>
+          {/* F7-32: pole zastane. Pokazujemy je tylko wtedy, gdy naprawdę coś
+              w nim siedzi — dla nowych kamerzystów nie ma po co istnieć. */}
+          {form.contact ? (
+            <div className="grid gap-1.5">
+              <Label htmlFor="contact">Kontakt (pole zastane)</Label>
+              <Input
+                id="contact"
+                value={form.contact}
+                onChange={(e) => setForm({ ...form, contact: e.target.value })}
+                placeholder="email / telefon / IG handle"
+              />
+            </div>
+          ) : null}
           <div className="grid gap-1.5">
             <Label htmlFor="rate">Stawka godzinowa (PLN)</Label>
             <Input

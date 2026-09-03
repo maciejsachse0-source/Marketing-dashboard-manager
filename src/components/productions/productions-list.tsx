@@ -174,7 +174,13 @@ function PersonGroup({
 }) {
   const handle = kind === 'artist' ? (person as Artist).handle : null;
   const subtitle =
-    kind === 'artist' ? handle : (person as Videographer).contact ?? 'kamerzysta';
+    kind === 'artist'
+      ? handle
+      : // F7-32: podpis kamerzysty z własnych kolumn, `contact` tylko awaryjnie.
+        ((person as Videographer).handle ??
+          (person as Videographer).email ??
+          (person as Videographer).contact ??
+          'kamerzysta');
 
   return (
     <div>

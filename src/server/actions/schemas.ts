@@ -130,7 +130,14 @@ export type OutreachInput = z.infer<typeof outreachInputSchema>;
 
 export const videographerInputSchema = z.object({
   name: z.string().min(1).max(120),
+  // F7-32: `contact` to pole ZASTANE — jedna linijka, w której siedział albo mail,
+  // albo telefon, albo nick. Migracja 0003 dołożyła trzy własne kolumny; formularz
+  // i karta pracują na nich, `contact` zostaje tylko dla wierszy, których
+  // `scripts/split-videographer-contact.ts` nie umiał rozpoznać.
   contact: z.string().max(200).optional().nullable(),
+  handle: z.string().max(120).optional().nullable(),
+  email: z.string().max(200).optional().nullable(),
+  phone: z.string().max(60).optional().nullable(),
   hourlyRate: z.number().min(0).optional().nullable(),
   equipment: z.string().max(2000).optional().nullable(),
   availabilityNotes: z.string().max(1000).optional().nullable(),

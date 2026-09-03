@@ -2363,9 +2363,12 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   z treści znaleziska pochodzi z baz syntetycznych. `marketing_preview` przeniesione
   (**36 email**, `contact` nietknięty); `marketing_perf` celowo pominięte, bo na niej
   stoi punkt odniesienia pomiarów.
-  **`--clear-contact` nie zostało uruchomione na żadnej prawdziwej bazie** i nie
-  powinno, dopóki nie zamknie się **F7-32**: ekran kamerzystów i karta produkcji nadal
-  czytają wyłącznie `contact`.
+  **`--clear-contact` nie zostało uruchomione na żadnej prawdziwej bazie.**
+  Blokada zdjęta 2026-09-03 razem z **F7-32**: interfejs czyta już `handle`, `email`
+  i `phone` z ich własnych kolumn, więc czyszczenie `contact` niczego nie opróżnia
+  (dowód: zrzuty przed i po czyszczeniu różnią się o 0 pikseli). Samo uruchomienie
+  na `marketing_preview` zostawiam userowi — to operacja jednokierunkowa, a korzyść
+  jest kosmetyczna. Kryteria F7-19 są tym samym spełnione w całości.
 
 **DoD F7:** każde znalezisko ma issue; każde issue ma dyspozycję: zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
@@ -2758,7 +2761,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - negatywne: wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs`,
     zrzut 1280x720 przed i po, poniżej progu 1 680 pikseli), `npm run test` kod 0
 
-- [ ] **F7-32** `znalezisko` `ui` `db` Ekran kamerzystów czyta wyłącznie stare `contact`
+- [x] **F7-32** `znalezisko` `ui` `db` Ekran kamerzystów czyta wyłącznie stare `contact`
   Znalezione przy F7-19. Migracja 0003 dołożyła `handle`, `email`, `phone`, a
   `scripts/split-videographer-contact.ts` umie już przenieść do nich treść ze starego
   pola — ale interfejs tych kolumn nie zna. `src/components/videographers/videographers-shell.tsx`
@@ -2769,6 +2772,24 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   Skutek: dopóki to stoi, uruchomienie `--clear-contact` opróżni karty kamerzystów,
   mimo że dane są w bazie. Dlatego flaga nie została odpalona na żadnej prawdziwej bazie.
   Waga: **ważne** (blokuje domknięcie F7-19). Szacunek: pół dnia.
+  ZROBIONE 2026-09-03. Karta kamerzysty pokazuje `email`, `phone` i `handle` z ich
+  własnych kolumn (`kontaktyDla`), `contact` renderuje się wyłącznie wtedy, gdy żadna
+  z trzech nic nie ma, a o jego kształt pyta `contactField` — druga kopia heurystyki
+  zniknęła (`grep -rn "contact?.includes('@')" src` zwraca **0**). Wyszukiwarka szuka
+  po wszystkich czterech polach. Formularz ma trzy nowe pola, `contact` pokazuje się
+  w nim tylko dla wierszy, które je jeszcze mają, i jest opisany jako pole zastane.
+  `videographerInputSchema` przyjmuje `handle`, `email` i `phone`.
+  `PersonHeader` na `/productions/<id>` bierze `email ?? contact`, `phone` i `handle`;
+  podpis na `productions-list.tsx` to `handle ?? email ?? contact ?? 'kamerzysta'`.
+  Dowód na uruchomionej aplikacji, cztery testowe wiersze (email, telefon, nick,
+  kształt nierozpoznany): po `--apply --clear-contact` karta nadal pokazuje wszystkie
+  cztery kontakty, a zrzuty 1280x720 `/videographers` przed i po czyszczeniu różnią się
+  o **0 pikseli**. Formularz zapisuje komplet (`email`, `phone`, `handle` sprawdzone
+  w bazie po zapisie z przeglądarki). Strona produkcji z kamerzystą bez artysty
+  wypisuje `@nowy.handle`, `nowy@kamera.pl` i `+48 700 111 222`.
+  Dane testowe skasowane, `marketing` znów ma zero kamerzystów.
+  Trzy błędy lintu `complexity`, które pojawiły się po drodze, zdjęte przez wyniesienie
+  `pasuje`, `kontaktyDla` i `doZapisu` do czystych funkcji — ostrzeżeń nadal 36, błędów 0.
   CZYTAJ: `src/components/videographers/videographers-shell.tsx`,
   `src/components/videographers/videographer-dialog.tsx`,
   `src/app/productions/[id]/page.tsx`, `src/components/productions/productions-list.tsx`
