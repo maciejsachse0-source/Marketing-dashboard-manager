@@ -10,49 +10,62 @@ Kolejka: `plan/08-BACKLOG.md`. Kontekst mierzony, nigdy szacowany.
 
 ## Stan repozytorium
 
-- Ostatni commit przebudowy: `b4d06ee` (F0-04)
-- Ostatnie odhaczone issue: **F0-04**
-- Następne issue: **F0-05** (szczegóły przekazania: `NEXT-TASKS.md`)
+- Ostatni commit przebudowy: `13ff35e`
 - Gałąź: `main`
+- **Wszystkie fazy budowlane F0 do F7 są zamknięte.** Przegląd końcowy wykonany,
+  jedenaście znalezisk recenzenta dopisane jako issues F7-33 do F7-43 i wykonane.
+- `WERYFIKACJA.md` (481 linii) czeka na odbiór przez usera.
+- Następny krok: **bramka decyzyjna F8**, czeka na decyzje usera.
 
 ## Ukończone issues
 
-F0-00, F0-01, F0-02, F0-03, F0-04. Każde odhaczone w `plan/08-BACKLOG.md`
-z wklejonym dowodem, commit per issue.
+F0 (osiem), F1 (cztery), F2 (sześć), F3 (osiem), F4 (siedem z ośmiu), F5 (cztery,
+jedno kryterium F5-04 otwarte), F6 (trzy), F7 (czterdzieści jeden z czterdziestu trzech).
+
+## Stan bramek na ostatnim commicie
+
+`npm run typecheck` 0 · `npm run lint` 0 błędów, 35 ostrzeżeń · `npm run test` 224 zielone
+· `node scripts/check-typography.mjs` 0 (pilnuje też twardych kolorów, strzałek
+i `force-dynamic`) · `node scripts/check-trust-boundaries.mjs` 0 (72 punkty wejścia)
+· `npm run perf` 0 (bundel `/calendar` 293,4 kB przy progu 301,6 kB, zestaw L zgodny
+co do wiersza) · `node scripts/a11y-audit.mjs` 0 naruszeń · `npx playwright test`
+22 zielone, 1 pominięty świadomie.
 
 ## Otwarte problemy i pułapki
 
-- `README.md` i `CLAUDE.md` w repozytorium opisują SQLite, a kod używa Postgresa.
-  Nie ufaj im do czasu ukończenia F0-07.
-- Dev server domyślnie chodzi na webpacku z 4 GB heapu. To objaw, nie ustawienie
-  do skopiowania. Decyzja o bundlerze zapada w F2-05 na podstawie pomiaru.
-- Dwie dostawy od usera są potrzebne po drodze: `DATABASE_URL` (F0-01) i plik `.xlsx`
-  z osobami (F4-06). Oba issues mają wariant zapasowy, więc budowa nie stoi.
-- `DATABASE_URL` nie przyszedł, więc F0-01 poszło wariantem zapasowym: baza stoi
-  w kontenerze Docker `mc-pg` na porcie 5433. Trzeba go wstawić przed pracą
-  (`docker start mc-pg`). Liczby wydajnościowe są przez to porównywalne między sobą,
-  ale nie są prognozą produkcji.
-- ESLint jest przypięty do 9.x. Wersja 10 wysypuje wtyczkę react z `eslint-config-next`.
+- Baza stoi w kontenerze Docker `mc-pg` na porcie 5433 (`docker start mc-pg`), bo
+  `DATABASE_URL` od usera nie przyszedł. Liczby są porównywalne między sobą, ale nie są
+  prognozą produkcji.
+- Historia gita nadal zawiera prawdziwe dane osobowe z usuniętego `scripts/import-people.ts`.
+  Usunięcie pliku tego nie czyści. Decyzja usera, patrz F7-23 i `docs/ARCHITEKTURA.md` sekcja 9.
 - Pomiar kontekstu workera: `bash ~/.claude/agent-context.sh 1000000`. ARGUMENT JEST
-  OBOWIĄZKOWY, okno modelu to 1 000 000, a domyślna stała skryptu to 200 000, więc bez
-  niego wynik jest pięć razy zawyżony. Skrypt naprawiony 2026-09-02 (szukał transkryptu
-  po złym katalogu i zwracał `NO-TRANSCRIPT`), szczegóły w `DECISIONS.md`.
-- Pełna lista pułapek i stan środowiska: `NEXT-TASKS.md`.
+  OBOWIĄZKOWY, okno modelu to 1 000 000, bez niego wynik jest pięć razy zawyżony.
+- Szum zrzutów ekranu wynosi 0 pikseli poza widokiem ganta, gdzie sięga około 4000.
+  Dowody wizualne dla ganta bierz z wartości wyliczonej stylu, nie z `pngdiff`.
+- Szum czasowy między przebiegami sięga 40%. Wnioski wydajnościowe z mediany trzech przebiegów.
+- Pełny stan środowiska i pułapki narzędziowe: `NEXT-TASKS.md` oraz `DECISIONS.md`.
 
 ## Znaczniki
 
 - `STOP-GATE:` — pętla zatrzymana, czeka na decyzję usera
 - `BLOCKED-ASK-USER:` — brakuje danych wejściowych od usera
 
-`BLOCKED-ASK-USER:` publiczny adres środowiska podglądowego (F5-04). Środowisko stoi
-i działa lokalnie oraz w sieci lokalnej, brakuje wyłącznie decyzji usera: (a) `tailscale
-funnel` na porcie 443, który dziś zajmuje vibe-kanban, albo (b) hosting, co wymaga
-wypchnięcia repozytorium poza tę maszynę, a w historii gita nadal siedzą prawdziwe dane
-osobowe. Niezależnie od wyboru potrzebna osobna para `AUTH_EMAIL` i `AUTH_PASSWORD`
-dla podglądu.
+`STOP-GATE: bramka decyzyjna F8.` Pętla zatrzymana przed ostatnią fazą. Do rozstrzygnięcia
+przez usera: F8-01 (czy wdrażamy na produkcję), F8-02 (czy zmieniamy stack; budżety są
+spełnione, więc rekomendacja brzmi „nie"), F8-03 (opcjonalne, logowanie i role, praca
+nieplanowana).
 
-`BLOCKED-ASK-USER:` trzy pytania o produkcję z `docs/ARCHITEKTURA.md` sekcja 2
-(aktywna domena, dostęp do panelu Vercela, los padniętego wdrożenia z 2026-05-03).
-To jedyny niespełniony punkt Definition of Done fazy F0. Nie blokuje fazy F1, bo indeksy
-i zapytania nie zależą od faktów o produkcji, więc pętla jedzie dalej, a punkt zostaje
-otwarty do czasu odpowiedzi usera.
+`BLOCKED-ASK-USER: F4-06` — plik `.xlsx` z twórcami i kamerzystami. Import działa
+na fixture syntetycznym, dopasowanie do prawdziwych nagłówków czeka.
+
+`BLOCKED-ASK-USER: F5-04` — publiczny adres środowiska podglądowego. Środowisko działa
+lokalnie i w sieci lokalnej. Wybór: `tailscale funnel` (zajmuje port 443, na którym stoi
+vibe-kanban) albo hosting (wymaga wypchnięcia repozytorium poza tę maszynę, a w historii
+gita siedzą dane osobowe). Niezależnie od wyboru potrzebna osobna para `AUTH_EMAIL`
+i `AUTH_PASSWORD`.
+
+`BLOCKED-ASK-USER: F7-23` — czyszczenie historii gita z danych osobowych. Przepisuje
+wszystkie commity, zmienia każdy hash, wymusza ponowne sklonowanie.
+
+`BLOCKED-ASK-USER: F7-29` — czy czas oglądania i CTR mają być widoczne na `/analytics`.
+Trzy kolumny arkusza CSV są wczytywane i nigdzie nie lądują.
