@@ -1,0 +1,22 @@
+import { getSessionEmail } from '@/lib/auth';
+import { env } from '@/lib/env';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+/**
+ * Znacznik tożsamości serwera (F7-18). Odpowiada nazwą bazy, na której ten proces
+ * naprawdę stoi, żeby `e2e/global-setup.ts` mógł odmówić przebiegu, gdy port 3000
+ * trzyma cudzy serwer z cudzą bazą (`npm run perf:serve` na `marketing_perf`).
+ *
+ * Granica zaufania (Z13): brak wejścia, więc nie ma czego walidować. Odpowiedź jest
+ * za `getSessionEmail`, bo sama nazwa bazy nie jest sekretem, ale nie ma powodu
+ * rozdawać jej komukolwiek. Nazwa czytana z `DATABASE_URL`, bez zapytania do bazy —
+ * to ma być tani znacznik, nie kolejny odczyt.
+ */
+export async function GET() {
+  if (!(await getSessionEmail())) {
+    return Response.json({ error: 'brak sesji' }, { status: 401 });
+  }
+  return Response.json({ db: new URL(env.DATABASE_URL).pathname.slice(1) });
+}

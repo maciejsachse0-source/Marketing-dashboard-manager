@@ -2285,7 +2285,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   `_backup*`, z wyjątkiem klucza `systemPrompt`; test negatywny (wstawiony myślnik)
   daje kod 1 z nazwą pliku i pola. Z7 w `plan/01` dostał ten zakres.
 
-- [ ] **F7-18** `znalezisko` `test` `tooling` `npx playwright test` po cichu bierze
+- [x] **F7-18** `znalezisko` `test` `tooling` `npx playwright test` po cichu bierze
   cudzy serwer i cudzą bazę
   Znalezione przy zamykaniu F3. `playwright.config.ts` ma `reuseExistingServer: true`,
   więc gdy na porcie 3000 stoi cokolwiek innego niż `npm run dev` (na przykład
@@ -2304,6 +2304,22 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     o niewłaściwym serwerze, a nie dwoma czerwonymi testami
   - negatywne: przy poprawnie wystawionym `npm run dev` przebieg nadal daje 8 zielonych
     i nie wydłuża się o więcej niż 2 sekundy
+
+  **DYSPOZYCJA: ZROBIONE.** `e2e/global-setup.ts` przed pierwszym testem pyta serwer
+  pod `E2E_BASE_URL` o `/api/health` i porównuje odpowiedź z nazwą bazy z `DATABASE_URL`
+  runnera (nadpisywalne przez `E2E_EXPECTED_DB`). Endpoint (`src/app/api/health/route.ts`)
+  jest za sesją i czyta nazwę z `DATABASE_URL`, bez zapytania do bazy. Ciasteczko sesji
+  podpisujemy w setupie tym samym sekretem co aplikacja, zamiast logować się przez
+  przeglądarkę — start chromium kosztowałby sekundy, a to sprawdzenie ma być darmowe.
+  Dowód pozytywny: przy `npm run perf:serve` na porcie 3000 `npx playwright test`
+  kończy się komunikatem „Serwer na http://localhost:3000 stoi na bazie
+  \"marketing_perf\", a testy zakładają \"marketing\"" i nie uruchamia ani jednego testu.
+  Dowód negatywny: na `npx next start` z bazą roboczą **22 zielone w 24,7 s**;
+  samo sprawdzenie to jedno żądanie, zmierzone **28 ms** (limit z kryterium: 2000 ms).
+  Przy tym `scripts/check-trust-boundaries.mjs` dostał dla handlerów `route.ts` tę samą
+  regułę, którą miał już dla akcji serwerowych: handler bez parametru nie dostaje
+  `Request`, więc nie ma w nim wejścia do walidacji. Punktów wejścia 73 → **74**, bez
+  schematu mimo argumentów **0**.
 
 - [ ] **F7-19** `znalezisko` `db` `import` Przeniesienie danych z `videographers.contact`
   do `handle` i `email`

@@ -59,8 +59,12 @@ for (const plik of plikiPod(path.join(ROOT, 'src/app/api'), (n) => n === 'route.
   const wzgl = path.relative(ROOT, plik);
   for (const b of bloki(kod, /export async function (GET|POST|PUT|PATCH|DELETE)\s*\(/g)) {
     const s = schematy(b.cialo);
-    wiersze.push({ plik: wzgl, punkt: b.nazwa, schematy: s });
-    if (s.length === 0) bledy += 1;
+    // Handler bez parametru nie dostaje `Request`, więc nie czyta ani ciała, ani
+    // adresu, ani nagłówków zapytania — nie ma tam wejścia do sprawdzenia. Ta sama
+    // reguła co dla akcji serwerowych niżej (F7-18, `src/app/api/health/route.ts`).
+    const argumenty = maArgumenty(b.cialo);
+    wiersze.push({ plik: wzgl, punkt: b.nazwa, schematy: s, argumenty });
+    if (s.length === 0 && argumenty) bledy += 1;
   }
 }
 

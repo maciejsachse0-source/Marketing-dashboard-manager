@@ -1076,3 +1076,29 @@ kopiują opisy kroków). Sprawdziłem sześć tabel z tekstem użytkownika
 (`calendar_entries`, `productions`, `campaigns`, `posts`, `artists`, `videographers`)
 — **zero** wystąpień, więc nie ma czego migrować. Gdyby kiedyś było, potrzebny jest
 osobny przebieg po tych tabelach, nie po katalogu.
+
+## F7-18: znacznik bazy zamiast zgadywania, i dlaczego bez logowania
+
+Sprawdzenie stoi w `e2e/global-setup.ts` i pyta serwer, na jakiej bazie naprawdę
+stoi. Dwie decyzje warte zapisania.
+
+**Endpoint zamiast markera na stronie.** Każda strona poza `/login` jest za sesją,
+a nazwa bazy nie jest nigdzie renderowana, więc „wołanie istniejącej strony
+i sprawdzanie znacznika" wymagałoby najpierw dołożenia znacznika do UI. Tańszy jest
+`/api/health` (`{ "db": "marketing" }`), który czyta nazwę z `DATABASE_URL` i nie
+odpytuje bazy w ogóle.
+
+**Ciasteczko podpisane w setupie zamiast logowania przez przeglądarkę.** Endpoint
+zostaje za sesją, bo nie ma powodu rozdawać nazwy bazy anonimowi. Setup nie startuje
+jednak chromium tylko po to, żeby wypełnić formularz: podpisuje ciasteczko
+`buildSessionToken` tym samym sekretem, którego używa aplikacja, i strzela `fetch`.
+Koszt zmierzony: **28 ms** wobec limitu 2000 ms z kryterium. Start przeglądarki
+i logowanie kosztowałyby 1,5 do 2,5 s, czyli ocierałyby się o ten limit przy każdym
+przebiegu.
+
+**Zmiana w bramce granic zaufania.** `check-trust-boundaries.mjs` żądał schematu Zod
+od KAŻDEGO handlera w `src/app/api`, także takiego, który nie bierze `Request`.
+Dla akcji serwerowych ta sama bramka od początku miała regułę „bez argumentów nie ma
+czego walidować". Wyrównałem: handler bez parametru jest opisany jako „brak wejścia",
+handler z parametrem i bez schematu nadal jest błędem. Punktów wejścia 73 → 74,
+błędów 0.
