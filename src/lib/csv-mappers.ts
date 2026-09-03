@@ -1,5 +1,15 @@
 import type { CsvSource, Platform } from '../../drizzle/schema';
 
+/**
+ * Czego z arkuszy NIE czytamy (F7-29, stan na 2026-09-03):
+ *   - TikTok „Total play time"
+ *   - YouTube „Watch time (hours)"
+ *   - YouTube „Impressions click-through rate (%)"
+ * Tabela `posts` (`drizzle/schema.ts`) nie ma na nie kolumn, a `/analytics` nie ma
+ * na nie miejsca. Kolumny dokładamy dopiero, gdy user powie, że czas oglądania
+ * i CTR mają być widoczne — inaczej migracja i trzy pola w każdym mapperze
+ * utrzymywałyby dane, których nikt nie ogląda. Decyzja czeka, patrz `DECISIONS.md`.
+ */
 export type NormalizedPost = {
   title: string;
   platform: Platform;

@@ -1191,3 +1191,21 @@ z `scripts/e2e-serve.mjs`) pokazuje ten scenariusz jako **pominięty**, nie ziel
 `E2E_EXPECTED_DB=marketing_perf npx playwright test e2e/gantt-filter.spec.ts`
 w drugim. Sprawdzone 2026-09-03, że bramka nadal potrafi zapalić się na czerwono:
 sztuczny koszt 120 ms na klatkę podniósł medianę do 1277 ms i scenariusz padł.
+
+
+## F7-29 — czas oglądania i CTR: decyzja odłożona, komentarz postawiony
+
+Parser CSV widzi w arkuszach trzy kolumny, których tabela `posts` nie ma:
+`Total play time` (TikTok), `Watch time (hours)` i
+`Impressions click-through rate (%)` (YouTube).
+
+Decyzja „dokładamy kolumny czy nie" należy do usera, bo to pytanie o to, co ma być
+widoczne na `/analytics`, a nie o kod. Koszt wariantu „dokładamy": migracja przez
+`npm run db:generate`, trzy pola w `NormalizedPost`, mapowanie w trzech mapperach,
+kolumna albo kafel na ekranie analityki i próg wydajnościowy dla szerszego wiersza —
+czyli kilka godzin za dane, których dziś nikt nie prosił, żeby zobaczyć.
+
+Do czasu odpowiedzi w `src/lib/csv-mappers.ts` stoi komentarz wymieniający te trzy
+kolumny z nazwy i mówiący wprost, dlaczego lądują w koszu. To zdejmuje jedyną realną
+szkodę znaleziska: że ktoś uzna brak odczytu za przeoczenie i doda go po cichu.
+Znalezisko zostaje otwarte, zależność: odpowiedź usera.

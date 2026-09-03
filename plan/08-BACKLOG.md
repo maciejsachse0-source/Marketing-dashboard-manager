@@ -2666,6 +2666,14 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   F7-07 zdjęło razem ze zmiennymi. Kolumny w `drizzle/schema.ts` (tabela `posts`,
   linie 294–301) kończą się na `reach`, `impressions`, `engagementRate`,
   `completionRate`, `saves`, `shares`, `comments`, `followersGained`.
+  ODŁOŻONE 2026-09-03, zależy od odpowiedzi usera: czy czas oglądania i CTR mają
+  być widoczne na `/analytics`. Kodu nie da się wybrać za niego, bo to pytanie
+  o zawartość ekranu, nie o implementację; koszt wariantu „dokładamy" (migracja,
+  trzy pola w `NormalizedPost`, trzy mappery, miejsce na ekranie) opisany
+  w `DECISIONS.md`. Zrobione już teraz, bo tanie i niezależne od decyzji: komentarz
+  w `src/lib/csv-mappers.ts` wymieniający te trzy kolumny z nazwy i mówiący, dlaczego
+  ich nie czytamy — żeby nikt nie uznał tego za przeoczenie i nie dodał po cichu.
+  `npm run test` kod 0, osiem testów `csv-mappers.test.ts` zielonych.
   Do decyzji usera: czy czas oglądania i CTR mają być widoczne w analityce.
   CZYTAJ: `src/lib/csv-mappers.ts`, `drizzle/schema.ts` sekcja `posts`,
   `src/components/analytics/analytics-shell.tsx`
