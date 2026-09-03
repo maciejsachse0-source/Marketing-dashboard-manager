@@ -97,6 +97,7 @@ export function CampaignGanttNarrativeRow({
           <div className="flex items-start gap-1">
             <Link
               href={`/campaigns/${campaign.id}`}
+              data-dense
               className="flex-1 block text-sm font-bold tracking-tight truncate hover:underline"
               title={`Kampania ${campaign.name} - otwórz szczegóły`}
             >

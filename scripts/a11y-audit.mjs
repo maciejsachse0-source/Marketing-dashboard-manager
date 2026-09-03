@@ -169,12 +169,17 @@ async function audytStrony(page, sciezka, touchPage) {
     OPIS,
   );
 
-  // 4. Obszar dotyku guzików komponentu `Button` (plan/05 sekcja 3), mierzony
-  // w drugiej karcie z emulacją ekranu dotykowego (`pointer: coarse`).
+  // 4. Obszar dotyku elementów akcji, mierzony w drugiej karcie z emulacją
+  // ekranu dotykowego (`pointer: coarse`). Od F7-25 obejmuje nie tylko guziki
+  // komponentu `Button` (plan/05 sekcja 3), ale też odnośniki `<a href>`,
+  // bo nawigacja w pasku bocznym to zwykłe odnośniki i halo ich omijało.
+  // `[data-dense]` to świadomy wyjątek: wiersze ganta mają poniżej 30 px
+  // wysokości, więc halo 44 px sąsiadów zachodziłyby na siebie i przechwytywały
+  // kliknięcia obok (opis przy utility `halo-dotyk` w `globals.css`).
   await touchPage.goto(BASE + sciezka);
   await touchPage.waitForLoadState('networkidle');
   const zaMale = await touchPage.$$eval(
-    '[data-slot="button"]',
+    '[data-slot="button"], a[href]:not([data-dense])',
     (els, args) => {
       const [opis, hit, min] = args;
       const f = new Function('return ' + opis)();

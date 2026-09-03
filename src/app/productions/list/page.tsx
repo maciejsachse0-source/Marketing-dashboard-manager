@@ -6,6 +6,7 @@ import { listVideographers } from '@/server/actions/videographers';
 import { NewProductionButton } from '@/components/productions/new-production-button';
 import { ProductionsList } from '@/components/productions/productions-list';
 import { loadTemplates } from '@/lib/production-templates';
+import { HALO_DOTYK } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,7 +100,7 @@ function FilterLink({
   return (
     <Link
       href={href}
-      className={`px-3 py-1.5 rounded-full border text-xs font-medium transition ${
+      className={`${HALO_DOTYK} px-3 py-1.5 rounded-full border text-xs font-medium transition ${
         active
           ? 'border-foreground bg-foreground text-background'
           : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'

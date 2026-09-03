@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { HALO_DOTYK } from '@/lib/utils';
 import {
   LayoutDashboard,
   ChartGantt,
@@ -142,7 +143,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
             }}
           />
           <div className="relative flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group min-w-0">
+            <Link href="/" className={`${HALO_DOTYK} flex items-center gap-2.5 group min-w-0`}>
               <div className="size-9 rounded-full bg-foreground grid place-items-center group-hover:scale-105 transition-transform shrink-0">
                 <Sparkles className="size-4 text-background" strokeWidth={2.5} />
               </div>
@@ -179,7 +180,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
               <div key={item.href} className="flex flex-col gap-0.5">
                 <Link
                   href={item.href}
-                  className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-full text-sm transition ${
+                  className={`group ${HALO_DOTYK} flex items-center gap-2.5 px-3 py-2 rounded-full text-sm transition ${
                     parentActive
                       ? 'bg-foreground text-background font-medium'
                       : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
@@ -200,7 +201,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full text-[12.5px] transition ${
+                          className={`${HALO_DOTYK} flex items-center gap-2 px-2.5 py-1.5 rounded-full text-[12.5px] transition ${
                             cActive
                               ? 'bg-foreground text-background font-medium'
                               : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60'
@@ -232,7 +233,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
                 <li key={a.slug}>
                   <Link
                     href={`/agents/${a.slug}`}
-                    className={`block px-2.5 py-1 text-xs rounded transition ${
+                    className={`${HALO_DOTYK} block px-2.5 py-1 text-xs rounded transition ${
                       active
                         ? 'text-foreground bg-sidebar-accent/70'
                         : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40'

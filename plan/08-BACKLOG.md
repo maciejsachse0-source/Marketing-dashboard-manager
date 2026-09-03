@@ -2513,7 +2513,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   `e2e/f5-scenariusze.spec.ts` sprawdza teraz tytuł wprost: nagłówek H1 na stronie
   produkcji i tytuł w karcie na liście, zamiast rozpoznawania po samym odnośniku.
 
-- [ ] **F7-25** `znalezisko` `ui` Odnośniki nawigacji poniżej 44 px obszaru dotyku
+- [x] **F7-25** `znalezisko` `ui` Odnośniki nawigacji poniżej 44 px obszaru dotyku
   Znalezione przy F6-01. Halo 44 x 44 px dostały guziki komponentu `Button`
   (`pointer-coarse:after:*` w `src/components/ui/button.tsx`), ale nawigacja w pasku
   bocznym to zwykłe `<a>` z `src/components/sidebar.tsx`, które halo omija. Zmierzone
@@ -2530,6 +2530,28 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - układ paska bocznego na myszy bez zmian (dowód: porównanie zrzutów
     `scripts/perf/pngdiff.mjs` poniżej progu szumu 1 680 px)
   - negatywne: `npx playwright test` nadal 22 zielone
+  ZROBIONE. Halo dotyku jest teraz stałą `HALO_DOTYK` w `src/lib/utils.ts` (ten sam
+  zestaw klas `pointer-coarse:after:*`, co wariant `Button`) i dostały je: cztery
+  rodzaje odnośników w `src/components/sidebar.tsx` (logo, pozycje główne, podpozycje,
+  agenci) oraz pigułki filtra na `/productions/list`.
+  Sprawdzenie z punktu 4 w `scripts/a11y-audit.mjs` obejmuje teraz
+  `[data-slot="button"], a[href]:not([data-dense])`. Wynik na uruchomionej aplikacji:
+  `RAZEM naruszeń: 0` (przed zmianą, po samym rozszerzeniu selektora: **164**, w tym
+  21 odnośników paska bocznego na każdej z trzech stron).
+  Wyjątek świadomy `data-dense`: wiersze ganta (`gantt-row-rail.tsx` 24 px,
+  `gantt-narrative-row.tsx` 20 px) halo NIE dostają, bo przy takiej wysokości wiersza
+  halo 44 px sąsiadów zachodzą na siebie i przechwytują kliknięcia w cudzy wiersz.
+  To 98 z tamtych 164 naruszeń; powód i oznaczenie opisane przy stałej `HALO_DOTYK`
+  oraz w komentarzu audytu.
+  Układ na myszy bez zmian: `pngdiff` zrzutów 1280x720 przed i po daje **0** pikseli
+  na `/productions/list`, `/import/osoby` i `/calendar` (reguła powstaje wyłącznie
+  w `@media (pointer: coarse)`).
+  Negatywne: `npx playwright test` **22 zielone**, `npm run typecheck` 0,
+  `npm run lint` 0 błędów i 37 ostrzeżeń, `npm run test` 223 zielone.
+  PUŁAPKA: pierwsze podejście robiło `@utility halo-dotyk` z zagnieżdżonym
+  `@media (pointer: coarse)` w `globals.css` — Tailwind v4 **nie wygenerował** z tego
+  ani jednej reguły (klasa w DOM, `::after` z `content: none`). Zwykłe klasy
+  wariantowe działają, więc kanon halo zostaje przy klasach, nie przy własnym utility.
 
 - [ ] **F7-26** `znalezisko` `tooling` `production-drawer.tsx` to martwy kod
   Znalezione przy F7-01, gdy próba weryfikacji szuflady na uruchomionej aplikacji nie

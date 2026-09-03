@@ -35,3 +35,18 @@ export function cn(...inputs: ClassValue[]) {
 export function fieldText(v: string | number | null | undefined): string {
   return v === null || v === undefined ? '' : String(v);
 }
+
+/**
+ * Halo dotyku 44 px dla odnośników nawigacji (F7-25). Guziki `Button` mają ten
+ * sam zestaw klas wpisany w wariant, ale nawigacja w pasku bocznym to zwykłe
+ * `<a>`, którego halo omijało: pozycje główne miały 36 px, podpozycje 31 px,
+ * odnośniki agentów 24 px. Reguła powstaje wyłącznie pod `pointer: coarse`,
+ * więc na myszy układ zostaje piksel w piksel.
+ *
+ * Wyjątek świadomy: wiersze ganta (`gantt-row-rail.tsx`,
+ * `gantt-narrative-row.tsx`) halo NIE dostają, bo przy wysokości wiersza
+ * poniżej 30 px sąsiednie halo zachodziłyby na siebie i przechwytywały
+ * kliknięcia obok. Oznaczone tam `data-dense`, audyt je pomija.
+ */
+export const HALO_DOTYK =
+  "relative pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:-translate-x-1/2 pointer-coarse:after:-translate-y-1/2 pointer-coarse:after:content-['']";
