@@ -90,10 +90,15 @@ test.describe('dodanie produkcji', () => {
     await sql`delete from productions where title = ${TYTUL}`;
 
     await page.goto('/productions/list');
-    await page.getByRole('button', { name: /Nowa produkcja/ }).first().click();
 
     const okno = page.getByRole('dialog');
-    await expect(okno.getByText('krok 1/3')).toBeVisible();
+    // F7-21: serwer e2e startuje na zimno, więc pierwsze kliknięcie potrafi
+    // trafić w stronę przed hydracją i przepaść. Ponawiamy, zamiast czekać
+    // dłużej na okno, którego nikt już nie otworzy.
+    await expect(async () => {
+      await page.getByRole('button', { name: /Nowa produkcja/ }).first().click();
+      await expect(okno.getByText('krok 1/3')).toBeVisible({ timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
     await okno.getByRole('button', { name: /Dalej/ }).click();
 
     await okno.getByLabel('Tytuł produkcji').fill(TYTUL);
@@ -111,19 +116,22 @@ test.describe('dodanie produkcji', () => {
     await expect(okno.getByText('krok 3/3')).toBeVisible();
     await okno.getByRole('button', { name: /Utwórz produkcję/ }).click();
 
-    // Kreator przerzuca na stronę produkcji; jej nagłówek to nazwa artysty,
-    // nie tytuł produkcji, więc tytuł sprawdzamy na liście produkcji.
+    // Kreator przerzuca na stronę produkcji. Od F7-24 w nagłówku stoi TYTUŁ,
+    // więc sprawdzamy go wprost.
     await page.waitForURL(/\/productions\/\d+$/, { timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: TYTUL, level: 1 })).toBeVisible({
+      timeout: 15_000,
+    });
     const [wiersz] = await sql`select id, title from productions where title = ${TYTUL}`;
     expect(wiersz?.title, 'produkcja nie trafiła do bazy').toBe(TYTUL);
     expect(page.url()).toContain(`/productions/${wiersz.id}`);
 
-    // Na liście produkcje są pogrupowane po artyście, a tytuł widać tylko
-    // w nagłówku grupy, więc nową produkcję rozpoznajemy po odnośniku do niej.
+    // Na liście każda karta ma swój tytuł (F7-24), więc rozpoznajemy produkcję
+    // po tytule w karcie prowadzącej pod jej adres.
     await page.goto('/productions/list');
-    await expect(page.locator(`a[href="/productions/${wiersz.id}"]`).first()).toBeVisible({
-      timeout: 15_000,
-    });
+    await expect(
+      page.locator(`a[href="/productions/${wiersz.id}"]`).getByText(TYTUL).first(),
+    ).toBeVisible({ timeout: 15_000 });
     await page.screenshot({
       path: path.join(SHOTS, 'F5-04-produkcja-dodana.png'),
       fullPage: false,

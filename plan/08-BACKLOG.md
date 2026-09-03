@@ -2478,7 +2478,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     prawdziwych danych, na przykład sprawdzeniem, że `scripts/import-people.ts` nie istnieje
   - negatywne: żadne inne kryterium w `plan/08-BACKLOG.md` nie zmienia treści
 
-- [ ] **F7-24** `znalezisko` `ui` Tytułu produkcji nie widać nigdzie na jej stronie
+- [x] **F7-24** `znalezisko` `ui` Tytułu produkcji nie widać nigdzie na jej stronie
   Znalezione przy F5-03. `src/app/productions/[id]/page.tsx` liczy
   `displayTitle = artist ? artist.name : production.title`, więc produkcja przypisana
   do artysty (a każda musi mieć artystę, `createProduction` odrzuca brak) pokazuje
@@ -2495,6 +2495,23 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - lista produkcji pokazuje tytuł każdej produkcji, nie tylko w nagłówku grupy
     (dowód: zrzut listy z dwiema produkcjami tego samego artysty, obie rozróżnialne)
   - negatywne: `npm run perf` kod 0, bundel `/calendar` bez wzrostu powyżej progu
+  ZROBIONE. Najpierw sprawdzone, czy tytuł w ogóle jest w danych: `select count(*),
+  count(nullif(trim(title),''))` daje `504|504` na bazie z zestawem L i `97|97` na
+  roboczej, więc problemem było wyłącznie wyświetlanie.
+  `src/app/productions/[id]/page.tsx`: `displayTitle` to teraz
+  `production.title || artist?.name || 'Produkcja'`, a nazwa artysty stoi w wierszu
+  pod tytułem, obok T-0. `src/components/productions/productions-list.tsx`:
+  `ProductionCard` straciło przełącznik `showHeader` i rysuje tytuł na KAŻDEJ karcie.
+  Dowód: zrzuty `screenshots/f724-przed-productions_332.png` (nagłówek „Ewa Wiśniewska",
+  tytułu „Produkcja 332" nie widać nigdzie) i `screenshots/f724-po-productions_332.png`
+  (nagłówek „Produkcja 332", pod nim „Ewa Wiśniewska") oraz
+  `screenshots/f724-po-productions_list.png` — Jakub Grabowski, dwie produkcje w grupie,
+  „Produkcja 394" i „Produkcja 2", rozróżnialne.
+  Różnice `pngdiff` są duże z definicji zmiany: strona produkcji **9 943** piksele
+  (napis w nagłówku i nowy wiersz z artystą), lista **109 848** (każda karta dostała
+  wiersz tytułu, więc treść niżej się przesunęła).
+  `e2e/f5-scenariusze.spec.ts` sprawdza teraz tytuł wprost: nagłówek H1 na stronie
+  produkcji i tytuł w karcie na liście, zamiast rozpoznawania po samym odnośniku.
 
 - [ ] **F7-25** `znalezisko` `ui` Odnośniki nawigacji poniżej 44 px obszaru dotyku
   Znalezione przy F6-01. Halo 44 x 44 px dostały guziki komponentu `Button`

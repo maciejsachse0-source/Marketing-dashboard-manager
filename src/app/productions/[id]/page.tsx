@@ -170,7 +170,9 @@ export default async function ProductionDetailPage({
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
   const t1Start = getFirstPeriodStart(production.t0At, production.periods);
 
-  const displayTitle = artist ? artist.name : production.title;
+  // F7-24: w nagłówku stoi TYTUŁ produkcji, bo to on odróżnia dwie produkcje tego
+  // samego artysty. Nazwa artysty nie znika — idzie do wiersza pod tytułem.
+  const displayTitle = production.title || artist?.name || 'Produkcja';
 
   const steps: ProductionStep[] = production.steps ?? [];
   const stepStates = buildStepStates(steps);
@@ -182,6 +184,7 @@ export default async function ProductionDetailPage({
       eyebrow={production.type === 'with-artist' ? 'produkcja z artystą' : 'produkcja solo'}
       description={
         <span className="flex flex-wrap items-center gap-2">
+          {artist ? <span className="font-medium text-foreground">{artist.name}</span> : null}
           <span className="tabular-nums">
             T-0: {production.t0At.toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' })}
           </span>

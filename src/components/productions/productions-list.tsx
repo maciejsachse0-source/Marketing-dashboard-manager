@@ -141,7 +141,7 @@ export function ProductionsList({
                 </header>
                 <div className="space-y-3">
                   {orphanSolo.map((p) => (
-                    <ProductionCard key={p.id} production={p} showHeader />
+                    <ProductionCard key={p.id} production={p} />
                   ))}
                 </div>
               </div>
@@ -208,39 +208,32 @@ function PersonGroup({
   );
 }
 
-function ProductionCard({
-  production: p,
-  showHeader = false,
-}: {
-  production: Production;
-  showHeader?: boolean;
-}) {
+/**
+ * F7-24: tytuł produkcji jest na KAŻDEJ karcie, nie tylko w grupie „Solo, po
+ * kamerzyście". Bez niego dwie produkcje tego samego artysty były na liście
+ * nierozróżnialne — widać było tylko paski kroków.
+ */
+function ProductionCard({ production: p }: { production: Production }) {
   return (
     <Link
       href={`/productions/${p.id}`}
       className="card-editorial p-5 block ui-transition hover:-translate-y-px"
     >
-      {showHeader ? (
-        <div className="flex items-start gap-3 mb-4">
-          <div className="w-7 h-7 rounded-full bg-muted grid place-items-center text-muted-foreground shrink-0 ring-2 ring-background">
-            <Film className="w-3.5 h-3.5" strokeWidth={1.75} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="font-semibold text-[0.95rem] tracking-tight truncate block">
-              {p.title}
-            </span>
-          </div>
-          {p.platforms?.length ? (
-            <div className="shrink-0">
-              <PlatformPills platforms={p.platforms} />
-            </div>
-          ) : null}
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-7 h-7 rounded-full bg-muted grid place-items-center text-muted-foreground shrink-0 ring-2 ring-background">
+          <Film className="w-3.5 h-3.5" strokeWidth={1.75} />
         </div>
-      ) : p.platforms?.length ? (
-        <div className="flex justify-end mb-3">
-          <PlatformPills platforms={p.platforms} />
+        <div className="flex-1 min-w-0">
+          <span className="font-semibold text-[0.95rem] tracking-tight truncate block">
+            {p.title}
+          </span>
         </div>
-      ) : null}
+        {p.platforms?.length ? (
+          <div className="shrink-0">
+            <PlatformPills platforms={p.platforms} />
+          </div>
+        ) : null}
+      </div>
 
       <ProductionStepTracker steps={p.steps ?? []} cancelled={!!p.cancelledAt} />
     </Link>
