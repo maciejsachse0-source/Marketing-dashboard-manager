@@ -2217,7 +2217,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   progiem 300). Dwanaście linii kanonu w zamian za skasowanie 90 duplikatów; wynoszenie
   ich do osobnego pliku CSS schowałoby kanon przed tym, kto go szuka.
 
-- [ ] **F7-16** `znalezisko` `ui` Trzy komponenty z `ui/` nie mają ani jednego użycia
+- [x] **F7-16** `znalezisko` `ui` Trzy komponenty z `ui/` nie mają ani jednego użycia
   Znalezione przy F3-01. `src/components/ui/card.tsx`, `badge.tsx` i `table.tsx` nie są
   importowane nigdzie w `src/` (`grep -rn "ui/card\|ui/badge\|ui/table" src --include='*.tsx' | wc -l`
   zwraca `0`), a równolegle w kodzie stoi 11 plików z ręcznie składaną kartą
@@ -2232,6 +2232,19 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     zwraca liczbę większą od zera albo pliki nie istnieją
   - negatywne: wygląd ekranów `/`, `/productions`, `/campaigns` bez zmian
     (`node scripts/perf/pngdiff.mjs` poniżej progu szumu)
+
+  **DYSPOZYCJA: ZROBIONE (częściowo przez unieważnienie premisy).** Znalezisko mówiło
+  o trzech martwych plikach; dziś martwy jest jeden. `badge.tsx` i `table.tsx` dostały
+  odbiorców w F4 — `grep -rn "ui/card\|ui/badge\|ui/table" src --include='*.tsx' | wc -l`
+  zwraca **3**, nie `0`: `import/import-preview.tsx` (Badge + Table) oraz
+  `import/import-mapping.tsx` (Table). Zostają.
+  `src/components/ui/card.tsx` (103 linie, 7 eksportów, 0 importów) **skasowany**.
+  Wariant „migrujemy" odpadł liczbowo: `Card` rysuje `ring-1 ring-foreground/10`
+  zamiast zastanego `border border-border`, a pierścień leży na zewnątrz pudełka —
+  jedenaście kart przesunęłoby się o piksel na krawędź, co łamie kryterium negatywne
+  tego samego issue. Powód w `DECISIONS.md` pod „F7-16".
+  Dowód: `npm run typecheck` kod 0; zrzuty 1280x720 `/`, `/productions`, `/campaigns`
+  przed i po — **0, 0, 0** różnych pikseli (`scripts/perf/pngdiff.mjs`).
 
 - [ ] **F7-17** `znalezisko` `ui` Długie myślniki w treściach z `data/`, poza zakresem Z7
   Znalezione przy F3-06. Zasada Z7 obejmuje dosłownie literały w `src/`, więc kanon

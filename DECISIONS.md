@@ -1012,3 +1012,27 @@ HMR, czyli ból zgłoszony przez usera, jest **4,2x krótszy**. Ciepłe żądani
 o 75 ms wolniejsze, co przy limicie 1200 ms nie jest ceną, o której warto rozmawiać.
 Liczby z F2-05 mówiły o 13x — nie potwierdzam ich na dzisiejszym kodzie i nie
 przepisuję: obowiązuje pomiar dzisiejszy.
+
+## F7-16: `card.tsx` skasowany, `badge.tsx` i `table.tsx` zostają (są używane)
+
+Znalezisko opisywało trzy martwe komponenty. Dziś martwy jest **jeden**. Pomiar:
+`grep -rn "ui/card\|ui/badge\|ui/table" src --include='*.tsx' | wc -l` zwraca **3**,
+a nie `0` jak w treści issue — `badge.tsx` i `table.tsx` dostały odbiorców w fazie F4,
+na ekranach importu (`src/components/import/import-preview.tsx`,
+`src/components/import/import-mapping.tsx`). Premisa znaleziska jest przeterminowana
+o dwie fazy.
+
+**`src/components/ui/card.tsx` — kasujemy.** 103 linie, siedem eksportów, zero
+importów w całym `src/`. Migracja jedenastu ręcznie składanych kart nie wchodzi w grę,
+bo `Card` maluje obramowanie inaczej niż zastany kod: `ring-1 ring-foreground/10`
+plus `bg-card` plus `py-4 gap-4` wobec zastanego `rounded-xl border border-border`.
+Pierścień renderuje się na zewnątrz pudełka, obramowanie w środku, więc migracja
+przesunęłaby zawartość każdej z jedenastu kart o jeden piksel na każdą krawędź —
+a kryterium negatywne tego samego issue żąda zrzutów bez zmian. Innymi słowy:
+kryteria issue wykluczają się nawzajem dla wariantu „użyć", i wybieramy „skasować".
+Wracamy do niego, gdy pojawi się nowy ekran, który ma wyglądać jak shadcn, a nie
+jak reszta tej aplikacji.
+
+**Dowód, że nic nie zniknęło z ekranu:** `npm run typecheck` kod 0 po skasowaniu,
+zrzuty 1280x720 stron `/`, `/productions`, `/campaigns` przed i po: **0, 0, 0**
+różnych pikseli.
