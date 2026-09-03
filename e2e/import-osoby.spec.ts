@@ -123,7 +123,12 @@ test.describe('import osób, kroki 1 do 4', () => {
     await page.getByLabel('Pole dla kolumny Imię').click();
     await page.getByRole('option', { name: 'kolumna pomijana' }).click();
 
+    // Od F7-44 samo odpięcie imienia nie zeruje wyniku: nazwa leci wtedy
+    // z handle. Zero nowych osób daje dopiero odpięcie obu kolumn naraz.
     await expect(podsumowanie).not.toHaveText(przed!);
+    await page.getByLabel('Pole dla kolumny Instagram').click();
+    await page.getByRole('option', { name: 'kolumna pomijana' }).click();
+
     await expect(podsumowanie).toContainText('0 nowych');
     expect(uploady).toBe(0);
   });
@@ -178,7 +183,7 @@ test('fixture jest syntetyczny, bez prawdziwych danych', () => {
 });
 
 test.describe('import osób, kroki 5 do 7', () => {
-  // Ten blok wsypuje do bazy 960 osób. Od F7-21 idzie to do bazy TESTOWEJ,
+  // Ten blok wsypuje do bazy 970 osób. Od F7-21 idzie to do bazy TESTOWEJ,
   // czyszczonej i zasiewanej przed przebiegiem przez `scripts/e2e-serve.mjs`,
   // więc zamiast sprzątania po znaczniku `max(id)` po prostu opróżniamy tabelę.
   // Kolejność plików ma znaczenie: scenariusze, które potrzebują zasianych
@@ -222,7 +227,7 @@ test.describe('import osób, kroki 5 do 7', () => {
     await expect(zapisano).toContainText('nowych');
 
     // Licznik paczek sprawdzamy na strumieniu, nie na przelotnym stanie DOM:
-    // zapis 975 wierszy trwa kilkadziesiąt milisekund, więc asercja na widoku
+    // zapis 985 wierszy trwa kilkadziesiąt milisekund, więc asercja na widoku
     // wygrywała wyścig raz na kilka przebiegów. Widok pokazuje dokładnie te linie.
     const linie: string[] = [];
     await page.route('**/api/import/people/save', async (route) => {
@@ -236,7 +241,9 @@ test.describe('import osób, kroki 5 do 7', () => {
 
     const podsumowanie = page.getByTestId('import-podsumowanie');
     await expect(podsumowanie).toBeVisible({ timeout: 30_000 });
-    await expect(podsumowanie).toContainText('Dodano 960');
+    // 970, nie 960: od F7-44 dziesięć wierszy fixture bez imienia, ale z handle,
+    // wchodzi jako osoby zamiast lecieć jako błąd „brak nazwy”.
+    await expect(podsumowanie).toContainText('Dodano 970');
     const link = page.getByTestId('import-link-lista');
     await expect(link).toHaveText('Przejdź do artystów');
     await expect(link).toHaveAttribute('href', '/artists');

@@ -3197,7 +3197,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     z poprawą pokazuje `poprawa`, nie `ostrzeżenie`
   - negatywne: `npm run perf` kod 0, próg blokujący zachowuje się jak przed zmianą
 
-- [ ] **F7-44** `znalezisko` `import` Wiersz znany wyłącznie z Instagrama jest odrzucany
+- [x] **F7-44** `znalezisko` `import` Wiersz znany wyłącznie z Instagrama jest odrzucany
   Waga: **ważne**. Szacunek: godzina plus decyzja usera. Znalezione w F4-06 na prawdziwym
   arkuszu. `plan/04` sekcja 5 wymaga niepustego `name`, więc wiersz, który ma handle,
   lokalizację i notatkę, ale nie ma imienia, kończy jako błąd „brak nazwy" i nie wchodzi
@@ -3217,6 +3217,18 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - dowód: suchy przebieg prawdziwego arkusza pokazuje 0 wierszy z błędem „brak nazwy"
     tam, gdzie handle jest niepusty
   - negatywne: wiersz bez imienia I bez handle nadal jest błędem, nie osobą bez nazwy
+  ZROBIONE 2026-09-03, wariant (a): decyzja w `DECISIONS.md`, reguła w `plan/04`
+  sekcja 5. `normalizeRow` bierze nazwę ze znormalizowanego handle, gdy imię puste,
+  a wynik niesie flagę `nameFromHandle`; podgląd dopisuje „nazwa z handle" w kolumnie
+  szczegółów. Trzy testy w `normalize.test.ts`: sam handle, brak obu (nadal błąd),
+  imię plus handle (imię wygrywa). Dowód na uruchomionej aplikacji: arkusz z trzema
+  przypadkami daje w podglądzie wiersz 2 „nowa osoba", wiersz 3 „nowa osoba, nazwa
+  z handle", wiersz 4 „błąd, brak nazwy". Dowód na prawdziwym arkuszu, same liczby:
+  arkusz twórców 294 wiersze, 182 przechodzi, 2 nadal odrzucone (ani imienia, ani
+  handle); arkusz kamerzystów 17 wierszy, wszystkie przechodzą; odzyskane 32 twórców
+  plus 3 kamerzystów, czyli zapowiedziane 35, plus 38 z osobnego arkusza roboczego.
+  E2e: `Dodano 970` zamiast 960 na fixture, `npx playwright test` 22 zielone i 1
+  pominięty.
 
 - [x] **F7-45** `znalezisko` `import` `db` Status twórcy z arkusza nie ma gdzie wejść
   Waga: **drobne**. Szacunek: godzina. Znalezione w F4-06. Arkusz twórców ma kolumnę

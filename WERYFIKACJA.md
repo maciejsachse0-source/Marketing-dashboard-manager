@@ -508,6 +508,16 @@ listy: to już nie są pytania do Ciebie, tylko rzeczy do klikniętego potwierdz
   Uwaga: przed wdrożeniem na produkcję trzeba tam wykonać migracje, aplikacja nie
   robi tego sama.
 
+- [ ] **Osoba znana wyłącznie z Instagrama wchodzi do bazy** (F7-44), przeglądarka
+  Uruchamiasz: `/import/osoby`, wgrywasz arkusz, w którym część wierszy ma sam profil
+  na Instagramie, bez imienia.
+  Oczekujesz: w kroku „Suchy przebieg" taki wiersz jest zielony jako „nowa", nazwa
+  to handle razem z małpą, a kolumna „Szczegóły" mówi wprost `nowa osoba, nazwa
+  z handle`. Wiersz, który nie ma ANI imienia, ANI handle, nadal jest czerwony
+  z komunikatem `brak nazwy`. Wiersz, który ma jedno i drugie, pokazuje imię
+  z arkusza, nie handle.
+  Na prawdziwym arkuszu usera: 35 wierszy, które wcześniej leciały jako błąd
+  „brak nazwy", przechodzi teraz jako osoby.
 
 ---
 

@@ -35,8 +35,26 @@ describe('normalizeRow - nazwa', () => {
     });
   });
 
-  it('brak nazwy przy innych wypełnionych polach to błąd', () => {
-    expect(errors({ name: '   ', handle: '@ktos' })).toContain('brak nazwy');
+  // F7-44: osoba znana wyłącznie z Instagrama dostaje nazwę z handle.
+  it('sam handle bez imienia daje nazwę równą handle', () => {
+    const result = normalizeRow({ name: '   ', handle: '@ktos' });
+    expect(result.kind).toBe('ok');
+    if (result.kind !== 'ok') return;
+    expect(result.person.name).toBe('@ktos');
+    expect(result.person.handle).toBe('@ktos');
+    expect(result.nameFromHandle).toBe(true);
+  });
+
+  it('brak imienia I brak handle to nadal błąd „brak nazwy”', () => {
+    expect(errors({ name: '   ', location: 'Warszawa' })).toContain('brak nazwy');
+  });
+
+  it('imię razem z handle: wygrywa imię, nazwa nie pochodzi z handle', () => {
+    const result = normalizeRow({ name: 'Ola Nowak', handle: '@ktos' });
+    expect(result.kind).toBe('ok');
+    if (result.kind !== 'ok') return;
+    expect(result.person.name).toBe('Ola Nowak');
+    expect(result.nameFromHandle).toBe(false);
   });
 });
 

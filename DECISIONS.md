@@ -1324,3 +1324,28 @@ niewidoczne, a to jest ta sama usterka, którą issue naprawia dla twórców.
 Statusu świadomie NIE ma w oknie edycji osoby. To okno nie edytuje też `location`
 ani `avatarUrl` kamerzysty, więc dokładanie tam jednego pola nie zamknęłoby luki,
 tylko zrobiłoby ją nierówną. Edycja pól z importu to osobna sprawa, nie ta.
+
+## F7-44 — nazwa z handle, gdy imienia nie ma (2026-09-03)
+
+**Dyspozycja usera: wariant (a), podstawiać handle jako nazwę.** Reguła z `plan/04`
+sekcja 5 wymagała niepustego `name`, więc wiersz znany wyłącznie z Instagrama kończył
+jako błąd „brak nazwy". Na prawdziwym arkuszu to 32 wiersze twórców i 3 kamerzystów,
+a osobny arkusz roboczy ma kolejnych 38 takich pozycji. To nie jest brud w danych,
+tylko sposób pracy usera: część osób prowadzi się po samym Instagramie.
+
+Reguła po zmianie, w jednym zdaniu: **puste imię plus niepusty handle daje nazwę równą
+znormalizowanemu handle; puste imię i pusty handle to nadal błąd „brak nazwy"; imię
+w arkuszu zawsze wygrywa z handle.** Nazwa dostaje handle po normalizacji, czyli razem
+z małpą (`@nick`) — dzięki temu na liście osób widać na pierwszy rzut oka, że to nie
+jest imię, tylko profil.
+
+Sygnał w podglądzie jest najtańszy z możliwych: kolumna „Szczegóły" dopisuje
+`, nazwa z handle` do opisu wiersza. Żadnego nowego komponentu, żadnej nowej kolumny
+w tabeli, żadnego koloru — podgląd ma jedną kolumnę na wyjaśnienia i to jest ona.
+Flaga `nameFromHandle` siedzi na wyniku `normalizeRow`, nie na samej osobie, więc
+nie przecieka do `dedup`, `save` ani do bazy: to fakt o wierszu arkusza, nie o osobie.
+
+Wykrywanie duplikatów zostaje bez zmian. `handle` ma pierwszeństwo przed porównaniem
+po nazwie, więc osoba z nazwą wziętą z handle zderzy się z istniejącym wpisem po handle,
+zanim ktokolwiek porówna nazwy — dwa importy tego samego arkusza nie zrobią z niej
+dwóch osób.

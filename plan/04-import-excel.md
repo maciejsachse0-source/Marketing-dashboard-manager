@@ -116,7 +116,9 @@ dostępny także dla twórcy.
 
 ```
 dla wiersza r:
-  name     = trim(r.name);  pusty → BŁĄD "brak nazwy"
+  name     = trim(r.name)
+             pusty, a handle niepusty → name = znormalizowany handle (F7-44)
+             pusty ORAZ handle pusty  → BŁĄD "brak nazwy"
   handle   = trim(r.handle).toLowerCase()
              usuń prefiks "https://instagram.com/", "instagram.com/", "www."
              usuń końcowy "/"
@@ -151,6 +153,13 @@ nigdy nie kasuje istniejącej wartości w bazie.
 Wiersz całkowicie pusty jest pomijany bez zgłaszania błędu. Wiersz z samą nazwą
 i niczym więcej jest poprawny.
 
+**Nazwa z handle (F7-44).** Część osób user prowadzi wyłącznie po Instagramie, więc
+wiersz bez imienia, ale z handle, nie jest już odrzucany: nazwą staje się handle po
+normalizacji, razem z małpą. Wiersz bez imienia I bez handle nadal jest błędem „brak
+nazwy", bo nie ma z czego zrobić nazwy. Imię w arkuszu zawsze wygrywa z handle.
+Podgląd oznacza taki wiersz dopiskiem „nazwa z handle" w kolumnie szczegółów, żeby
+nie udawał, że imię stało w arkuszu. Dla wykrywania duplikatów nic się nie zmienia:
+handle i tak ma pierwszeństwo przed porównaniem po nazwie.
 
 ## 6. Tabela zdarzeń (S3)
 

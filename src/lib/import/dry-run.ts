@@ -101,11 +101,13 @@ export function dryRun(
     if (plan.action === 'insert') out.inserts += 1;
     else if (plan.action === 'update') out.updates += 1;
     else out.skips += 1;
+    // F7-44: nazwa wzięta z handle musi być widoczna jako taka, żeby podgląd
+    // nie udawał, że imię stało w arkuszu.
     addPreview(out, previewLimit, {
       line,
       name: result.person.name,
       action: plan.action,
-      detail: planDetail(plan),
+      detail: result.nameFromHandle ? `${planDetail(plan)}, nazwa z handle` : planDetail(plan),
     });
   });
 

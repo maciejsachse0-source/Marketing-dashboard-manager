@@ -21,7 +21,9 @@ export type NormalizedPerson = {
 
 export type RowResult =
   | { kind: 'empty' }
-  | { kind: 'ok'; person: NormalizedPerson }
+  /** `nameFromHandle` znaczy, że nazwa nie stała w arkuszu, tylko została wzięta
+   *  z handle na Instagramie (F7-44). Podgląd musi to powiedzieć wprost. */
+  | { kind: 'ok'; person: NormalizedPerson; nameFromHandle: boolean }
   | { kind: 'error'; errors: string[] };
 
 /** Komórka arkusza sprowadzona do tekstu albo null. Pusta nigdy nie daje "". */
@@ -100,10 +102,16 @@ function normalizeChecked(cells: Cells, errors: string[]): { email: string | nul
   return { email, phone };
 }
 
-function toPerson(cells: Cells, email: string | null, phone: string | null): NormalizedPerson {
+function toPerson(
+  cells: Cells,
+  name: string,
+  handle: string | null,
+  email: string | null,
+  phone: string | null,
+): NormalizedPerson {
   return {
-    name: cells.name ?? '',
-    handle: cells.handle ? normalizeHandle(cells.handle) : null,
+    name,
+    handle,
     email,
     phone,
     location: cells.location ? normalizeLocation(cells.location) : null,
@@ -136,9 +144,18 @@ export function normalizeRow(raw: Record<string, unknown>): RowResult {
   if (!hasValue) return { kind: 'empty' };
 
   const errors: string[] = [];
-  if (!cells.name) errors.push('brak nazwy');
+  // F7-44: część osób user prowadzi wyłącznie po Instagramie, więc wiersz bez
+  // imienia, ale z handle, dostaje nazwę z handle zamiast lecieć jako błąd.
+  // Wiersz bez obu nadal jest błędem, bo nie ma z czego zrobić nazwy.
+  const handle = cells.handle ? normalizeHandle(cells.handle) : null;
+  const name = cells.name ?? handle;
+  if (!name) errors.push('brak nazwy');
   const { email, phone } = normalizeChecked(cells, errors);
-  if (errors.length > 0) return { kind: 'error', errors };
+  if (errors.length > 0 || name === null) return { kind: 'error', errors };
 
-  return { kind: 'ok', person: toPerson(cells, email, phone) };
+  return {
+    kind: 'ok',
+    person: toPerson(cells, name, handle, email, phone),
+    nameFromHandle: cells.name === null || cells.name === undefined,
+  };
 }
