@@ -2869,7 +2869,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - `/videographers` na bazie pomiarowej pokazuje kontakty z nowych kolumn (zrzut 1280x720)
   - negatywne: `npm run perf` kod 0, `npm run test` kod 0
 
-- [ ] **F7-36** `znalezisko` `ui` Tysiąc linii komponentów bez ani jednego odbiorcy
+- [x] **F7-36** `znalezisko` `ui` Tysiąc linii komponentów bez ani jednego odbiorcy
   Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   Pięć plików, razem 1012 linii, nie jest importowanych z niczego w `src/` ani `e2e/`:
   `src/components/campaigns/milestones-tracker.tsx` (582),
@@ -2877,6 +2877,13 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   `src/components/ui/scroll-area.tsx` (55), `src/components/ui/separator.tsx` (25).
   Martwy kod jest czytany przy każdej recenzji, liczony w metrykach `'use client'`
   i podnosi koszt każdej zmiany globalnej (Z4, Z5), nic za to nie dając.
+  ZROBIONE 2026-09-03. Pięć plików usuniętych (`git rm`), 1012 linii mniej.
+  `SelectSeparator` w `src/components/ui/select.tsx` to osobny byt z `@base-ui/react`,
+  nie ma nic wspólnego z usuniętym `ui/separator.tsx`, więc został.
+  Dowód AC: `grep -rn "milestones-tracker\|ui/dropdown-menu\|ui/tabs\|ui/scroll-area\|ui/separator" src e2e`
+  zwraca `0`. Efekt uboczny: ostrzeżeń lintu **36 do 35** (jedno siedziało w martwym
+  `milestones-tracker.tsx`), a plików klienckich w `src/components` **65 do 64**.
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, test 224 zielone.
   CZYTAJ: pięć plików wyżej
   AC:
   - `git rm` na wszystkie pięć plików
