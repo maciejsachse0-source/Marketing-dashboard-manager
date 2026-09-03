@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import postgres from 'postgres';
+import { connectTestDb } from './db';
 
 /**
  * Scenariusze end-to-end fazy F5 (plan/06 sekcja 3): kalendarz z przewijaniem
@@ -76,9 +76,10 @@ test('kalendarz: przewinięcie osi czasu i filtr kampanii', async ({ page }) => 
 });
 
 test.describe('dodanie produkcji', () => {
-  // Ten test pisze do bazy roboczej, więc kasuje po sobie dokładnie to, co
-  // dodał: produkcję o tytule z prefiksem `E2E F5`.
-  const sql = postgres(process.env.DATABASE_URL!, { prepare: false, max: 2 });
+  // Baza testowa jest czyszczona przed przebiegiem (F7-21), ale test i tak
+  // kasuje po sobie produkcję `E2E F5`, żeby dwa uruchomienia pod rząd na tym
+  // samym serwerze nie wchodziły sobie w drogę.
+  const sql = connectTestDb();
 
   test.afterAll(async () => {
     await sql`delete from productions where title = ${TYTUL}`;

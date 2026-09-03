@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import postgres from 'postgres';
+import { connectTestDb } from './db';
 
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
@@ -171,27 +171,22 @@ test('fixture jest syntetyczny, bez prawdziwych danych', () => {
 });
 
 test.describe('import osób, kroki 5 do 7', () => {
-  // Ten blok naprawdę pisze do bazy, z której korzysta serwer deweloperski.
-  // ponytail: sprzątanie po znaczniku najwyższego id sprzed testu, czyli
-  // kasujemy wyłącznie wiersze wstawione przez ten test. Osobna baza dla e2e
-  // to szersza zmiana środowiska, opisana jako znalezisko w F7.
-  const sql = postgres(process.env.DATABASE_URL!, { prepare: false, max: 2 });
-  let znacznik = 0;
-
-  test.beforeAll(async () => {
-    const [row] = await sql`select coalesce(max(id), 0)::int as id from artists`;
-    znacznik = row.id as number;
-  });
+  // Ten blok wsypuje do bazy 975 osób. Od F7-21 idzie to do bazy TESTOWEJ,
+  // czyszczonej i zasiewanej przed przebiegiem przez `scripts/e2e-serve.mjs`,
+  // więc zamiast sprzątania po znaczniku `max(id)` po prostu opróżniamy tabelę.
+  // Kolejność plików ma znaczenie: scenariusze, które potrzebują zasianych
+  // artystów (`f5-scenariusze`), biegną wcześniej, a późniejsze zakładają
+  // własnych.
+  const sql = connectTestDb();
 
   test.afterAll(async () => {
-    await sql`delete from artists where id > ${znacznik}`;
     await sql.end();
   });
 
   test.beforeEach(async ({ page }) => {
     // Każdy test tego bloku startuje z tego samego stanu bazy, inaczej import
     // z jednego testu robi z wierszy następnego same duplikaty.
-    await sql`delete from artists where id > ${znacznik}`;
+    await sql`truncate table artists restart identity cascade`;
     await zaloguj(page);
     await page.goto('/import/osoby');
     await wgrajFixture(page);

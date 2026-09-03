@@ -2400,7 +2400,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   wyboru, które zrobiło się szersze od dłuższego napisu; reszta formularza bez zmian.
   `npm run test` 223 zielone.
 
-- [ ] **F7-21** `znalezisko` `test` `tooling` Testy e2e importu piszą do bazy roboczej
+- [x] **F7-21** `znalezisko` `test` `tooling` Testy e2e importu piszą do bazy roboczej
   Znalezione przy F4-05. `playwright.config.ts` nie ustawia bazy, więc scenariusz pełnego
   importu wpisuje 975 syntetycznych osób do tej bazy, na której stoi serwer deweloperski
   (`marketing`). Test sprząta po sobie po znaczniku `max(id)` sprzed przebiegu, ale to
@@ -2421,6 +2421,27 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - sprzątanie po znaczniku `max(id)` znika z `e2e/import-osoby.spec.ts`
   - negatywne: `npm run dev` i `npm run perf` dalej używają swoich baz, żaden skrypt
     nie zaczyna wskazywać na `marketing_test`
+  ZROBIONE. `playwright.config.ts` stawia serwer skryptem `scripts/e2e-serve.mjs`:
+  podmienia `DATABASE_URL` na `TEST_DATABASE_URL` (z odmową, gdy równy roboczej,
+  pomiarowej albo podglądowej), przed startem robi migrację, zasiew zestawem L
+  (`scripts/perf/seed-large.ts` sam robi `truncate`, więc czyszczenie jest PRZED
+  przebiegiem) i zasiew prawdziwego katalogu (`drizzle/seed-catalog.ts`, bo kreator
+  kampanii szuka szablonu po nazwie z katalogu), dopiero potem `next dev`.
+  Dowód izolacji: `select count(*)` na bazie `marketing` przed pełnym przebiegiem
+  `152|97|29` (artyści, produkcje, kampanie) i po przebiegu `152|97|29`, bez żadnego
+  sprzątania; baza `marketing_test` po przebiegu ma 975 artystów z importu.
+  `e2e/global-setup.ts` porównuje teraz nazwę bazy serwera z `TEST_DATABASE_URL`.
+  `revalidate.spec.ts` i `stale-data.spec.ts` dostały `afterAll` kasujące własne
+  wiersze (prefiksy `Prod F1-04`, `Kampania F1-04`, `Artysta/Osoba F1-04`, `Test cache`).
+  Znacznik `max(id)` z `import-osoby.spec.ts` zniknął; stan między testami bloku
+  przywraca `truncate table artists restart identity cascade` — wolno, bo baza jest
+  wyłącznie testowa. Nowy `e2e/db.ts` kieruje zapytania scenariuszy na tę samą bazę,
+  na której stoi serwer.
+  Negatywne: `npm run dev`, `npm run perf`, `perf:serve`, `preview` bez zmian —
+  żaden z nich nie dotyka `TEST_DATABASE_URL`.
+  Bramki: `npx playwright test` **22 zielone w 1,5 min**, `npm run typecheck` 0,
+  `npm run lint` 0 błędów i 37 ostrzeżeń, `npm run test` 223 zielone,
+  `check-typography` 0, `check-trust-boundaries` 0 (74 punkty wejścia).
 
 - [ ] **F7-22** `znalezisko` `docs` `AGENTS.md` wskazuje nieistniejący plik planu
   Znalezione przy F4-04. Wiersz „Import osób z arkusza" w `AGENTS.md` kieruje do

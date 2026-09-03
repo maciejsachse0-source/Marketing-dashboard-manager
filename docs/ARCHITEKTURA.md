@@ -180,7 +180,7 @@ zasiał bazy roboczej:
 |---|---|---|
 | `marketing` | `DATABASE_URL` | robocza, z niej czyta `npm run dev` |
 | `marketing_perf` | `PERF_DATABASE_URL` | pomiarowa, mieszka w niej zestaw L (500 produkcji) |
-| `marketing_test` | `TEST_DATABASE_URL` | testowa, testy ją czyszczą między przebiegami |
+| `marketing_test` | `TEST_DATABASE_URL` | testowa, testy jednostkowe i **e2e** ją czyszczą przed przebiegiem (F7-21) |
 | `marketing_preview` | `PREVIEW_DATABASE_URL` | podglądowa dla zespołu (sekcja 2.1), też zestaw L |
 
 **Skąd 10.** Limit połączeń serwera to 100 (`npm run pg:info`, wiersz wyżej), a poza
@@ -475,7 +475,7 @@ Komendy sprawdzające, wszystkie kończą się kodem 0 poza `perf` (patrz niżej
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint, dziś **0 błędów i 108 ostrzeżeń**, każde ma issue w fazie F7. Reguła `no-restricted-syntax` na surowym `<button>` jest błędem, lista wyjątków jest pusta |
 | `npm run test` | 216 testów jednostkowych w 20 plikach, Vitest |
-| `npm run e2e` | 22 scenariusze przeglądarkowe, Playwright (`reuseExistingServer: true`, więc bierze serwer stojący na porcie 3000) |
+| `npm run e2e` | 22 scenariusze przeglądarkowe, Playwright. Serwer stawia `scripts/e2e-serve.mjs`: czyści i zasiewa bazę **testową**, dopiero potem `next dev` (F7-21). `reuseExistingServer: true`, więc stojący serwer na porcie 3000 zostanie użyty — i odrzucony przez `e2e/global-setup.ts`, gdy siedzi na innej bazie |
 | `npm run pg:info` | wersja bazy, indeksy, liczby wierszy |
 | `npm run perf` | pomiar bazy i stron plus raport progów |
 | `npm run perf:dev` | pomiar trybu deweloperskiego, wymaga zimnego `.next` |

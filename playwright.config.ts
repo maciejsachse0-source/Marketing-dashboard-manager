@@ -19,7 +19,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run dev',
+    // F7-21: własny skrypt, bo `npm run dev` stawiał serwer na bazie ROBOCZEJ
+    // i scenariusze dopisywały do niej śmieci. `scripts/e2e-serve.mjs` czyści
+    // i zasiewa bazę testową, dopiero potem uruchamia `next dev`.
+    command: 'node scripts/e2e-serve.mjs',
     url: BASE_URL,
     reuseExistingServer: true,
     timeout: 120_000,

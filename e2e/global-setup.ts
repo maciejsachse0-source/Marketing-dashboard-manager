@@ -13,7 +13,8 @@ import { buildSessionToken, AUTH_COOKIE } from '../src/lib/auth-token';
  */
 async function globalSetup() {
   const base = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
-  const oczekiwana = process.env.E2E_EXPECTED_DB ?? new URL(process.env.DATABASE_URL!).pathname.slice(1);
+  const oczekiwana = process.env.E2E_EXPECTED_DB ??
+    new URL(process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL!).pathname.slice(1);
   const email = process.env.AUTH_EMAIL;
   if (!email) throw new Error('AUTH_EMAIL musi być w .env.local');
 
@@ -38,8 +39,9 @@ async function globalSetup() {
   if (db !== oczekiwana) {
     throw new Error(
       `Serwer na ${base} stoi na bazie "${db}", a testy zakładają "${oczekiwana}".\n` +
-        'Najczęstsza przyczyna: na porcie trzyma `npm run perf:serve` (baza marketing_perf).\n' +
-        'Ubij ten proces (`lsof -nP -iTCP:3000 -sTCP:LISTEN`) i puść `npm run dev`,\n' +
+        'Najczęstsza przyczyna: na porcie stoi `npm run dev` (baza robocza) albo\n' +
+        '`npm run perf:serve` (baza marketing_perf). Testy chodzą na bazie testowej.\n' +
+        'Ubij ten proces (`lsof -nP -iTCP:3000 -sTCP:LISTEN`) i puść testy jeszcze raz,\n' +
         'albo wskaż inną bazę przez E2E_EXPECTED_DB.'
     );
   }

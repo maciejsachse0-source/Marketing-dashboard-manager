@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { connectTestDb } from './db';
 
 /**
  * Issue F1-04. Zawężenie unieważniania ścieżek ma sens tylko wtedy, gdy nic po
@@ -54,6 +55,17 @@ async function createProduction(page: Page): Promise<string> {
   await page.waitForURL(/\/productions\/\d+$/, { timeout: 20_000 });
   return title;
 }
+
+// F7-21: scenariusze zakładają artystów, produkcje i kampanię; baza testowa
+// jest czyszczona przed przebiegiem, ale sprzątamy też po sobie, żeby dwa
+// przebiegi pod rząd na tym samym serwerze nie zostawiały narastających kopii.
+const sql = connectTestDb();
+test.afterAll(async () => {
+  await sql`delete from productions where title like 'Prod F1-04%'`;
+  await sql`delete from campaigns where name like 'Kampania F1-04%'`;
+  await sql`delete from artists where name like 'Artysta F1-04%' or name like 'Osoba F1-04%'`;
+  await sql.end();
+});
 
 test.beforeEach(async ({ page }) => {
   expect(EMAIL, 'AUTH_EMAIL musi być w .env.local').toBeTruthy();

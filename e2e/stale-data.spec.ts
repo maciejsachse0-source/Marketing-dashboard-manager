@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { connectTestDb } from './db';
 
 /**
  * Sieć bezpieczeństwa dla nieświeżych danych po mutacji. Powstała przy issue
@@ -14,6 +15,13 @@ import { expect, test } from '@playwright/test';
 
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
+
+// F7-21: test dodaje osobę, więc ją po sobie kasuje.
+const sql = connectTestDb();
+test.afterAll(async () => {
+  await sql`delete from artists where name like 'Test cache %'`;
+  await sql.end();
+});
 
 test('po dodaniu osoby lista pokazuje ją bez twardego odświeżenia', async ({ page }) => {
   expect(EMAIL, 'AUTH_EMAIL musi być w .env.local').toBeTruthy();
