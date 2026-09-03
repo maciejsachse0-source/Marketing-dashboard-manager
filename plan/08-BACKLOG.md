@@ -2802,7 +2802,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     kontakt (zrzut 1280x720 przed i po czyszczeniu, różnica poniżej progu szumu)
   - negatywne: `npm run test` kod 0, formularz kamerzysty nadal zapisuje wszystkie pola
 
-- [ ] **F7-33** `znalezisko` `tooling` Windowsowa ścieżka robi śmieciowy katalog w korzeniu repo
+- [x] **F7-33** `znalezisko` `tooling` Windowsowa ścieżka robi śmieciowy katalog w korzeniu repo
   Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   `src/lib/production-work-folder.ts:37` trzyma `HARDCODED_FALLBACK` równy
   `'C:\Users\Hp omen\OneDrive\MARKETPLACE DOCS\Marketing Content'`. Na POSIX to nie jest
@@ -2812,6 +2812,18 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   z każdym przebiegiem testów. Git go nie widzi, bo podkatalogi są puste. Literał wiezie
   też cudzą nazwę konta Windows. Ten sam brak guardu psuje `resolveSafeStagePath`:
   jego test na wyjście poza korzeń przy korzeniu WZGLĘDNYM sprawdza pozorną własność.
+  ZROBIONE 2026-09-03. `getRoot()` poza Windowsem zwraca `join(process.cwd(),
+  '.data-local-content')` zamiast literału windowsowego; literał został wyłącznie dla
+  `process.platform === 'win32'`, gdzie faktycznie jest ścieżką bezwzględną. Nowy korzeń
+  wpisany do `.gitignore`. Śmieciowy katalog z 59 podkatalogami usunięty z korzenia repo.
+  Źródło zaśmiecania namierzone: `e2e/revalidate.spec.ts:42` zakłada artystę
+  `Artysta F1-04 <znacznik czasu>`, a akcja folderu produkcji tworzy pod niego katalog —
+  czyli robił to przebieg Playwrighta, nie `npm run test`.
+  Dowód AC: po `npm run test` i po `npx playwright test` `ls -d 'C:'*` w korzeniu repo
+  zwraca „no matches found", `git status --short` nie pokazuje nowego katalogu, a nowe
+  foldery robocze lądują w ignorowanym `.data-local-content/`.
+  Bramki: typecheck 0, lint 0 błędów / 36 ostrzeżeń, test 224 zielone, typografia 0,
+  granice zaufania 0.
   CZYTAJ: `src/lib/production-work-folder.ts`, `tests/production-work-folder.test.ts`
   AC:
   - `getRoot()` poza Windows nie zwraca literału windowsowego: albo `join(process.cwd(),

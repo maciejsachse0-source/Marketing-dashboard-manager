@@ -68,3 +68,6 @@ next-env.d.ts
 # przez `npx tsx scripts/make-fixture-xlsx.ts`, wiec nie ma powodu trzymac go w repo.
 /tests/fixtures/*.xlsx
 /.data-import/
+
+# F7-33: awaryjny korzeń folderów roboczych poza Windowsem
+/.data-local-content/

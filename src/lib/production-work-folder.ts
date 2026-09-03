@@ -28,13 +28,15 @@ import { join, normalize, sep } from 'node:path';
  *      the per-user OneDrive env vars Windows sets automatically. Works
  *      across machines/accounts because the shared `MARKETPLACE DOCS`
  *      folder is synced to each user's OneDrive root.
- *   3. Hardcoded fallback (rarely hit) — keeps the app from crashing on
- *      machines without OneDrive while still surfacing "folder missing"
- *      errors at the call site.
+ *   3. Fallback: poza Windowsem `<cwd>/.data-local-content`, na Windowsie
+ *      zaszyta ścieżka OneDrive. Trzyma aplikację przy życiu na maszynie bez
+ *      OneDrive, a błąd "folder missing" nadal wychodzi w miejscu wywołania.
  */
 
 const FOLDER_TAIL = ['MARKETPLACE DOCS', 'Marketing Content'] as const;
 const HARDCODED_FALLBACK = 'C:\\Users\\Hp omen\\OneDrive\\MARKETPLACE DOCS\\Marketing Content';
+/** Awaryjny korzeń poza Windowsem (F7-33). Ignorowany przez gita. */
+const POSIX_FALLBACK_DIR = '.data-local-content';
 
 function detectOneDriveRoot(): string | null {
   // Windows sets one of these automatically per signed-in profile:
@@ -58,6 +60,12 @@ function getRoot(): string {
 
   const oneDrive = detectOneDriveRoot();
   if (oneDrive) return join(oneDrive, ...FOLDER_TAIL);
+
+  // F7-33: poza Windowsem literał `C:\...` NIE jest ścieżką bezwzględną, tylko
+  // jedną nazwą pliku z ukośnikami odwrotnymi w środku. `mkdirSync(recursive)`
+  // zakładał katalog o tej nazwie w katalogu roboczym, czyli w korzeniu repo.
+  // Awaryjny korzeń trzymamy więc lokalnie, obok repo, i w `.gitignore`.
+  if (process.platform !== 'win32') return join(process.cwd(), POSIX_FALLBACK_DIR);
 
   return HARDCODED_FALLBACK;
 }
