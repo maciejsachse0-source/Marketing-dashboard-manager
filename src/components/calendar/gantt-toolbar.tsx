@@ -121,11 +121,11 @@ export function GanttToolbar({
     router.push(`/calendar${qs ? `?${qs}` : ''}`);
   };
 
-  // Step size matches the visible window: in month/quarter views a 1-week
-  // jump feels lost in the canvas, so we paginate by ~1/4 of the window.
+  // Krok pasuje do okna (miesiąc/kwartał: ćwiartka). F7-13: etykieta liczona raz.
   const stepWeeks = view === 'quarter' ? Math.max(4, Math.floor(zoom / 4))
     : view === 'month' ? Math.max(2, Math.floor(zoom / 4))
     : 1;
+  const stepLabel = `${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`;
   const navigate = (delta: number) => {
     const next = addDays(weekStart, delta * stepWeeks * 7);
     // Use LOCAL Y-M-D, not toISOString(): toISOString returns UTC, so a Monday
@@ -170,8 +170,8 @@ export function GanttToolbar({
             variant="ghost"
             onClick={() => navigate(-1)}
             className="h-auto border-0 rounded-none px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
-            aria-label={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
-            title={`Cofnij o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
+            aria-label={`Cofnij o ${stepLabel}`}
+            title={`Cofnij o ${stepLabel}`}
           >
             <ChevronLeft className="size-5" />
           </Button>
@@ -187,8 +187,8 @@ export function GanttToolbar({
             variant="ghost"
             onClick={() => navigate(1)}
             className="h-auto border-0 rounded-none px-3 py-2 hover:bg-muted/60 active:bg-muted ui-transition active:scale-[0.97]"
-            aria-label={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
-            title={`Naprzód o ${stepWeeks} ${stepWeeks === 1 ? 'tydzień' : 'tygodni'}`}
+            aria-label={`Naprzód o ${stepLabel}`}
+            title={`Naprzód o ${stepLabel}`}
           >
             <ChevronRight className="size-5" />
           </Button>

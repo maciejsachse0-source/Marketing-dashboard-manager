@@ -15,12 +15,17 @@ export type { GanttRow };
 export function GanttView({
   weeks,
   rows,
+  todayMs,
   campaigns = [],
   minWidthPx = 1900,
   headerDensity = 'days',
 }: {
   weeks: Date[];
   rows: GanttRow[];
+  /** „Dzisiaj" w milisekundach, policzone przez komponent serwerowy strony.
+   *  Zegar jest daną żądania, a nie stanem klienta — dzięki temu ani oś, ani
+   *  wiersz nie wołają `Date.now()` w trakcie renderowania (F7-13). */
+  todayMs: number;
   /** Active campaigns whose narrative arc overlaps the visible window — each
    *  rendered as a single-row strip directly under the days header so the
    *  user reads the campaign-level narrative against the same time axis as
@@ -42,7 +47,7 @@ export function GanttView({
     const firstDay = startOfDay(weeks[0]);
     const totalWeeks = weeks.length;
     const totalDays = totalWeeks * 7;
-    const todayIdx = Math.round(dayDiff(new Date(), firstDay));
+    const todayIdx = Math.round(dayDiff(new Date(todayMs), firstDay));
     const days: { date: Date; weekday: string; dom: string; isMonday: boolean; isWeekend: boolean }[] = [];
     for (let i = 0; i < totalDays; i++) {
       const d = new Date(firstDay);
@@ -64,7 +69,7 @@ export function GanttView({
       todayInWindow: todayIdx >= 0 && todayIdx < totalDays,
       days,
     };
-  }, [weeks]);
+  }, [weeks, todayMs]);
 
   if (!axis) return null;
   const { firstDay, totalWeeks, totalDays, dayWidthPct, todayIdx, todayInWindow, days } = axis;
@@ -153,6 +158,7 @@ export function GanttView({
                 days={days}
                 todayIdx={todayIdx}
                 todayInWindow={todayInWindow}
+                todayMs={todayMs}
                 isFirstOfArtist={isFirstOfArtist}
                 showArtistGap={isFirstOfArtist && idx > 0}
               />

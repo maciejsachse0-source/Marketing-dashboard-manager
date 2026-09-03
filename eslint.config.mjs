@@ -62,11 +62,10 @@ export default [
   // zlozonosc cyklomatyczna (F7-06).
 
   {
-    // GRANDFATHER Z11 (F7-06): 40 zastanych funkcji ponad progiem 10 w 29 plikach
-    // (bylo 58 w 43 plikach). Lista ma sie kurczyc.
-    // Sciezki `calendar/gantt-*` NIE sa nowym dlugiem — to ten sam zastany kod,
-    // ktory w F2-02 przeniosl sie z `gantt-view.tsx` (2545 linii) do jedenastu
-    // plikow. Wypisujemy sie z tego przez F7-13.
+    // GRANDFATHER Z11 (F7-06, F7-13): 33 zastane funkcje ponad progiem 10
+    // w 24 plikach (bylo 58 w 43, potem 40 w 29). Lista ma sie kurczyc.
+    // F7-13 zamkniete: wszystkie piec sciezek `calendar/gantt-*` wypisane —
+    // zadna funkcja w tych plikach nie przekracza juz zlozonosci 10.
     files: [
       'drizzle/seed-catalog.ts',
       'scripts/migrate-templates-flexible.ts',
@@ -80,11 +79,6 @@ export default [
       'src/components/analytics/analytics-shell.tsx',
       'src/components/analytics/csv-dropzone.tsx',
       'src/components/artists/artists-shell.tsx',
-      'src/components/calendar/gantt-milestone-labels.tsx',
-      'src/components/calendar/gantt-milestones.tsx',
-      'src/components/calendar/gantt-row.tsx',
-      'src/components/calendar/gantt-substep-bar.tsx',
-      'src/components/calendar/gantt-toolbar.tsx',
       'src/components/campaigns/campaign-wizard.tsx',
       'src/components/campaigns/campaigns-list.tsx',
       'src/components/campaigns/gantt-narrative-row.tsx',

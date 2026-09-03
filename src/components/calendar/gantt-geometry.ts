@@ -7,6 +7,7 @@
 import { startOfWeek as startOfWeekFn } from '@/lib/dates';
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import {
+  PRODUCTION_PROGRESSION,
   type Platform,
   type ProductionPeriods,
   type ProductionStatus,
@@ -87,6 +88,44 @@ export function categoryState(
  *  so all readers compute the same key. */
 export function subStepKey(s: { kind: 'canonical' | 'custom'; stage: ProductionStatus | null; customId: string | null }): string {
   return s.kind === 'canonical' ? `cn:${s.stage}` : `cs:${s.customId}`;
+}
+
+/** Krok w kolejności wyświetlania — tyle, ile potrzeba do arytmetyki kaskady. */
+type CascadeStep = {
+  kind: 'canonical' | 'custom';
+  stage: ProductionStatus | null;
+  customId: string | null;
+};
+
+/**
+ * F7-13: kaskada „kroki po kolei" była wpisana dwa razy, raz w pasku kamieni
+ * milowych i raz w pasku podkroków, w obu miejscach wprost w ciele funkcji
+ * obsługującej kliknięcie. Jedno źródło, dwa wywołania.
+ *
+ * Optymistyczna mapa „zrobione": wszystko do `lastDoneIdx` włącznie jest
+ * zrobione, reszta nie.
+ */
+export function cascadeOverrides(steps: CascadeStep[], lastDoneIdx: number): Record<string, boolean> {
+  const next: Record<string, boolean> = {};
+  for (let i = 0; i < steps.length; i++) {
+    next[subStepKey(steps[i])] = i <= lastDoneIdx;
+  }
+  return next;
+}
+
+/** Status produkcji wynikający z najdalszego zaliczonego kroku kanonicznego:
+ *  jeden dalej niż on, przycięty do końca listy postępu. */
+export function statusAfterCascade(steps: CascadeStep[], lastDoneIdx: number): ProductionStatus {
+  let highest = -1;
+  for (let i = 0; i <= lastDoneIdx; i++) {
+    const step = steps[i];
+    if (step.kind === 'canonical' && step.stage) {
+      const sIdx = STAGE_INDEX[step.stage];
+      if (sIdx > highest) highest = sIdx;
+    }
+  }
+  if (highest < 0) return 'email-sent';
+  return PRODUCTION_PROGRESSION[Math.min(highest + 1, PRODUCTION_PROGRESSION.length - 1)];
 }
 
 export type MilestoneSource = 'recorded' | 'derived' | 't0' | 'tentative';

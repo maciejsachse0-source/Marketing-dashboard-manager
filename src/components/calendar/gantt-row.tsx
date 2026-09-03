@@ -11,6 +11,62 @@ import { PipelineMilestones } from './gantt-milestones';
 import { SubStepBar, type SubStepInfo } from './gantt-substep-bar';
 import { ExpandedDetails } from './gantt-expanded';
 
+// F7-13: czysta arytmetyka etykiet wiersza wyjęta z ciała komponentu. Same
+// łańcuchy `?:` i `??` podnosiły złożoność cyklomatyczną `GanttRowView` do 18,
+// choć nic nie rozgałęziają w sensie renderu.
+
+/** Etykieta T-n liczona względem „dzisiaj" podanego przez oś (`todayMs`), a nie
+ *  przez `Date.now()` w trakcie renderowania — zegar nie jest daną komponentu. */
+function tLabelFor(t0At: Date, todayMs: number): string {
+  const t0Days = Math.round((t0At.getTime() - todayMs) / DAY_MS);
+  if (t0Days === 0) return 'T-0';
+  return t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
+}
+
+function railLabels(row: GanttRow): {
+  displayName: string;
+  subtitle: string;
+  orphanWithArtist: boolean;
+} {
+  const orphanWithArtist = row.type === 'with-artist' && !row.artistName;
+  if (!row.artistName) {
+    return {
+      displayName: row.title,
+      subtitle: orphanWithArtist ? 'bez artysty - przypisz w produkcji' : 'solo',
+      orphanWithArtist,
+    };
+  }
+  return {
+    displayName: row.artistName,
+    subtitle: row.artistHandle ?? row.title,
+    orphanWithArtist,
+  };
+}
+
+/** Odstęp nad wierszem: pierwszy wiersz nowego artysty dostaje podwójną kreskę,
+ *  kolejny wiersz tego samego artysty cienką, reszta nic. */
+function rowGapClass(showArtistGap: boolean, isFirstOfArtist: boolean): string {
+  if (showArtistGap) return 'mt-10 pt-4 border-t-[3px] border-double border-foreground/25';
+  return isFirstOfArtist ? 'border-t border-border/70' : '';
+}
+
+/** „Wszystko zrobione" = produkcja doszła do publikacji I żaden krok własny
+ *  nie został. Publikacja jest statusem końcowym. */
+function progressOf(
+  allSubSteps: SubStepInfo[],
+  stepStateOf: (s: SubStepInfo) => 'passed' | 'active' | 'pending',
+  cancelled: boolean,
+  status: ProductionStatus,
+): { allDone: boolean; nextStep: SubStepInfo | null } {
+  const customsRemaining = allSubSteps.some(
+    (s) => s.kind === 'custom' && stepStateOf(s) !== 'passed',
+  );
+  const allDone =
+    !cancelled && STAGE_INDEX[status] >= STAGE_INDEX.publishing && !customsRemaining;
+  if (cancelled || allDone) return { allDone, nextStep: null };
+  return { allDone, nextStep: allSubSteps.find((s) => stepStateOf(s) !== 'passed') ?? null };
+}
+
 /**
  * Jeden wiersz ganta — jedna produkcja. Skorupa: stan optymistyczny, model
  * wiersza z `gantt-row-model.ts` i złożenie czterech warstw (szyna, pasma,
@@ -24,6 +80,7 @@ export const GanttRowView = memo(function GanttRowView({
   days,
   todayIdx,
   todayInWindow,
+  todayMs,
   isFirstOfArtist,
   showArtistGap,
 }: {
@@ -34,6 +91,9 @@ export const GanttRowView = memo(function GanttRowView({
   days: { isWeekend: boolean }[];
   todayIdx: number;
   todayInWindow: boolean;
+  /** „Dzisiaj" w milisekundach, policzone raz razem z osią w `gantt-view.tsx`.
+   *  Prop, a nie `Date.now()` w renderze — F7-13. */
+  todayMs: number;
   isFirstOfArtist: boolean;
   showArtistGap: boolean;
 }) {
@@ -72,15 +132,8 @@ export const GanttRowView = memo(function GanttRowView({
   // border tidy.
   const rightColumnHeight = 14.75;
 
-  const t0Days = Math.round((row.t0At.getTime() - Date.now()) / DAY_MS);
-  const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
-  const displayName = row.artistName ?? row.title;
-  const orphanWithArtist = row.type === 'with-artist' && !row.artistName;
-  const subtitle = row.artistName
-    ? row.artistHandle ?? row.title
-    : orphanWithArtist
-      ? 'bez artysty - przypisz w produkcji'
-      : 'solo';
+  const tLabel = tLabelFor(row.t0At, todayMs);
+  const { displayName, subtitle, orphanWithArtist } = railLabels(row);
   const cancelled = optimisticStatus === 'cancelled';
 
   // Per-step state derived strictly from each step's own doneAt (the data
@@ -114,29 +167,12 @@ export const GanttRowView = memo(function GanttRowView({
     if (i === stripFirstUndoneIdx) return 'active';
     return 'pending';
   };
-  // "All done" = production has reached publishing AND every custom step is
-  // checked off. Publishing is the terminal status; once status='publishing'
-  // and no customs remain, the workflow has nothing left to mark.
-  const customsRemaining = allSubSteps.some(
-    (s) => s.kind === 'custom' && stepStateOf(s) !== 'passed',
-  );
-  const allDone =
-    !cancelled && STAGE_INDEX[optimisticStatus] >= STAGE_INDEX.publishing && !customsRemaining;
-  const nextStep =
-    cancelled || allDone
-      ? null
-      : allSubSteps.find((s) => stepStateOf(s) !== 'passed') ?? null;
+  const { allDone, nextStep } = progressOf(allSubSteps, stepStateOf, cancelled, optimisticStatus);
   const totalStepCount = allSubSteps.length;
 
   return (
     <div
-      className={`${
-        showArtistGap
-          ? 'mt-10 pt-4 border-t-[3px] border-double border-foreground/25'
-          : isFirstOfArtist
-            ? 'border-t border-border/70'
-            : ''
-      } hover:bg-muted/15 ui-transition group`}
+      className={`${rowGapClass(showArtistGap, isFirstOfArtist)} hover:bg-muted/15 ui-transition group`}
     >
       <div
         className="grid gap-0"

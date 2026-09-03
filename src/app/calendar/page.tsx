@@ -265,6 +265,11 @@ export default async function CalendarPage({
   });
 
   const weeks = Array.from({ length: zoom }, (_, i) => addDays(weekStart, i * 7));
+  // Komponent serwerowy, patrz komentarz w `src/app/campaigns/[id]/page.tsx`:
+  // render RSC to jedno wywołanie na żądanie. Zegar zjeżdża propem do ganta,
+  // żeby ani oś, ani wiersz nie wołały `Date.now()` w renderze klienta (F7-13).
+  // eslint-disable-next-line react-hooks/purity
+  const todayMs = Date.now();
   const totalCount = productionsRaw.length;
 
   // Canvas stretch — placement model (gantt-view.tsx) packs every step in a
@@ -377,6 +382,7 @@ export default async function CalendarPage({
         <GanttView
           weeks={weeks}
           rows={rows}
+          todayMs={todayMs}
           campaigns={narrativeCampaigns}
           minWidthPx={canvasMinWidth}
           headerDensity={headerDensity}

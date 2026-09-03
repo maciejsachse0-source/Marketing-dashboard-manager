@@ -2,10 +2,32 @@
 
 import { useState, useTransition } from 'react';
 import { cascadeStepsTo } from '@/server/actions/production-steps';
-import { PRODUCTION_PROGRESSION, type ProductionStatus } from '../../../drizzle/schema';
-import { STAGE_INDEX, subStepKey, type StageCategory, type WeekFrameCode } from './gantt-geometry';
-import { FRAME_TONE } from './gantt-frames';
+import { type ProductionStatus } from '../../../drizzle/schema';
+import {
+  cascadeOverrides,
+  statusAfterCascade,
+  subStepKey,
+  type StageCategory,
+  type WeekFrameCode,
+} from './gantt-geometry';
+import { FRAME_TONE, stepCircleClass, accentBorderFor } from './gantt-frames';
 import { Button } from '@/components/ui/button';
+
+type StepState = 'passed' | 'active' | 'pending';
+
+// F7-13: tooltip wyjęty z ciała `map`, klasy kółka do `gantt-frames.tsx`.
+// Ten sam kod, tylko poza funkcją, której złożoność wynosiła 16.
+
+function stepTooltip(s: SubStepInfo, state: StepState): string {
+  const kind = s.kind === 'custom' ? `Krok ${s.n} (dodatkowy)` : `Krok ${s.n}`;
+  const stateLabel =
+    state === 'passed'
+      ? 'zaliczone - klik cofa ten i wszystkie kolejne'
+      : state === 'active'
+        ? 'w trakcie - klik kończy ten i wszystkie poprzednie'
+        : 'do zrobienia - klik kończy ten i wszystkie poprzednie';
+  return `${kind}: ${s.label} (${s.cat.label}), ${stateLabel}`;
+}
 
 /**
  * 9-step numbered sub-progress bar — positioned ABSOLUTELY in the timeline
@@ -143,28 +165,11 @@ export function SubStepBar({
     // matches the in-flight server cascade — server-side cascadeStepsTo
     // operates on the same flat steps[] in the same visual order.
     const lastDoneIdx = mode === 'mark' ? idxInAll : idxInAll - 1;
-    const nextOverrides: Record<string, boolean> = {};
-    for (let i = 0; i < allSubSteps.length; i++) {
-      nextOverrides[keyOf(allSubSteps[i])] = i <= lastDoneIdx;
-    }
-    setOptimisticDoneByKey(nextOverrides);
-
+    setOptimisticDoneByKey(cascadeOverrides(allSubSteps, lastDoneIdx));
     // Optimistic: project new canonical status from cascade. Highest canonical
     // in [0..lastDoneIdx] determines status as one-past (next active), capped
     // at publishing.
-    let highestCanonicalIdx = -1;
-    for (let i = 0; i <= lastDoneIdx; i++) {
-      const step = allSubSteps[i];
-      if (step.kind === 'canonical' && step.stage) {
-        const sIdx = STAGE_INDEX[step.stage];
-        if (sIdx > highestCanonicalIdx) highestCanonicalIdx = sIdx;
-      }
-    }
-    const nextStatus: ProductionStatus =
-      highestCanonicalIdx < 0
-        ? 'email-sent'
-        : PRODUCTION_PROGRESSION[Math.min(highestCanonicalIdx + 1, PRODUCTION_PROGRESSION.length - 1)];
-    onChange(nextStatus);
+    onChange(statusAfterCascade(allSubSteps, lastDoneIdx));
 
     // New cascade signature: each step has a unique id. Canonical steps use
     // their old ProductionStatus value as id; customs keep their original id.
@@ -222,29 +227,10 @@ export function SubStepBar({
         const k = keyOf(s);
         const isHovered = hoveredKey === k;
         const tone = FRAME_TONE[s.frame];
-        const accentBorder =
-          s.frame === 'T1'
-            ? 'border-amber-400'
-            : s.frame === 'T2'
-              ? 'border-violet-400'
-              : 'border-emerald-400';
         const x = stepX(s);
         const isCustom = s.kind === 'custom';
-
-        const tooltipKindPrefix = isCustom ? `Krok ${s.n} (dodatkowy)` : `Krok ${s.n}`;
-        const stateLabel =
-          state === 'passed'
-            ? 'zaliczone - klik cofa ten i wszystkie kolejne'
-            : state === 'active'
-              ? 'w trakcie - klik kończy ten i wszystkie poprzednie'
-              : 'do zrobienia - klik kończy ten i wszystkie poprzednie';
-        const tooltip = `${tooltipKindPrefix}: ${s.label} (${s.cat.label}), ${stateLabel}`;
-
+        const tooltip = stepTooltip(s, state);
         const onClick = () => onStepClick(s);
-
-        // Custom circles use slightly-thinner border + dashed outline when
-        // pending, to telegraph "this is an inserted, user-defined step".
-        const customRing = isCustom ? 'ring-1 ring-offset-1 ring-offset-background ring-foreground/15' : '';
 
         return (
           <Button
@@ -261,15 +247,14 @@ export function SubStepBar({
             aria-current={state === 'active' ? 'step' : undefined}
             title={tooltip}
             style={{ top: TRACK_TOP, left: `${x}%`, transform: 'translate(-50%, -50%)' }}
-            className={`disabled:opacity-100 absolute z-20 grid place-items-center rounded-full p-0 border-0 bg-clip-border text-[11px] font-bold tabular-nums transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-              cancelled ? 'opacity-50 disabled:opacity-50 cursor-not-allowed' : 'cursor-pointer'
-            } ${customRing} ${
-              state === 'passed'
-                ? `w-6 h-6 ${tone.passed} hover:scale-110 shadow-sm`
-                : state === 'active'
-                  ? `w-7 h-7 bg-foreground text-background ring-2 ring-offset-1 ring-offset-background scale-110 shadow`
-                  : `w-6 h-6 bg-card border-2 ${isCustom ? 'border-dashed' : ''} ${accentBorder} text-muted-foreground hover:border-foreground/60 hover:scale-110`
-            } ${isHovered && state !== 'active' ? 'ring-2 ring-foreground/20' : ''}`}
+            className={stepCircleClass({
+              state,
+              tonePassed: tone.passed,
+              accentBorder: accentBorderFor(s.frame),
+              isCustom,
+              cancelled,
+              isHovered,
+            })}
           >
             {s.n}
             {s.outOfWindow ? (

@@ -2071,7 +2071,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   ani `gantt-stages.ts`. Wygląd `/calendar?week=2026-03-02` na budowaniu produkcyjnym,
   okno 1280x720: **0 różnych pikseli z 7 823 808** (`scripts/perf/pngdiff.mjs`).
 
-- [ ] **F7-13** `znalezisko` `ui` Wypisać gant z listy grandfather w ESLint
+- [x] **F7-13** `znalezisko` `ui` Wypisać gant z listy grandfather w ESLint
   Waga: **drobne**. Szacunek: pół dnia. Powstało przy F2-02.
   Sześć plików ganta siedzi na liście wyjątków w `eslint.config.mjs` wyłącznie dlatego,
   że zastany kod o złożoności powyżej 10 zmienił plik przy podziale. Reguła z komentarza
@@ -2088,6 +2088,35 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `Date.now()` w wierszu ganta przestaje być wołane w trakcie renderowania
   - negatywne: testy z F2-01 zielone bez zmiany treści, `npm run e2e` zielony,
     wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs` poniżej progu szumu)
+  **DYSPOZYCJA: ZROBIONE (2026-09-03).** Lista grandfather w `eslint.config.mjs`
+  straciła **wszystkie pięć** ścieżek `src/components/calendar/gantt-*` (issue mówi
+  o sześciu, ale F7-06 zdjął już wcześniej `gantt-row-model.ts` — w chwili startu
+  na liście stało pięć). Trafień reguły `complexity` w całym repozytorium: **40 przed,
+  33 po** (`npx eslint . -f json | jq '[.[].messages[]|select(.ruleId=="complexity")]|length'`).
+  Ostrzeżeń lintu razem: 44 przed, **37 po**, 0 błędów.
+  Co zeszło poniżej progu i czym: `GanttToolbar` 11 → etykieta kroku liczona raz
+  zamiast czterech razy w atrybutach; `GanttRowView` 18 → `tLabelFor`, `railLabels`,
+  `rowGapClass` i `progressOf` wyjęte na poziom modułu; strzałka w
+  `gantt-milestone-labels.tsx` 18 → podział na `MilestoneLabel` i `MilestoneDate`
+  plus `stateTextClass`; dwie strzałki w `gantt-milestones.tsx` 12 i 17 →
+  `tickTooltip`, `tickClass`, `TickIcon` i wspólna kaskada; dwie w
+  `gantt-substep-bar.tsx` 13 i 16 → `stepTooltip` oraz `stepCircleClass`
+  i `accentBorderFor` przeniesione do `gantt-frames.tsx`.
+  **Kaskada „kroki po kolei" była wpisana dwa razy** (pasek kamieni i pasek podkroków);
+  jest raz, jako `cascadeOverrides` i `statusAfterCascade` w `gantt-geometry.ts`,
+  z trzema nowymi testami jednostkowymi (219 zielonych w 20 plikach, było 216).
+  **`Date.now()` w wierszu**: zegar jedzie propem `todayMs` z komponentu serwerowego
+  `src/app/calendar/page.tsx` (tam jedno `eslint-disable` z uzasadnieniem, zgodnie
+  ze wzorcem z `campaigns/[id]/page.tsx`), więc ani wiersz, ani oś nie wołają go
+  w renderze klienta. Reguła `react-hooks/purity` milczy.
+  **Dowód braku regresji, dwa niezależne:** zrzut `/calendar?week=2026-03-02` na
+  budowaniu produkcyjnym w oknie 1280x720 — **0 różnych pikseli z 7 823 808**;
+  odpowiedź HTML tej samej trasy urosła o **26 bajtów z 2 522 523**, dokładnie
+  o jedno pole `todayMs` w ładunku RSC (sprawdzone: występuje raz), czyli żadna
+  klasa ani żaden znacznik się nie zmieniły. `npx playwright test` **22 zielone**
+  na `next start` z bazą roboczą. Z11 pilnowany: żaden dotknięty plik nie urósł
+  ponad swój rozmiar sprzed zmiany (`gantt-toolbar.tsx` 442 = 442),
+  żaden nie przekracza 300 linii poza zastanym `gantt-toolbar.tsx`.
 
 - [ ] **F7-14** `znalezisko` `ui` `tooling` Turbopack w trybie deweloperskim gubi siatkę dni w pasach T
   Znalezione przy F2-05. `npm run dev:alt` (turbopack) renderuje `/calendar` inaczej niż

@@ -3,12 +3,64 @@
 import { useState, useTransition } from 'react';
 import { Check } from 'lucide-react';
 import { cascadeStepsTo } from '@/server/actions/production-steps';
-import { PRODUCTION_PROGRESSION, type ProductionStatus } from '../../../drizzle/schema';
-import { STAGE_CATEGORIES, STAGE_INDEX, subStepKey, type MilestoneSource } from './gantt-geometry';
+import { type ProductionStatus } from '../../../drizzle/schema';
+import {
+  cascadeOverrides,
+  statusAfterCascade,
+  STAGE_CATEGORIES,
+  subStepKey,
+  type MilestoneSource,
+} from './gantt-geometry';
 import { type SubStepInfo } from './gantt-substep-bar';
 import { MilestoneLabels } from './gantt-milestone-labels';
 import { Button } from '@/components/ui/button';
 
+
+type MilestoneState = 'passed' | 'active' | 'pending';
+
+// F7-13: pochodne kliknięcia i wyglądu pinezki wyjęte z ciała komponentu.
+// Nic tu nie zmienia treści znaczników — to ten sam kod, tylko poza `map`
+// i poza `onClickCategory`, których złożoność cyklomatyczna wynosiła 17 i 12.
+
+function tickTooltip(cp: CheckpointInfo, state: MilestoneState): string {
+  const stateLabel =
+    state === 'passed'
+      ? 'zaliczone (klik = cofnij)'
+      : state === 'active'
+        ? 'w trakcie (klik = odhacz całą fazę)'
+        : 'do zrobienia (klik = odhacz)';
+  const dateLabel =
+    cp.source === 'tentative'
+      ? 'brak daty - ustaw na produkcji'
+      : cp.date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
+  const window =
+    cp.outOfWindow === 'before' ? ' (przed oknem)' : cp.outOfWindow === 'after' ? ' (po oknie)' : '';
+  return `${cp.cat.label}, ${dateLabel}${window}, ${stateLabel}`;
+}
+
+function tickClass(
+  state: MilestoneState,
+  tentative: boolean,
+  cancelled: boolean,
+  isHovered: boolean,
+): string {
+  const size =
+    state === 'active'
+      ? 'w-7 h-7 bg-foreground text-background ring-4 ring-[var(--accent-blue)]/25 scale-105'
+      : state === 'passed'
+        ? 'w-6 h-6 bg-[var(--accent-blue)] text-white hover:scale-110'
+        : `w-5 h-5 bg-background border-2 ${tentative ? 'border-dashed border-muted-foreground/50' : 'border-border'} hover:border-foreground/50 hover:scale-110`;
+  return `disabled:opacity-100 absolute z-10 grid place-items-center rounded-full p-0 border-0 bg-clip-border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+    cancelled ? 'opacity-50 disabled:opacity-50 cursor-not-allowed' : 'cursor-pointer'
+  } ${size} ${isHovered && state !== 'active' ? 'ring-4 ring-foreground/10' : ''}`;
+}
+
+function TickIcon({ state }: { state: MilestoneState }) {
+  if (state === 'passed') return <Check className="size-3.5" strokeWidth={3} />;
+  if (state === 'active')
+    return <span className="block w-2 h-2 rounded-full bg-background animate-pulse" />;
+  return null;
+}
 
 /**
  * Pipeline milestones — same visual language as the StageTracker on the
@@ -103,25 +155,8 @@ export function PipelineMilestones({
     // to a milestone click until the server revalidate landed (because the
     // sub-step rendering reads from optimisticDoneByKey + s.doneAt, never
     // from the canonical-derived ProductionStatus).
-    const nextOverrides: Record<string, boolean> = {};
-    for (let i = 0; i < allSubSteps.length; i++) {
-      nextOverrides[subStepKey(allSubSteps[i])] = i <= lastDoneIdx;
-    }
-    setOptimisticDoneByKey(nextOverrides);
-
-    let highestCanonicalIdx = -1;
-    for (let i = 0; i <= lastDoneIdx; i++) {
-      const step = allSubSteps[i];
-      if (step.kind === 'canonical' && step.stage) {
-        const sIdx = STAGE_INDEX[step.stage];
-        if (sIdx > highestCanonicalIdx) highestCanonicalIdx = sIdx;
-      }
-    }
-    const nextStatus: ProductionStatus =
-      highestCanonicalIdx < 0
-        ? 'email-sent'
-        : PRODUCTION_PROGRESSION[Math.min(highestCanonicalIdx + 1, PRODUCTION_PROGRESSION.length - 1)];
-    onChange(nextStatus);
+    setOptimisticDoneByKey(cascadeOverrides(allSubSteps, lastDoneIdx));
+    onChange(statusAfterCascade(allSubSteps, lastDoneIdx));
 
     startMilestoneTransition(() => {
       // New cascade signature: stepId is the canonical step's id, which —
@@ -175,17 +210,7 @@ export function PipelineMilestones({
         const isHovered = hoveredKey === cp.cat.key;
         const tentative = cp.source === 'tentative';
         const x = tickX(cp);
-
-        const stateLabel =
-          state === 'passed'
-            ? 'zaliczone (klik = cofnij)'
-            : state === 'active'
-              ? 'w trakcie (klik = odhacz całą fazę)'
-              : 'do zrobienia (klik = odhacz)';
-        const dateLabel = tentative
-          ? 'brak daty - ustaw na produkcji'
-          : cp.date.toLocaleDateString('pl-PL', { dateStyle: 'medium' });
-        const tooltip = `${cp.cat.label}, ${dateLabel}${cp.outOfWindow === 'before' ? ' (przed oknem)' : cp.outOfWindow === 'after' ? ' (po oknie)' : ''}, ${stateLabel}`;
+        const tooltip = tickTooltip(cp, state);
 
         return (
           <Button
@@ -201,26 +226,14 @@ export function PipelineMilestones({
             aria-current={state === 'active' ? 'step' : undefined}
             aria-pressed={state === 'passed'}
             title={tooltip}
-            className={`disabled:opacity-100 absolute z-10 grid place-items-center rounded-full p-0 border-0 bg-clip-border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-              cancelled ? 'opacity-50 disabled:opacity-50 cursor-not-allowed' : 'cursor-pointer'
-            } ${
-              state === 'active'
-                ? 'w-7 h-7 bg-foreground text-background ring-4 ring-[var(--accent-blue)]/25 scale-105'
-                : state === 'passed'
-                  ? 'w-6 h-6 bg-[var(--accent-blue)] text-white hover:scale-110'
-                  : `w-5 h-5 bg-background border-2 ${tentative ? 'border-dashed border-muted-foreground/50' : 'border-border'} hover:border-foreground/50 hover:scale-110`
-            } ${isHovered && state !== 'active' ? 'ring-4 ring-foreground/10' : ''}`}
+            className={tickClass(state, tentative, cancelled, isHovered)}
             style={{
               top: TRACK_TOP,
               left: `${x}%`,
               transform: 'translate(-50%, -50%)',
             }}
           >
-            {state === 'passed' ? (
-              <Check className="size-3.5" strokeWidth={3} />
-            ) : state === 'active' ? (
-              <span className="block w-2 h-2 rounded-full bg-background animate-pulse" />
-            ) : null}
+            <TickIcon state={state} />
             {cp.outOfWindow ? (
               <span
                 aria-hidden

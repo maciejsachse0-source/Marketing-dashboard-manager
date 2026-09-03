@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cascadeOverrides,
   categoryState,
   clipToWindow,
   computeFrameBands,
   dayDiff,
   resolveStageDate,
   STAGE_CATEGORIES,
+  statusAfterCascade,
   type GanttRow,
 } from '../gantt-geometry';
 
@@ -150,5 +152,33 @@ describe('categoryState - stan kategorii wobec statusu produkcji', () => {
 
   it('produkcja anulowana nie ma żadnej kategorii zaliczonej', () => {
     expect(categoryState(outreach, 'cancelled')).toBe('pending');
+  });
+});
+
+describe('kaskada kroków - jedno źródło dla obu pasków (F7-13)', () => {
+  // Kolejność wyświetlania: dwa kanoniczne, jeden własny między nimi.
+  const steps = [
+    { kind: 'canonical' as const, stage: 'email-sent' as const, customId: null },
+    { kind: 'custom' as const, stage: null, customId: 'c1' },
+    { kind: 'canonical' as const, stage: 'terms-accepted' as const, customId: null },
+  ];
+
+  it('mapa optymistyczna zaznacza wszystko do wskazanego kroku włącznie', () => {
+    expect(cascadeOverrides(steps, 1)).toEqual({
+      'cn:email-sent': true,
+      'cs:c1': true,
+      'cn:terms-accepted': false,
+    });
+  });
+
+  it('cofnięcie do minus jeden zdejmuje wszystko', () => {
+    expect(Object.values(cascadeOverrides(steps, -1))).toEqual([false, false, false]);
+  });
+
+  it('status idzie o jeden dalej niż najdalszy zaliczony krok kanoniczny', () => {
+    expect(statusAfterCascade(steps, -1)).toBe('email-sent');
+    expect(statusAfterCascade(steps, 0)).toBe('terms-accepted');
+    // Krok własny nie przesuwa statusu — liczy się ostatni kanoniczny przed nim.
+    expect(statusAfterCascade(steps, 1)).toBe('terms-accepted');
   });
 });
