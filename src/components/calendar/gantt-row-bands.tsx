@@ -178,7 +178,7 @@ export function GanttRowBands({
                     >
                       {pin.n}
                     </span>
-                    <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground">
+                    <span className="label-micro-wide font-semibold text-muted-foreground">
                       Krok {pin.n}
                     </span>
                   </div>

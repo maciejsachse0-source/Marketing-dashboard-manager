@@ -296,7 +296,7 @@ function StepType({
       <div className="space-y-3">
         <div className="flex items-baseline justify-between gap-2">
           <p className="text-sm text-muted-foreground">Szablon kroków</p>
-          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70 tabular-nums">
+          <span className="label-micro text-muted-foreground/70 tabular-nums">
             {templates.length} {templates.length === 1 ? 'szablon' : 'szablony'}
           </span>
         </div>
@@ -342,7 +342,7 @@ function TemplateCard({
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="font-semibold text-sm tracking-tight">{template.name}</span>
         <span
-          className={`text-[10px] uppercase tracking-[0.12em] tabular-nums shrink-0 ${
+          className={`label-micro tabular-nums shrink-0 ${
             active ? 'text-primary font-bold' : 'text-muted-foreground'
           }`}
         >

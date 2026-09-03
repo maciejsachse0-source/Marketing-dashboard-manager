@@ -46,7 +46,7 @@ function CampaignTemplateCard({ template }: { template: MarketingTemplate }) {
           <h2 className="text-lg font-bold tracking-tight leading-tight">{template.name}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{template.summary}</p>
         </div>
-        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0 text-right leading-snug">
+        <span className="label-micro text-muted-foreground tabular-nums shrink-0 text-right leading-snug">
           {milestones.length} milestone&apos;ów
           <br />
           {totalSubs} sub.
@@ -72,7 +72,7 @@ function CampaignTemplateCard({ template }: { template: MarketingTemplate }) {
                   >
                     {period.code}
                   </span>
-                  <span className={`text-[11px] uppercase tracking-[0.14em] font-bold ${tone.ink}`}>
+                  <span className={`label-mini-wide font-bold ${tone.ink}`}>
                     {length} {length === 1 ? 'dzień' : 'dni'}
                   </span>
                 </div>

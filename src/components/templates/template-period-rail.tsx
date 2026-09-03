@@ -59,7 +59,7 @@ export function PeriodRail({
         <span className="text-[10px] tabular-nums text-muted-foreground">
           ({describeOffset(period.startOffsetDays)} → {describeOffset(period.endOffsetDays)})
         </span>
-        <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+        <span className="ml-auto label-micro text-muted-foreground tabular-nums">
           {lengthDays} {lengthDays === 1 ? 'dzień' : 'dni'}
         </span>
         {onRemove ? (

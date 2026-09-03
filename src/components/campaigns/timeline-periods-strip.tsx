@@ -26,7 +26,7 @@ export function PeriodsStrip({
 }) {
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+      <div className="flex items-center gap-2 label-micro-wide text-muted-foreground font-medium">
         <span className="pill-label pill-label-sm">Narracja</span>
       </div>
 

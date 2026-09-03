@@ -89,7 +89,7 @@ export function AddStepInline({
   return (
     <div className="rounded-xl border border-border bg-card p-3 space-y-3">
       <div className="flex items-baseline justify-between">
-        <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+        <span className="label-micro-wide text-muted-foreground font-medium">
           Nowy krok
         </span>
         <Button
@@ -128,7 +128,7 @@ export function AddStepInline({
         </p>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+          <label className="label-micro-wide text-muted-foreground font-medium">
             Opis (opcjonalnie)
           </label>
           <textarea
@@ -142,7 +142,7 @@ export function AddStepInline({
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium block">
+          <label className="label-micro-wide text-muted-foreground font-medium block">
             Plik (opcjonalnie)
           </label>
           {file ? (

@@ -69,7 +69,7 @@ export function NextStepIndicator({
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground">
+          <span className="label-micro-wider font-bold text-muted-foreground">
             Następny krok
           </span>
           <span className="text-[10px] tabular-nums text-muted-foreground/70 font-semibold">

@@ -147,7 +147,7 @@ function TemplateOption({
     >
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="font-semibold text-sm tracking-tight">{template.name}</span>
-        <span className="text-[10px] uppercase tracking-[0.12em] tabular-nums text-muted-foreground">
+        <span className="label-micro tabular-nums text-muted-foreground">
           {template.milestones.length} milestone&apos;ów, {totalSubs} sub.
         </span>
       </div>

@@ -333,7 +333,7 @@ export function ProductionStepRow({
               <span className="font-medium tabular-nums">
                 {date ? formatDate(date, withTime) : 'czeka na datę nagrań'}
               </span>
-              <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70 ml-1">
+              <span className="label-micro text-muted-foreground/70 ml-1">
                 , auto z nagrywki
               </span>
             </div>
@@ -391,7 +391,7 @@ export function ProductionStepRow({
                 className="px-2 py-1 rounded-md border border-border bg-background text-[11px] font-medium tabular-nums focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <span
-                className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80 tabular-nums"
+                className="label-micro text-muted-foreground/80 tabular-nums"
                 title="Krok jest przypięty do tygodnia swojej fazy"
               >
                 {weekRangeLabel}
@@ -431,7 +431,7 @@ export function ProductionStepRow({
       {expanded ? (
         <div className="border-t border-border/60 px-3 py-3 space-y-3 text-xs">
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+            <label className="label-micro-wide text-muted-foreground font-medium">
               Opis (opcjonalnie)
             </label>
             <textarea
@@ -449,7 +449,7 @@ export function ProductionStepRow({
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium block">
+            <label className="label-micro-wide text-muted-foreground font-medium block">
               Plik (opcjonalnie)
             </label>
             {step.attachmentPath ? (

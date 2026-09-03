@@ -267,7 +267,7 @@ function MetricCard({
     <div className="card-editorial p-5 relative overflow-hidden">
       <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-gradient-to-br from-[var(--accent-blue-tint)] to-transparent opacity-50 blur-2xl pointer-events-none" />
       <div className="relative flex items-center justify-between gap-2 mb-3">
-        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-medium">
+        <span className="label-micro text-muted-foreground font-medium">
           {label}
         </span>
         <Icon className="w-4 h-4 text-[var(--accent-blue)]/70" strokeWidth={1.5} />

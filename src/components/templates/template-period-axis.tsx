@@ -56,7 +56,7 @@ export function PeriodAxis({
       <div className="relative h-4 select-none">
         {/* First-month label sits at the left edge */}
         <span
-          className="absolute text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+          className="absolute label-micro-wide font-semibold text-muted-foreground"
           style={{ left: `0%` }}
         >
           {MONTH_PL[previewStart.getMonth()]} {previewStart.getFullYear()}
@@ -64,7 +64,7 @@ export function PeriodAxis({
         {monthBoundaries.map((m) => (
           <span
             key={m.offset}
-            className="absolute -translate-x-1/2 text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+            className="absolute -translate-x-1/2 label-micro-wide font-semibold text-muted-foreground"
             style={{ left: `${dayToPercent(m.offset)}%` }}
           >
             {m.label}

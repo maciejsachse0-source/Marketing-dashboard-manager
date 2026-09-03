@@ -34,7 +34,7 @@ export function ProductionsLane({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+      <div className="flex items-center gap-2 label-micro-wide text-muted-foreground font-medium">
         <span className="pill-label pill-label-sm">Produkcje artystów</span>
         <span>{sorted.length} {sorted.length === 1 ? 'produkcja' : sorted.length < 5 ? 'produkcje' : 'produkcji'}</span>
       </div>
@@ -81,7 +81,7 @@ export function LooseEntriesLane({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+      <div className="flex items-center gap-2 label-micro-wide text-muted-foreground font-medium">
         <span className="pill-label pill-label-sm">Wpisy ogólnokampanijne</span>
         <span>{sorted.length} bez powiązania z produkcją</span>
       </div>

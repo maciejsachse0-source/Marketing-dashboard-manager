@@ -264,7 +264,7 @@ function TemplateCard({
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="font-semibold text-sm tracking-tight">{template.name}</span>
         <span
-          className={`text-[10px] uppercase tracking-[0.12em] tabular-nums shrink-0 ${
+          className={`label-micro tabular-nums shrink-0 ${
             active ? 'text-primary font-bold' : 'text-muted-foreground'
           }`}
         >
@@ -419,7 +419,7 @@ function StepReview({
 
       {template ? (
         <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+          <p className="label-micro-wide text-muted-foreground font-bold">
             Co zostanie sklonowane
           </p>
           {periods.map((p, idx) => {

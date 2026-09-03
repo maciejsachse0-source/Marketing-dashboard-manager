@@ -58,14 +58,14 @@ export function ArtistPicker({
     <div className={wrapperCls}>
       <div className="flex items-center gap-3 flex-wrap">
         <span
-          className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] font-medium ${
+          className={`inline-flex items-center gap-1.5 label-micro-wide font-medium ${
             variant === 'warning' ? 'text-amber-900' : 'text-muted-foreground'
           }`}
         >
           <Mic className="size-3.5" strokeWidth={1.75} />
           Artysta
           {variant === 'warning' && !current ? (
-            <span className="ml-1 text-[10px] uppercase tracking-[0.14em] text-amber-900 font-bold">
+            <span className="ml-1 label-micro-wide text-amber-900 font-bold">
               , brak - przypisz
             </span>
           ) : null}

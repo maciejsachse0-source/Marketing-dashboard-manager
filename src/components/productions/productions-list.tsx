@@ -134,7 +134,7 @@ export function ProductionsList({
                       przypisz w produkcji →
                     </div>
                   </div>
-                  <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                  <span className="ml-auto label-micro text-muted-foreground tabular-nums">
                     {orphanSolo.length}{' '}
                     {orphanSolo.length === 1 ? 'produkcja' : 'produkcji'}
                   </span>
@@ -195,7 +195,7 @@ function PersonGroup({
             </div>
           ) : null}
         </div>
-        <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+        <span className="ml-auto label-micro text-muted-foreground tabular-nums">
           {productions.length} {productions.length === 1 ? 'produkcja' : 'produkcji'}
         </span>
       </header>

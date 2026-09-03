@@ -119,7 +119,7 @@ function StepDetails({
   return (
         <div className="border-t border-border/60 px-3 py-3 space-y-3 text-xs">
           <div className="grid gap-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            <Label className="label-micro-wide text-muted-foreground">
               Opis (podpowiedź dla użytkownika)
             </Label>
             <Textarea
@@ -134,7 +134,7 @@ function StepDetails({
 
           <div className="grid gap-1.5 sm:grid-cols-2">
             <div className="grid gap-1">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <Label className="label-micro-wide text-muted-foreground">
                 Tryb daty
               </Label>
               <select
@@ -151,7 +151,7 @@ function StepDetails({
             </div>
             {isCalendar ? (
               <div className="grid gap-1">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                <Label className="label-micro-wide text-muted-foreground">
                   Typ wpisu kalendarza
                 </Label>
                 <select
@@ -173,7 +173,7 @@ function StepDetails({
 
           {isCalendar ? (
             <div className="grid gap-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <Label className="label-micro-wide text-muted-foreground">
                 Domyślny czas trwania (minuty)
               </Label>
               <Input

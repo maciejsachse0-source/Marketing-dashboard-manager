@@ -135,7 +135,7 @@ export function ProductionStepTracker({
     <div className="select-none">
       <div className="flex items-baseline justify-between gap-3 mb-3">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+          <span className="label-micro-wide text-muted-foreground font-medium">
             {labelCat ? CATEGORY_META[labelCat].label : 'Pipeline'}
           </span>
           <span className="text-sm font-semibold tracking-tight truncate">
@@ -227,7 +227,7 @@ export function ProductionStepTracker({
           return (
             <div key={cat} className="text-center">
               <span
-                className={`text-[10px] uppercase tracking-[0.12em] font-semibold ${
+                className={`label-micro font-semibold ${
                   state === 'active'
                     ? 'text-foreground'
                     : state === 'passed'

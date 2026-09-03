@@ -331,3 +331,15 @@
     background-clip: padding-box;
   }
 }
+
+/* Mikro-etykieta sekcji (F7-15). Kształt „małe wersaliki z rozstrzeloną spacją"
+   był wpisany ręcznie 90 razy w 37 plikach, w sześciu kombinacjach rozmiaru
+   i rozstrzelenia. Tu jest jedno źródło tych sześciu. Kolor, grubość pisma
+   i odstępy zostają przy wywołaniu, bo różnią się realnie: dziewięć kolorów,
+   z czego cztery liczone w czasie działania. Zmiana kanonu = zmiana tutaj. */
+@utility label-micro { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; }
+@utility label-micro-wide { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; }
+@utility label-micro-wider { font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; }
+@utility label-mini { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
+@utility label-mini-wide { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; }
+@utility label-mini-wider { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; }

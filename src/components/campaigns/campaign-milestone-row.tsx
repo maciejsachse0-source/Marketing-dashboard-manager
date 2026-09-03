@@ -100,7 +100,7 @@ export function MilestoneRow({
       {expanded ? (
         <div className="border-t border-border/60 px-3 py-3 space-y-3 text-xs">
           <div className="grid gap-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            <Label className="label-micro-wide text-muted-foreground">
               Opis (opcjonalnie)
             </Label>
             <Textarea
@@ -115,7 +115,7 @@ export function MilestoneRow({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <Label className="label-micro-wide text-muted-foreground">
                 Submilestone&apos;y
               </Label>
               <Button

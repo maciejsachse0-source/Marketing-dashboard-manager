@@ -27,7 +27,7 @@ export function SectionHeaderRow({
       <div className="px-5 py-2 border-r border-border/40 sticky left-0 z-30 bg-muted/40 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] flex items-center gap-2">
         <span className={labelClasses}>{label}</span>
         {hint ? (
-          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+          <span className="label-micro text-muted-foreground tabular-nums">
             {hint}
           </span>
         ) : null}

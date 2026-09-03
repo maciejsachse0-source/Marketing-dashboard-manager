@@ -84,7 +84,7 @@ function TemplateCard({ template }: { template: ProductionTemplate }) {
           <h2 className="text-lg font-bold tracking-tight leading-tight">{template.name}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{template.description}</p>
         </div>
-        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0">
+        <span className="label-micro text-muted-foreground tabular-nums shrink-0">
           {totalSteps} kroków
         </span>
       </header>
@@ -108,7 +108,7 @@ function TemplateCard({ template }: { template: ProductionTemplate }) {
                   >
                     {frame}
                   </span>
-                  <span className={`text-[11px] uppercase tracking-[0.14em] font-bold ${tone.accent}`}>
+                  <span className={`label-mini-wide font-bold ${tone.accent}`}>
                     {CATEGORY_LABEL[cat]}
                   </span>
                 </div>

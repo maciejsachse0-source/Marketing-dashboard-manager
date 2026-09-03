@@ -2166,7 +2166,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   `check-typography` 0, `check-trust-boundaries` 0, `perf` 0, `npx playwright test`
   22 zielone na `next start`.
 
-- [ ] **F7-15** `znalezisko` `ui` Mikro-etykieta sekcji powielona 90 razy w pięciu wariantach
+- [x] **F7-15** `znalezisko` `ui` Mikro-etykieta sekcji powielona 90 razy w pięciu wariantach
   Znalezione przy F3-01. Nagłówek sekcji „małe wersaliki z rozstrzeloną spacją" jest
   wpisywany ręcznie w klasach: `text-[10px] uppercase tracking-[0.12em] text-muted-foreground
   tabular-nums` (13 razy), `... tracking-[0.14em] text-muted-foreground` (10),
@@ -2186,6 +2186,36 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - wygląd niezmieniony: zrzuty przed i po dla `/`, `/productions` i `/campaigns`,
     każdy poniżej progu szumu (`node scripts/perf/pngdiff.mjs`, próg 1 680 pikseli)
   - negatywne: `npm run test` i `npm run e2e` zielone
+  **DYSPOZYCJA: ZROBIONE (2026-09-03), z jednym świadomym odstępstwem od kryterium 1.**
+  Kanon nie jest komponentem `section-label.tsx` z CVA, tylko **sześcioma utility
+  Tailwinda v4 w `src/app/globals.css`** (`label-micro`, `-wide`, `-wider`, `label-mini`,
+  `-wide`, `-wider`), spisanymi w `plan/05` sekcja 3b. Powód jest zmierzony, nie
+  estetyczny: wariantów nie było pięć, tylko **sześć kształtów rozmiaru i rozstrzelenia
+  w 90 wystąpieniach w 37 plikach**, a na nich **czterdzieści różnych łańcuchów klas** —
+  dziewięć kolorów, z czego cztery liczone w czasie działania (`${tone.ink}`,
+  `${frame.accent}`, `${tone.accent}`, `${categoryTone}`), do tego `tabular-nums`,
+  `shrink-0`, `truncate`, `mb-2`, `hover:*`, `font-mono` i pięć innych dodatków.
+  Etykiety siedzą na siedmiu różnych znacznikach (`div`, `span`, `p`, `label`, `th`,
+  `button`, `h3`). Komponent musiałby mieć oś rozmiaru, rozstrzelenia, grubości, koloru,
+  prop `as` **i** przelot `className` używany w większości wywołań — czyli więcej kodu
+  niż usuwa. Utility robi dokładnie to, co miało robić kryterium: jedno miejsce zmiany
+  kanonu, zero zmian w drzewie DOM.
+  Dowody: `grep -rnoE 'text-\[1[01]px\] uppercase tracking-\[0\.1[0-9]em\]' src --include='*.tsx' | wc -l`
+  → **0** (było 90). Zrzuty przed i po na budowaniu produkcyjnym, okno 1280x720:
+  `/` **0**, `/campaigns` **0**, `/templates` **0**, `/calendar` **0**,
+  `/productions` **64** piksele — a te 64 to szum danych, zmierzony osobno na dwóch
+  budowaniach BEZ zmiany (ta sama liczba). `npm run test` 219 zielonych,
+  `npx playwright test` 22 zielone, sześć bramek zielonych, bundel 293,2 kB przy 301,6.
+  **Pułapka warta zapamiętania, kosztowała pierwsze podejście:** własne utility nie jest
+  znane `tailwind-merge`, więc `cn()` przestaje widzieć kolizję z `text-sm` z wariantu
+  `Button` i zostawia obie klasy. Rozmiar wygrywa nasz, ale **wysokość wiersza zostaje
+  po `text-sm`** i element rośnie: przycisk skrótów w panelu bocznym miał 21 px, po
+  migracji 20,28 px, co przesuwało całą nawigację o 0,17 px i dawało 1 512 różnych
+  pikseli na każdej stronie. Naprawione zgłoszeniem klas `label-*` jako grupy
+  `font-size` w `extendTailwindMerge` w `src/lib/utils.ts` — po tym zrzuty schodzą do zera.
+  **Odstępstwo od Z11:** `src/app/globals.css` urósł z 333 do 345 linii (jest ponad
+  progiem 300). Dwanaście linii kanonu w zamian za skasowanie 90 duplikatów; wynoszenie
+  ich do osobnego pliku CSS schowałoby kanon przed tym, kto go szuka.
 
 - [ ] **F7-16** `znalezisko` `ui` Trzy komponenty z `ui/` nie mają ani jednego użycia
   Znalezione przy F3-01. `src/components/ui/card.tsx`, `badge.tsx` i `table.tsx` nie są

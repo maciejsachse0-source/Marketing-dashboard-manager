@@ -37,7 +37,7 @@ export function HelpDialog() {
         onClick={() => setOpen(true)}
         aria-label="Pomoc - instrukcja dyspozytorni"
         title="Pomoc - kliknij ?, żeby zobaczyć instrukcję"
-        className="h-auto font-normal bg-clip-border group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/60 text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-foreground/40 transition"
+        className="h-auto font-normal bg-clip-border group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border/60 label-micro text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-foreground/40 transition"
       >
         <span>Pomoc</span>
         <span className="grid place-items-center size-3.5 rounded-full bg-muted/60 group-hover:bg-foreground group-hover:text-background transition">
@@ -352,7 +352,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
 
 function SubHeader({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground/80 font-semibold pt-1">
+    <p className="label-micro-wide text-muted-foreground/80 font-semibold pt-1">
       {children}
     </p>
   );

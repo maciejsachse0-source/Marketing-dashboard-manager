@@ -52,7 +52,7 @@ export function VideographerPicker({
   return (
     <div className="rounded-xl border border-border bg-card/60 p-4 space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+        <span className="inline-flex items-center gap-1.5 label-micro-wide text-muted-foreground font-medium">
           <Camera className="size-3.5" strokeWidth={1.75} />
           Kamerzysta
         </span>

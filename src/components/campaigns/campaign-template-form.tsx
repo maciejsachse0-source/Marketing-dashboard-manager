@@ -325,7 +325,7 @@ export function CampaignTemplateForm({
           <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
             Podstawy
           </h2>
-          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+          <span className="label-micro text-muted-foreground tabular-nums">
             {milestones.length} milestone&apos;ów, {totalSubs} sub.
           </span>
         </header>
@@ -419,7 +419,7 @@ export function CampaignTemplateForm({
             <Button
               variant="ghost"
               onClick={resetPeriods}
-              className="h-auto border-0 p-0 font-normal hover:bg-transparent text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition"
+              className="h-auto border-0 p-0 font-normal hover:bg-transparent label-micro text-muted-foreground hover:text-foreground ui-transition"
             >
               Domyślne
             </Button>
@@ -427,7 +427,7 @@ export function CampaignTemplateForm({
         </header>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="preview-start" className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <Label htmlFor="preview-start" className="label-micro-wide text-muted-foreground">
             Podgląd dat - kotwica osi (nie zapisywana w szablonie)
           </Label>
           <Input
@@ -488,10 +488,10 @@ export function CampaignTemplateForm({
                 >
                   {period.code}
                 </span>
-                <span className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.ink}`}>
+                <span className={`label-mini-wider font-semibold ${tone.ink}`}>
                   Okres {period.code}
                 </span>
-                <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                <span className="ml-auto label-micro text-muted-foreground tabular-nums">
                   {indices.length} milestone&apos;ów
                 </span>
               </header>

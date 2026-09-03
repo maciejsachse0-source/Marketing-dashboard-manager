@@ -189,7 +189,7 @@ export default async function ProductionDetailPage({
             {tLabel}
           </span>
           {cancelled ? (
-            <span className="px-1.5 py-0.5 rounded font-medium bg-rose-100 text-rose-700 text-[11px] uppercase tracking-[0.12em]">
+            <span className="px-1.5 py-0.5 rounded font-medium bg-rose-100 text-rose-700 label-mini">
               Anulowana
             </span>
           ) : null}
@@ -216,7 +216,7 @@ export default async function ProductionDetailPage({
 
         <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
+            <div className="label-mini-wider text-[var(--accent-blue)] font-bold">
               Start produkcji {artist ? `, ${artist.name}` : ''}
             </div>
             <p className="text-sm text-foreground/80 mt-1.5 leading-relaxed">
@@ -302,11 +302,11 @@ export default async function ProductionDetailPage({
                       {frame.code}
                     </span>
                     <span
-                      className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${frame.accent}`}
+                      className={`label-mini-wider font-semibold ${frame.accent}`}
                     >
                       {frame.label}
                     </span>
-                    <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                    <span className="ml-auto label-micro text-muted-foreground tabular-nums">
                       tydzień {frame.code.replace('T', '')}
                     </span>
                   </header>
@@ -543,7 +543,7 @@ function CategorySection({
           {category.label}
         </span>
         <span className="text-sm text-muted-foreground">{category.description}</span>
-        <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums font-medium">
+        <span className="ml-auto label-micro text-muted-foreground tabular-nums font-medium">
           {passedCount}/{stepsInCat.length} kroków
         </span>
       </div>
@@ -552,7 +552,7 @@ function CategorySection({
 
       <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-2 font-medium">
+          <div className="label-micro-wide text-muted-foreground mb-2 font-medium">
             Kroki
           </div>
           <div className="space-y-3">
@@ -589,7 +589,7 @@ function CategorySection({
         <div className="space-y-4">
           <div>
             <div className="flex items-baseline justify-between mb-2">
-              <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+              <span className="label-micro-wide text-muted-foreground font-medium">
                 Pliki
               </span>
               <span className="text-[10px] text-muted-foreground/80 italic truncate ml-2">
@@ -627,7 +627,7 @@ function ItemList({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-2 font-medium">
+      <div className="flex items-center gap-1.5 label-micro-wide text-muted-foreground mb-2 font-medium">
         <Icon className="w-3 h-3" strokeWidth={1.75} />
         {title}
       </div>

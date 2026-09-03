@@ -115,7 +115,7 @@ export function CampaignGanttNarrativeRow({
               />
             </Button>
           </div>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground tabular-nums flex items-center gap-2">
+          <div className="label-micro-wide text-muted-foreground tabular-nums flex items-center gap-2">
             <PhasePill phase={campaign.phase} />
             <span>
               kickoff {campaign.kickoffAt.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: '2-digit' })}
@@ -181,7 +181,7 @@ export function CampaignGanttNarrativeRow({
             <div
               className={`absolute top-1 bottom-1 flex items-center gap-1.5 px-2 ${arcFullyAfterWindow ? 'right-0 flex-row' : 'left-0 flex-row-reverse'}`}
             >
-              <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-muted-foreground whitespace-nowrap">
+              <span className="label-micro-wide font-bold text-muted-foreground whitespace-nowrap">
                 {arcFullyAfterWindow
                   ? `start ${campaign.kickoffAt.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })} →`
                   : `← zakończona ${arcEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}`}
@@ -269,7 +269,7 @@ function ExpandedCampaignDetails({ campaign }: { campaign: GanttNarrativeCampaig
          *  left, delete + open-full-page on the right. */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border/40">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+            <div className="label-micro-wide text-muted-foreground font-bold">
               Szczegóły kampanii
             </div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -337,7 +337,7 @@ function ExpandedCampaignDetails({ campaign }: { campaign: GanttNarrativeCampaig
          *  on save). Standalone state inside this component is fine — the
          *  parent re-fetches on save through router.refresh(). */}
         <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold mb-3">
+          <div className="label-micro-wide text-muted-foreground font-bold mb-3">
             Pasy narracji (T1, T2, …)
           </div>
           <CampaignPeriodsEditor
@@ -358,7 +358,7 @@ function ExpandedCampaignDetails({ campaign }: { campaign: GanttNarrativeCampaig
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-card p-3.5">
-      <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold mb-1.5">
+      <div className="label-micro-wide text-muted-foreground font-bold mb-1.5">
         {label}
       </div>
       <div className="text-sm">{children}</div>

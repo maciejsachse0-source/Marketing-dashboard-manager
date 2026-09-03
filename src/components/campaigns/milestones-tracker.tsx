@@ -166,7 +166,7 @@ export function MilestonesTracker({
             w nazwę aby edytować
           </p>
         </div>
-        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+        <span className="label-micro text-muted-foreground tabular-nums">
           {totalSubs > 0
             ? `${Math.round((doneSubs / totalSubs) * 100)}% kroków`
             : `${totalMain > 0 ? Math.round((doneMain / totalMain) * 100) : 0}% milestone'ów`}
@@ -287,7 +287,7 @@ function PeriodBucket({
         </span>
         <div className="flex flex-col">
           <span
-            className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.ink}`}
+            className={`label-mini-wider font-semibold ${tone.ink}`}
           >
             {name ? name : `Okres ${code}`}
             {orphan ? (
@@ -302,7 +302,7 @@ function PeriodBucket({
             </span>
           ) : null}
         </div>
-        <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+        <span className="ml-auto label-micro text-muted-foreground tabular-nums">
           {doneInP}/{milestones.length}
         </span>
       </header>

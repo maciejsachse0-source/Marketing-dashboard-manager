@@ -85,7 +85,7 @@ export function GanttAxisHeader({
                 {monthSpans.map((m) => (
                   <div
                     key={m.key}
-                    className="px-3 py-2 border-l border-border/60 first:border-l-0 last:border-r-0 text-[11px] uppercase tracking-[0.14em] font-bold text-muted-foreground/80 truncate"
+                    className="px-3 py-2 border-l border-border/60 first:border-l-0 last:border-r-0 label-mini-wide font-bold text-muted-foreground/80 truncate"
                     style={{ gridColumn: `${m.startDay + 1} / span ${m.lengthDays}` }}
                   >
                     {m.label}
@@ -112,7 +112,7 @@ export function GanttAxisHeader({
                     } ${isCurrent ? 'bg-foreground/5' : ''}`}
                   >
                     <div
-                      className={`text-[10px] uppercase tracking-[0.14em] font-bold ${
+                      className={`label-micro-wide font-bold ${
                         isCurrent ? 'text-foreground' : 'text-muted-foreground/70'
                       } truncate`}
                     >

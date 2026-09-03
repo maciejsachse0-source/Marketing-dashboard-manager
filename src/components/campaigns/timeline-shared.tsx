@@ -36,7 +36,7 @@ export function DateAxis({
     <div className="space-y-0.5 select-none">
       <div className="relative h-4">
         <span
-          className="absolute text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+          className="absolute label-micro-wide font-semibold text-muted-foreground"
           style={{ left: '0%' }}
         >
           {MONTH_PL[minDate.getMonth()]} {minDate.getFullYear()}
@@ -46,7 +46,7 @@ export function DateAxis({
           return (
             <span
               key={m.offset}
-              className="absolute -translate-x-1/2 text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground"
+              className="absolute -translate-x-1/2 label-micro-wide font-semibold text-muted-foreground"
               style={{ left: `${(m.offset / (totalDays - 1)) * 100}%` }}
             >
               {m.label} {date.getFullYear() !== minDate.getFullYear() ? date.getFullYear() : ''}

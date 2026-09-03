@@ -91,6 +91,31 @@ obszaru dotyku, więc na ekranach dotykowych dostają wypełnienie zewnętrzne w
 elementu: pseudoelement `::after` (`pointer-coarse:after:min-h-11 min-w-11`) w bazie
 `buttonVariants`. Sprawdzone w F6-01 skryptem `scripts/a11y-audit.mjs`.
 
+## 3b. Katalog mikro-etykiety sekcji (F7-15)
+
+Kształt „małe wersaliki z rozstrzeloną spacją" był wpisywany ręcznie **90 razy
+w 37 plikach**. Kanon mieszka w `src/app/globals.css` jako sześć utility Tailwinda
+v4 i to jest jedyne miejsce, w którym wolno zmienić rozmiar albo rozstrzelenie:
+
+| klasa | rozmiar | rozstrzelenie | wystąpień przy migracji |
+|---|---|---|---|
+| `label-micro` | 10 px | 0,12em | 33 |
+| `label-micro-wide` | 10 px | 0,14em | 45 |
+| `label-micro-wider` | 10 px | 0,18em | 1 |
+| `label-mini` | 11 px | 0,12em | 1 |
+| `label-mini-wide` | 11 px | 0,14em | 3 |
+| `label-mini-wider` | 11 px | 0,16em | 7 |
+
+Kolor, grubość pisma i odstępy **zostają przy wywołaniu**: kolorów jest dziewięć,
+z czego cztery liczone w czasie działania (`${tone.ink}`, `${frame.accent}`,
+`${tone.accent}`, `${categoryTone}`), a odstępy zależą od miejsca w układzie.
+Wariantowanie ich w komponencie dałoby komponent, który i tak przepuszcza
+`className` w większości wywołań.
+
+Pułapka, zmierzona: klasy `label-*` są zgłoszone do `tailwind-merge` jako grupa
+`font-size` w `src/lib/utils.ts`. Bez tego `cn()` nie wie, że kolidują z `text-sm`
+z wariantu `Button`, zostawia obie i element dostaje wysokość wiersza po `text-sm`.
+
 ## 4. Tabela zdarzeń dla wzorca guzika (S3)
 
 Kolumna „stan dziś" mówi, co komponent już robi, a co trzeba dobudować. Bez tego

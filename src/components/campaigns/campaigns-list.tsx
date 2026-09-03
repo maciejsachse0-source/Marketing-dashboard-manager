@@ -87,7 +87,7 @@ export function CampaignsList({ campaigns }: { campaigns: Campaign[] }) {
                   : `dzień ${daysSinceKickoff + 1}/${arcLength || '?'}`}
               </span>
               {c.templateSlug ? (
-                <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-mono">
+                <span className="ml-auto label-micro text-muted-foreground font-mono">
                   {c.templateSlug}
                 </span>
               ) : null}

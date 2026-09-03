@@ -256,7 +256,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
           <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
             Podstawy
           </h2>
-          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+          <span className="label-micro text-muted-foreground tabular-nums">
             łącznie {totalSteps} kroków
           </span>
         </header>
@@ -365,7 +365,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
           <Button
             variant="ghost"
             onClick={resetPeriods}
-            className="h-auto border-0 p-0 font-normal hover:bg-transparent text-[10px] uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground ui-transition shrink-0"
+            className="h-auto border-0 p-0 font-normal hover:bg-transparent label-micro text-muted-foreground hover:text-foreground ui-transition shrink-0"
           >
             Przywróć domyślne
           </Button>
@@ -373,7 +373,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
 
         <div className="flex flex-wrap items-end gap-3 pb-2 border-b border-border/40">
           <div className="grid gap-1">
-            <Label htmlFor="preview-start" className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            <Label htmlFor="preview-start" className="label-micro-wide text-muted-foreground">
               Data startu (podgląd na osi)
             </Label>
             <input
@@ -430,7 +430,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               usunąć. Strzałki przesuwają w obrębie tej samej kategorii.
             </p>
           </div>
-          <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums shrink-0">
+          <span className="label-micro text-muted-foreground tabular-nums shrink-0">
             {totalSteps} kroków
           </span>
         </header>
@@ -464,11 +464,11 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
                   {frame}
                 </span>
                 <span
-                  className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.accent}`}
+                  className={`label-mini-wider font-semibold ${tone.accent}`}
                 >
                   {CATEGORY_LABEL[cat]}
                 </span>
-                <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                <span className="ml-auto label-micro text-muted-foreground tabular-nums">
                   {indicesInCat.length} {indicesInCat.length === 1 ? 'krok' : 'kroków'}
                 </span>
               </header>

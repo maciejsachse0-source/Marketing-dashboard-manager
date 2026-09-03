@@ -195,7 +195,7 @@ export function GanttToolbar({
         </div>
 
         <div className="flex flex-col leading-tight min-w-0">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+          <span className="label-micro-wide text-muted-foreground font-bold">
             Widoczny zakres
           </span>
           <span className="text-sm font-bold tabular-nums truncate">
@@ -327,7 +327,7 @@ function SegmentedControl<T>({
 }) {
   return (
     <div className="inline-flex items-center gap-2">
-      <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+      <span className="label-micro-wide text-muted-foreground font-bold">
         {label}
       </span>
       <div className="inline-flex rounded-md border border-border bg-card overflow-hidden shadow-sm">
@@ -417,7 +417,7 @@ function CampaignSelector({
   const value = selectedId === null ? 'none' : String(selectedId);
   return (
     <div className="inline-flex items-center gap-2">
-      <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+      <span className="label-micro-wide text-muted-foreground font-bold">
         Kampania
       </span>
       <select

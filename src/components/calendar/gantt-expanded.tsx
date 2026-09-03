@@ -40,7 +40,7 @@ export function ExpandedDetails({
         {/* Header: title, T-0 chip + CTA to full production page */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border/40">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-bold">
+            <div className="label-micro-wide text-muted-foreground font-bold">
               Szczegóły produkcji
             </div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -73,7 +73,7 @@ export function ExpandedDetails({
             entry by the chosen Δdays. Same component as /productions/[id]. */}
         <section className="rounded-2xl border-2 border-foreground/10 bg-gradient-to-br from-[var(--accent-blue-tint)] to-background p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-blue)] font-bold">
+            <div className="label-mini-wider text-[var(--accent-blue)] font-bold">
               Start produkcji {row.artistName ? `, ${row.artistName}` : ''}
             </div>
             <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed">
@@ -113,11 +113,11 @@ export function ExpandedDetails({
                       {frame.code}
                     </span>
                     <span
-                      className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${frame.accent}`}
+                      className={`label-mini-wider font-semibold ${frame.accent}`}
                     >
                       {frame.label}
                     </span>
-                    <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                    <span className="ml-auto label-micro text-muted-foreground tabular-nums">
                       tydzień {frame.code.replace('T', '')}
                     </span>
                   </header>
@@ -201,7 +201,7 @@ export function ExpandedCategorySection({
         <span className="text-xs text-muted-foreground flex-1 min-w-0">
           {category.description}
         </span>
-        <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums font-medium shrink-0">
+        <span className="label-micro text-muted-foreground tabular-nums font-medium shrink-0">
           {passedCount}/{stepsInCat.length} kroków
         </span>
       </div>

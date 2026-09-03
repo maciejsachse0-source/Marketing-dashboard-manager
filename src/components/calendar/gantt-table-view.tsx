@@ -233,7 +233,7 @@ function StatusCell({ row }: { row: GanttRow }) {
   if (row.cancelled || row.status === 'cancelled') {
     return (
       <div className="space-y-1">
-        <div className="text-[10px] uppercase tracking-[0.12em] font-bold text-rose-700">
+        <div className="label-micro font-bold text-rose-700">
           Anulowane
         </div>
         <ProductionStatusPill status="cancelled" />
@@ -250,7 +250,7 @@ function StatusCell({ row }: { row: GanttRow }) {
 
   return (
     <div className="space-y-1 leading-snug">
-      <div className={`text-[10px] uppercase tracking-[0.12em] font-bold ${categoryTone}`}>
+      <div className={`label-micro font-bold ${categoryTone}`}>
         {categoryLabel}
       </div>
       <div className="flex items-center gap-2 flex-wrap">

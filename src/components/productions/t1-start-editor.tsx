@@ -68,7 +68,7 @@ export function T1StartEditor({
       }`}
     >
       <CalendarRange className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.75} />
-      <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold shrink-0">
+      <span className="label-micro-wide text-muted-foreground font-semibold shrink-0">
         Start produkcji
       </span>
       <input

@@ -255,7 +255,7 @@ export function CampaignPeriodsEditor({
         <div className="grid gap-1.5">
           <Label
             htmlFor="campaign-preview-start"
-            className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
+            className="label-micro-wide text-muted-foreground"
           >
             Data startu kampanii (kotwica osi){' '}
             {kickoffSaving ? (
@@ -277,7 +277,7 @@ export function CampaignPeriodsEditor({
           />
         </div>
         <div className="grid gap-1.5">
-          <Label className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <Label className="label-micro-wide text-muted-foreground">
             Horyzont kalendarza (jak daleko widać oś)
           </Label>
           <div className="flex flex-wrap gap-1">
