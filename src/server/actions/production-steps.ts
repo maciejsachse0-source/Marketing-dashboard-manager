@@ -10,6 +10,7 @@ import {
   defaultDurationMinutes,
   deriveFromShootingIso,
   getActiveStepIndex,
+  getFirstPeriodStart,
   getStepWeekRange,
   newStepId,
 } from '@/lib/production-steps';
@@ -26,12 +27,7 @@ import {
   uploadedFileSchema,
 } from './schemas';
 import { z } from 'zod';
-import {
-  periodsRelativeToT0Mon,
-  resolvePeriods,
-  type TemplatePeriod,
-} from '@/lib/production-periods';
-import { startOfWeek } from '@/lib/dates';
+import { resolvePeriods, type TemplatePeriod } from '@/lib/production-periods';
 import type {
   CalendarType,
   ProductionStage,
@@ -553,11 +549,11 @@ export async function shiftProductionT1Start(
   // partial-day delta.
   newT1.setHours(0, 0, 0, 0);
 
-  const resolved = periodsRelativeToT0Mon(prod.periods);
-  const t0Mon = startOfWeek(prod.t0At);
-  const oldT1 = new Date(t0Mon);
-  oldT1.setDate(oldT1.getDate() + resolved[0].startOffsetDays);
-  oldT1.setHours(0, 0, 0, 0);
+  // F7-27: jedno źródło prawdy dla „gdzie zaczyna się T1" — ta sama funkcja,
+  // którą renderuje pole. Wcześniej akcja liczyła oldT1 z poniedziałku tygodnia
+  // T-0, więc przesunięcie o 1..6 dni nie zmieniało oldT1 i każde powtórzenie
+  // dokładało kolejną deltę do t0At (dryf niewidoczny w polu).
+  const oldT1 = getFirstPeriodStart(prod.t0At, prod.periods);
 
   const DAY_MS = 86_400_000;
   // Round to integer days to absorb DST drift between old/new midnight.

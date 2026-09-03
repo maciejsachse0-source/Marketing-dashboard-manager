@@ -139,15 +139,23 @@ export function getStepWeekRange(
 
 /** Day (00:00 local) on which the first period (T1) begins, derived from the
  *  production's T-0 anchor + period offsets. Used by the "edit T1 start" UI as
- *  the canonical handle for shifting the whole pipeline timeline. */
+ *  the canonical handle for shifting the whole pipeline timeline.
+ *
+ *  F7-27: anchored on the T-0 DAY, not on its Monday. `startOfWeek` here made
+ *  the handle lossy — shifting `t0At` by 1..6 days left the field showing the
+ *  old date, and `shiftProductionT1Start` then recomputed the same Δ again, so
+ *  every repeat of a "no-op looking" edit moved the whole timeline once more.
+ *  The gantt strip stays Monday-quantised (`getStepWeekRange`); only this
+ *  handle is day-precise, which is what a date input has to be to round-trip. */
 export function getFirstPeriodStart(
   t0At: Date,
   periods?: TemplatePeriod[] | null,
 ): Date {
-  const t0Mon = startOfWeek(t0At);
+  const t0Day = new Date(t0At);
+  t0Day.setHours(0, 0, 0, 0);
   const resolved = periodsRelativeToT0Mon(periods);
   const first = resolved[0];
-  return addDays(t0Mon, first.startOffsetDays);
+  return addDays(t0Day, first.startOffsetDays);
 }
 
 /** Compute a coarse production state from `steps` + `cancelledAt`. Used by

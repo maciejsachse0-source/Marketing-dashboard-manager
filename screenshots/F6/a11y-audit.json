@@ -20464,8 +20464,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -20512,7 +20512,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -20528,8 +20528,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|2|Krok 2: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -20640,8 +20640,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -20784,8 +20784,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -21584,8 +21584,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|7|Krok 7: nagrywki (Nagrywanie), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -22112,8 +22112,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -22848,7 +22848,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -22864,7 +22864,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -22992,7 +22992,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -23760,8 +23760,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -23840,8 +23840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -24000,8 +24000,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -24048,7 +24048,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -24240,8 +24240,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -24256,7 +24256,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -24464,7 +24464,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -24512,8 +24512,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -25184,8 +25184,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -25792,7 +25792,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -25840,8 +25840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -25888,7 +25888,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
         "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
       },
@@ -26000,8 +26000,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -26016,8 +26016,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -26592,7 +26592,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -26848,8 +26848,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -27440,8 +27440,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -28000,8 +28000,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -28432,8 +28432,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -28784,8 +28784,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -28800,8 +28800,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -28816,8 +28816,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -28832,8 +28832,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -29856,7 +29856,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -30192,7 +30192,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -30224,7 +30224,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -30944,8 +30944,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -31008,8 +31008,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -31184,8 +31184,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -31216,8 +31216,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -31232,8 +31232,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -32176,8 +32176,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -32192,7 +32192,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -32224,7 +32224,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33392,7 +33392,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33424,7 +33424,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33632,8 +33632,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -33648,7 +33648,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -33664,7 +33664,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33712,8 +33712,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -33744,8 +33744,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -33792,7 +33792,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33824,7 +33824,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33840,8 +33840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -33856,7 +33856,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -33968,8 +33968,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -33984,8 +33984,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -34576,8 +34576,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -34592,7 +34592,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -34608,8 +34608,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -34624,7 +34624,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -34832,8 +34832,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -34848,7 +34848,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -34864,7 +34864,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -34880,8 +34880,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -34896,8 +34896,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -34928,7 +34928,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -34944,8 +34944,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -34976,8 +34976,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -35024,7 +35024,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -35056,7 +35056,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -35696,8 +35696,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|4|Krok 4: data ustalona (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -35712,8 +35712,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -35728,7 +35728,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -36112,8 +36112,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -36128,7 +36128,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -36160,8 +36160,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -36208,8 +36208,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -38032,8 +38032,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -38288,7 +38288,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
         "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
       },
@@ -38384,8 +38384,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -38416,8 +38416,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -38432,8 +38432,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -38480,8 +38480,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -39824,7 +39824,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -40192,7 +40192,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -40448,7 +40448,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -40560,8 +40560,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -40592,7 +40592,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -41840,8 +41840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -42224,7 +42224,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -42240,8 +42240,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -42288,7 +42288,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
         "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
       },
@@ -42608,8 +42608,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -43280,8 +43280,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|3|Krok 3: warunki akcept (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -43376,8 +43376,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -44048,7 +44048,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -44208,8 +44208,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -44224,7 +44224,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -44256,7 +44256,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -44384,8 +44384,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -44640,8 +44640,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -44656,7 +44656,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -44848,8 +44848,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -45248,7 +45248,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -45344,8 +45344,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -45360,8 +45360,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -45376,8 +45376,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -45856,7 +45856,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -46000,8 +46000,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -46016,8 +46016,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -46048,8 +46048,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -46192,7 +46192,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -46208,8 +46208,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -46768,8 +46768,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -47248,8 +47248,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -47376,8 +47376,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -48576,8 +48576,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -48688,7 +48688,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
         "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
       },
@@ -48992,7 +48992,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -49024,7 +49024,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -49040,8 +49040,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -49056,7 +49056,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -49248,7 +49248,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -49840,8 +49840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -50160,8 +50160,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|8|Krok 8: scenariusz wysłany (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -50288,7 +50288,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
         "klucz": "BUTTON||Rozwiń szczegóły||group/button relative inline-flex items-center justify-cente"
       },
@@ -50400,8 +50400,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -50416,8 +50416,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -50448,7 +50448,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -52768,8 +52768,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -52784,8 +52784,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -53264,7 +53264,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -53376,8 +53376,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -53392,7 +53392,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -53408,8 +53408,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -53424,7 +53424,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -53456,7 +53456,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -53808,8 +53808,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -53824,7 +53824,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -53840,8 +53840,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -53856,7 +53856,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -54368,8 +54368,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -54384,8 +54384,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -54400,8 +54400,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -54576,8 +54576,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|9|Krok 9: nagrywki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -54592,7 +54592,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|10|Krok 10 (dodatkowy): odbiór surówki (Nagrywanie), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -54608,8 +54608,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -54624,7 +54624,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -54640,8 +54640,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|13|Krok 13: publikacja (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -54656,7 +54656,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -55312,8 +55312,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -55344,8 +55344,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -56368,8 +56368,8 @@
           "h": 29
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Outreach, brak daty - ustaw na produkcji, w trakcie (klik = odhacz całą fazę)||group/button shrink-0 items-center justify-center border-tra"
       },
       {
@@ -56656,7 +56656,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -56800,8 +56800,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Nagrywanie, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -56848,8 +56848,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), zaliczone - klik cofa ten i wszystkie kolejne||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -56928,7 +56928,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -57056,7 +57056,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|14|Krok 14 (dodatkowy): analiza pierwszych 24h (Publikacja), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -57264,7 +57264,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|2|Krok 2 (dodatkowy): brief konceptu do artysty (Outreach), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -57344,8 +57344,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|7|Krok 7: scenariusz omówiony (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -57408,8 +57408,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -57424,7 +57424,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|12|Krok 12 (dodatkowy): review przez artystę + poprawki (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -57616,8 +57616,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Obróbka, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -57632,8 +57632,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -57648,7 +57648,7 @@
           "h": 31
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|1|Krok 1: mail wysłany (Outreach), w trakcie - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center border-tra"
       },
@@ -58128,7 +58128,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -58384,8 +58384,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Ustalenia + scenariusz, brak daty - ustaw na produkcji, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -58432,8 +58432,8 @@
           "h": 20
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON||Publikacja, 14 wrz 2026, do zrobienia (klik = odhacz)||group/button shrink-0 items-center justify-center text-sm fo"
       },
       {
@@ -58512,8 +58512,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
+        "outline": "none 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|5|Krok 5: data przekazana (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -58528,7 +58528,7 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
         "klucz": "BUTTON|6|Krok 6 (dodatkowy): outline scenariusza (Ustalenia + scenariusz), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
@@ -58608,8 +58608,8 @@
           "h": 24
         },
         "obwodka": true,
-        "outline": "none 2px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.9849",
+        "outline": "none 3px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 ",
         "klucz": "BUTTON|11|Krok 11: obróbka (Obróbka), do zrobienia - klik kończy ten i wszystkie poprzednie||group/button shrink-0 items-center justify-center whitespace"
       },
       {
@@ -58887,7 +58887,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788404068556 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788395837330 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -59023,14 +59023,6 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788403379615 OUTREACH 1/4 kr",
-        "label": "",
-        "testid": "",
-        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
-      },
-      {
-        "tag": "a",
-        "role": "",
         "text": "Prod F1-04 1788403382211 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
@@ -59048,6 +59040,14 @@
         "tag": "a",
         "role": "",
         "text": "Prod F1-04 1788404065884 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788404068556 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -59439,14 +59439,6 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788395837330 OUTREACH 0/4 kr",
-        "label": "",
-        "testid": "",
-        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
-      },
-      {
-        "tag": "a",
-        "role": "",
         "text": "Prod F1-04 1788397595031 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
@@ -59616,6 +59608,14 @@
         "tag": "a",
         "role": "",
         "text": "Prod F1-04 1788403377218 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788403379615 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px"
@@ -60097,7 +60097,7 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788404068556 OUTREACH 0/4 kr",
+        "text": "Prod F1-04 1788395837330 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
         "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
@@ -60108,7 +60108,7 @@
         "obwodka": true,
         "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788404068556 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+        "klucz": "A|Prod F1-04 1788395837330 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
@@ -60369,22 +60369,6 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788403379615 OUTREACH 1/4 kr",
-        "label": "",
-        "testid": "",
-        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
-        "box": {
-          "w": 960,
-          "h": 215
-        },
-        "obwodka": true,
-        "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788403379615 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
-      },
-      {
-        "tag": "a",
-        "role": "",
         "text": "Prod F1-04 1788403382211 OUTREACH 0/4 kr",
         "label": "",
         "testid": "",
@@ -60429,6 +60413,22 @@
         "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "none",
         "klucz": "A|Prod F1-04 1788404065884 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788404068556 OUTREACH 0/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 207
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788404068556 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",
@@ -61201,22 +61201,6 @@
       {
         "tag": "a",
         "role": "",
-        "text": "Prod F1-04 1788395837330 OUTREACH 0/4 kr",
-        "label": "",
-        "testid": "",
-        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
-        "box": {
-          "w": 960,
-          "h": 207
-        },
-        "obwodka": true,
-        "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
-        "boxShadow": "none",
-        "klucz": "A|Prod F1-04 1788395837330 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
-      },
-      {
-        "tag": "a",
-        "role": "",
         "text": "Prod F1-04 1788397595031 OUTREACH 1/4 kr",
         "label": "",
         "testid": "",
@@ -61565,6 +61549,22 @@
         "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
         "boxShadow": "none",
         "klucz": "A|Prod F1-04 1788403377218 OUTREACH 0/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
+      },
+      {
+        "tag": "a",
+        "role": "",
+        "text": "Prod F1-04 1788403379615 OUTREACH 1/4 kr",
+        "label": "",
+        "testid": "",
+        "cls": "card-editorial p-5 block ui-transition hover:-translate-y-px",
+        "box": {
+          "w": 960,
+          "h": 215
+        },
+        "obwodka": true,
+        "outline": "auto 1px oklab(0.61999 -0.0618134 -0.190191 / 0.5)",
+        "boxShadow": "none",
+        "klucz": "A|Prod F1-04 1788403379615 OUTREACH 1/4 kr|||card-editorial p-5 block ui-transition hover:-translate-y-px"
       },
       {
         "tag": "a",

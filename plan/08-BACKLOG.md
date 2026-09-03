@@ -2580,7 +2580,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   punktami wejścia (było 74, spadek o 1), `npm run lint` 0 błędów i **36** ostrzeżeń
   (było 37 — martwy komponent wnosił jedno `react-hooks/exhaustive-deps`).
 
-- [ ] **F7-27** `znalezisko` `dane` Przesunięcie startu produkcji gubi się w polu, ale nie w danych
+- [x] **F7-27** `znalezisko` `dane` Przesunięcie startu produkcji gubi się w polu, ale nie w danych
   Znalezione przy F7-01 na uruchomionej aplikacji, `/productions/80`. Pole „Start produkcji"
   (`T1StartEditor`) dostaje `t1Start` z `getFirstPeriodStart(t0At, periods)`
   (`src/lib/production-steps.ts:143`), a ta funkcja **zaokrągla `t0At` do poniedziałku**
@@ -2593,6 +2593,28 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   a za każdym razem dokłada kolejne dni — cztery przebiegi po +2 dni przesunęły
   produkcję o 8 dni bez żadnego widocznego śladu w polu. Mierzone: po każdym
   przesunięciu `input[type="date"]` = `2026-08-31`, a `T-0` rosło o 2 dni.
+  ZROBIONE 2026-09-03. Odtworzone na uruchomionej aplikacji, `/productions/80`: trzy
+  przesunięcia o +2 dni z rzędu, pole za każdym razem wracało do `2026-08-31`, a `T-0`
+  szło `14 wrz -> 16 wrz -> 18 wrz -> 20 wrz`. Kolumna `t0_at` w bazie potwierdziła dryf
+  (`2026-09-14` przed, `2026-09-20` po). To był **błąd i wyświetlania, i danych**:
+  oś przesuwała się poprawnie o zadaną deltę, ale uchwyt startu był kwantowany do
+  tygodnia, więc pole nie odzwierciedlało zapisu, a powtórzenie akcji liczyło tę samą
+  deltę jeszcze raz i dokładało dni do bazy.
+  Naprawa: `getFirstPeriodStart` liczy się od DNIA `t0At`, nie od poniedziałku jego
+  tygodnia (`src/lib/production-steps.ts`), a `shiftProductionT1Start` woła tę samą
+  funkcję zamiast liczyć `oldT1` po swojemu (`src/server/actions/production-steps.ts`).
+  Pas ganta zostaje tygodniowy (`getStepWeekRange` bez zmian), zmienia się tylko uchwyt.
+  Dowód na uruchomionej aplikacji: przesunięcia o 1, 2 i 3 dni dały po przeładowaniu
+  dokładnie zadaną datę (`2026-09-06 -> 07 -> 09 -> 12`), a powtórzenie tej samej daty
+  zostawiło `T-0: 26 wrz 2026, 12:00` bez zmian. Produkcja 80 przywrócona do
+  `2026-09-14 10:00+00`. Scenariusz e2e: `e2e/f7-27-start-produkcji.spec.ts`
+  (n = 1, 2, 3 plus powtórka), `npx playwright test` **23 zielone w 1,6 min**.
+  Test jednostkowy dryfu stoi w `src/lib/production-steps.test.ts` na czystej funkcji
+  (`przesunięcie T-0 o jeden dzień przesuwa start o dokładnie jeden dzień`) — akcji
+  serwerowej nie da się zaimportować do vitesta (`server-only`, patrz F7-30), więc
+  idempotencję akcji sprawdza scenariusz e2e.
+  Istniejące produkcje: dryf jest nieodróżnialny od świadomej edycji, więc nie da się
+  go automatycznie cofnąć; poza produkcją 80 (naprawioną) nie stwierdzono żadnej.
   Waga: **ważne**. Szacunek: pół dnia.
   AC:
   - po przesunięciu startu o `n` dni pole „Start produkcji" po przeładowaniu strony

@@ -106,8 +106,17 @@ describe('okno tygodnia dla kategorii', () => {
     expect(range.end.getHours()).toBe(23);
   });
 
-  it('pierwszy okres startuje dwa tygodnie przed tygodniem T-0', () => {
-    expect(getFirstPeriodStart(new Date(2026, 5, 18))).toEqual(new Date(2026, 5, 1));
+  it('pierwszy okres startuje czternaście dni przed dniem T-0', () => {
+    expect(getFirstPeriodStart(new Date(2026, 5, 18))).toEqual(new Date(2026, 5, 4));
+  });
+
+  // F7-27: uchwyt startu musi być dokładny co do dnia, inaczej przesunięcie
+  // o 1..6 dni nie zmienia wyświetlanej daty, a akcja liczy tę samą deltę
+  // jeszcze raz i dryf kumuluje się w bazie.
+  it('przesunięcie T-0 o jeden dzień przesuwa start o dokładnie jeden dzień', () => {
+    const a = getFirstPeriodStart(new Date(2026, 5, 18, 12, 0));
+    const b = getFirstPeriodStart(new Date(2026, 5, 19, 12, 0));
+    expect((b.getTime() - a.getTime()) / 86_400_000).toBe(1);
   });
 });
 
