@@ -823,3 +823,21 @@ numerował kroki zmienną `runningOffset` nadpisywaną wewnątrz `map`, opakowan
 tylko po to, żeby ta zmienna miała gdzie mieszkać. Nowy kod liczy pierwszy numer
 kategorii wprost z `steps` i IIFE znika. Sprawdzone porównaniem tekstu strony przed
 i po na czterech szablonach — bajt w bajt to samo.
+
+**F7-04, licznik z kryteriów F7 liczy nie to, co miał liczyć.** Kryteria w F7-01 do
+F7-05 mierzą postęp komendą `npx eslint . -f json | grep -c '<nazwa reguły>'`.
+Formatter `json` dokłada do każdego pliku, który ma jakikolwiek komunikat, pole `source`
+z całą treścią tego pliku. `eslint.config.mjs` ma własne ostrzeżenie
+(`import/no-anonymous-default-export`) i wymienia nazwy reguł w komentarzach, a pliki
+z F7-02 mają w kodzie `eslint-disable-next-line <nazwa reguły>`. Efekt: `grep` trafia
+w komentarze i zwraca liczbę większą od zera przy zerowej liczbie komunikatów. Uczciwy
+licznik: `npx eslint . -f json | jq '[.[].messages[] | select(.ruleId=="X")] | length'`.
+Wyniki w F7 podawane są tym licznikiem, a rozbieżność opisana przy każdym issue.
+
+**F7-04, dowód wymagał wywołania stanu pustego.** Oba `<a>` żyją w gałęzi „brak
+szablonów kampanii", której przy dwóch szablonach w bazie roboczej nie da się zobaczyć.
+Weryfikacja: `pg_dump --data-only -t marketing_templates` do pliku, `delete from
+marketing_templates`, `template_slug = null` na kampanii 1, przebieg testu, przywrócenie
+z kopii i sprawdzenie, że wróciły 2 wiersze i slug. Kontrola negatywna na kodzie sprzed
+zmiany dała `BRAK` w obu miejscach, czyli test naprawdę odróżnia nawigację klientem od
+przeładowania dokumentu, a nie przechodzi „przy okazji".

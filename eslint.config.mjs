@@ -57,6 +57,7 @@ export default [
   // z uzasadnieniem; dwa w komponentach klienckich zostaly naprawione.
   // F7-03 zamkniete: `react-hooks/immutability` i `react-hooks/refs` tak samo,
   // obie listy znikly.
+  // F7-04 zamkniete: `@next/next/no-html-link-for-pages` tak samo.
 
   {
     // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
@@ -124,12 +125,4 @@ export default [
     rules: { 'react/no-unescaped-entities': 'warn' },
   },
 
-  {
-    // GRANDFATHER (F7-04): surowy <a> na trase wewnetrzna.
-    files: [
-      'src/components/campaigns/apply-template-button.tsx',
-      'src/components/campaigns/campaign-wizard.tsx',
-    ],
-    rules: { '@next/next/no-html-link-for-pages': 'warn' },
-  },
 ];

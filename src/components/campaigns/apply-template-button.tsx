@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -54,9 +55,9 @@ export function ApplyTemplateButton({
     return (
       <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50/50 px-4 py-3 text-xs text-amber-900">
         Brak szablonów kampanii. Utwórz pierwszy w{' '}
-        <a href="/campaigns/templates/new" className="underline font-medium">
+        <Link href="/campaigns/templates/new" className="underline font-medium">
           /campaigns/templates/new
-        </a>{' '}
+        </Link>{' '}
         - bez szablonu kampania nie ma narracji.
       </div>
     );

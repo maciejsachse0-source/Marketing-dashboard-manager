@@ -1618,7 +1618,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   **DYSPOZYCJA: ZROBIONE.** Wszystkie 11 trafień usunięte przez jeden wspólny hak
   `useResetOnChange` (`src/lib/use-reset-on-change.ts`, 8 linii kodu) — wzorzec
   „dostosowania stanu w trakcie renderu" z dokumentacji Reacta zamiast efektu.
-  Dowody: `npx eslint . -f json | grep -c set-state-in-effect` zwraca `0`;
+  Dowody: `npx eslint . -f json | jq '[.[].messages[] | select(.ruleId=="react-hooks/set-state-in-effect")] | length'` zwraca `0` (o `grep -c` z kryterium patrz uwaga o licznikach niżej);
   reguła zniknęła z `eslint.config.mjs` razem z całą swoją listą wyjątków
   (blok grandfather rozbity na osobną listę plików per reguła, żeby dało się
   wypisywać z jednej reguły, a nie z całego worka); ostrzeżenia lintu 108 → 93;
@@ -1658,7 +1658,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   Trzy z nich są w komponentach serwerowych (brak `'use client'`) i dostały lokalne
   `eslint-disable-next-line react-hooks/purity` z uzasadnieniem; dwa kliencke dostały
   `useState(() => Date.now())`. Rozumowanie w `DECISIONS.md`.
-  Dowody: `npx eslint . -f json | grep -c 'react-hooks/purity'` zwraca `0`; reguła
+  Dowody: `npx eslint . -f json | jq '[.[].messages[] | select(.ruleId=="react-hooks/purity")] | length'` zwraca `0`; reguła
   usunięta z `eslint.config.mjs` razem z listą; ostrzeżenia lintu 93 → 88, 0 błędów;
   `npm run test` 216 zielonych; `npm run typecheck` 0. Pomiar `/calendar`, mediana
   z trzech przebiegów na budowaniu produkcyjnym: przed 85,2 ms, po 79,3 ms, bundel
@@ -1692,7 +1692,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   mapowania zniknął; (3) zapis `onPeriodsChangeRef.current` przeniesiony z renderu do
   efektu bez tablicy zależności (efekty biegną w kolejności deklaracji, więc ref jest
   aktualny, zanim odpali się powiadomienie).
-  Dowody: `npx eslint . -f json | grep -cE 'react-hooks/(immutability|refs)'` zwraca `0`;
+  Dowody: ten sam licznik z `jq` dla `react-hooks/immutability` i `react-hooks/refs` zwraca `0`;
   obie reguły usunięte z `eslint.config.mjs` razem z listami; ostrzeżenia lintu 88 → 85,
   0 błędów; `npm run typecheck` 0; `npm run test` 216 zielonych; złożoność
   `TemplateForm` bez zmian (19 przed i po). Weryfikacja na uruchomionej aplikacji:
@@ -1713,7 +1713,27 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `npx eslint . -f json | grep -cE 'react-hooks/(immutability|refs)'` zwraca `0`
   - te 3 pliki wypisane z listy grandfather
 
-- [ ] **F7-04** `znalezisko` `ui` Dwa `<a href>` na trasy wewnętrzne zamiast `<Link>`
+- [x] **F7-04** `znalezisko` `ui` Dwa `<a href>` na trasy wewnętrzne zamiast `<Link>`
+  **DYSPOZYCJA: ZROBIONE.** Oba `<a>` zamienione na `<Link>` z `next/link`.
+  Dowód licznikowy: `npx eslint . -f json | jq '[.[].messages[] |
+  select(.ruleId=="@next/next/no-html-link-for-pages")] | length'` zwraca `0`,
+  a reguła zniknęła z `eslint.config.mjs`. **Uwaga do kryterium:**
+  `grep -c 'no-html-link-for-pages'` na wyjściu `-f json` zwraca `1` mimo zera
+  komunikatów — formatter `json` dokłada do każdego pliku z jakimkolwiek komunikatem
+  pole `source` z całą treścią pliku, a `eslint.config.mjs` ma własne ostrzeżenie
+  i wspomina nazwę reguły w komentarzu. Ten sam błąd dotyczy liczników w F7-01, F7-02,
+  F7-03 i F7-05; policzone po `ruleId`, nie po tekście.
+  Weryfikacja na uruchomionej aplikacji, oba linki żyją w stanie pustym „brak szablonów
+  kampanii", więc trzeba go było wywołać: kopia `marketing_templates` przez `pg_dump`,
+  wyczyszczenie tabeli i `template_slug = null` na kampanii 1, po teście przywrócenie
+  z kopii (sprawdzone: 2 wiersze i slug z powrotem). W tym stanie skrypt ustawia
+  `window.__zyje = 'tak'`, klika link i czyta wartość po nawigacji:
+  - **po zmianie**: karta kampanii `tak`, kreator nowej kampanii `tak` (dokument przeżył)
+  - **przed zmianą, kontrola negatywna**: karta kampanii `BRAK`, kreator `BRAK`
+    (pełne przeładowanie dokumentu wyczyściło `window`)
+  Negatywne: `npm run test` 216 zielonych, `npm run typecheck` 0, ostrzeżenia lintu
+  85 → 83, pngdiff `/campaigns` i `/campaigns/1` po 0 różnych pikseli.
+
   Waga: **drobne**. Szacunek: 15 minut.
   `@next/next/no-html-link-for-pages`, 2 trafienia: `campaigns/apply-template-button.tsx`
   i `campaigns/campaign-wizard.tsx`. Surowy `<a>` na trasę wewnętrzną robi pełne

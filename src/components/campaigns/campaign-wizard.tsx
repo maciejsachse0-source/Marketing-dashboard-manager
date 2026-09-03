@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -204,12 +205,12 @@ function StepTemplate({
     return (
       <div className="rounded-lg border border-dashed border-border bg-card/30 p-6 text-center text-sm text-muted-foreground">
         Brak szablonów kampanii. Utwórz pierwszy w{' '}
-        <a
+        <Link
           href="/campaigns/templates/new"
           className="underline text-foreground hover:text-[var(--accent-blue)]"
         >
           /campaigns/templates/new
-        </a>
+        </Link>
         .
       </div>
     );
