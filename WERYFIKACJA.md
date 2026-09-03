@@ -5,6 +5,12 @@ Lista jest zbudowana z issues, które naprawdę są skończone. Pozycje zablokow
 (F4-06, F5-04 w części publicznego adresu, F7-23, F7-29, cała faza F8) nie mają tu wpisu,
 bo nie ma czego klikać.
 
+Aktualizacja 2026-09-03, po naprawie znalezisk recenzji: jedenaście uwag z końca
+tego dokumentu przestało być listą do decyzji. Każda dostała issue (**F7-33 do F7-43**)
+i została wykonana, więc ostatnia sekcja to dziś normalne pozycje do odklikania,
+a nie pytania do Ciebie. Dotknięte przy okazji pozycje z F0, F1, F2, F3, F5 i F6
+opisują stan po naprawie.
+
 ## Jak z tego korzystać
 
 1. Odpal bazę i aplikację na tej maszynie:
@@ -49,15 +55,18 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   Uruchamiasz: `node scripts/perf/table-counts.mjs`.
   Oczekujesz: `videographers 60`, `campaigns 40`, `calendar_entries 3000`,
   `posts 5000`, `csv_uploads 20`, `csv_rows 12000`.
-  Uwaga, znaleziona rozbieżność: `artists` pokazuje dziś 1180 zamiast 200,
-  a `productions` 504 zamiast 500, bo przebiegi testowe dopisały wiersze do bazy
-  pomiarowej. Jeżeli chcesz czystego pomiaru, przed nim wykonaj
-  `npx tsx scripts/perf/seed-large.ts`, który stawia zestaw od zera.
+  Także `artists 200` i `productions 500`: rozjazd (1180 i 504) był naprawiony
+  2026-09-03 przez `npx tsx scripts/perf/seed-large.ts`, który stawia zestaw od zera.
+  Od F7-34 nie da się już tego przeoczyć: `npm run perf` wypisuje sekcję `ZESTAW L`
+  z jedenastoma wierszami i kończy kodem 1, gdy którakolwiek liczba się nie zgadza.
+  Liczności stoją w jednym miejscu, `perf/budget.json` klucz `zestawL`, czytanym
+  i przez generator, i przez raport.
 
 - [ ] **Harness pomiarowy odpowiada liczbami, nie opiniami** (F0-04, F0-05), terminal
   Uruchamiasz: `npm run perf:serve` w jednym oknie, `npm run perf` w drugim.
   Oczekujesz: tabela `BAZA` z czterema zapytaniami, przy każdym `seqScan nie`;
-  tabela `STRONY` z dziewięcioma adresami; linia `BUNDLE`; na końcu
+  tabela `STRONY` z dziewięcioma adresami; sekcje `ZESTAW L` (F7-34) i
+  `KOMPONENTY KLIENCKIE` (F7-40); linia `BUNDLE`; na końcu
   `Wszystkie progi trzymają` i kod wyjścia 0.
 
 - [ ] **Dokumentacja mówi prawdę o stacku** (F0-06, F0-07, F6-03, Z12), plik
@@ -93,6 +102,10 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   i obalona, opis w `DECISIONS.md` pod hasłem F1-03), a `src/app/layout.tsx`
   nie ma już linii `export const dynamic = 'force-dynamic'`.
   Kontrola: `grep -c "force-dynamic" src/app/layout.tsx` zwraca `0`.
+  Dociągnięte w F7-41: pozostałe 27 deklaracji `force-dynamic` ma nad sobą komentarz
+  z powodem (baza czytana na żądanie, katalog z dysku, ciało żądania, ciasteczko sesji),
+  dwie zbędne zniknęły, a `node scripts/check-typography.mjs` kończy kodem 1, gdy
+  ktoś doda deklarację bez uzasadnienia.
 
 - [ ] **Zapis od razu widać w docelowym widoku** (F1-04), `/productions/list`,
       `/campaigns/list`, `/artists`, `/calendar`
@@ -127,8 +140,12 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
 
 - [ ] **Kod JavaScript strony kalendarza mieści się w budżecie** (F2-06), terminal
   Uruchamiasz: `npm run perf:serve`, potem `npm run perf`.
-  Oczekujesz: linia `JS /calendar (gzip) 293.3 kB / limit 301.6`, status `ok`.
+  Oczekujesz: linia `JS /calendar (gzip) 293.4 kB / limit 301.6`, status `ok`.
   Punkt wyjścia przed przebudową to 354,8 kB, czyli spadek o około 17 procent.
+  Od F7-40 tuż pod spodem stoi druga linia, `pliki z use client 64 plików / limit 64`.
+  Kryterium F2-06 mówiło o **50** plikach klienckich i przestało być prawdziwe
+  (F7-36 zdjął jeden, zostało 64); teraz pilnuje go bramka, a nie tylko zdanie
+  w backlogu.
 
 ---
 
@@ -142,10 +159,13 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   i `/team` każdy guzik ma ten sam kształt narożników, tę samą wysokość w danym rozmiarze
   i tę samą obwódkę po wejściu tabulatorem.
 
-- [ ] **Teksty nie mają emoji, wyśrodkowanych kropek ani długich myślników**
-      (F3-06, F7-17, zasady Z5, Z6, Z7), terminal plus przeglądarka
+- [ ] **Teksty nie mają emoji, kropek, myślników, strzałek ani twardych kolorów**
+      (F3-06, F7-17, F7-38, F7-39, F7-41, zasady Z4, Z5, Z6, Z7), terminal plus przeglądarka
   Uruchamiasz: `node scripts/check-typography.mjs` oraz `node scripts/check-typography.mjs data`.
   Oczekujesz: obie komendy wypisują `TRAFIENIA: 0`.
+  Skrypt urósł 2026-09-03 i pilnuje dziś czterech rzeczy więcej: twardych kolorów
+  `rgb(` i `#rrggbb` (F7-38), strzałek typograficznych w blokach 2190-21FF (F7-39)
+  oraz komentarza z powodem nad każdą deklaracją `force-dynamic` (F7-41).
   Klikasz: przejrzyj `/agents` i wejdź w dowolną personę.
   Oczekujesz: w opisach nie ma znaku `—` ani `·`. Treść promptu systemowego zostaje
   nietknięta, bo idzie do modelu, nie na ekran.
@@ -252,7 +272,9 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
 - [ ] **Bramka wydajnościowa blokuje regres, ale nie pada na szumie** (F5-02), terminal
   Uruchamiasz: `node scripts/perf/drift-selftest.mjs`, potem `npm run perf`.
   Oczekujesz: samotest przechodzi, a w raporcie sekcja `DRYF` wypisuje ostrzeżenia
-  przy zmianach powyżej 15 procent i kończy się `Wszystkie progi trzymają`.
+  przy pogorszeniu powyżej 15 procent i kończy się `Wszystkie progi trzymają`.
+  Zmiana w dół jest od F7-43 podpisana słowem `poprawa`, nie `ostrzeżenie` —
+  wcześniej raport ostrzegał także wtedy, gdy było szybciej.
   Ostrzeżenie samo w sobie nie blokuje, blokuje dopiero 30 procent razem
   z 10 procentami limitu budżetowego.
 
@@ -261,6 +283,9 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   musi być wolny, test stawia własny serwer na bazie testowej).
   Oczekujesz: `22 passed, 1 skipped` w około 1,5 minuty. Pominięty jest wyłącznie pomiar
   przerysowania ganta, który ma sens dopiero na budowaniu produkcyjnym.
+  Sprawdź też `git status --short`: od F7-42 ma być pusty. Zrzuty dowodowe lecą
+  domyślnie do ignorowanego `test-results/`, a `screenshots/` aktualizuje dopiero
+  `UPDATE_SHOTS=1 npx playwright test`.
 
 - [ ] **Środowisko do klikania dla zespołu wstaje lokalnie** (F5-04, część niezablokowana),
       `http://localhost:3001`
@@ -277,7 +302,8 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
   Uruchamiasz: `npm run perf:serve`, potem `node scripts/a11y-audit.mjs`.
   Oczekujesz: dla `/calendar`, `/productions/list` i `/import/osoby` po trzy zera:
   `bez obwódki ogniskowania: 0`, `guziki bez nazwy: 0`, `obszar dotyku < 44 px: 0`,
-  a na końcu `RAZEM naruszeń: 0`.
+  a na końcu `RAZEM naruszeń: 0`. Plik z wynikiem ląduje w `test-results/F6/`;
+  do śledzonego `screenshots/F6/` trafia dopiero pod `UPDATE_SHOTS=1` (F7-42).
   Klikasz sam: wejdź na `/calendar`, naciskaj tabulator.
   Oczekujesz: przy każdym elemencie widać wyraźną obwódkę, żaden nie jest przeskakiwany.
 
@@ -370,25 +396,87 @@ i dopiero wtedy uruchamiaj pomiar w drugim oknie terminala.
 
 ---
 
-## Znaleziska recenzenta, do rozstrzygnięcia przez Ciebie
+## Znaleziska recenzenta, naprawione 2026-09-03 (F7-33 do F7-43)
 
-Poniższe nie są pozycjami do odhaczenia, tylko listą do decyzji. Pełny opis w raporcie
-recenzji, każde nadaje się na issue w `F7-ZNALEZISKA`.
+Jedenaście znalezisk z recenzji końcowej trafiło do `plan/08-BACKLOG.md` jako issues
+**F7-33 do F7-43** i zostało wykonanych. Poniższe pozycje sprawdzasz tak jak resztę
+listy: to już nie są pytania do Ciebie, tylko rzeczy do klikniętego potwierdzenia.
 
-- [ ] Katalog o nazwie `C:\Users\Hp omen\OneDrive\MARKETPLACE DOCS\Marketing Content`
-      powstaje w katalogu repozytorium na macOS i rośnie z każdym przebiegiem testów
-      (dziś 59 podkatalogów). Źródło: `src/lib/production-work-folder.ts:37`.
-- [ ] Baza pomiarowa `marketing_perf` odjechała od zestawu L (1180 artystów zamiast 200,
-      504 produkcje zamiast 500), a przebiegi w `perf/runs/` nie zapisują liczby wierszy,
-      więc nie widać, na jakich danych zmierzono którą liczbę.
-- [ ] Cztery komponenty z `src/components/ui/` i `src/components/campaigns/milestones-tracker.tsx`
-      nie mają ani jednego odbiorcy, razem 1012 linii martwego kodu.
-- [ ] Akcja serwerowa `saveOutreach` w `src/server/actions/outreach.ts` nie jest wołana
-      z żadnego miejsca w interfejsie.
-- [ ] Strzałki `←` i `→` w tekstach przycisków i odnośników zastępują ikony,
-      a zasada Z5 mówi o ikonach wyłącznie z `lucide-react`.
-- [ ] Cztery pliki ganta mają kolor cienia wpisany wprost jako `rgb(...)`,
-      co zasada Z4 wyklucza.
+- [ ] **Katalog o windowsowej nazwie nie powstaje w repozytorium** (F7-33), terminal
+  Uruchamiasz: `npx playwright test`, potem `ls -d 'C:'*` w katalogu repozytorium.
+  Oczekujesz: `no matches found`. Stary katalog (59 podkatalogów) został usunięty,
+  a `getRoot()` poza Windowsem zwraca `<repo>/.data-local-content`, wpisany
+  do `.gitignore`. Literał `C:\Users\...` działa tylko tam, gdzie jest ścieżką
+  bezwzględną, czyli na Windowsie.
+
+- [ ] **Pomiar zapisuje, na ilu wierszach był zrobiony** (F7-34), terminal
+  Uruchamiasz: `npm run perf:serve`, potem `npm run perf`.
+  Oczekujesz: sekcja `ZESTAW L` z jedenastoma wierszami `ok`, między innymi
+  `artists 200` i `productions 500`. Raport kończy kodem 1, gdy baza pomiarowa
+  odjedzie od specyfikacji, więc p95 mierzone na innych danych nie przejdzie po cichu.
+
+- [ ] **Kamerzyści w bazie pomiarowej mają nowe kolumny, nie samo `contact`** (F7-35),
+      terminal plus przeglądarka
+  Uruchamiasz: `npx tsx scripts/perf/seed-large.ts`, potem otwierasz `/videographers`
+  na środowisku pomiarowym.
+  Oczekujesz: karty pokazują nick, mail i telefon z ich własnych kolumn (ścieżka z F7-32),
+  a nie stare pole `contact`. W bazie po zasianiu: `email 35`, `handle 47`, `phone 24`,
+  `location 37`, `status 28` niepuste. Przed naprawą wszystkie trzy pierwsze były zerowe.
+
+- [ ] **Nie ma już komponentów bez odbiorcy** (F7-36), terminal
+  Uruchamiasz: `grep -rn "milestones-tracker\|ui/dropdown-menu\|ui/tabs\|ui/scroll-area\|ui/separator" src e2e`.
+  Oczekujesz: zero trafień. Pięć plików, razem 1012 linii, zostało usuniętych;
+  przy okazji ostrzeżeń lintu ubyło z 36 do 35.
+
+- [ ] **Akcja serwerowa bez odbiorcy zniknęła** (F7-37), terminal
+  Uruchamiasz: `grep -rn "saveOutreach" src e2e`.
+  Oczekujesz: zero trafień. Wyeksportowana akcja `'use server'` jest endpointem HTTP
+  niezależnie od tego, czy woła ją interfejs, a tej nie wołał nikt. Schemat walidacji
+  `outreachInputSchema` został, bo używa go wprost persona `agents/artist-outreach.md`.
+  Uzasadnienie wyboru „skasować" zamiast „udokumentować jak F7-09" stoi w `DECISIONS.md`.
+
+- [ ] **Cienie i ramki idą przez tokeny, nie przez `rgb(...)`** (F7-38, zasada Z4), terminal
+  Uruchamiasz: `grep -rn "rgb(" src/components | wc -l` oraz `node scripts/check-typography.mjs`.
+  Oczekujesz: `0` i `TRAFIENIA: 0`. Cztery pliki ganta używają teraz
+  `shadow-(--shadow-rail)`, a formularz szablonu kampanii `border-(--border-faint)` —
+  to piąte miejsce, którego recenzja nie wymieniła, znalazła dopiero nowa reguła bramki.
+  Wygląd bez zmian: przeglądarka liczy cień jako `lab(0 0 0 / 0.08) 2px 0px 6px -2px`,
+  czyli dokładnie tę samą czerń w 8 procentach, którą dawał literał.
+
+- [ ] **Strzałki w tekstach zastąpione ikonami** (F7-39, zasada Z5), przeglądarka plus terminal
+  Klikasz: pulpit (odnośnik „cała analityka"), `/campaigns/<id>` i `/productions/<id>`
+  (powrót), kreator produkcji i kampanii (Wstecz, Dalej), paleta poleceń (Ctrl+K, stopka).
+  Oczekujesz: w każdym z tych miejsc widać ikonę strzałki z `lucide-react`, nie znak
+  tekstowy; czytnik ekranu jej nie czyta, bo ma `aria-hidden`.
+  Uruchamiasz: `node scripts/check-typography.mjs`. Oczekujesz `TRAFIENIA: 0`.
+  Uwaga: miejsc było trzydzieści cztery, nie dziewięć. Tam, gdzie strzałka była
+  separatorem zakresu dat („12.03 do 19.03") albo listy faz, wstawione zostało słowo,
+  bo separator nie jest ikoną i nie ma czym go zastąpić z `lucide-react`.
+
+- [ ] **Liczba plików klienckich jest pilnowana bramką** (F7-40), terminal
+  Uruchamiasz: `npm run perf`.
+  Oczekujesz: linia `pliki z use client 64 plików / limit 64`, status `ok`.
+  Kryterium odhaczonego F2-06 mówiło 50 i przestało być prawdziwe; wpis w backlogu
+  ma teraz adnotację z wartością aktualną i powodem, dlaczego to nie regres wydajności
+  (bundel `/calendar` nadal 293,4 kB przy progu 301,6 kB).
+
+- [ ] **Każda deklaracja `force-dynamic` mówi, dlaczego jest** (F7-41), terminal
+  Uruchamiasz: `grep -rn "force-dynamic" src | wc -l` oraz `node scripts/check-typography.mjs`.
+  Oczekujesz: `27` i `TRAFIENIA: 0`. Każda deklaracja ma nad sobą komentarz z powodem,
+  dwie zbędne (`/templates/new`, `/campaigns/templates/new`) zniknęły, a bramka nie
+  przepuszcza nowej deklaracji bez uzasadnienia.
+
+- [ ] **Uruchomienie bramek nie brudzi drzewa roboczego** (F7-42), terminal
+  Uruchamiasz na czystym drzewie: `npx playwright test`, potem `node scripts/a11y-audit.mjs`,
+  potem `git status --short`.
+  Oczekujesz: pustka. Zrzuty dowodowe i `a11y-audit.json` lądują w ignorowanym
+  `test-results/`; do śledzonego `screenshots/` dopiero przy `UPDATE_SHOTS=1`.
+
+- [ ] **Raport dryfu nie ostrzega o tym, że jest szybciej** (F7-43), terminal
+  Uruchamiasz: `npm run perf`.
+  Oczekujesz: w sekcji `DRYF` zmiany w dół podpisane słowem `poprawa`, w górę
+  `ostrzeżenie`, blokada bez zmian. Przykład z ostatniego przebiegu:
+  `poprawa hmrMs: 1961 -> 466 (-76%)`.
 
 ---
 
