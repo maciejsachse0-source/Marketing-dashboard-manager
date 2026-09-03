@@ -1036,3 +1036,43 @@ jak reszta tej aplikacji.
 **Dowód, że nic nie zniknęło z ekranu:** `npm run typecheck` kod 0 po skasowaniu,
 zrzuty 1280x720 stron `/`, `/productions`, `/campaigns` przed i po: **0, 0, 0**
 różnych pikseli.
+
+## F7-17: myślnik w danych, rozdzielenie „na ekran" od „do modelu", i gdzie te dane naprawdę mieszkają
+
+Dwa ustalenia, oba zmierzone, oba zmieniają kształt naprawy.
+
+**1. Pliki `data/*.json` nie są już źródłem prawdy dla ekranu.** Katalog agentów
+i szablonów przeniósł się do Postgresa (`agents`, `production_templates`,
+`marketing_templates`; backfill w `drizzle/seed-catalog.ts`, powód: system plików
+na Vercelu jest tylko do odczytu). Poprawka wyłącznie w JSON-ach nie zmieniłaby
+ani jednego piksela: `select count(*) from agents where description like '%—%'`
+zwracało **3** długo po tym, jak plik byłby czysty. Naprawa musi dotknąć obu miejsc —
+bazy, bo ona renderuje, i plików, bo z nich idzie ponowny zasiew.
+
+**2. Rozdzielenie pól jest w tych danych darmowe.** Bałem się, że „widoczne"
+i „idące do modelu" są wymieszane w jednym polu. Nie są: prompt siedzi w osobnym
+kluczu `systemPrompt` (kolumna `system_prompt`), a szablony produkcji i kampanii
+nie mają promptu w ogóle — tam każde pole tekstowe jest napisem na ekran. Zakres
+naprawy: wszystko poza `systemPrompt`.
+
+**Podmiana.** ` — ` na ` - `, mechanicznie, bo wszystkie 85 wystąpień w `data/` to
+dokładnie „spacja, długi myślnik, spacja" (`grep -o '.\{3\}—.\{3\}' | grep -v ' — '`
+zwraca pustkę). Krótki myślnik z odstępami jest wprost dopuszczony przez Z7, więc
+nie ma tu decyzji stylistycznej do podjęcia per zdanie i nie ma ryzyka zmiany sensu.
+
+**Dowód, że prompty są nietknięte:** `git diff -U0 -- data/agents` nie zawiera ani
+jednej zmienionej linii z `"systemPrompt"`, a suma kontrolna `jq -r .systemPrompt`
+zgadza się dla wszystkich sześciu agentów z wersją z `HEAD`. W bazie
+`select count(*) from agents where system_prompt like '%—%'` zwraca **6** przed
+i **6** po — celowo, prompty zostają.
+
+**Bramka, żeby nie wróciło.** `scripts/check-typography.mjs` skanuje teraz także
+`data/**/*.json` (poza `_backup*`), z jednym wyjątkiem: klucz `systemPrompt`.
+Test negatywny: po wstawieniu myślnika do `description` skrypt kończy kodem 1
+i wypisuje plik oraz pole; po cofnięciu kodem 0. Z7 w `plan/01` dostał ten zakres.
+
+**Czego nie ruszyłem:** wierszy pochodnych (produkcje i kampanie założone z szablonu
+kopiują opisy kroków). Sprawdziłem sześć tabel z tekstem użytkownika
+(`calendar_entries`, `productions`, `campaigns`, `posts`, `artists`, `videographers`)
+— **zero** wystąpień, więc nie ma czego migrować. Gdyby kiedyś było, potrzebny jest
+osobny przebieg po tych tabelach, nie po katalogu.

@@ -1,7 +1,7 @@
 {
   "slug": "artist-outreach",
   "name": "Artist Outreach",
-  "description": "Pisze maile do artystów — cold, zaproszenia, briefy, follow-upy, podziękowania.",
+  "description": "Pisze maile do artystów - cold, zaproszenia, briefy, follow-upy, podziękowania.",
   "sidePanel": "artists-list",
   "dashboardWidget": {
     "kind": "stale-artists",

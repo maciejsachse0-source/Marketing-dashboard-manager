@@ -2,15 +2,15 @@
   "slug": "standard-solo",
   "name": "Solo (artysta nagrywa sam)",
   "type": "solo",
-  "summary": "Tygodniowy cykl x2 — Ty robisz koncept i montaż, artysta nagrywa sam.",
-  "description": "Pipeline pod cykl 2 filmików tygodniowo, gdzie artysta nagrywa się sam (telefon / aparat), a Ty dostarczasz koncept, scenariusz i robisz całą obróbkę. Dwie produkcje biegnące równolegle (np. publikacje we wt. + pt.) zapewniają 2 publikacje na tydzień. Brak kamerzysty — etap 'ustalenia' to alignment scenariusza z artystą zamiast brief'a do ekipy filmowej.",
+  "summary": "Tygodniowy cykl x2 - Ty robisz koncept i montaż, artysta nagrywa sam.",
+  "description": "Pipeline pod cykl 2 filmików tygodniowo, gdzie artysta nagrywa się sam (telefon / aparat), a Ty dostarczasz koncept, scenariusz i robisz całą obróbkę. Dwie produkcje biegnące równolegle (np. publikacje we wt. + pt.) zapewniają 2 publikacje na tydzień. Brak kamerzysty - etap 'ustalenia' to alignment scenariusza z artystą zamiast brief'a do ekipy filmowej.",
   "steps": [
     {
       "id": "email-sent",
       "category": "outreach",
       "label": "pomysł na odcinek",
       "dateMode": "record",
-      "description": "Twój research: trendy, formaty, hook. Wybierasz temat odcinka — co rezonuje z audytorium artysty teraz."
+      "description": "Twój research: trendy, formaty, hook. Wybierasz temat odcinka - co rezonuje z audytorium artysty teraz."
     },
     {
       "id": "custom-standard-solo-1",
@@ -24,7 +24,7 @@
       "category": "outreach",
       "label": "artysta przyjmuje koncept",
       "dateMode": "record",
-      "description": "Artysta wraca z OK / poprawkami. Iterujecie do zielonego światła — maks. 1 rundę uwag."
+      "description": "Artysta wraca z OK / poprawkami. Iterujecie do zielonego światła - maks. 1 rundę uwag."
     },
     {
       "id": "cam-meeting-set",
@@ -40,7 +40,7 @@
       "dateMode": "calendar",
       "durationMinutes": 0,
       "calendarType": "deadline",
-      "description": "Wpada artyście w terminarz. Mów o deadline'ie NAGRAŃ, nie publikacji — krytyczne, żeby nie nagrywał w ostatniej chwili."
+      "description": "Wpada artyście w terminarz. Mów o deadline'ie NAGRAŃ, nie publikacji - krytyczne, żeby nie nagrywał w ostatniej chwili."
     },
     {
       "id": "custom-standard-solo-5",
@@ -56,7 +56,7 @@
       "dateMode": "calendar",
       "durationMinutes": 30,
       "calendarType": "meeting",
-      "description": "Krótki call / wymiana głosówek — sprawdzenie czy hook gra, czy ton pasuje. 30 min max, bez przeciągania."
+      "description": "Krótki call / wymiana głosówek - sprawdzenie czy hook gra, czy ton pasuje. 30 min max, bez przeciągania."
     },
     {
       "id": "script-sent",
@@ -74,14 +74,14 @@
       "dateMode": "calendar",
       "durationMinutes": 60,
       "calendarType": "shoot",
-      "description": "Artysta nagrywa sam — telefonem / aparatem. Ty na pingu jeśli zacięcie. Nagraj 2-3 dubli każdej kwestii."
+      "description": "Artysta nagrywa sam - telefonem / aparatem. Ty na pingu jeśli zacięcie. Nagraj 2-3 dubli każdej kwestii."
     },
     {
       "id": "custom-standard-solo-shoot-1",
       "category": "nagrywanie",
       "label": "odbiór surówki",
       "dateMode": "record",
-      "description": "Artysta wrzuca raw na Drive / WeTransfer. Sprawdzasz: kompletność, audio, format, czy są dubli — wyłapuje brakujące zanim zaczniesz montaż."
+      "description": "Artysta wrzuca raw na Drive / WeTransfer. Sprawdzasz: kompletność, audio, format, czy są dubli - wyłapuje brakujące zanim zaczniesz montaż."
     },
     {
       "id": "editing",
@@ -97,7 +97,7 @@
       "category": "obrobka",
       "label": "review przez artystę + poprawki",
       "dateMode": "record",
-      "description": "Wysyłasz preview do artysty. Maks. 1 runda poprawek — większe zmiany odkładasz na następny odcinek (zachowuje cadence)."
+      "description": "Wysyłasz preview do artysty. Maks. 1 runda poprawek - większe zmiany odkładasz na następny odcinek (zachowuje cadence)."
     },
     {
       "id": "publishing",
@@ -111,7 +111,7 @@
       "category": "publikacja",
       "label": "analiza pierwszych 24h",
       "dateMode": "none",
-      "description": "Reach, completion rate, save / share ratio, top retention drops. Krótka notatka — co przenieść do następnego odcinka."
+      "description": "Reach, completion rate, save / share ratio, top retention drops. Krótka notatka - co przenieść do następnego odcinka."
     }
   ]
 }

@@ -4,6 +4,11 @@
  * w literałach tekstowych i w tekście JSX. Komentarze w kodzie są pomijane,
  * bo parser je zna, a grep nie.
  *
+ * Od F7-17 skanuje także katalog `data/` (pliki JSON zasilające katalog agentów
+ * i szablonów). Tam sprawdzane są wszystkie wartości tekstowe POZA `systemPrompt`,
+ * bo prompt idzie do modelu, a nie na ekran, i jego treść ma zostać bajt w bajt.
+ * Katalogi kopii zapasowych (`_backup*`) są pomijane — to zamrożone zrzuty.
+ *
  * Użycie: node scripts/check-typography.mjs [katalog]
  * Kod wyjścia: 0 gdy zero trafień, 1 gdy cokolwiek znaleziono.
  */
@@ -51,5 +56,35 @@ for (const path of files(ROOT)) {
   };
   visit(source);
 }
+// Pliki danych: JSON z `data/`. Klucz `systemPrompt` pomijany świadomie (F7-17).
+function jsonFiles(dir) {
+  return readdirSync(dir).flatMap((entry) => {
+    const path = join(dir, entry);
+    if (statSync(path).isDirectory()) return entry.startsWith('_backup') ? [] : jsonFiles(path);
+    return path.endsWith('.json') ? [path] : [];
+  });
+}
+
+function walkJson(value, key, path) {
+  if (typeof value === 'string') {
+    if (key === 'systemPrompt') return;
+    for (const rule of RULES) {
+      if (rule.re.test(value)) {
+        console.log(`${path}: ${rule.name}: ${key}: ${value.trim().slice(0, 80)}`);
+        hits += 1;
+      }
+    }
+    return;
+  }
+  if (Array.isArray(value)) value.forEach((v) => walkJson(v, key, path));
+  else if (value && typeof value === 'object') {
+    for (const [k, v] of Object.entries(value)) walkJson(v, k, path);
+  }
+}
+
+if (ROOT === 'src') {
+  for (const path of jsonFiles('data')) walkJson(JSON.parse(readFileSync(path, 'utf8')), '', path);
+}
+
 console.log(`TRAFIENIA: ${hits}`);
 process.exit(hits === 0 ? 0 : 1);

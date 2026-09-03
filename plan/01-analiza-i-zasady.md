@@ -116,7 +116,10 @@ Separator to spacja, przecinek albo osobny element.
 
 **Z7. Zakaz długich myślników `—` w tekstach widocznych dla użytkownika aplikacji.**
 W copy używamy przecinka, dwukropka albo krótkiego myślnika z odstępami.
-Zakres, dosłownie: literały tekstowe renderowane w JSX oraz słowniki etykiet w `src/`.
+Zakres, dosłownie: literały tekstowe renderowane w JSX oraz słowniki etykiet w `src/`,
+a od F7-17 także wartości tekstowe w plikach `data/**/*.json` (katalog agentów
+i szablonów), **z wyjątkiem klucza `systemPrompt`** — ten idzie do modelu, nie na ekran,
+i zostaje bajt w bajt. Pomijane są katalogi kopii zapasowych (`_backup*`).
 **Nie dotyczy**: komentarzy w kodzie, dokumentów w `plan/` i `docs/`, komunikatów
 commitów. Metoda sprawdzenia w F3-06, bo grep nie odróżnia stringa od komentarza.
 

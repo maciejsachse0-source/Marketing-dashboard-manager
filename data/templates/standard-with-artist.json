@@ -2,8 +2,8 @@
   "slug": "standard-with-artist",
   "name": "Standard z artystą (9 kroków)",
   "type": "with-artist",
-  "summary": "Pełny pipeline kolaboracji — od pierwszego maila po publikację. Bez dodatkowych kroków.",
-  "description": "Klasyczny scenariusz pracy z artystą: outreach, akceptacja warunków, ustalenie kamerzysty, omówienie i wysłanie scenariusza, nagrywka, obróbka, publikacja. Polecane dla większości kolab — minimalistyczne, bez nadmiarowych kroków.",
+  "summary": "Pełny pipeline kolaboracji - od pierwszego maila po publikację. Bez dodatkowych kroków.",
+  "description": "Klasyczny scenariusz pracy z artystą: outreach, akceptacja warunków, ustalenie kamerzysty, omówienie i wysłanie scenariusza, nagrywka, obróbka, publikacja. Polecane dla większości kolab - minimalistyczne, bez nadmiarowych kroków.",
   "steps": [
     {
       "id": "email-sent",
@@ -17,7 +17,7 @@
       "category": "outreach",
       "label": "akceptacja warunków współpracy",
       "dateMode": "record",
-      "description": "Artysta zgodził się na warunki — termin, lokację, zakres."
+      "description": "Artysta zgodził się na warunki - termin, lokację, zakres."
     },
     {
       "id": "cam-meeting-set",
@@ -33,7 +33,7 @@
       "dateMode": "calendar",
       "durationMinutes": 30,
       "calendarType": "meeting",
-      "description": "Data przekazana kamerzyście — gotowy w terminarzu."
+      "description": "Data przekazana kamerzyście - gotowy w terminarzu."
     },
     {
       "id": "script-discussed",

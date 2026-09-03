@@ -17,14 +17,14 @@
       "category": "outreach",
       "label": "research artysty",
       "dateMode": "none",
-      "description": "Analiza twórczości — utwory, social, audience, ostatnie premiery."
+      "description": "Analiza twórczości - utwory, social, audience, ostatnie premiery."
     },
     {
       "id": "terms-accepted",
       "category": "outreach",
       "label": "akceptacja warunków współpracy",
       "dateMode": "record",
-      "description": "Artysta zgodził się na warunki — termin, lokację, zakres."
+      "description": "Artysta zgodził się na warunki - termin, lokację, zakres."
     },
     {
       "id": "cam-meeting-set",
@@ -40,14 +40,14 @@
       "dateMode": "calendar",
       "durationMinutes": 30,
       "calendarType": "meeting",
-      "description": "Data przekazana kamerzyście — gotowy w terminarzu."
+      "description": "Data przekazana kamerzyście - gotowy w terminarzu."
     },
     {
       "id": "custom-rozszerzony-z-artysta-5",
       "category": "ustalenia",
       "label": "moodboard wizualny",
       "dateMode": "none",
-      "description": "Reference — kadry, kolory, tempo. Wspólny board (Pinterest/FigJam)."
+      "description": "Reference - kadry, kolory, tempo. Wspólny board (Pinterest/FigJam)."
     },
     {
       "id": "script-discussed",
@@ -63,7 +63,7 @@
       "category": "ustalenia",
       "label": "ustalenie lokacji",
       "dateMode": "none",
-      "description": "Studio vs plener — adres, dojazd, rekwizyty, godziny dostępu."
+      "description": "Studio vs plener - adres, dojazd, rekwizyty, godziny dostępu."
     },
     {
       "id": "script-sent",

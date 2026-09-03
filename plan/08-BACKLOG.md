@@ -2246,7 +2246,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   Dowód: `npm run typecheck` kod 0; zrzuty 1280x720 `/`, `/productions`, `/campaigns`
   przed i po — **0, 0, 0** różnych pikseli (`scripts/perf/pngdiff.mjs`).
 
-- [ ] **F7-17** `znalezisko` `ui` Długie myślniki w treściach z `data/`, poza zakresem Z7
+- [x] **F7-17** `znalezisko` `ui` Długie myślniki w treściach z `data/`, poza zakresem Z7
   Znalezione przy F3-06. Zasada Z7 obejmuje dosłownie literały w `src/`, więc kanon
   typografii wyzerował je tylko tam. Tymczasem opisy agentów i szablonów żyją w plikach
   danych i trafiają na ekran bez zmiany: `grep -rno '—' data/agents/*.json | wc -l`
@@ -2264,6 +2264,26 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - zrzut pulpitu po zmianie nie pokazuje ani jednego długiego myślnika w kartach agentów
   - negatywne: `npm run test` kod 0, treść promptów agentów bajt w bajt bez zmian
     (`git diff -- data/agents | grep '"systemPrompt"' | wc -l` zwraca `0`)
+
+  **DYSPOZYCJA: ZROBIONE, ale zakres wyszedł poza pliki.** Pomiar unieważnił połowę
+  treści znaleziska: `data/*.json` **nie jest już źródłem prawdy dla ekranu** — katalog
+  agentów i szablonów mieszka w Postgresie (`agents`, `production_templates`,
+  `marketing_templates`, backfill `drizzle/seed-catalog.ts`). Sama poprawka w plikach
+  nie zmieniłaby ani jednego piksela. Naprawione oba miejsca.
+  Rozdzielenie „na ekran" od „do modelu" okazało się darmowe: prompt siedzi w osobnym
+  kluczu `systemPrompt`, a szablony produkcji i kampanii nie mają promptu w ogóle.
+  Podmiana ` — ` na ` - ` (Z7 dopuszcza krótki myślnik z odstępami) — mechaniczna bez
+  ryzyka, bo wszystkie wystąpienia w `data/` to dokładnie spacja-myślnik-spacja.
+  Dowód: `/`, `/agents`, `/templates`, `/campaigns`, `/productions` — `innerText`
+  strony daje **0** długich myślników na każdej. W bazie pola widoczne: **0**,
+  `system_prompt`: **6 przed i 6 po**. `git diff -U0 -- data/agents` nie ma ani jednej
+  zmienionej linii z `"systemPrompt"`, sumy kontrolne `jq -r .systemPrompt` zgodne
+  z `HEAD` dla wszystkich sześciu agentów. Zrzut pulpitu 1280x720 wobec stanu sprzed
+  zmiany: **908** różnych pikseli, wyłącznie przelanie trzech opisów na kartach agentów
+  (jedyne pola, które się zmieniły). `npm run test` 219 zielonych.
+  **Bramka:** `scripts/check-typography.mjs` skanuje teraz `data/**/*.json` poza
+  `_backup*`, z wyjątkiem klucza `systemPrompt`; test negatywny (wstawiony myślnik)
+  daje kod 1 z nazwą pliku i pola. Z7 w `plan/01` dostał ten zakres.
 
 - [ ] **F7-18** `znalezisko` `test` `tooling` `npx playwright test` po cichu bierze
   cudzy serwer i cudzą bazę
