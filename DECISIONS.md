@@ -1209,3 +1209,47 @@ Do czasu odpowiedzi w `src/lib/csv-mappers.ts` stoi komentarz wymieniający te t
 kolumny z nazwy i mówiący wprost, dlaczego lądują w koszu. To zdejmuje jedyną realną
 szkodę znaleziska: że ktoś uzna brak odczytu za przeoczenie i doda go po cichu.
 Znalezisko zostaje otwarte, zależność: odpowiedź usera.
+
+
+## F7-30 — przepisy dla agentów przepisane na `db.insert`, akcje serwerowe są nieosiągalne
+
+Persony i `CLAUDE.md` uczyły importu server action do skryptu `tsx`. Zmierzone
+2026-09-03, `npx tsx -e "import('<moduł>')"`, każdy moduł osobno:
+
+| moduł | wynik |
+|---|---|
+| `src/server/actions/calendar` | **rzuca** `This module cannot be imported from a Client Component module` |
+| `src/server/actions/campaigns` | **rzuca**, jak wyżej |
+| `src/server/actions/posts` | **rzuca**, jak wyżej |
+| `src/server/actions/outreach` | **rzuca**, jak wyżej |
+| `src/lib/files` (używany przez `saveOutreach`) | **rzuca**, jak wyżej |
+| `src/server/actions/schemas` | importuje się, to czysty Zod |
+| `src/lib/context` | importuje się |
+| `src/lib/db` | importuje się |
+
+Przyczyna jest wspólna: `requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet
+`server-only`. `src/lib/files.ts` ma `import 'server-only'` wprost w pierwszej linii.
+Nieosiągalne są więc **wszystkie** akcje, nie tylko te trzy z pierwotnego znaleziska,
+i dodatkowo cała warstwa plików.
+
+Nowy przepis: `schema.parse(...)` z `src/server/actions/schemas.ts` plus `db.insert` /
+`db.update`. Walidacja zostaje ta sama, odpada `revalidatePath` (strony są dynamiczne)
+i — przy kampanii — klonowanie szablonu marketingowego, co jest w personie napisane wprost.
+Zapis pliku outreach idzie przez `node:fs` z frontmatterem w tym samym kształcie,
+w jakim czyta go aplikacja.
+
+Dwie pułapki zmierzone przy okazji, obie w `CLAUDE.md`:
+- `npx tsx -e "...await..."` **nigdy nie działał** — `/eval.ts` idzie do CJS, a tam nie ma
+  `await` na najwyższym poziomie. Wszystkie dziewięć przepisów w personach było napisane
+  w tej formie, więc padały jeszcze przed dojściem do importu. Stąd wzorzec
+  „heredoc do pliku `.ts` + `async function main()`".
+- Rozszerzenie `.mts` nie rozwiązuje problemu: wtedy z kolei nie widzi nazwanych
+  eksportów z modułów `.ts`.
+
+Przy okazji poprawione w `agents/viral-analyzer.md`: odczyt surowego CSV pokazywał
+`sqlite3 data/marketing-crew.db`, a baza od dawna stoi w PostgreSQL w kontenerze `mc-pg`.
+
+Dowód: dziewięć przepisów wyciągniętych z plików person i uruchomionych jeden po drugim
+kończy się kodem 0; zapisy naprawdę powstały (kampania #31 z trzema wpisami, wpis
+kalendarza #10, plik `data/files/outreach/ania-test-cold-outreach-2026-04-26.md`)
+i zostały posprzątane po sprawdzeniu.

@@ -78,32 +78,50 @@ REKOMENDACJE NA NASTĘPNY RAZ 🎯
 
 **Wczytaj posty z metrykami**:
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
 import { getPostsWithMetrics } from './src/lib/context';
-const ps = await getPostsWithMetrics(20);
-console.log(JSON.stringify(ps, null, 2));
-"
+async function main() {
+  const ps = await getPostsWithMetrics(20);
+  console.log(JSON.stringify(ps, null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
 **Wczytaj konkretny post**:
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
 import { db, schema } from './src/lib/db';
 import { eq } from 'drizzle-orm';
-const p = await db.query.posts.findFirst({ where: eq(schema.posts.id, 1) });
-console.log(JSON.stringify(p, null, 2));
-"
+async function main() {
+  const p = await db.query.posts.findFirst({ where: eq(schema.posts.id, 1) });
+  console.log(JSON.stringify(p, null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
-**Zaktualizuj metryki posta** (po wgraniu CSV przez usera, jeśli automatyczne mapowanie nie złapało):
+**Zaktualizuj metryki posta** (po wgraniu CSV przez usera, jeśli automatyczne mapowanie
+nie złapało). Server actions z `src/server/actions/` są niedostępne ze skryptu (F7-30) —
+walidacja przez schemę, zapis przez `db.update`, w `main()` jak wyżej:
 ```ts
-import { updatePostMetrics } from './src/server/actions/posts';
-await updatePostMetrics(5, { reach: 12000, engagementRate: 4.2, completionRate: 55, saves: 89 });
+import { db, schema } from './src/lib/db';
+import { eq } from 'drizzle-orm';
+import { postMetricsSchema } from './src/server/actions/schemas';
+const m = postMetricsSchema.parse({ reach: 12000, engagementRate: 4.2, completionRate: 55, saves: 89 });
+await db.update(schema.posts).set(m).where(eq(schema.posts.id, 5));
 ```
 
-**Wczytaj surowy CSV** (jeśli user wgrał ale parser nie zmapował):
+**Wczytaj surowy CSV** (jeśli user wgrał ale parser nie zmapował). Baza to PostgreSQL
+w kontenerze `mc-pg`, nie SQLite — `psql` nie jest zainstalowany na hoście:
 ```bash
-sqlite3 data/marketing-crew.db "SELECT u.source, u.filename, r.data FROM csv_rows r JOIN csv_uploads u ON r.upload_id = u.id WHERE u.id = 1 LIMIT 5;"
+docker exec mc-pg psql -U postgres -d marketing -c "select u.source, u.filename, r.data from csv_rows r join csv_uploads u on r.upload_id = u.id where u.id = 1 limit 5;"
 ```
 
 ## Co Ty NIE robisz

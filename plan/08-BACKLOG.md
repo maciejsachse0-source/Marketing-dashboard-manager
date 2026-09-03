@@ -2686,7 +2686,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     kolumn arkusza nie czytamy i dlaczego
   - negatywne: `npm run test` kod 0, osiem testów `csv-mappers.test.ts` nadal zielonych
 
-- [ ] **F7-30** `znalezisko` `docs` Persony agentów pokazują wywołanie, które rzuca wyjątkiem
+- [x] **F7-30** `znalezisko` `docs` Persony agentów pokazują wywołanie, które rzuca wyjątkiem
   Waga: **ważne**. Szacunek: pół godziny. Znalezione przy F7-09.
   Trzy miejsca uczą Claude Code importu server action do skryptu `tsx`:
   `agents/schedule-manager.md:54` i `:70`, `agents/campaign-strategist.md:58` i `:78`
@@ -2696,6 +2696,25 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   poza kontekstem żądania rzuca natychmiast. Agent, który pójdzie za przepisem,
   dostanie ścianę i będzie improwizował. Działa `db.insert(schema.calendarEntries)`.
   Dotyczy prawdopodobnie także innych akcji cytowanych w personach — do sprawdzenia.
+  ZROBIONE 2026-09-03. Zakres okazał się szerszy niż znalezisko: nieosiągalne z `tsx`
+  są **wszystkie cztery** moduły akcji (`calendar`, `campaigns`, `posts`, `outreach`)
+  oraz `src/lib/files.ts` (`import 'server-only'` w pierwszej linii), a niezależnie
+  od tego **żaden** z dziewięciu przepisów w personach nie dawał się uruchomić, bo
+  `npx tsx -e "...await..."` kompiluje się do CJS i pada na `await` na najwyższym
+  poziomie. Pełna tabela pomiarów w `DECISIONS.md`.
+  Naprawione: wszystkie przepisy w `agents/*.md` i w `CLAUDE.md` przepisane na wzorzec
+  „heredoc do pliku `.ts` + `async function main()`", zapis przez schemę Zod
+  z `src/server/actions/schemas.ts` plus `db.insert`/`db.update`, zapis plików przez
+  `node:fs`. Przy okazji w `agents/viral-analyzer.md` zniknął `sqlite3
+  data/marketing-crew.db` (baza to PostgreSQL w kontenerze `mc-pg`).
+  Dowód: dziewięć przepisów wyciągniętych automatycznie z plików person i uruchomionych
+  po kolei — dziewięć razy kod 0, z realnymi zapisami (kampania #31 z trzema wpisami,
+  wpis kalendarza #10, plik outreach), posprzątanymi po sprawdzeniu. Fragmenty ```ts```
+  (edycja i kasowanie wpisu, dodanie artysty, metryki posta) sprawdzone osobno, kod 0.
+  Grep z AC: `grep -rnE "from './src/server/actions/(calendar|campaigns|posts|outreach|artists)'"
+  agents/ CLAUDE.md` zwraca **0**. Dosłowny grep z AC (`from './src/server/actions`)
+  zwraca 6, bo działający przepis importuje z tego katalogu **schemy Zod**
+  (`schemas.ts`, sprawdzone: importuje się bez wyjątku) — to nie jest server action.
   CZYTAJ: `agents/schedule-manager.md`, `agents/campaign-strategist.md`, `CLAUDE.md`
   sekcja „Jak czytać/pisać do bazy", `src/lib/auth.ts`
   AC:

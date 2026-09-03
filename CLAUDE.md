@@ -25,24 +25,66 @@ Na czas przebudowy wydajnościowej obowiązują też: `plan/01-analiza-i-zasady.
 
 ## Jak czytać/pisać do bazy
 
-**Preferuj server actions** (już zwalidowane Zodem, `revalidatePath` odświeża UI):
+**Server actions z `src/server/actions/` są niedostępne ze skryptu.** Zmierzone
+2026-09-03 (F7-30): każdy z czterech modułów — `calendar`, `campaigns`, `posts`,
+`outreach` — rzuca przy imporcie `This module cannot be imported from a Client
+Component module`, bo `requireSession()` ciągnie `src/lib/auth.ts` z pakietem
+`server-only`. Akcje działają wyłącznie z przeglądarki. Nie próbuj obejścia,
+nie ma go.
 
-```ts
-import { createCalendarEntry, updateCalendarEntry, deleteCalendarEntry, listCalendarEntries } from './src/server/actions/calendar';
-import { createCampaign } from './src/server/actions/campaigns';
-import { createPost, updatePostMetrics } from './src/server/actions/posts';
-import { saveOutreach } from './src/server/actions/outreach';
-```
-
-**Kiedy potrzebujesz ad-hoc query** — używaj `tsx` z Bash:
+**Zapis ze skryptu: schema Zod z akcji plus `db.insert`.** Walidacja zostaje ta sama,
+odpada tylko `revalidatePath` (strony i tak są dynamiczne, wystarczy odświeżyć):
 
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a     # DATABASE_URL do środowiska
+cat > dodaj.ts <<'TS'
 import { db, schema } from './src/lib/db';
-const rows = await db.query.calendarEntries.findMany({ orderBy: schema.calendarEntries.startsAt });
-console.log(JSON.stringify(rows, null, 2));
-"
+import { calendarEntryInputSchema } from './src/server/actions/schemas';
+
+async function main() {
+  const wpis = calendarEntryInputSchema.parse({
+    type: 'shoot',
+    title: 'Nagranie BTS z Anią',
+    startsAt: '2026-04-30T14:00:00.000Z',
+    endsAt: '2026-04-30T16:00:00.000Z',
+    platforms: ['instagram', 'tiktok'],
+  });
+  const [row] = await db.insert(schema.calendarEntries).values({
+    ...wpis,
+    startsAt: new Date(wpis.startsAt),
+    endsAt: new Date(wpis.endsAt),
+    status: wpis.status ?? 'planned',
+  }).returning();
+  console.log('dodano #' + row.id);
+  process.exit(0);
+}
+main();
+TS
+npx tsx dodaj.ts && rm dodaj.ts
 ```
+
+Dwie pułapki, obie zmierzone: rozszerzenie **`.ts` kompiluje się do CJS**, więc
+`await` na najwyższym poziomie nie przejdzie — stąd `async function main()`.
+Rozszerzenie `.mts` z kolei nie widzi nazwanych eksportów z modułów `.ts`.
+
+**Odczyt** działa tym samym wzorcem; `src/lib/context` nie ma `server-only`,
+więc gotowe zapytania kontekstowe są dostępne:
+
+```bash
+set -a; . ./.env.local; set +a
+cat > czytaj.ts <<'TS'
+import { getUpcomingCalendar } from './src/lib/context';
+async function main() {
+  console.log(JSON.stringify(await getUpcomingCalendar(14), null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx czytaj.ts && rm czytaj.ts
+```
+
+`npx tsx -e "...await..."` **nie działa** z tego samego powodu co wyżej
+(`/eval.ts` idzie do CJS). Do jednolinijkowca bez `await` nadaje się nadal.
 
 **Surowy SQL** przez kontener bazy (`psql` nie jest zainstalowany na hoście).
 Nazwy tabel i kolumn: `docs/ARCHITEKTURA.md` sekcja 5, nie zgaduj ich z pamięci.

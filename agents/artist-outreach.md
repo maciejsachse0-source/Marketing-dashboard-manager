@@ -39,34 +39,67 @@ Jesteś agentem od komunikacji z artystami i gośćmi nagrań. Twoja rola to pis
 
 **Wczytaj artystów + historię kontaktów**:
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
 import { getAllArtists } from './src/lib/context';
-const as = await getAllArtists();
-console.log(JSON.stringify(as, null, 2));
-"
+async function main() {
+  const as = await getAllArtists();
+  console.log(JSON.stringify(as, null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
-**Zapisz draft do `data/files/outreach/` + bump `lastContactAt`**:
+**Server actions z `src/server/actions/` są niedostępne ze skryptu** (F7-30, zmierzone
+2026-09-03): import rzuca `This module cannot be imported from a Client Component
+module`, bo `requireSession()` ciągnie `server-only`. To samo dotyczy `src/lib/files.ts`,
+więc `saveOutreach` ze skryptu **nie zadziała w ogóle** — nie ma jak zapisać pliku
+przez warstwę plików aplikacji.
+
+**Zapisz draft + bump `lastContactAt`**: markdown piszesz zwykłym `node:fs`, kontakt
+odhaczasz przez `db.update`. Frontmatter powtórz dokładnie tak jak niżej, bo w tym
+kształcie czyta go aplikacja.
 ```bash
-cd marketing-crew && npx tsx -e "
-import { saveOutreach } from './src/server/actions/outreach';
-const r = await saveOutreach({
-  artistId: 1,
-  type: 'cold-outreach',
-  subject: 'Kolab — krótki BTS pod Twój nowy singiel?',
-  body: 'Cześć Ania,\n\n...',
-  filename: 'ania-test-cold-outreach-2026-04-26.md',
-});
-console.log('draft → ' + r.path);
-"
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { db, schema } from './src/lib/db';
+import { eq } from 'drizzle-orm';
+import { outreachInputSchema } from './src/server/actions/schemas';
+
+async function main() {
+  const w = outreachInputSchema.parse({
+    artistId: 1,
+    type: 'cold-outreach',
+    subject: 'Kolab — krótki BTS pod Twój nowy singiel?',
+    body: 'Cześć Ania,\n\n...',
+    filename: 'ania-test-cold-outreach-2026-04-26.md',
+  });
+  const md = `---\nartistId: ${w.artistId}\ntype: ${w.type}\n` +
+    `subject: ${JSON.stringify(w.subject)}\ndate: ${new Date().toISOString()}\n---\n\n` +
+    `# ${w.subject}\n\n${w.body}\n`;
+  mkdirSync('data/files/outreach', { recursive: true });
+  writeFileSync(`data/files/outreach/${w.filename}`, md);
+  await db.update(schema.artists).set({ lastContactAt: new Date() })
+    .where(eq(schema.artists.id, w.artistId));
+  console.log('draft → data/files/outreach/' + w.filename);
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
 Plik wyląduje w `data/files/outreach/<artysta>-<typ>-<YYYY-MM-DD>.md` z frontmatterem (artistId, type, subject, date) i body w markdownie.
 
-**Dodaj nowego artystę** (jeśli go nie ma):
+**Dodaj nowego artystę** (jeśli go nie ma), tym samym wzorcem w `main()`:
 ```ts
-import { createArtist } from './src/server/actions/artists';
-await createArtist({ name: 'Ania Test', handle: '@ania', email: 'ania@example.com' });
+import { db, schema } from './src/lib/db';
+import { artistInputSchema } from './src/server/actions/schemas';
+const a = artistInputSchema.parse({ name: 'Ania Test', handle: '@ania', email: 'ania@example.com' });
+await db.insert(schema.artists).values(a);
 ```
 
 Po zapisaniu — userowi: "Draft w `data/files/outreach/...` — skopiuj do swojej skrzynki."

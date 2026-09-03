@@ -41,35 +41,61 @@ Najlepsze godziny publikacji (referencja, finalnie zawsze opieraj na danych z vi
 
 **Wczytaj kontekst kalendarza** (najbliższe 14 dni):
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
 import { getUpcomingCalendar } from './src/lib/context';
-const upcoming = await getUpcomingCalendar(14);
-console.log(JSON.stringify(upcoming, null, 2));
-"
+async function main() {
+  const upcoming = await getUpcomingCalendar(14);
+  console.log(JSON.stringify(upcoming, null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
+
+**Server actions z `src/server/actions/` są niedostępne ze skryptu** (F7-30,
+zmierzone 2026-09-03): import rzuca `This module cannot be imported from a Client
+Component module`, bo `requireSession()` ciągnie `server-only`. Zapisujesz przez
+schemę Zod z `src/server/actions/schemas.ts` plus `db.insert` / `db.update`.
 
 **Dodaj wpis kalendarza** (po akceptacji usera):
 ```bash
-cd marketing-crew && npx tsx -e "
-import { createCalendarEntry } from './src/server/actions/calendar';
-const r = await createCalendarEntry({
-  type: 'shoot',
-  title: 'Nagranie BTS z Anią',
-  startsAt: '2026-04-30T14:00:00.000Z',
-  endsAt: '2026-04-30T16:00:00.000Z',
-  description: 'Krótkie BTS pod Reels-y',
-  platforms: ['instagram', 'tiktok'],
-  artistId: 1,
-});
-console.log('dodano #' + r.id);
-"
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
+import { db, schema } from './src/lib/db';
+import { calendarEntryInputSchema } from './src/server/actions/schemas';
+async function main() {
+  const wpis = calendarEntryInputSchema.parse({
+    type: 'shoot',
+    title: 'Nagranie BTS z Anią',
+    startsAt: '2026-04-30T14:00:00.000Z',
+    endsAt: '2026-04-30T16:00:00.000Z',
+    description: 'Krótkie BTS pod Reels-y',
+    platforms: ['instagram', 'tiktok'],
+    artistId: 1,
+  });
+  const [r] = await db.insert(schema.calendarEntries).values({
+    ...wpis,
+    startsAt: new Date(wpis.startsAt),
+    endsAt: new Date(wpis.endsAt),
+    status: wpis.status ?? 'planned',
+  }).returning();
+  console.log('dodano #' + r.id);
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
-**Edytuj / usuń**:
+**Edytuj / usuń** (ten sam wzorzec, w `main()`):
 ```ts
-import { updateCalendarEntry, deleteCalendarEntry } from './src/server/actions/calendar';
-await updateCalendarEntry({ id: 5, status: 'done' });
-await deleteCalendarEntry(5);
+import { db, schema } from './src/lib/db';
+import { eq } from 'drizzle-orm';
+await db.update(schema.calendarEntries).set({ status: 'done' })
+  .where(eq(schema.calendarEntries.id, 5));
+await db.delete(schema.calendarEntries).where(eq(schema.calendarEntries.id, 5));
 ```
 
 **Format wpisu** (Zod-validated):

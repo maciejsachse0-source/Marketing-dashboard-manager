@@ -44,48 +44,76 @@ Jesteś agentem od strategii kampanii marketingowych dla short-form video. Twoja
 
 **Sprawdź aktywne kampanie**:
 ```bash
-cd marketing-crew && npx tsx -e "
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
 import { getActiveCampaigns } from './src/lib/context';
-const cs = await getActiveCampaigns();
-console.log(JSON.stringify(cs, null, 2));
-"
+async function main() {
+  const cs = await getActiveCampaigns();
+  console.log(JSON.stringify(cs, null, 2));
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
+
+**Server actions z `src/server/actions/` są niedostępne ze skryptu** (F7-30,
+zmierzone 2026-09-03): import rzuca `This module cannot be imported from a Client
+Component module`, bo `requireSession()` ciągnie `server-only`. Zapisujesz przez
+schemę Zod z `src/server/actions/schemas.ts` plus `db.insert` / `db.update`.
+Uwaga: `createCampaign` w aplikacji umie jeszcze sklonować szablon marketingowy
+(`templateSlug`) — ze skryptu tego nie ma, kampania powstaje bez kamieni milowych.
 
 **Utwórz kampanię + auto-dodanie wpisów kalendarza**:
 ```bash
-cd marketing-crew && npx tsx -e "
-import { createCampaign } from './src/server/actions/campaigns';
-import { createCalendarEntry } from './src/server/actions/calendar';
-
-const c = await createCampaign({
-  name: 'Premiera singla \"Świt\"',
-  goal: 'Premiera — 250k reach, 5% ER',
-  releaseAt: '2026-05-26T18:00:00.000Z',
-  phase: 'build-up',
-  kpis: { reach: 250000, engagementRate: 5 },
-});
-
-const T0 = new Date('2026-05-26T18:00:00.000Z').getTime();
-const day = 24 * 60 * 60 * 1000;
-const entries = [
-  { offsetDays: -14, type: 'shoot', title: 'BTS sesja' },
-  { offsetDays: -7,  type: 'publish', title: 'Date announce', platforms: ['instagram','tiktok'] },
-  { offsetDays:  0,  type: 'publish', title: 'Premiera', platforms: ['instagram','tiktok','youtube'] },
-];
-for (const e of entries) {
-  const start = new Date(T0 + e.offsetDays * day);
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
-  await createCalendarEntry({
-    type: e.type as any,
-    title: e.title,
-    startsAt: start.toISOString(),
-    endsAt: end.toISOString(),
-    platforms: e.platforms ?? null,
-    campaignId: c.id,
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
+import { db, schema } from './src/lib/db';
+import { campaignInputSchema, calendarEntryInputSchema } from './src/server/actions/schemas';
+async function main() {
+  const kampania = campaignInputSchema.parse({
+    name: 'Premiera singla \"Świt\"',
+    goal: 'Premiera — 250k reach, 5% ER',
+    releaseAt: '2026-05-26T18:00:00.000Z',
+    phase: 'build-up',
+    kpis: { reach: 250000, engagementRate: 5 },
   });
+  const [c] = await db.insert(schema.campaigns).values({
+    ...kampania,
+    releaseAt: new Date(kampania.releaseAt),
+    phase: kampania.phase ?? 'build-up',
+  }).returning();
+  const T0 = new Date('2026-05-26T18:00:00.000Z').getTime();
+  const day = 24 * 60 * 60 * 1000;
+  const entries = [
+    { offsetDays: -14, type: 'shoot', title: 'BTS sesja' },
+    { offsetDays: -7,  type: 'publish', title: 'Date announce', platforms: ['instagram','tiktok'] },
+    { offsetDays:  0,  type: 'publish', title: 'Premiera', platforms: ['instagram','tiktok','youtube'] },
+  ];
+  for (const e of entries) {
+    const start = new Date(T0 + e.offsetDays * day);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const wpis = calendarEntryInputSchema.parse({
+      type: e.type,
+      title: e.title,
+      startsAt: start.toISOString(),
+      endsAt: end.toISOString(),
+      platforms: e.platforms ?? null,
+      campaignId: c.id,
+    });
+    await db.insert(schema.calendarEntries).values({
+      ...wpis,
+      startsAt: new Date(wpis.startsAt),
+      endsAt: new Date(wpis.endsAt),
+      status: wpis.status ?? 'planned',
+    });
+  }
+  console.log('kampania #' + c.id + ' + ' + entries.length + ' wpisów');
+  process.exit(0);
 }
-console.log('kampania #' + c.id + ' + ' + entries.length + ' wpisów');
-"
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
 
 Po stworzeniu — userowi: "Kampania #X w `/campaigns`, wpisy widoczne w `/calendar`."

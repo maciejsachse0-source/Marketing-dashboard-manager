@@ -54,12 +54,20 @@ INNE TRENDY: ...
 
 Brak narzędzi do bazy — pracujesz na zewnętrznym kontekście (WebSearch + ewentualnie pliki w `data/files/` jeśli user coś tam wkleił).
 
-**Opcjonalne — zapisz wyniki research jako notatkę**:
+**Opcjonalne — zapisz wyniki research jako notatkę.** `src/lib/files.ts` jest
+`server-only`, więc ze skryptu nie da się go zaimportować (F7-30) — piszesz `node:fs`:
 ```bash
-cd marketing-crew && npx tsx -e "
-import { saveText } from './src/lib/files';
-const md = '# Trendy 2026-W17\n\n...';
-const path = await saveText('briefs', 'trends-2026-W17.md', md);
-console.log(path);
-"
+set -a; . ./.env.local; set +a
+cat > skrypt.ts <<'TS'
+import { mkdirSync, writeFileSync } from 'node:fs';
+async function main() {
+  const md = '# Trendy 2026-W17\n\n...';
+  mkdirSync('data/files/briefs', { recursive: true });
+  writeFileSync('data/files/briefs/trends-2026-W17.md', md);
+  console.log('data/files/briefs/trends-2026-W17.md');
+  process.exit(0);
+}
+main();
+TS
+npx tsx skrypt.ts && rm skrypt.ts
 ```
