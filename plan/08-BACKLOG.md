@@ -2979,8 +2979,18 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   na uruchomionej aplikacji zrzut pulpitu pokazuje ikonę przy „cała analityka",
   stopka palety poleceń trzy ikony zamiast `↑↓ ... ↵`, a stopka kreatora produkcji
   ma trzy elementy `svg` (zamknięcie plus dwie strzałki).
+  DOCIĄGNIĘTE po pierwszym przebiegu e2e: cztery scenariusze w `e2e/revalidate.spec.ts`
+  szukały guzika po nazwie `Dalej →`, a dostępna nazwa to teraz `Dalej` (ikona ma
+  `aria-hidden`) — selektory poprawione na `/^Dalej$/`. Przy okazji wyszedł piąty,
+  starszy błąd tego pliku: klik w „+ Nowa produkcja" leciał przed zhydrowaniem
+  `/productions`, więc okno kreatora się nie otwierało (sprawdzone: `document
+  .querySelectorAll('[role=dialog]').length` równe **0** trzy sekundy po kliknięciu,
+  a po dołożeniu `waitForLoadState('networkidle')` równe **1**). To wyścig, nie regres
+  aplikacji — Playwright pilnuje widoczności, nie gotowości Reacta, a lista ma
+  500 produkcji w bazie testowej.
   Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, test 224 zielone, typografia 0,
-  a11y 0 naruszeń (73 elementy akcji na 8 ekranach, wszystkie osiągalne Tabem).
+  a11y 0 naruszeń (73 elementy akcji na 8 ekranach, wszystkie osiągalne Tabem),
+  `npx playwright test` 22 zielone i 1 pominięty.
   CZYTAJ: dziewięć plików wyżej, `scripts/check-typography.mjs`
   AC:
   - w każdym z dziewięciu miejsc jest `ArrowLeft` albo `ArrowRight` z `lucide-react`

@@ -42,14 +42,18 @@ async function createProduction(page: Page): Promise<string> {
   const artist = await createArtist(page, 'Artysta F1-04');
   const title = `Prod F1-04 ${Date.now()}`;
   await page.goto('/productions');
+  // F7-39: klik w guzik przed zhydrowaniem strony nie robi nic, a `/productions`
+  // z 500 produkcjami w bazie testowej hydruje się zauważalnie długo. Playwright
+  // sprawdza widoczność, nie gotowość Reacta, więc czekamy na koniec ładowania.
+  await page.waitForLoadState('networkidle');
   await page.getByRole('button', { name: '+ Nowa produkcja' }).click();
   // Typ „Solo": nie wymaga przypisanego artysty, więc kreator przechodzi
   // do końca także na czystej bazie.
   await page.getByRole('button', { name: /^Solo/ }).click();
-  await page.getByRole('button', { name: 'Dalej →' }).click();
+  await page.getByRole('button', { name: /^Dalej$/ }).click();
   await page.getByLabel('Tytuł produkcji').fill(title);
   await page.getByRole('button', { name: artist, exact: true }).click();
-  await page.getByRole('button', { name: 'Dalej →' }).click();
+  await page.getByRole('button', { name: /^Dalej$/ }).click();
   await page.getByRole('button', { name: 'Utwórz produkcję' }).click();
   // Kreator po zapisie przenosi na stronę nowej produkcji.
   await page.waitForURL(/\/productions\/\d+$/, { timeout: 20_000 });
@@ -114,10 +118,10 @@ test('kampania: po utworzeniu widać ją na liście kampanii', async ({ page }) 
   await page.getByRole('button', { name: /nowa kampania/i }).click();
   // Krok 1 to wybór szablonu narracji, dopiero krok 2 pyta o nazwę.
   await page.getByRole('button', { name: /Premiera singla|Cykl content/i }).first().click();
-  await page.getByRole('button', { name: 'Dalej →' }).click();
+  await page.getByRole('button', { name: /^Dalej$/ }).click();
   await page.getByLabel('Nazwa kampanii').fill(name);
   await page.getByLabel('Wizja / cel narracji').fill('Cel testowy dla scenariusza F1-04.');
-  await page.getByRole('button', { name: 'Dalej →' }).click();
+  await page.getByRole('button', { name: /^Dalej$/ }).click();
   await page.getByRole('button', { name: 'Utwórz kampanię' }).click();
   await expect(page.getByText(name).first()).toBeVisible({ timeout: 20_000 });
 
