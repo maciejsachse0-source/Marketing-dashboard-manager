@@ -213,12 +213,3 @@ export async function getProduction(id: number) {
   return { production, entries, posts, artist, videographer, campaign };
 }
 
-export async function getProductionByEntryId(entryId: number) {
-  await requireSession();
-  idSchema.parse(entryId);
-  const entry = await db.query.calendarEntries.findFirst({
-    where: eq(schema.calendarEntries.id, entryId),
-  });
-  if (!entry?.productionId) return null;
-  return getProduction(entry.productionId);
-}

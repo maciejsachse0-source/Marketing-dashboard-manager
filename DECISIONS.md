@@ -1144,3 +1144,20 @@ nieistniejącego `plan/04-import-osob.md`. Na dzień rozliczania wiersz wskazuje
 ścieżki w cudzysłowach odwrotnych) nie znajduje ani jednego brakującego pliku,
 więc nie ma czego naprawiać. Koszt utrzymania issue przy życiu byłby wyższy niż
 jego wartość: każda kolejna paczka czytałaby je i powtarzała ten sam grep.
+
+
+## F7-26 — martwa szuflada produkcji skasowana, nie podpięta
+
+`src/components/productions/production-drawer.tsx` (ok. 120 linii) nie miał ani
+jednego importera. Wybór był między podpięciem go pod kalendarz a usunięciem.
+
+Usunięcie, bo podpięcie oznaczałoby wymyślenie brakującego zachowania od zera:
+komponent pobierał dane osobnym `useEffect` po wejściu w wiersz kalendarza, a
+kalendarz od F2 rysuje produkcje z kroków i prowadzi na stronę `/productions/<id>`,
+gdzie jest komplet informacji. Utrzymywanie drugiej, uboższej ścieżki do tych samych
+danych to koszt bez odbiorcy — nikt nigdy tej szuflady nie zobaczył.
+
+Razem z komponentem zniknęła akcja serwerowa `getProductionByEntryId`: to był jej
+jedyny wywołujący, a każda akcja serwerowa jest publicznym punktem wejścia, który
+trzeba pilnować (`scripts/check-trust-boundaries.mjs`, 74 punkty przed, 73 po).
+Powrót jest tani: kod siedzi w historii gita, commit `F7-26`.

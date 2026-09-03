@@ -2553,7 +2553,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   ani jednej reguły (klasa w DOM, `::after` z `content: none`). Zwykłe klasy
   wariantowe działają, więc kanon halo zostaje przy klasach, nie przy własnym utility.
 
-- [ ] **F7-26** `znalezisko` `tooling` `production-drawer.tsx` to martwy kod
+- [x] **F7-26** `znalezisko` `tooling` `production-drawer.tsx` to martwy kod
   Znalezione przy F7-01, gdy próba weryfikacji szuflady na uruchomionej aplikacji nie
   znalazła żadnego miejsca, które ją otwiera. `src/components/productions/production-drawer.tsx`
   (ok. 120 linii, własny `useEffect` z pobieraniem danych i wywołanie akcji serwerowej
@@ -2569,6 +2569,16 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     (dowód: `grep -rn getProductionByEntryId src/` zwraca 0 trafień)
   - negatywne: `npm run typecheck` 0, `npm run test` kod 0, `npx playwright test` 22 zielone,
     `node scripts/check-trust-boundaries.mjs` 0 (liczba punktów wejścia spada o 1, nie rośnie)
+  ZROBIONE, wariant „usunięty". Znalezisko potwierdzone na zastanym stanie:
+  `grep -rn "production-drawer\|ProductionDrawer" src/ e2e/ scripts/` zwracał
+  wyłącznie samą definicję. Skasowany plik komponentu i akcja serwerowa
+  `getProductionByEntryId` (`src/server/actions/productions.ts`), która nie miała
+  już żadnego innego wywołania — `grep -rn getProductionByEntryId src/` zwraca **0**.
+  Uzasadnienie wyboru w `DECISIONS.md`.
+  Negatywne: `npm run typecheck` 0, `npm run test` 223 zielone,
+  `npx playwright test` **22 zielone**, `check-trust-boundaries` kod 0 z **73**
+  punktami wejścia (było 74, spadek o 1), `npm run lint` 0 błędów i **36** ostrzeżeń
+  (było 37 — martwy komponent wnosił jedno `react-hooks/exhaustive-deps`).
 
 - [ ] **F7-27** `znalezisko` `dane` Przesunięcie startu produkcji gubi się w polu, ale nie w danych
   Znalezione przy F7-01 na uruchomionej aplikacji, `/productions/80`. Pole „Start produkcji"
