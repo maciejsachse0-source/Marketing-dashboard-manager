@@ -18,6 +18,7 @@ import {
 import { updateCampaign, updateCampaignPeriods } from '@/server/actions/campaigns';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 /**
  * Inline period editor on the campaign detail page. Lets the user move T1..Tn
@@ -83,9 +84,7 @@ export function CampaignPeriodsEditor({
   // OR after an external edit). The .getTime() dep keeps the comparison
   // stable across new Date() instances representing the same moment.
   const [previewStart, setPreviewStartState] = useState<Date>(kickoffAt);
-  useEffect(() => {
-    setPreviewStartState(kickoffAt);
-  }, [kickoffAt.getTime()]);
+  useResetOnChange(kickoffAt.getTime(), () => setPreviewStartState(kickoffAt));
   const [kickoffSaving, startKickoffSave] = useTransition();
   const setPreviewStart = (d: Date) => {
     setPreviewStartState(d);

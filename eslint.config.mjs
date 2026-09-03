@@ -45,15 +45,19 @@ export default [
     },
   },
 
+  // GRANDFATHER, kurczy sie do zera. Kazda regula ma WLASNA liste plikow, wiec
+  // plik wypisuje sie z jednej reguly, nie z calego worka na raz. Zjechanie na
+  // 'warn' TYLKO tutaj trzyma `npm run lint` zielony dla nowego kodu, zamiast
+  // zamieniac cala bramke w szum. Regula: z tych list sie WYPISUJEMY, nigdy do
+  // nich nie dopisujemy.
+  // F7-01 zamkniete: `react-hooks/set-state-in-effect` nie ma juz zadnego
+  // trafienia, wiec cala jego lista znikla stad razem z regula.
+
   {
-    // GRANDFATHER, kurczy się do zera. Te 47 plików weszły do przebudowy z 91
-    // błędami: 63 x complexity (Z11 dotyczy NOWEGO kodu, zastany wolno zostawić,
-    // ale nie powiększyć), 21 x reguły react-hooks z Reacta 19 (set-state-in-effect,
-    // purity, immutability, refs), 5 x no-unescaped-entities, 2 x
-    // no-html-link-for-pages. Wszystkie mają issues w F7 (F7-01 do F7-05).
-    // Zjechanie na 'warn' TYLKO tutaj trzyma `npm run lint` zielony dla nowego kodu,
-    // zamiast zamieniać całą bramkę w szum, który każdy zaraz zacznie ignorować.
-    // Reguła: z tej listy się WYPISUJEMY, nigdy do niej nie dopisujemy.
+    // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
+    // Sciezki `calendar/gantt-*` NIE sa nowym dlugiem — to ten sam zastany kod,
+    // ktory w F2-02 przeniosl sie z `gantt-view.tsx` (2545 linii) do jedenastu
+    // plikow. Wypisujemy sie z tego przez F7-13.
     files: [
       'drizzle/seed-catalog.ts',
       'scripts/migrate-templates-flexible.ts',
@@ -66,33 +70,20 @@ export default [
       'src/components/agents/agent-form.tsx',
       'src/components/analytics/analytics-shell.tsx',
       'src/components/analytics/csv-dropzone.tsx',
-      'src/components/analytics/post-dialog.tsx',
       'src/components/artists/artist-dialog.tsx',
       'src/components/artists/artists-shell.tsx',
-      'src/components/calendar/gantt-toolbar.tsx',
-      // F2-02: `gantt-view.tsx` (2545 linii) rozpadł się na jedenaście plików.
-      // Poniższe ścieżki NIE są nowym długiem — to ten sam, zastany kod, który
-      // zmienił plik. Bilans: przed podziałem gant miał 8 zgłoszeń (7 x complexity,
-      // 1 x purity), po podziale ma 10, bo `GanttRowView` o złożoności 55 rozpadł
-      // się na trzy funkcje o złożonościach 18, 20 i 11 (suma 49, czyli mniej).
-      // Wypisujemy się z tego stąd przez F7-13, nie przez dopisywanie kolejnych.
-      'src/components/calendar/gantt-view.tsx',
-      'src/components/calendar/gantt-row.tsx',
-      'src/components/calendar/gantt-row-model.ts',
-      'src/components/calendar/gantt-row-placement.ts',
-      'src/components/calendar/gantt-milestones.tsx',
       'src/components/calendar/gantt-milestone-labels.tsx',
+      'src/components/calendar/gantt-milestones.tsx',
+      'src/components/calendar/gantt-row-model.ts',
+      'src/components/calendar/gantt-row.tsx',
       'src/components/calendar/gantt-substep-bar.tsx',
-      'src/components/campaigns/apply-template-button.tsx',
-      'src/components/campaigns/campaign-periods-editor.tsx',
+      'src/components/calendar/gantt-toolbar.tsx',
       'src/components/campaigns/campaign-template-form.tsx',
       'src/components/campaigns/campaign-wizard.tsx',
       'src/components/campaigns/campaigns-list.tsx',
       'src/components/campaigns/gantt-narrative-row.tsx',
       'src/components/campaigns/milestones-tracker.tsx',
-      'src/components/campaigns/narrative-section.tsx',
       'src/components/campaigns/timeline.tsx',
-      'src/components/command-palette.tsx',
       'src/components/inline-edit.tsx',
       'src/components/periods-slider.tsx',
       'src/components/productions/artist-avatar.tsx',
@@ -102,12 +93,9 @@ export default [
       'src/components/productions/production-step-tracker.tsx',
       'src/components/productions/production-wizard.tsx',
       'src/components/productions/productions-list.tsx',
-      'src/components/productions/t1-start-editor.tsx',
-      'src/components/sidebar.tsx',
       'src/components/templates/template-form.tsx',
       'src/components/videographers/videographer-dialog.tsx',
       'src/lib/agents/widget.ts',
-      'src/lib/category-sequence.ts',
       'src/lib/csv-mappers.ts',
       'src/lib/dates.ts',
       'src/lib/production-work-folder.ts',
@@ -115,14 +103,54 @@ export default [
       'src/server/actions/production-steps.ts',
       'src/server/actions/productions.ts',
     ],
-    rules: {
-      complexity: 'warn',
-      'react-hooks/purity': 'warn',
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/immutability': 'warn',
-      'react-hooks/refs': 'warn',
-      'react/no-unescaped-entities': 'warn',
-      '@next/next/no-html-link-for-pages': 'warn',
-    },
+    rules: { 'complexity': 'warn' },
+  },
+
+  {
+    // GRANDFATHER (F7-02): wywolania Date.now() w renderze.
+    files: [
+      'src/app/campaigns/\\[id\\]/page.tsx',
+      'src/app/productions/\\[id\\]/page.tsx',
+      'src/components/campaigns/campaigns-list.tsx',
+      'src/components/campaigns/gantt-narrative-row.tsx',
+      'src/components/productions/production-drawer.tsx',
+    ],
+    rules: { 'react-hooks/purity': 'warn' },
+  },
+
+  {
+    // GRANDFATHER (F7-03): mutacja wartosci niezmiennej z punktu widzenia Reacta.
+    files: [
+      'src/components/periods-slider.tsx',
+      'src/components/templates/template-form.tsx',
+    ],
+    rules: { 'react-hooks/immutability': 'warn' },
+  },
+
+  {
+    // GRANDFATHER (F7-03): odczyt refa w renderze.
+    files: [
+      'src/components/campaigns/campaign-periods-editor.tsx',
+    ],
+    rules: { 'react-hooks/refs': 'warn' },
+  },
+
+  {
+    // GRANDFATHER (F7-05): niezaescapowane apostrofy i cudzyslowy w JSX.
+    files: [
+      'src/components/campaigns/campaign-periods-editor.tsx',
+      'src/components/command-palette.tsx',
+      'src/components/templates/template-form.tsx',
+    ],
+    rules: { 'react/no-unescaped-entities': 'warn' },
+  },
+
+  {
+    // GRANDFATHER (F7-04): surowy <a> na trase wewnetrzna.
+    files: [
+      'src/components/campaigns/apply-template-button.tsx',
+      'src/components/campaigns/campaign-wizard.tsx',
+    ],
+    rules: { '@next/next/no-html-link-for-pages': 'warn' },
   },
 ];

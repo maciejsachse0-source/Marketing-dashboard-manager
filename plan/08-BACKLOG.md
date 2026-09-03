@@ -1614,7 +1614,25 @@ Wiadome już teraz, do dopisania przez pierwszego workera, który je potwierdzi:
 błędy `typecheck` z kodu zastanego (F0-02), przeniesienie danych z `videographers.contact`
 do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gantem (F2-02).
 
-- [ ] **F7-01** `znalezisko` `ui` Reguła `react-hooks/set-state-in-effect` w 10 komponentach
+- [x] **F7-01** `znalezisko` `ui` Reguła `react-hooks/set-state-in-effect` w 10 komponentach
+  **DYSPOZYCJA: ZROBIONE.** Wszystkie 11 trafień usunięte przez jeden wspólny hak
+  `useResetOnChange` (`src/lib/use-reset-on-change.ts`, 8 linii kodu) — wzorzec
+  „dostosowania stanu w trakcie renderu" z dokumentacji Reacta zamiast efektu.
+  Dowody: `npx eslint . -f json | grep -c set-state-in-effect` zwraca `0`;
+  reguła zniknęła z `eslint.config.mjs` razem z całą swoją listą wyjątków
+  (blok grandfather rozbity na osobną listę plików per reguła, żeby dało się
+  wypisywać z jednej reguły, a nie z całego worka); ostrzeżenia lintu 108 → 93;
+  `npm run typecheck` 0, `npm run test` 216 zielonych, `npx playwright test`
+  22 zielone. Weryfikacja na uruchomionej aplikacji (port 3000, `npm run dev`):
+  pngdiff `/calendar`, `/campaigns`, `/productions/list`, `/artists` w oknie
+  1280x720 — **0 różnych pikseli na każdym z czterech ekranów**; paleta komend
+  po ponownym otwarciu ma puste pole i fokus w polu; dialog artysty po ponownym
+  otwarciu ma puste pole (brudnopis nie przecieka); pasek boczny na `390x800`
+  z `hasTouch` zamyka się po nawigacji (`translate-x-0` znika); zmiana kickoffu
+  kampanii `/campaigns/1` przechodzi przez `router.refresh` i wraca w polu;
+  `InlineEdit` na `/productions/80` zapisuje i pokazuje nową wartość, a po
+  ponownym wejściu w edycję draft równa się zapisanej wartości.
+
   Waga: **ważne**. Szacunek: 1 dzień.
   Znalezione w F0-02, gdy ESLint ruszył pierwszy raz. `setState` wołany wprost
   w `useEffect` to dodatkowy przebieg renderu na każdą zmianę, czyli dokładnie ta klasa
@@ -2024,6 +2042,46 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - układ paska bocznego na myszy bez zmian (dowód: porównanie zrzutów
     `scripts/perf/pngdiff.mjs` poniżej progu szumu 1 680 px)
   - negatywne: `npx playwright test` nadal 22 zielone
+
+- [ ] **F7-26** `znalezisko` `tooling` `production-drawer.tsx` to martwy kod
+  Znalezione przy F7-01, gdy próba weryfikacji szuflady na uruchomionej aplikacji nie
+  znalazła żadnego miejsca, które ją otwiera. `src/components/productions/production-drawer.tsx`
+  (ok. 120 linii, własny `useEffect` z pobieraniem danych i wywołanie akcji serwerowej
+  `getProductionByEntryId`) nie ma ani jednego importera. Dowód:
+  `grep -rn "production-drawer\|ProductionDrawer" src/ e2e/ scripts/` zwraca wyłącznie
+  samą definicję. Martwy komponent wchodzi do bundla tylko wtedy, gdy ktoś go zaimportuje,
+  więc kosztem nie jest rozmiar, tylko to, że trzyma przy życiu punkt wejścia
+  `getProductionByEntryId` i myli przy przeglądzie.
+  Waga: **drobne**. Szacunek: 20 minut.
+  AC:
+  - plik usunięty albo podpięty do widoku, który go otwiera (decyzja opisana w `DECISIONS.md`)
+  - jeśli usunięty: `getProductionByEntryId` też znika, o ile nie ma innych wywołań
+    (dowód: `grep -rn getProductionByEntryId src/` zwraca 0 trafień)
+  - negatywne: `npm run typecheck` 0, `npm run test` kod 0, `npx playwright test` 22 zielone,
+    `node scripts/check-trust-boundaries.mjs` 0 (liczba punktów wejścia spada o 1, nie rośnie)
+
+- [ ] **F7-27** `znalezisko` `dane` Przesunięcie startu produkcji gubi się w polu, ale nie w danych
+  Znalezione przy F7-01 na uruchomionej aplikacji, `/productions/80`. Pole „Start produkcji"
+  (`T1StartEditor`) dostaje `t1Start` z `getFirstPeriodStart(t0At, periods)`
+  (`src/lib/production-steps.ts:143`), a ta funkcja **zaokrągla `t0At` do poniedziałku**
+  (`startOfWeek`) przed dodaniem offsetu pierwszego okresu. `shiftProductionT1Start`
+  (`src/server/actions/production-steps.ts:529`) liczy `deltaDays` wobec tej samej,
+  zaokrąglonej wartości. Skutek: przesunięcie o liczbę dni, która nie wyprowadza `t0At`
+  poza bieżący tydzień, **przesuwa całą oś** (T-0 z „20 wrz 2026" na „22 wrz 2026",
+  kroki i wpisy kalendarza razem z nim), ale pole wraca do starej daty i pokazuje
+  komunikat „Timeline przesunięty". Ta sama akcja powtórzona wygląda jak brak zmiany,
+  a za każdym razem dokłada kolejne dni — cztery przebiegi po +2 dni przesunęły
+  produkcję o 8 dni bez żadnego widocznego śladu w polu. Mierzone: po każdym
+  przesunięciu `input[type="date"]` = `2026-08-31`, a `T-0` rosło o 2 dni.
+  Waga: **ważne**. Szacunek: pół dnia.
+  AC:
+  - po przesunięciu startu o `n` dni pole „Start produkcji" po przeładowaniu strony
+    pokazuje datę większą o dokładnie `n` dni (dowód: scenariusz e2e dla n = 1, 2 i 3)
+  - powtórzenie przesunięcia na tę samą datę nie zmienia już nic
+    (dowód: `T-0` w tekście strony identyczne przed i po drugim zatwierdzeniu)
+  - test jednostkowy odtwarzający dryf: `shiftProductionT1Start` wywołane dwa razy
+    z tą samą datą docelową przesuwa `t0At` tylko raz
+  - negatywne: `npm run test` kod 0, `npx playwright test` 22 zielone
 
 ---
 

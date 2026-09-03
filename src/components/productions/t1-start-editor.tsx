@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { CalendarRange, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { shiftProductionT1Start } from '@/server/actions/production-steps';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -34,9 +35,7 @@ export function T1StartEditor({
 
   // Sync local input back to the server-rendered value after a successful
   // shift — otherwise stale draft would override the next render.
-  useEffect(() => {
-    setValue(initial);
-  }, [initial]);
+  useResetOnChange(initial, () => setValue(initial));
 
   const commit = (next: string) => {
     if (!next || next === initial) {

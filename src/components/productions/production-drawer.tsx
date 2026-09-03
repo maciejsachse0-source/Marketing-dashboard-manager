@@ -17,6 +17,7 @@ import type {
   Campaign,
 } from '../../../drizzle/schema';
 import { Button } from '@/components/ui/button';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type Bundle = {
   production: Production;
@@ -36,17 +37,19 @@ export function ProductionDrawer({
   onClose: () => void;
 }) {
   const [data, setData] = useState<Bundle | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(open && entryId !== null);
   const [notFound, setNotFound] = useState(false);
 
-  useEffect(() => {
-    if (!open || entryId === null) {
-      setData(null);
-      setNotFound(false);
-      return;
-    }
-    setLoading(true);
+  // Czyszczenie stanu przy zmianie wejscia dzieje sie w renderze, nie w efekcie:
+  // inaczej szuflada malowalaby przez chwile dane poprzedniej produkcji.
+  useResetOnChange(open ? entryId : null, () => {
+    setData(null);
     setNotFound(false);
+    setLoading(open && entryId !== null);
+  });
+
+  useEffect(() => {
+    if (!open || entryId === null) return;
     getProductionByEntryId(entryId)
       .then((bundle) => {
         if (!bundle) {

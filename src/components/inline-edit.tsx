@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type Props = {
   value: string;
@@ -23,9 +24,7 @@ export function InlineEdit({ value, onSave, multiline, placeholder, className, e
   const [, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
+  useResetOnChange(value, () => setDraft(value));
 
   useEffect(() => {
     if (editing) {

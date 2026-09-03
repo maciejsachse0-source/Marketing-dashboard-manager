@@ -25,6 +25,7 @@ import type { AgentMeta } from '@/lib/agents/types';
 import { HelpDialog } from '@/components/help-dialog';
 import { logoutAction } from '@/server/actions/auth';
 import { Button } from '@/components/ui/button';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type NavChild = { href: string; label: string; icon: LucideIcon };
 type NavItem = { href: string; label: string; icon: LucideIcon; children?: NavChild[] };
@@ -82,9 +83,7 @@ export function Sidebar({ agents }: { agents: AgentMeta[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  useResetOnChange(pathname, () => setMobileOpen(false));
 
   useEffect(() => {
     if (!mobileOpen) return;

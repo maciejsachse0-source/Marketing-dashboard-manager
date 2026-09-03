@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
 import { Button } from '@/components/ui/button';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type CommandItem = {
   id: string;
@@ -49,14 +50,18 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  useEffect(() => {
+  useResetOnChange(open, () => {
     if (open) {
       setQuery('');
       setActiveIdx(0);
-      // small delay so the dialog mounts before focus
-      const t = setTimeout(() => inputRef.current?.focus(), 30);
-      return () => clearTimeout(t);
     }
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    // small delay so the dialog mounts before focus
+    const t = setTimeout(() => inputRef.current?.focus(), 30);
+    return () => clearTimeout(t);
   }, [open]);
 
   const allItems: CommandItem[] = useMemo(() => {
@@ -131,9 +136,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
     });
   }, [allItems, query]);
 
-  useEffect(() => {
-    setActiveIdx(0);
-  }, [query]);
+  useResetOnChange(query, () => setActiveIdx(0));
 
   // Group items
   const grouped = useMemo(() => {

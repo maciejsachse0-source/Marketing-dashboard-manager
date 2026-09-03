@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,6 +14,7 @@ import {
   deleteVideographer,
 } from '@/server/actions/videographers';
 import type { Videographer } from '../../../drizzle/schema';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type FormState = {
   name: string;
@@ -51,12 +52,12 @@ export function VideographerDialog({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
+  useResetOnChange(open && videographer, () => {
     if (open) {
       setForm(initial(videographer));
       setError(null);
     }
-  }, [open, videographer]);
+  });
 
   const submit = () => {
     setError(null);

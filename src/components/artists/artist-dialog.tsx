@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { createArtist, updateArtist, deleteArtist } from '@/server/actions/artists';
 import type { Artist } from '../../../drizzle/schema';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type FormState = {
   name: string;
@@ -45,12 +46,12 @@ export function ArtistDialog({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
+  useResetOnChange(open && artist, () => {
     if (open) {
       setForm(initial(artist));
       setError(null);
     }
-  }, [open, artist]);
+  });
 
   const submit = () => {
     setError(null);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type {
   CalendarEntry,
   Production,
@@ -10,6 +10,7 @@ import type {
 import type { TemplatePeriod } from '@/lib/production-periods';
 import { CampaignTimeline } from './timeline';
 import { CampaignPeriodsEditor } from './campaign-periods-editor';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type ProductionWithArtist = Production & {
   artist: Pick<Artist, 'id' | 'name' | 'handle'> | null;
@@ -41,9 +42,7 @@ export function CampaignNarrativeSection({
   );
   const [livePreviewStart, setLivePreviewStart] = useState<Date>(kickoffAt);
   // Resync after server-side updates (e.g. the editor's save → router.refresh).
-  useEffect(() => {
-    setLivePreviewStart(kickoffAt);
-  }, [kickoffAt.getTime()]);
+  useResetOnChange(kickoffAt.getTime(), () => setLivePreviewStart(kickoffAt));
 
   return (
     <>

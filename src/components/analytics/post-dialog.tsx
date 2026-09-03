@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { createPost } from '@/server/actions/posts';
 import { PLATFORMS, type Platform } from '../../../drizzle/schema';
 import { isoToInputLocal } from '@/lib/dates';
+import { useResetOnChange } from '@/lib/use-reset-on-change';
 
 type FormState = {
   title: string;
@@ -42,12 +43,12 @@ export function PostDialog({ open, onOpenChange }: { open: boolean; onOpenChange
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
+  useResetOnChange(open, () => {
     if (open) {
       setForm(initial());
       setError(null);
     }
-  }, [open]);
+  });
 
   const submit = () => {
     setError(null);
