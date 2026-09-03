@@ -9,7 +9,8 @@
  *     (liczony razem z pseudoelementem `::after`, którym poszerzamy strefę).
  *
  * Uruchomienie: `node scripts/a11y-audit.mjs` przy serwerze na porcie 3000.
- * Wynik: tabela na stdout plus `screenshots/F6/a11y-audit.json`. Kod 1, gdy
+ * Wynik: tabela na stdout plus `a11y-audit.json` w katalogu zrzutów
+ * (`test-results/F6/`, a pod `UPDATE_SHOTS=1` w `screenshots/F6/`). Kod 1, gdy
  * którykolwiek warunek nie jest spełniony.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -20,7 +21,8 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
-const OUT = path.join(process.cwd(), 'screenshots', 'F6');
+// F7-42: do screenshots/ tylko pod UPDATE_SHOTS=1, inaczej bramka brudzi drzewo.
+const OUT = path.join(process.cwd(), process.env.UPDATE_SHOTS === '1' ? 'screenshots' : 'test-results', 'F6');
 const STRONY = ['/calendar', '/productions/list', '/import/osoby'];
 const MIN_DOTYK = 44;
 

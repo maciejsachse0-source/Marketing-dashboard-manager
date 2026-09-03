@@ -240,7 +240,8 @@ test.describe('import osób, kroki 5 do 7', () => {
 
     // Zrzut scenariusza F5-03 (plan/06 sekcja 3, scenariusz „pełny import
     // z fixture"). Fixture jest syntetyczny, na zrzucie nie ma prawdziwych osób.
-    const shots = path.join(process.cwd(), 'screenshots', 'F5');
+    // F7-42: do screenshots/ tylko pod UPDATE_SHOTS=1, inaczej bramka brudzi drzewo.
+    const shots = path.join(process.cwd(), process.env.UPDATE_SHOTS === '1' ? 'screenshots' : 'test-results', 'F5');
     mkdirSync(shots, { recursive: true });
     await page.screenshot({
       path: path.join(shots, 'F5-02-import-podsumowanie.png'),

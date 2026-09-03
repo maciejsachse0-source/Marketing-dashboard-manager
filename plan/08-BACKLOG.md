@@ -3029,7 +3029,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     cichego przemilczenia
   - negatywne: `npm run typecheck` kod 0, `npm run perf` kod 0
 
-- [ ] **F7-42** `znalezisko` `test` `tooling` Bramki brudzą drzewo robocze zrzutami dowodowymi
+- [x] **F7-42** `znalezisko` `test` `tooling` Bramki brudzą drzewo robocze zrzutami dowodowymi
   Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   `screenshots/F5/F5-01-logowanie.png`, `screenshots/F5/F5-04-produkcja-dodana.png`
   i `screenshots/F6/a11y-audit.json` są śledzone przez gita i nadpisywane przy każdym
@@ -3037,6 +3037,18 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   Skutek: uruchomienie bramek zmienia drzewo robocze, więc `git status` przestaje
   odpowiadać na pytanie „czy coś zmieniłem", a przypadkowe `git add -A` wciąga do commita
   szum pomiarowy. Zrzut dowodowy ma być artefaktem świadomym, nie efektem ubocznym.
+  ZROBIONE 2026-09-03. Sześć miejsc zapisujących dowody (`e2e/login.spec.ts`,
+  `e2e/import-osoby.spec.ts`, `e2e/f5-scenariusze.spec.ts`, `scripts/a11y-audit.mjs`,
+  `scripts/f6-import-widoki.mjs`, `scripts/f6-komunikaty-bledow.mjs`) kieruje teraz
+  do `test-results/` (już w `.gitignore`), a do `screenshots/` tylko przy
+  `UPDATE_SHOTS=1`. Świadomie bez wspólnego modułu: to jeden warunek w linii,
+  a katalogi `e2e/` (TypeScript) i `scripts/` (`.mjs`) i tak nie dzielą modułów.
+  Dowód AC: na czystym drzewie `npx playwright test` (22 zielone, 1 pominięty)
+  i `node scripts/a11y-audit.mjs` (0 naruszeń) zostawiają `git status --short` bez
+  ani jednej linii z `screenshots/`; plik trafia do `test-results/F6/a11y-audit.json`.
+  `UPDATE_SHOTS=1 node scripts/a11y-audit.mjs` nadal aktualizuje `screenshots/F6/a11y-audit.json`
+  (czas modyfikacji 06:40:08 przed, 06:42:21 po).
+  Bramki: typecheck 0, e2e 22 zielone i 1 pominięty, a11y 0 naruszeń.
   CZYTAJ: `e2e/f5-scenariusze.spec.ts`, `scripts/a11y-audit.mjs`, `.gitignore`
   AC:
   - domyślnie zrzuty i `a11y-audit.json` lądują w `test-results/` (już ignorowanym),

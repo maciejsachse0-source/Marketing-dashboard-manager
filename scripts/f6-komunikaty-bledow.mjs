@@ -6,7 +6,8 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local' });
 const BASE = 'http://localhost:3000';
-const OUT = path.join(process.cwd(), 'screenshots', 'F6');
+// F7-42: do screenshots/ tylko pod UPDATE_SHOTS=1, inaczej bramka brudzi drzewo.
+const OUT = path.join(process.cwd(), process.env.UPDATE_SHOTS === '1' ? 'screenshots' : 'test-results', 'F6');
 mkdirSync(OUT, { recursive: true });
 const FIXTURE = path.join(process.cwd(), 'tests', 'fixtures', 'osoby.xlsx');
 

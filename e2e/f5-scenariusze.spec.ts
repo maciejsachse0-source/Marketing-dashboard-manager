@@ -7,7 +7,8 @@ import { connectTestDb } from './db';
  * Scenariusze end-to-end fazy F5 (plan/06 sekcja 3): kalendarz z przewijaniem
  * i filtrem oraz dodanie produkcji. Logowanie stoi w `login.spec.ts`, pełny
  * import z fixture w `import-osoby.spec.ts` — oba zostawiają własny zrzut
- * w `screenshots/F5/`.
+ * w tym samym katalogu zrzutów (`test-results/F5/`, a pod `UPDATE_SHOTS=1`
+ * w `screenshots/F5/`).
  *
  * Dane: wyłącznie to, co już siedzi w bazie roboczej, plus jedna produkcja
  * o nazwie z prefiksem `E2E F5` tworzona i kasowana przez ten plik. Żadnych
@@ -16,7 +17,8 @@ import { connectTestDb } from './db';
  */
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
-const SHOTS = path.join(process.cwd(), 'screenshots', 'F5');
+// F7-42: do screenshots/ tylko pod UPDATE_SHOTS=1, inaczej bramka brudzi drzewo.
+const SHOTS = path.join(process.cwd(), process.env.UPDATE_SHOTS === '1' ? 'screenshots' : 'test-results', 'F5');
 const TYTUL = 'E2E F5 produkcja testowa';
 
 async function zaloguj(page: Page) {
