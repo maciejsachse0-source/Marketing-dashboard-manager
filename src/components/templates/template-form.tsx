@@ -424,7 +424,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
               Kroki szablonu
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Pełna definicja pipeline'u. Każdy krok jest edytowalny i można go
+              Pełna definicja pipeline&apos;u. Każdy krok jest edytowalny i można go
               usunąć. Strzałki przesuwają w obrębie tej samej kategorii.
             </p>
           </div>

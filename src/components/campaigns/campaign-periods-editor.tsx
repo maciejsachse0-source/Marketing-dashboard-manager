@@ -215,10 +215,10 @@ export function CampaignPeriodsEditor({
             Edycja okresów narracji
           </h2>
           <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
-            Klik w nazwę przy każdym okresie, by ją zmienić (np. „Build-up", „Reveal");
+            Klik w nazwę przy każdym okresie, by ją zmienić (np. „Build-up&rdquo;, „Reveal&rdquo;);
             klik w pole pod paskiem otwiera opis - co chcesz w tej fazie powiedzieć
             widzowi. Przeciągaj kotwice po osi, by kształtować rytm wizji.
-            Wynik widać u góry na „Wspólnym planie kampanii".
+            Wynik widać u góry na „Wspólnym planie kampanii&rdquo;.
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

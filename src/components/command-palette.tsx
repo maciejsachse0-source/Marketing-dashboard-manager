@@ -194,7 +194,7 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
         <div className="max-h-[50vh] overflow-y-auto p-2">
           {flatList.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              Brak wyników dla „{query}"
+              Brak wyników dla „{query}&rdquo;
             </div>
           ) : (
             grouped.map(([group, items]) => (

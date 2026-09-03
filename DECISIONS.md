@@ -841,3 +841,18 @@ marketing_templates`, `template_slug = null` na kampanii 1, przebieg testu, przy
 z kopii i sprawdzenie, że wróciły 2 wiersze i slug. Kontrola negatywna na kodzie sprzed
 zmiany dała `BRAK` w obu miejscach, czyli test naprawdę odróżnia nawigację klientem od
 przeładowania dokumentu, a nie przechodzi „przy okazji".
+
+**F7-05, cudzysłowy zamknięte znakiem, nie prostym `"`.** Trzy miejsca miały parę
+mieszaną: otwierający „ i zamykający prosty `"`. `&rdquo;` domyka je znakiem ”, czyli
+tak, jak robi to już `campaigns-list.tsx` parą `&bdquo;` / `&rdquo;`. To jedyna
+widoczna zmiana tej paczki: 762 piksele na `/campaigns/1` przy progu szumu 1 155,
+a strona szablonu (apostrof zamieniony na `&apos;`, ten sam znak) ma 0 pikseli różnicy.
+
+**F7-05, przebieg e2e ujawnił próg zależny od środowiska.** `npx playwright test` dał
+`21 passed, 1 failed` — `gantt-filter.spec.ts` mierzy przemalowanie gantu i wymaga
+mediany poniżej 300 ms. Na serwerze deweloperskim wychodzi 306, 309 i 313 ms, na
+`next build` + `next start` 139, 116 i 117 ms. To nie jest regresja tej paczki: ten sam
+test na commicie `68171c6` sprzed paczki daje na serwerze deweloperskim 316, 333 i
+301 ms. `reuseExistingServer: true` sprawia, że wynik zależy od tego, co stoi na porcie
+3000. Zapisane jako **F7-28**; przebieg zaliczający tę paczkę wykonany na budowaniu
+produkcyjnym: **22 zielone**.

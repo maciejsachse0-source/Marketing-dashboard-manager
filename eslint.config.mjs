@@ -58,6 +58,8 @@ export default [
   // F7-03 zamkniete: `react-hooks/immutability` i `react-hooks/refs` tak samo,
   // obie listy znikly.
   // F7-04 zamkniete: `@next/next/no-html-link-for-pages` tak samo.
+  // F7-05 zamkniete: `react/no-unescaped-entities` tak samo. Zostala jedna lista:
+  // zlozonosc cyklomatyczna (F7-06).
 
   {
     // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
@@ -112,17 +114,5 @@ export default [
     rules: { 'complexity': 'warn' },
   },
 
-
-
-
-  {
-    // GRANDFATHER (F7-05): niezaescapowane apostrofy i cudzyslowy w JSX.
-    files: [
-      'src/components/campaigns/campaign-periods-editor.tsx',
-      'src/components/command-palette.tsx',
-      'src/components/templates/template-form.tsx',
-    ],
-    rules: { 'react/no-unescaped-entities': 'warn' },
-  },
 
 ];

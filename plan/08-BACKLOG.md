@@ -1743,7 +1743,28 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - kliknięcie obu linków w przeglądarce nie przeładowuje dokumentu (dowód: scenariusz
     e2e sprawdzający, że wartość ustawiona w `window` przed kliknięciem przeżywa nawigację)
 
-- [ ] **F7-05** `znalezisko` `ui` Pięć niezaescapowanych apostrofów i cudzysłowów w JSX
+- [x] **F7-05** `znalezisko` `ui` Pięć niezaescapowanych apostrofów i cudzysłowów w JSX
+  **DYSPOZYCJA: ZROBIONE.** Pięć trafień, wszystkie na miejscu: trzy zamykające
+  cudzysłowy w `campaign-periods-editor.tsx` (wiersze 218 i 221), jeden w
+  `command-palette.tsx` (197) i jeden apostrof w `template-form.tsx` (427).
+  Cudzysłowy dostały `&rdquo;`, bo to konwencja już obecna w repozytorium
+  (`campaigns-list.tsx` ma parę `&bdquo;` / `&rdquo;`), a wcześniej stała tam para
+  mieszana: otwierający „ i zamykający prosty `"`. Apostrof w `pipeline'u` dostał
+  `&apos;`, czyli ten sam znak co przedtem.
+  Dowody: `npx eslint . -f json | jq '[.[].messages[] |
+  select(.ruleId=="react/no-unescaped-entities")] | length'` zwraca `0` (o `grep -c`
+  z kryterium patrz uwaga w F7-04); reguła usunięta z `eslint.config.mjs` razem z listą,
+  po czym w bloku grandfather została **już tylko jedna reguła: `complexity` (F7-06)**;
+  ostrzeżenia lintu 83 → 78, 0 błędów; `npm run typecheck` 0; `npm run test`
+  216 zielonych; `node scripts/check-typography.mjs` 0 trafień.
+  Weryfikacja na uruchomionej aplikacji: `/campaigns/1` renderuje
+  „Build-up”, „Reveal”, „Wspólnym planie kampanii”; `/templates/standard-solo/edit`
+  renderuje `pipeline'u` bez zmiany; paleta komend pokazuje
+  `Brak wyników dla „zzzzz-nic-takiego”`. Pngdiff `fullPage`: strona szablonu
+  **0 pikseli**, `/campaigns/1` **762 piksele** — to trzy zamykające cudzysłowy
+  zmieniające glif z `"` na `”`, czyli zmiana zamierzona i jedyna na tej stronie
+  (poniżej progu szumu 1 155).
+
   Waga: **drobne**. Szacunek: 15 minut.
   `react/no-unescaped-entities` w `campaigns/campaign-periods-editor.tsx`,
   `command-palette.tsx`, `templates/template-form.tsx`.
@@ -2147,6 +2168,29 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - test jednostkowy odtwarzający dryf: `shiftProductionT1Start` wywołane dwa razy
     z tą samą datą docelową przesuwa `t0At` tylko raz
   - negatywne: `npm run test` kod 0, `npx playwright test` 22 zielone
+
+- [ ] **F7-28** `znalezisko` `tooling` Próg 300 ms w `gantt-filter.spec.ts` mierzy serwer deweloperski
+  Znalezione przy F7-05, gdy pełny przebieg `npx playwright test` dał `21 passed, 1 failed`.
+  `e2e/gantt-filter.spec.ts:119` sprawdza `median < 300` dla przemalowania gantu po zmianie
+  filtra kampanii. `reuseExistingServer: true` sprawia, że test bierze serwer stojący na
+  porcie 3000 — a to bywa `npm run dev`, czyli **webpack bez optymalizacji**. Zmierzone
+  mediany na tej samej maszynie i tych samych danych:
+  - serwer deweloperski: 306, 309, 313 ms → **czerwony**
+  - `next build` + `next start`: 139, 116, 117 ms → **zielony z zapasem**
+  Nie jest to regresja z paczki F7-01 do F7-05: ten sam test na commicie `68171c6`
+  (sprzed całej paczki) na serwerze deweloperskim dał 316, 333 i 301 ms, czyli tak samo
+  czerwono. Test jest więc zielony albo czerwony zależnie od tego, co akurat stoi na
+  porcie 3000, i przy medianie ocierającej się o próg potrafi przejść raz na kilka razy.
+  Waga: **ważne** (bramka, która kłamie w obie strony, jest gorsza niż jej brak).
+  Szacunek: godzina.
+  AC:
+  - test albo wymusza budowanie produkcyjne, albo pomija pomiar na serwerze deweloperskim
+    z czytelnym komunikatem (dowód: `npx playwright test e2e/gantt-filter.spec.ts` przy
+    `npm run dev` na porcie 3000 nie kończy się `failed`)
+  - na budowaniu produkcyjnym test nadal mierzy i nadal potrafi zapalić się na czerwono
+    (dowód: sztuczne podniesienie kosztu przemalowania wywala test)
+  - decyzja opisana w `DECISIONS.md`, razem z liczbami z obu środowisk
+  - negatywne: `npx playwright test` 22 zielone na budowaniu produkcyjnym
 
 ---
 
