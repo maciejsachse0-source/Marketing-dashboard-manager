@@ -55,8 +55,9 @@ npx tsx skrypt.ts && rm skrypt.ts
 **Server actions z `src/server/actions/` są niedostępne ze skryptu** (F7-30, zmierzone
 2026-09-03): import rzuca `This module cannot be imported from a Client Component
 module`, bo `requireSession()` ciągnie `server-only`. To samo dotyczy `src/lib/files.ts`,
-więc `saveOutreach` ze skryptu **nie zadziała w ogóle** — nie ma jak zapisać pliku
-przez warstwę plików aplikacji.
+więc warstwa plików aplikacji jest ze skryptu nieosiągalna. Akcji `saveOutreach`
+już zresztą nie ma (F7-37): nikt jej nie wołał, a wyeksportowana akcja serwerowa jest
+endpointem HTTP niezależnie od tego, czy interfejs jej używa.
 
 **Zapisz draft + bump `lastContactAt`**: markdown piszesz zwykłym `node:fs`, kontakt
 odhaczasz przez `db.update`. Frontmatter powtórz dokładnie tak jak niżej, bo w tym

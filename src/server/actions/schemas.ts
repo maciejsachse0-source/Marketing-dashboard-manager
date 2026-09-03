@@ -116,6 +116,10 @@ export const productionFilterSchema = z
   .object({ type: productionTypeSchema.optional() })
   .optional();
 
+// F7-37: kształt draftu wiadomości do artysty. Akcja serwerowa `saveOutreach`
+// została usunięta (eksport `'use server'` bez ani jednego wywołania to endpoint
+// HTTP bez odbiorcy). Schema zostaje, bo woła ją persona z `agents/artist-outreach.md`,
+// która zapisuje plik przez `node:fs` i odhacza kontakt przez `db.update`.
 export const outreachInputSchema = z.object({
   artistId: z.number().int().positive(),
   type: z.string().min(1).max(60),

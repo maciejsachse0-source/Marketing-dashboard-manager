@@ -1253,3 +1253,23 @@ Dowód: dziewięć przepisów wyciągniętych z plików person i uruchomionych j
 kończy się kodem 0; zapisy naprawdę powstały (kampania #31 z trzema wpisami, wpis
 kalendarza #10, plik `data/files/outreach/ania-test-cold-outreach-2026-04-26.md`)
 i zostały posprzątane po sprawdzeniu.
+
+## F7-37 — `saveOutreach` skasowana, nie udokumentowana jako kanał agentowy (2026-09-03)
+
+**Dyspozycja: usunięte.** Issue dawało wybór: skasować albo opisać jako kanał agentowy
+tak jak `createCalendarEntry` w F7-09. Wybór padł na skasowanie, bo trzy powody, które
+uratowały akcje kalendarza, tutaj nie zachodzą.
+
+Po pierwsze, `saveOutreach` nie jest jedyną ścieżką zapisu z walidacją: schema
+`outreachInputSchema` została w `src/server/actions/schemas.ts` i persona woła ją
+bezpośrednio, więc walidacja Zod nie znika razem z akcją. Po drugie, żaden przepis
+w personach jej nie używa — `agents/artist-outreach.md` po F7-30 pisze plik przez
+`node:fs`, a `lastContactAt` odhacza przez `db.update`, bo warstwa plików aplikacji
+(`src/lib/files.ts`) też ciągnie `server-only` i ze skryptu jest nieosiągalna. Po
+trzecie, kasowanie nie wymaga przepisania żadnej persony, tylko skreślenia jednego
+zdania, które i tak mówiło „to nie zadziała".
+
+Zostaje więc mniej powierzchni: eksport `'use server'` jest endpointem HTTP niezależnie
+od tego, czy interfejs go woła, a ten nie miał ani jednego wywołania w `src/` ani `e2e/`.
+Dowód: `grep -rn "saveOutreach" src e2e` zwraca `0`, punktów wejścia w bramce granic
+zaufania 73 do 72, „bez schematu mimo argumentów" nadal 0.

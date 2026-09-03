@@ -2891,13 +2891,23 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     zwraca `0` trafień
   - negatywne: `npm run typecheck` kod 0, `npm run test` kod 0, `npm run perf` kod 0
 
-- [ ] **F7-37** `znalezisko` `security` `arch` Akcja serwerowa `saveOutreach` bez wywołania
+- [x] **F7-37** `znalezisko` `security` `arch` Akcja serwerowa `saveOutreach` bez wywołania
   Waga: **drobne**. Szacunek: pół godziny. Znalezione w recenzji końcowej.
   `src/server/actions/outreach.ts:9` eksportuje `saveOutreach` z dyrektywą `'use server'`,
   ale nic jej nie woła w `src/` ani `e2e/`. Wyeksportowana akcja serwerowa jest endpointem
   HTTP niezależnie od tego, czy interfejs jej używa. Ma `requireSession()` i walidację Zod,
   więc nie jest dziurą — jest powierzchnią bez odbiorcy, czyli kodem, którego nikt nie
   testuje, a który da się wywołać z sieci.
+  ZROBIONE 2026-09-03. `src/server/actions/outreach.ts` usunięty. Wybór między
+  skasowaniem a udokumentowaniem rozstrzygnięty na korzyść skasowania, uzasadnienie
+  w `DECISIONS.md` sekcja „F7-37": trzy powody, dla których zostały akcje kalendarza
+  (jedyna ścieżka z walidacją, przepis w personie, koszt przepisania persony), tutaj
+  nie zachodzą. `outreachInputSchema` zostaje w `schemas.ts` z komentarzem, bo woła ją
+  wprost persona `agents/artist-outreach.md`, i to ona jest kanałem agentowym.
+  Zdanie w personie o `saveOutreach` poprawione, żeby nie odsyłało do nieistniejącego kodu.
+  Dowód AC: `grep -rn "saveOutreach" src e2e` zwraca `0`; punktów wejścia w bramce granic
+  zaufania **73 do 72**, „bez schematu mimo argumentów" nadal 0.
+  Bramki: typecheck 0, test 224 zielone, granice zaufania 0.
   CZYTAJ: `src/server/actions/outreach.ts`, `plan/08-BACKLOG.md` wpis F7-09
   AC:
   - albo plik usunięty (`grep -rn "saveOutreach" src e2e` zwraca `0`), albo akcja
