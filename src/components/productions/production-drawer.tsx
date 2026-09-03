@@ -105,7 +105,9 @@ export function ProductionDrawer({
 
 function DrawerContent({ data }: { data: Bundle }) {
   const { production, entries, posts, artist, campaign } = data;
-  const t0Days = Math.round((production.t0At.getTime() - Date.now()) / 86400000);
+  // Zegar odczytany raz, przy montowaniu szuflady — patrz `gantt-narrative-row.tsx`.
+  const [now] = useState(() => Date.now());
+  const t0Days = Math.round((production.t0At.getTime() - now) / 86400000);
   const state = deriveProductionState(production.steps ?? [], production.cancelledAt);
   const STATE_LABEL = {
     'in-progress': 'w trakcie',

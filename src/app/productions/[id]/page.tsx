@@ -163,6 +163,9 @@ export default async function ProductionDetailPage({
     ? await listProductions().then((rows) => rows.filter((r) => r.artistId === artist.id))
     : [];
 
+  // Komponent serwerowy, patrz komentarz w `src/app/campaigns/[id]/page.tsx`:
+  // render RSC to jedno wywołanie na żądanie.
+  // eslint-disable-next-line react-hooks/purity
   const t0Days = Math.round((production.t0At.getTime() - Date.now()) / 86400000);
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
   const t1Start = getFirstPeriodStart(production.t0At, production.periods);

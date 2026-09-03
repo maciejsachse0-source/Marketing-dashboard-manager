@@ -774,3 +774,38 @@ lista długów w sekcji 9. To jest argument za tym, żeby każdą liczbę w doku
 trzymać razem z komendą, która ją odtwarza: pięć zdań zestarzało się w dwa dni pracy.
 Dziesięć sprawdzeń stoi w załączniku dokumentu, razem z komendą i wynikiem przy każdym.
 
+
+**F7-01, jeden hak zamiast jedenastu efektów.** Wszystkie trafienia
+`react-hooks/set-state-in-effect` miały ten sam kształt: „gdy prop się zmienił, ustaw
+stan". Zamiast jedenastu poprawek w miejscu wszedł jeden ośmiolinijkowy hak
+`useResetOnChange` (`src/lib/use-reset-on-change.ts`) realizujący wzorzec
+„dostosowania stanu w trakcie renderu" z dokumentacji Reacta. Efekt commituje
+nieaktualny render i dopiero potem drugi z poprawnym stanem; render przerwany
+w połowie powtarza się, zanim cokolwiek trafi na ekran. Jedno malowanie zamiast dwóch.
+Zrzuty czterech ekranów przed i po są identyczne co do piksela, więc zmiana jest
+niewidoczna dla użytkownika, a nie „prawie taka sama".
+
+**F7-01, grandfather rozbity na listę per reguła.** Zastany blok w `eslint.config.mjs`
+trzymał jedną listę 47 plików dla siedmiu reguł naraz. Wypisanie pliku z jednej reguły
+zdejmowało z niego pozostałe sześć, więc domykanie znalezisk F7 pojedynczo było
+niewykonalne bez rozluźnienia bramki gdzie indziej. Teraz każda reguła ma własną listę
+plików i znika stąd w całości, gdy jej lista pustoszeje.
+
+**F7-02, trzy z pięciu trafień `react-hooks/purity` to fałszywe alarmy.**
+`src/app/campaigns/[id]/page.tsx`, `src/app/productions/[id]/page.tsx`
+i `src/components/campaigns/campaigns-list.tsx` nie mają `'use client'` — to komponenty
+serwerowe. Reguły `react-hooks/*` pilnują czystości renderu klienta, gdzie React może
+powtórzyć render z zapamiętanych wartości i pokazać dwie różne liczby dla tych samych
+danych. Render RSC to jedno wywołanie na żądanie, a zegar jest tam takim samym wejściem
+jak odczyt z bazy kilka linii wyżej. Dlatego zamiast przepisywania kodu weszło lokalne
+`eslint-disable-next-line` z uzasadnieniem przy każdej z trzech linii. Dwa pozostałe
+trafienia (`gantt-narrative-row.tsx`, `production-drawer.tsx`) to prawdziwe komponenty
+klienckie i dostały `useState(() => Date.now())`, czyli zegar odczytany raz przy
+montowaniu.
+
+**F7-02, pomiar `/calendar` przed i po.** Mediana z trzech przebiegów `npm run perf`
+na tym samym budowaniu produkcyjnym: **przed 85,2 ms** (72,4 / 85,2 / 92,2),
+**po 79,3 ms** (82,4 / 75,9 / 79,3). Bundel `/calendar` bez zmiany: 292,7 kB przy progu
+301,6 kB w obu przebiegach. Różnica −7% mieści się w zmierzonym szumie 40%, czyli
+zmiana jest wydajnościowo neutralna — czego się spodziewaliśmy, bo rozwijany panel
+kampanii nie wchodzi do pierwszego ładowania strony.

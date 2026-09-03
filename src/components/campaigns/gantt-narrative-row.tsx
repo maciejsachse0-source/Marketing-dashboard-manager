@@ -234,9 +234,11 @@ export function CampaignGanttNarrativeRow({
 function ExpandedCampaignDetails({ campaign }: { campaign: GanttNarrativeCampaign }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const t0Days = Math.round(
-    (campaign.kickoffAt.getTime() - Date.now()) / DAY_MS,
-  );
+  // Zegar odczytany raz, przy montowaniu panelu. W renderze klienta `Date.now()`
+  // daje przy każdym powtórzeniu renderu inną wartość, więc etykieta T-x mogłaby
+  // przeskoczyć bez żadnej zmiany danych.
+  const [now] = useState(() => Date.now());
+  const t0Days = Math.round((campaign.kickoffAt.getTime() - now) / DAY_MS);
   const tLabel = t0Days === 0 ? 'T-0' : t0Days > 0 ? `T-${t0Days}` : `T+${Math.abs(t0Days)}`;
   const t0Label = campaign.kickoffAt.toLocaleString('pl-PL', {
     dateStyle: 'medium',

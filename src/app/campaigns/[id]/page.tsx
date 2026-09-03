@@ -86,6 +86,11 @@ export default async function CampaignDetailPage({
   const targetReach = Number(kpis.reach ?? 0);
   const targetER = Number(kpis.engagementRate ?? 0);
 
+  // To jest komponent serwerowy, nie klient. Reguły `react-hooks/*` pilnują czystości
+  // renderu klienta, gdzie React może powtórzyć render z zapamiętanych wartości.
+  // Render RSC to jedno wywołanie na żądanie, a zegar jest tu takim samym wejściem
+  // jak odczyt z bazy kilka linii wyżej.
+  // eslint-disable-next-line react-hooks/purity
   const daysToT0 = Math.round((campaign.releaseAt.getTime() - Date.now()) / 86400000);
 
   return (

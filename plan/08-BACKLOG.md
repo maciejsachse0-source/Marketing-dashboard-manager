@@ -1647,7 +1647,27 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - te 10 plików wypisane z listy grandfather w `eslint.config.mjs`
   - `npm run test` i `npm run e2e` nadal kod 0, czyli zachowanie się nie zmieniło
 
-- [ ] **F7-02** `znalezisko` `perf` Reguła `react-hooks/purity` w 6 plikach, w tym w gancie
+- [x] **F7-02** `znalezisko` `perf` Reguła `react-hooks/purity` w 6 plikach, w tym w gancie
+  **DYSPOZYCJA: ZROBIONE.** Uwaga do licznika z treści znaleziska: trafień jest **pięć,
+  nie sześć**, i `calendar/gantt-view.tsx` nie ma wśród nich ani jednego — plik rozpadł
+  się w F2-02 i jego trafienie purity zniknęło razem z podziałem. Dowód:
+  `npx eslint . -f json` przed zmianą wypisywał purity w `app/campaigns/[id]/page.tsx`,
+  `app/productions/[id]/page.tsx`, `campaigns/campaigns-list.tsx`,
+  `campaigns/gantt-narrative-row.tsx` i `productions/production-drawer.tsx`.
+  Wszystkie pięć to ten sam kształt: `Date.now()` w renderze przy liczeniu etykiety T-x.
+  Trzy z nich są w komponentach serwerowych (brak `'use client'`) i dostały lokalne
+  `eslint-disable-next-line react-hooks/purity` z uzasadnieniem; dwa kliencke dostały
+  `useState(() => Date.now())`. Rozumowanie w `DECISIONS.md`.
+  Dowody: `npx eslint . -f json | grep -c 'react-hooks/purity'` zwraca `0`; reguła
+  usunięta z `eslint.config.mjs` razem z listą; ostrzeżenia lintu 93 → 88, 0 błędów;
+  `npm run test` 216 zielonych; `npm run typecheck` 0. Pomiar `/calendar`, mediana
+  z trzech przebiegów na budowaniu produkcyjnym: przed 85,2 ms, po 79,3 ms, bundel
+  292,7 kB bez zmiany (obie liczby w `DECISIONS.md`). Weryfikacja na uruchomionej
+  aplikacji: pngdiff `/campaigns`, `/campaigns/1`, `/productions/80`, `/calendar`
+  w oknie 1280x720 — **0 różnych pikseli na każdym z czterech ekranów**; rozwinięty
+  panel kampanii w gancie nadal pokazuje etykiety `T-0` i `T-4`, konsola bez błędów
+  (w tym bez ostrzeżenia o niezgodności hydratacji).
+
   Waga: **ważne**. Szacunek: pół dnia.
   „Cannot call impure function during render", 6 trafień. `gantt-view.tsx` jest wśród nich,
   a to główny podejrzany o zawieszki z A5, więc to znalezisko wchodzi w drogę F2.

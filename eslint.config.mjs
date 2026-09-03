@@ -52,6 +52,9 @@ export default [
   // nich nie dopisujemy.
   // F7-01 zamkniete: `react-hooks/set-state-in-effect` nie ma juz zadnego
   // trafienia, wiec cala jego lista znikla stad razem z regula.
+  // F7-02 zamkniete: `react-hooks/purity` tak samo. Trzy z pieciu trafien byly
+  // w komponentach serwerowych i maja tam lokalne `eslint-disable-next-line`
+  // z uzasadnieniem; dwa w komponentach klienckich zostaly naprawione.
 
   {
     // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
@@ -106,17 +109,6 @@ export default [
     rules: { 'complexity': 'warn' },
   },
 
-  {
-    // GRANDFATHER (F7-02): wywolania Date.now() w renderze.
-    files: [
-      'src/app/campaigns/\\[id\\]/page.tsx',
-      'src/app/productions/\\[id\\]/page.tsx',
-      'src/components/campaigns/campaigns-list.tsx',
-      'src/components/campaigns/gantt-narrative-row.tsx',
-      'src/components/productions/production-drawer.tsx',
-    ],
-    rules: { 'react-hooks/purity': 'warn' },
-  },
 
   {
     // GRANDFATHER (F7-03): mutacja wartosci niezmiennej z punktu widzenia Reacta.

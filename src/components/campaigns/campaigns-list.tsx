@@ -25,7 +25,10 @@ export function CampaignsList({ campaigns }: { campaigns: Campaign[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {campaigns.map((c) => {
+        // Komponent serwerowy (brak 'use client'), patrz komentarz
+        // w `src/app/campaigns/[id]/page.tsx`.
         const daysSinceKickoff = Math.round(
+          // eslint-disable-next-line react-hooks/purity
           (Date.now() - c.releaseAt.getTime()) / 86400000,
         );
         const milestones = c.milestones ?? [];
