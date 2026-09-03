@@ -71,7 +71,7 @@ export function ApplyTemplateButton({
           <span className="font-semibold">Brak narracji.</span>{' '}
           Ta kampania powstała bez szablonu - nie ma nazwanych okresów ani
           milestone&apos;ów. Zastosuj szablon by dostać gotowy łuk narracyjny
-          (build-up → premiera → afterglow itd.).
+          (build-up, premiera, afterglow itd.).
         </div>
         <Button
           type="button"

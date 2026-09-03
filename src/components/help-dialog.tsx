@@ -62,17 +62,17 @@ export function HelpDialog() {
               num={1}
               icon={<Megaphone className="size-4" />}
               title="Założenie kampanii"
-              path="/campaigns/list → „+ Nowa kampania”"
+              path="/campaigns/list, potem „+ Nowa kampania”"
             >
               <p>
                 Kampania to <b>parasol narracyjny</b> - np. „Singiel Świt”,
                 „Trasa jesień 2026”. Trzyma cel (KPI), datę startu i kolejne fazy
-                (build-up → teaser → reveal → premiera → afterglow). Produkcje
+                (build-up, teaser, reveal, premiera, afterglow). Produkcje
                 podpinasz pod nią później.
               </p>
               <Steps>
                 <Step n={1}>
-                  Wejdź w <Code>Kampanie → Lista kampanii</Code> i kliknij{' '}
+                  Wejdź w <Code>Kampanie, Lista kampanii</Code> i kliknij{' '}
                   <Pill>+ Nowa kampania</Pill>.
                 </Step>
                 <Step n={2}>
@@ -101,7 +101,7 @@ export function HelpDialog() {
               num={2}
               icon={<Film className="size-4" />}
               title="Dodanie produkcji"
-              path="/productions/list → „+ Nowa produkcja” (skrót: P)"
+              path="/productions/list, potem „+ Nowa produkcja” (skrót: P)"
             >
               <p>
                 Produkcja = <b>jeden klip</b> (Reel / TikTok / Short). Ma swoją

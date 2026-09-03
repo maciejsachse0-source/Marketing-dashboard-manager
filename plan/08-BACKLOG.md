@@ -2952,7 +2952,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - negatywne: wygląd `/calendar` bez zmian (zrzut 1280x720 przed i po,
     `scripts/perf/pngdiff.mjs` poniżej progu szumu), `npm run test` kod 0
 
-- [ ] **F7-39** `znalezisko` `ui` Strzałki typograficzne zamiast ikon lucide, wbrew Z5
+- [x] **F7-39** `znalezisko` `ui` Strzałki typograficzne zamiast ikon lucide, wbrew Z5
   Waga: **ważne**. Szacunek: pół dnia. Znalezione w recenzji końcowej.
   Z5 mówi „ikony wyłącznie z `lucide-react`". Dziewięć miejsc renderuje zamiast tego znak
   strzałki w tekście widocznym dla użytkownika: `src/components/productions/production-wizard.tsx:241,249`,
@@ -2963,6 +2963,24 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   Potwierdzone na uruchomionej aplikacji. `scripts/check-typography.mjs:20` tego nie łapie,
   bo strzałki siedzą w zakresie Unicode `2190-21FF`, a reguła Z5 skanuje tylko emoji.
   Dla czytnika ekranu znak strzałki bywa czytany jako słowo, ikona z `aria-hidden` nie jest.
+  ZROBIONE 2026-09-03. Nowa reguła `Z5 strzałka` w `scripts/check-typography.mjs`
+  (zakres `←-⇿`) pokazała, że miejsc jest nie dziewięć, tylko **trzydzieści
+  cztery w dwudziestu plikach**. Podzielone na dwa rodzaje, bo Z5 mówi o IKONACH:
+  strzałka stojąca za ikonę wróciła jako `ArrowLeft`, `ArrowRight`, `ArrowUp`,
+  `ArrowDown` i `CornerDownLeft` z `aria-hidden` (pulpit, edycja agenta, strona
+  kampanii, strona produkcji, oba formularze szablonów, oba kreatory, lista produkcji,
+  paleta poleceń, pas kampanii poza oknem); strzałka będąca separatorem zakresu dat
+  albo listy faz to nie ikona i nie ma jej czym zastąpić z lucide, więc zeszła do słowa
+  `do` (zakresy) i do przecinków (`build-up, teaser, reveal, premiera, afterglow`).
+  Trzy takie miejsca dorzucone poza listą z recenzji: opis zmiany w imporcie CSV
+  (`z 1200 na 1500` zamiast `1200 → 1500`), ścieżki w oknie pomocy i podpowiedź
+  o zmianie kolejności kroków (`strzałkami w górę i w dół`).
+  Dowód AC: `node scripts/check-typography.mjs` kod 0 (przed zmianą 34 trafienia);
+  na uruchomionej aplikacji zrzut pulpitu pokazuje ikonę przy „cała analityka",
+  stopka palety poleceń trzy ikony zamiast `↑↓ ... ↵`, a stopka kreatora produkcji
+  ma trzy elementy `svg` (zamknięcie plus dwie strzałki).
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, test 224 zielone, typografia 0,
+  a11y 0 naruszeń (73 elementy akcji na 8 ekranach, wszystkie osiągalne Tabem).
   CZYTAJ: dziewięć plików wyżej, `scripts/check-typography.mjs`
   AC:
   - w każdym z dziewięciu miejsc jest `ArrowLeft` albo `ArrowRight` z `lucide-react`

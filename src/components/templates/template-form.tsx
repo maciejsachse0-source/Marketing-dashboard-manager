@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -529,7 +529,7 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
           href="/templates"
           className="text-sm text-muted-foreground hover:text-foreground ui-transition"
         >
-          ← Wróć do listy
+          <ArrowLeft className="inline size-3.5" aria-hidden="true" /> Wróć do listy
         </Link>
         <div className="flex items-center gap-2">
           {mode.kind === 'edit' ? (

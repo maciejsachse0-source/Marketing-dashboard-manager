@@ -126,9 +126,9 @@ export async function POST(req: NextRequest) {
         if (v === null) continue;
         const existing = (match as Record<string, unknown>)[k];
         if (existing === null || existing === undefined) {
-          changes[k] = `- → ${v}`;
+          changes[k] = `ustawione na ${v}`;
         } else if (typeof existing === 'number' && typeof v === 'number' && v > existing) {
-          changes[k] = `${existing} → ${v}`;
+          changes[k] = `z ${existing} na ${v}`;
         }
       }
       if (Object.keys(changes).length === 0) {

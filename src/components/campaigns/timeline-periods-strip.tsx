@@ -81,7 +81,7 @@ export function PeriodsStrip({
                 key={p.code}
                 className={`absolute top-0 bottom-0 ${tone.bg} border-r border-border/60 px-2 py-1.5 overflow-hidden`}
                 style={{ left: `${left}%`, width: `${width}%` }}
-                title={`${p.code}, ${phaseTitle}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(endDate)}, ${lengthDays} dni${p.description ? `\n\n${p.description}` : ''}`}
+                title={`${p.code}, ${phaseTitle}: ${fmtDayMonth(startDate)} do ${fmtDayMonth(endDate)}, ${lengthDays} dni${p.description ? `\n\n${p.description}` : ''}`}
               >
                 <div className="flex items-center gap-1.5">
                   <span
@@ -101,7 +101,7 @@ export function PeriodsStrip({
                   </span>
                 </div>
                 <div className={`text-[9px] tabular-nums ${tone.ink} opacity-70 mt-0.5 truncate`}>
-                  {fmtDayMonth(startDate)} → {fmtDayMonth(endDate)}
+                  {fmtDayMonth(startDate)} do {fmtDayMonth(endDate)}
                 </div>
                 {p.description ? (
                   <div

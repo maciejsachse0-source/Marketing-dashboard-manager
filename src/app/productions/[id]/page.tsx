@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Mail, Phone, Sparkles, Megaphone, FileText } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Sparkles, Megaphone, FileText } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { getProduction, listProductions } from '@/server/actions/productions';
 import { listArtists } from '@/server/actions/artists';
@@ -213,7 +213,10 @@ export default async function ProductionDetailPage({
           href="/productions"
           className="group inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground ui-transition w-fit"
         >
-          <span className="inline-block ui-transition group-hover:-translate-x-0.5">←</span>
+          <ArrowLeft
+            className="size-3.5 ui-transition group-hover:-translate-x-0.5"
+            aria-hidden="true"
+          />
           wszystkie produkcje
         </Link>
 

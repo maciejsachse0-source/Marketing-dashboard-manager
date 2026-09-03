@@ -10,6 +10,7 @@ import {
   Megaphone,
   Users,
   FileText,
+  ArrowRight,
   type LucideIcon,
 } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
@@ -235,7 +236,7 @@ export default async function DashboardPage() {
             href="/analytics"
             className="text-xs text-muted-foreground hover:text-foreground transition"
           >
-            cała analityka →
+            cała analityka <ArrowRight className="inline size-3.5" aria-hidden="true" />
           </Link>
         </div>
         <CsvDropzone />

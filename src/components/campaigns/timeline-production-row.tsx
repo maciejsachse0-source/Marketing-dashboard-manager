@@ -71,7 +71,7 @@ export function ProductionRow({
               key={p.code}
               className={`absolute top-3 h-8 ${tone.bar} border ${tone.thumb.replace('bg-', 'border-').split(' ')[0]} rounded`}
               style={{ left: `${left}%`, width: `${width}%` }}
-              title={`${p.code} produkcji ${displayName}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(endDate)} (${length}d)`}
+              title={`${p.code} produkcji ${displayName}: ${fmtDayMonth(startDate)} do ${fmtDayMonth(endDate)} (${length}d)`}
             >
               <span
                 className={`absolute top-0.5 left-1 text-[9px] font-bold tracking-[0.14em] ${tone.ink} pointer-events-none`}

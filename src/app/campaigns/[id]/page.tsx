@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { eq, desc, inArray } from 'drizzle-orm';
 import { PageShell } from '@/components/page-shell';
 import { db, schema } from '@/lib/db';
@@ -108,7 +109,7 @@ export default async function CampaignDetailPage({
             ({daysToT0 >= 0 ? `T-${daysToT0}` : `T+${Math.abs(daysToT0)}`})
           </span>
           <Link href="/campaigns" className="ml-auto text-xs text-muted-foreground hover:text-foreground underline">
-            ← wszystkie kampanie
+            <ArrowLeft className="inline size-3.5" aria-hidden="true" /> wszystkie kampanie
           </Link>
         </header>
 

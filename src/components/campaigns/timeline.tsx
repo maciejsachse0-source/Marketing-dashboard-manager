@@ -153,7 +153,7 @@ export function CampaignTimeline({
         </div>
         <div className="flex items-baseline gap-3 label-micro text-muted-foreground tabular-nums shrink-0">
           <span>{fmtDayMonth(minDate)} {minDate.getFullYear()}</span>
-          <span>→</span>
+          <span>do</span>
           <span>{fmtDayMonth(maxDate)} {maxDate.getFullYear()}</span>
           <span className="opacity-70">, {totalDays} dni</span>
         </div>

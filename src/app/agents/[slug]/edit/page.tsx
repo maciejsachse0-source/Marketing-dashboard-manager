@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { AgentForm } from '@/components/agents/agent-form';
 import { getAgent } from '@/lib/agents';
@@ -30,7 +31,7 @@ export default async function EditAgentPage({
           href={`/agents/${agent.slug}`}
           className="text-sm text-muted-foreground hover:text-foreground transition"
         >
-          ← powrót
+          <ArrowLeft className="inline size-3.5" aria-hidden="true" /> powrót
         </Link>
       }
     >

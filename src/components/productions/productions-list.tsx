@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Film } from 'lucide-react';
+import { ArrowRight, Film } from 'lucide-react';
 import { EmptyState } from '@/components/empty-state';
 import { PlatformPills } from '@/components/platforms-pills';
 import { PersonAvatar } from '@/components/productions/artist-avatar';
@@ -131,7 +131,7 @@ export function ProductionsList({
                       Bez kamerzysty
                     </div>
                     <div className="text-xs text-muted-foreground leading-tight">
-                      przypisz w produkcji →
+                      przypisz w produkcji <ArrowRight className="inline size-3" aria-hidden="true" />
                     </div>
                   </div>
                   <span className="ml-auto label-micro text-muted-foreground tabular-nums">

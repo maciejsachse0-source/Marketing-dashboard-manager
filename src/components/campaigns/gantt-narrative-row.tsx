@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { ChevronDown, ExternalLink, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ExternalLink, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   resolvePeriods,
@@ -148,7 +148,7 @@ export function CampaignGanttNarrativeRow({
                   key={p.code}
                   className={`absolute top-1 bottom-1 ${tone.bar} ${tone.ink} border-r border-background/40 px-2 py-1.5 overflow-hidden rounded-sm shadow-sm`}
                   style={{ left: `${clippedLeft}%`, width: `${width}%` }}
-                  title={`${p.code}${p.name ? `, ${p.name}` : ''}: ${fmtDayMonth(startDate)} → ${fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}${p.description ? `\n\n${p.description}` : ''}`}
+                  title={`${p.code}${p.name ? `, ${p.name}` : ''}: ${fmtDayMonth(startDate)} do ${fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}${p.description ? `\n\n${p.description}` : ''}`}
                 >
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-[10px] font-black tracking-[0.16em] tabular-nums opacity-90">
@@ -161,7 +161,7 @@ export function CampaignGanttNarrativeRow({
                     ) : null}
                   </div>
                   <div className="text-[9px] tabular-nums opacity-75 mt-0.5 truncate">
-                    {fmtDayMonth(startDate)} → {fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}
+                    {fmtDayMonth(startDate)} do {fmtDayMonth(addDays(campaign.kickoffAt, p.endOffsetDays))}
                   </div>
                   {p.description ? (
                     <div className="text-[10px] leading-snug opacity-95 mt-1 line-clamp-2">
@@ -182,10 +182,18 @@ export function CampaignGanttNarrativeRow({
             <div
               className={`absolute top-1 bottom-1 flex items-center gap-1.5 px-2 ${arcFullyAfterWindow ? 'right-0 flex-row' : 'left-0 flex-row-reverse'}`}
             >
-              <span className="label-micro-wide font-bold text-muted-foreground whitespace-nowrap">
-                {arcFullyAfterWindow
-                  ? `start ${campaign.kickoffAt.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })} →`
-                  : `← zakończona ${arcEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}`}
+              <span className="label-micro-wide font-bold text-muted-foreground whitespace-nowrap inline-flex items-center gap-1">
+                {arcFullyAfterWindow ? (
+                  <>
+                    start {campaign.kickoffAt.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
+                    <ArrowRight className="size-3" aria-hidden="true" />
+                  </>
+                ) : (
+                  <>
+                    <ArrowLeft className="size-3" aria-hidden="true" />
+                    zakończona {arcEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}
+                  </>
+                )}
               </span>
               <div className="flex items-center gap-1">
                 {resolved.map((p, idx) => {

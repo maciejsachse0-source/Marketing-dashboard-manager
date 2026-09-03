@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -238,7 +239,7 @@ export function ProductionWizard({
 
         <DialogFooter className="flex justify-between sm:justify-between gap-2">
           <Button variant="outline" onClick={back} disabled={step === 1 || pending}>
-            ← Wstecz
+            <ArrowLeft className="size-4" aria-hidden="true" /> Wstecz
           </Button>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => close(false)} disabled={pending}>
@@ -246,7 +247,7 @@ export function ProductionWizard({
             </Button>
             {step < 3 ? (
               <Button onClick={next} disabled={pending}>
-                Dalej →
+                Dalej <ArrowRight className="size-4" aria-hidden="true" />
               </Button>
             ) : (
               <Button onClick={submit} disabled={pending}>

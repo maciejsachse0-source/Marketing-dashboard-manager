@@ -392,10 +392,10 @@ function PeriodRail({
           </span>
         ) : null}
         <span className={`tabular-nums ${tone.ink} text-[10px] opacity-80`}>
-          {fmtDayMonth(startDate)} → {fmtDayMonth(endDate)}
+          {fmtDayMonth(startDate)} do {fmtDayMonth(endDate)}
         </span>
         <span className="text-[10px] tabular-nums text-muted-foreground">
-          ({describeOffset(period.startOffsetDays)} → {describeOffset(period.endOffsetDays)})
+          ({describeOffset(period.startOffsetDays)} do {describeOffset(period.endOffsetDays)})
         </span>
         <span className="ml-auto label-micro text-muted-foreground tabular-nums">
           {lengthDays} {lengthDays === 1 ? 'dzień' : 'dni'}

@@ -22,6 +22,11 @@ const RULES = [
   // żadna z siedmiu bramek — cztery pasy ganta woziły twardy cień przez całą fazę F7.
   { name: 'Z4 twardy kolor', re: /rgba?\(|#[0-9a-fA-F]{6}\b/u },
   { name: 'Z5 emoji', re: /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u },
+  // F7-39: Z5 mówi „ikony wyłącznie z lucide-react", a strzałki typograficzne siedzą
+  // w bloku 2190-21FF, poza zakresem reguły emoji. Przez całą fazę F7 przechodziły
+  // przez bramkę. Nawigacyjne wracają jako ArrowLeft/ArrowRight z aria-hidden,
+  // separatory zakresów schodzą do słowa „do".
+  { name: 'Z5 strzałka', re: /[\u2190-\u21FF]/u },
   { name: 'Z6 kropka', re: /·/u },
   { name: 'Z7 myślnik', re: /—/u },
 ];

@@ -15,6 +15,9 @@ import {
   Plus,
   Upload,
   Search,
+  ArrowUp,
+  ArrowDown,
+  CornerDownLeft,
   type LucideIcon,
 } from 'lucide-react';
 import type { AgentMeta } from '@/lib/agents/types';
@@ -234,7 +237,11 @@ export function CommandPalette({ agents }: { agents: AgentMeta[] }) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>↑↓ nawigacja, ↵ wybór</span>
+          <span className="inline-flex items-center gap-1">
+            <ArrowUp className="size-3" aria-hidden="true" />
+            <ArrowDown className="size-3" aria-hidden="true" />
+            nawigacja, <CornerDownLeft className="size-3" aria-hidden="true" /> wybór
+          </span>
           <span>{flatList.length} {flatList.length === 1 ? 'wynik' : flatList.length < 5 ? 'wyniki' : 'wyników'}</span>
         </div>
       </div>

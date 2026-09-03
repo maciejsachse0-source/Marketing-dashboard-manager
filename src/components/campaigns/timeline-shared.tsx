@@ -131,7 +131,7 @@ export function Legend({ periods }: { periods: TemplatePeriod[] }) {
         );
       })}
       <span className="ml-auto opacity-60">
-        Klik w produkcję → szczegóły pipeline&apos;u
+        Klik w produkcję otwiera szczegóły pipeline&apos;u
       </span>
     </div>
   );

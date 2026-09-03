@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -167,7 +168,7 @@ export function CampaignWizard({
 
         <DialogFooter className="flex justify-between sm:justify-between gap-2">
           <Button variant="outline" onClick={back} disabled={step === 1 || pending}>
-            ← Wstecz
+            <ArrowLeft className="size-4" aria-hidden="true" /> Wstecz
           </Button>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => close(false)} disabled={pending}>
@@ -178,7 +179,7 @@ export function CampaignWizard({
                 onClick={next}
                 disabled={pending || (step === 1 && !templateSlug)}
               >
-                Dalej →
+                Dalej <ArrowRight className="size-4" aria-hidden="true" />
               </Button>
             ) : (
               <Button onClick={submit} disabled={pending}>

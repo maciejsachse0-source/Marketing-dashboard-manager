@@ -124,7 +124,7 @@ export function AddStepInline({
         />
 
         <p className="text-[10px] text-muted-foreground italic">
-          Krok pojawi się na końcu kategorii. Kolejność zmienisz strzałkami ↑/↓.
+          Krok pojawi się na końcu kategorii. Kolejność zmienisz strzałkami w górę i w dół.
         </p>
 
         <div className="space-y-1">
