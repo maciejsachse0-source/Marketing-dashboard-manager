@@ -1,8 +1,6 @@
 import { PageShell } from '@/components/page-shell';
 import { TemplateForm } from '@/components/templates/template-form';
 
-export const dynamic = 'force-dynamic';
-
 export default function NewTemplatePage() {
   return (
     <PageShell

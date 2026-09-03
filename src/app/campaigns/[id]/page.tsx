@@ -16,6 +16,7 @@ import { ApplyTemplateButton } from '@/components/campaigns/apply-template-butto
 import { loadMarketingTemplates } from '@/lib/campaign-templates';
 import { TYPE_LABEL } from '@/components/calendar/type-color';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function CampaignDetailPage({

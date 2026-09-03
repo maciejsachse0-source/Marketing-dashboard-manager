@@ -4,6 +4,7 @@ import { saveBuffer, type FileCategory } from '@/lib/files';
 import { getSessionEmail } from '@/lib/auth';
 
 export const runtime = 'nodejs';
+// F7-41: trasa czyta ciało żądania i pisze do bazy, nie ma czego wyliczyć przy budowaniu.
 export const dynamic = 'force-dynamic';
 
 const categorySchema = z.enum(['assets', 'briefs', 'csv', 'outreach']);

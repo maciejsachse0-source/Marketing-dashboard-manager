@@ -22,6 +22,7 @@ import { savePlans } from '@/lib/import/save';
 import { existingPeople } from '@/lib/import/existing';
 
 export const runtime = 'nodejs';
+// F7-41: trasa czyta ciało żądania i pisze do bazy, nie ma czego wyliczyć przy budowaniu.
 export const dynamic = 'force-dynamic';
 
 const cell = z.union([z.string(), z.number(), z.boolean(), z.null()]);

@@ -4,6 +4,7 @@ import { PageShell } from '@/components/page-shell';
 import { AgentForm } from '@/components/agents/agent-form';
 import { loadAgents, getAgent } from '@/lib/agents';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function NewAgentPage({

@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { PageShell } from '@/components/page-shell';
 import { loadAgents } from '@/lib/agents';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function AgentsListPage() {

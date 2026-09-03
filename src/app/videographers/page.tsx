@@ -3,6 +3,7 @@ import { PageShell } from '@/components/page-shell';
 import { db, schema } from '@/lib/db';
 import { VideographersShell, type VideographerRow } from '@/components/videographers/videographers-shell';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function VideographersPage() {

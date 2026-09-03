@@ -32,6 +32,7 @@ function parseWeekParam(raw: string | undefined): Date {
   return Number.isFinite(d.getTime()) ? d : fallback;
 }
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 // View mode determines how wide a window we render and what the header

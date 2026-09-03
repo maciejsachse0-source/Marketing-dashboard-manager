@@ -4,6 +4,7 @@ import { ArtistsShell, type ArtistRow } from '@/components/artists/artists-shell
 import { db, schema } from '@/lib/db';
 import { listOutreachFiles, outreachFilesForArtist } from '@/lib/outreach-files';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function ArtistsPage() {

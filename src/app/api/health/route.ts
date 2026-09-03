@@ -2,6 +2,7 @@ import { getSessionEmail } from '@/lib/auth';
 import { env } from '@/lib/env';
 
 export const runtime = 'nodejs';
+// F7-41: trasa czyta ciało żądania i pisze do bazy, nie ma czego wyliczyć przy budowaniu.
 export const dynamic = 'force-dynamic';
 
 /**

@@ -7,6 +7,7 @@ import { runAgentWidget } from '@/lib/agents/widget';
 import { AgentContextPanel } from '@/components/agent-context-panel';
 import { CopyButton } from '@/components/copy-button';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function AgentPage({

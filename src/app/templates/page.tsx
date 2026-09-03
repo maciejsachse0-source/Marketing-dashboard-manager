@@ -5,6 +5,7 @@ import { loadTemplates } from '@/lib/production-templates';
 import { Button } from '@/components/ui/button';
 import { TemplatesList } from '@/components/templates/templates-list';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function TemplatesPage() {

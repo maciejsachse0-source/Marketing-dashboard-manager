@@ -9,6 +9,7 @@ import { loadMarketingTemplates } from '@/lib/campaign-templates';
 import { CampaignsList } from '@/components/campaigns/campaigns-list';
 import { CampaignTemplatesList } from '@/components/campaigns/campaign-templates-list';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function CampaignsOverviewPage() {

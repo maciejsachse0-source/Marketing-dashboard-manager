@@ -10,6 +10,7 @@ import { getSessionEmail } from '@/lib/auth';
 import { checkFile, parseWorkbook } from '@/lib/import/parse';
 
 export const runtime = 'nodejs';
+// F7-41: trasa czyta ciało żądania i pisze do bazy, nie ma czego wyliczyć przy budowaniu.
 export const dynamic = 'force-dynamic';
 
 const uploadSchema = z.object({

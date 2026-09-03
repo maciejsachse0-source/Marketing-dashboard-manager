@@ -8,6 +8,7 @@ import { ProductionsList } from '@/components/productions/productions-list';
 import { loadTemplates } from '@/lib/production-templates';
 import { HALO_DOTYK } from '@/lib/utils';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function ProductionsListPage({

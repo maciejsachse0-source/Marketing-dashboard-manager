@@ -1,8 +1,6 @@
 import { PageShell } from '@/components/page-shell';
 import { CampaignTemplateForm } from '@/components/campaigns/campaign-template-form';
 
-export const dynamic = 'force-dynamic';
-
 export default function NewCampaignTemplatePage() {
   return (
     <PageShell

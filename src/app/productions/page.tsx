@@ -10,6 +10,7 @@ import { ProductionsList } from '@/components/productions/productions-list';
 import { TemplatesList } from '@/components/templates/templates-list';
 import { loadTemplates } from '@/lib/production-templates';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function ProductionsOverviewPage() {

@@ -3,6 +3,7 @@ import { ImportShell } from '@/components/import/import-shell';
 import { db, schema } from '@/lib/db';
 import { existingPeople } from '@/lib/import/existing';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function ImportPeoplePage() {

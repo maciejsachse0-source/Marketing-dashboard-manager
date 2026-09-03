@@ -8,6 +8,7 @@ import { detectCsvSource, parseCsvBuffer } from '@/lib/csv-parser';
 import { normalizeRow, isLikelyMatch, type NormalizedPost } from '@/lib/csv-mappers';
 
 export const runtime = 'nodejs';
+// F7-41: trasa czyta ciało żądania i pisze do bazy, nie ma czego wyliczyć przy budowaniu.
 export const dynamic = 'force-dynamic';
 
 const MAX_BYTES = 50 * 1024 * 1024;

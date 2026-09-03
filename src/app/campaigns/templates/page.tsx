@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { loadMarketingTemplates } from '@/lib/campaign-templates';
 import { CampaignTemplatesList } from '@/components/campaigns/campaign-templates-list';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function CampaignTemplatesPage() {

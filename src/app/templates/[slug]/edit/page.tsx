@@ -3,6 +3,7 @@ import { PageShell } from '@/components/page-shell';
 import { TemplateForm } from '@/components/templates/template-form';
 import { getTemplate } from '@/lib/production-templates';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function EditTemplatePage({

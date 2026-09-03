@@ -388,6 +388,11 @@ uruchamialne.
   ZOSTAJE: `e2e/stale-data.spec.ts` zielony na serwerze produkcyjnym
   (`npm run e2e`: 2 passed), `src/app/layout.tsx` bez `force-dynamic`,
   `npm run build` kod 0, `npm run typecheck` kod 0, `npm run lint` kod 0.
+  POPRAWKA DOWODU 2026-09-03 (**F7-41**): trzecie kryterium poniżej
+  nie było prawdziwe. Po cofnięciu zmiany deklaracje wróciły, a doszły trzy nowe
+  (`import/osoby`, `videographers`, `campaigns/templates`) — 29 sztuk i ani jednego
+  komentarza z powodem. Dociągnięte w F7-41: 27 deklaracji z komentarzem, 2 usunięte,
+  a nowa reguła w `scripts/check-typography.mjs` nie przepuszcza deklaracji bez powodu.
   CZYTAJ: `plan/03-wydajnosc.md` sekcja 5 wiersz P3, `src/app/layout.tsx`,
   dokumentacja Next 16 o Cache Components (przeczytaj przed pisaniem kodu)
   AC:
@@ -3014,13 +3019,26 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - `grep -n "wc -l\` równe 50" plan/08-BACKLOG.md` zwraca `0`
   - negatywne: `npm run perf` kod 0
 
-- [ ] **F7-41** `znalezisko` `docs` `perf` `force-dynamic` bez uzasadnień, wbrew kryterium F1-03
+- [x] **F7-41** `znalezisko` `docs` `perf` `force-dynamic` bez uzasadnień, wbrew kryterium F1-03
   Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   `plan/08-BACKLOG.md:374` (F1-03, odhaczone) mówi, że każdy z 26 plików z `force-dynamic`
   albo traci deklarację, albo ma nad nią komentarz z powodem. Dziś deklaracji jest **29**
   i ani jedna nie ma komentarza. Trzy nowe przyszły po F1 bez uzasadnienia:
   `import/osoby`, `videographers`, `campaigns/templates`. Deklaracja bez powodu jest
   nieusuwalna, bo nikt nie wie, czy wolno.
+  ZROBIONE 2026-09-03. Z 29 deklaracji zostało **27**, każda z komentarzem `F7-41`
+  podającym powód w jednej z czterech kategorii: strona czyta bazę na każde żądanie
+  (13), katalog agentów albo szablonów czytany z dysku na każde żądanie (8), trasa API
+  czyta ciało żądania (5), render zależy od ciasteczka sesji (`/login`). Dwie
+  deklaracje **usunięte**, bo obie strony nie czytają niczego: `/templates/new`
+  i `/campaigns/templates/new` renderują sam formularz.
+  Pilnuje tego nowa reguła w `scripts/check-typography.mjs` (sprawdzana na tekście, nie
+  na AST, bo komentarzy w AST nie ma): deklaracja bez komentarza w linii wyżej to kod 1.
+  Dowód AC: `node scripts/check-typography.mjs` kod 0; po tymczasowym skasowaniu
+  komentarza w `src/app/api/health/route.ts` kod 1 z nazwą pliku i numerem linii.
+  DOWÓD w odhaczonym F1-03 poprawiony adnotacją, że kryterium przestało być prawdziwe.
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, test 224 zielone, typografia 0,
+  granice zaufania 0.
   CZYTAJ: `plan/08-BACKLOG.md` wpis F1-03, 29 plików z `grep -rn "force-dynamic" src`
   AC:
   - nad każdą deklaracją `force-dynamic` stoi komentarz z powodem albo deklaracja znika

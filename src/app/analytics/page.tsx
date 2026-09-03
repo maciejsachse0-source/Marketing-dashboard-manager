@@ -3,6 +3,7 @@ import { PageShell } from '@/components/page-shell';
 import { AnalyticsShell } from '@/components/analytics/analytics-shell';
 import { db, schema } from '@/lib/db';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function AnalyticsPage() {

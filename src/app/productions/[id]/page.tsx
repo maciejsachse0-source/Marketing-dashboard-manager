@@ -22,6 +22,7 @@ import type {
   ProductionStep,
 } from '../../../../drizzle/schema';
 
+// F7-41: strona czyta bazę na każde żądanie, statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 type WeekPhase = 'T1' | 'T2' | 'T3';

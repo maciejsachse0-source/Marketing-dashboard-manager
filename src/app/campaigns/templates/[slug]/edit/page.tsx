@@ -3,6 +3,7 @@ import { PageShell } from '@/components/page-shell';
 import { CampaignTemplateForm } from '@/components/campaigns/campaign-template-form';
 import { getMarketingTemplate } from '@/lib/campaign-templates';
 
+// F7-41: katalog szablonów/agentów czytany z dysku na każde żądanie (hot-reload bez restartu).
 export const dynamic = 'force-dynamic';
 
 export default async function EditCampaignTemplatePage({

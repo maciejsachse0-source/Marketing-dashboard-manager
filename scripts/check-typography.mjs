@@ -64,6 +64,23 @@ for (const path of files(ROOT)) {
   };
   visit(source);
 }
+/**
+ * F7-41: `export const dynamic = 'force-dynamic'` musi mieć nad sobą komentarz
+ * z powodem. Kryterium F1-03 tego wymagało, ale nic nie pilnowało — deklaracji
+ * urosło z 26 do 29 i ani jedna nie miała uzasadnienia, więc żadnej nie dało się
+ * bezpiecznie zdjąć. Sprawdzane na tekście, nie na AST, bo komentarza w AST nie ma.
+ */
+const DEKLARACJA = "export const dynamic = 'force-dynamic';";
+for (const path of files(ROOT)) {
+  const linie = readFileSync(path, 'utf8').split('\n');
+  linie.forEach((linia, i) => {
+    if (linia.trim() !== DEKLARACJA) return;
+    if ((linie[i - 1] ?? '').trim().startsWith('//')) return;
+    console.log(`${path}:${i + 1}: F7-41 force-dynamic: brak komentarza z powodem nad deklaracją`);
+    hits += 1;
+  });
+}
+
 // Pliki danych: JSON z `data/`. Klucz `systemPrompt` pomijany świadomie (F7-17).
 function jsonFiles(dir) {
   return readdirSync(dir).flatMap((entry) => {

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Logowanie, Marketing Crew',
 };
 
+// F7-41: render zależy od ciasteczka sesji (getSessionEmail), statycznej wersji nie ma.
 export const dynamic = 'force-dynamic';
 
 export default async function LoginPage({
