@@ -1,8 +1,8 @@
 /**
- * Kanon typografii (zasady Z5, Z6, Z7): szuka emoji, wyśrodkowanych kropek
- * i długich myślników WYŁĄCZNIE w tekstach widocznych dla użytkownika, czyli
- * w literałach tekstowych i w tekście JSX. Komentarze w kodzie są pomijane,
- * bo parser je zna, a grep nie.
+ * Kanon typografii i tokenów (zasady Z4, Z5, Z6, Z7): szuka twardych kolorów,
+ * emoji, wyśrodkowanych kropek i długich myślników WYŁĄCZNIE w literałach
+ * tekstowych i w tekście JSX. Komentarze w kodzie są pomijane, bo parser je zna,
+ * a grep nie — dlatego reguła Z4 nie płoszy się o `rgb(` opisany w komentarzu.
  *
  * Od F7-17 skanuje także katalog `data/` (pliki JSON zasilające katalog agentów
  * i szablonów). Tam sprawdzane są wszystkie wartości tekstowe POZA `systemPrompt`,
@@ -18,6 +18,9 @@ import ts from 'typescript';
 
 const ROOT = process.argv[2] ?? 'src';
 const RULES = [
+  // F7-38: Z4 wymienia `rgb(` i `#rrggbb` wprost, a do tej pory nie pilnowała ich
+  // żadna z siedmiu bramek — cztery pasy ganta woziły twardy cień przez całą fazę F7.
+  { name: 'Z4 twardy kolor', re: /rgba?\(|#[0-9a-fA-F]{6}\b/u },
   { name: 'Z5 emoji', re: /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u },
   { name: 'Z6 kropka', re: /·/u },
   { name: 'Z7 myślnik', re: /—/u },

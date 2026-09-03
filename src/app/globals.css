@@ -82,6 +82,15 @@
   --sidebar-border: oklch(0.90 0.01 255);
   --sidebar-ring: oklch(0.62 0.20 252);
 
+  /* F7-38: cień pod przyklejoną lewą kolumną ganta (wiersz, nagłówek, legenda,
+     pas narracyjny kampanii). Był wpisany czterokrotnie jako
+     `shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]`, czyli twardy kolor wbrew Z4. */
+  --shadow-rail: 2px 0 6px -2px oklch(0 0 0 / 8%);
+
+  /* F7-38: ledwo widoczna ramka kafla okresu w formularzu szablonu kampanii.
+     Była wpisana jako `style={{ borderColor: 'rgba(0,0,0,0.08)' }}`, wbrew Z4. */
+  --border-faint: oklch(0 0 0 / 8%);
+
   /* Signature accent — saturated electric blue from reference image */
   --accent-blue: oklch(0.62 0.20 252);
   --accent-blue-soft: oklch(0.85 0.10 248);

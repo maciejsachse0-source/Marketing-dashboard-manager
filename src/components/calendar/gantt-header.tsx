@@ -73,7 +73,7 @@ export function GanttAxisHeader({
           className="grid gap-0 sticky top-0 z-30 bg-background/95 backdrop-blur"
           style={{ gridTemplateColumns: `22rem 1fr` }}
         >
-          <div className="border-b border-r border-border/60 px-5 py-3 text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold sticky left-0 z-40 bg-background/95 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]">
+          <div className="border-b border-r border-border/60 px-5 py-3 text-xs uppercase tracking-[0.14em] text-muted-foreground font-semibold sticky left-0 z-40 bg-background/95 backdrop-blur shadow-(--shadow-rail)">
             Produkcja, pipeline
           </div>
           <div>

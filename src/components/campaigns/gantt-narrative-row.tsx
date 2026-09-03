@@ -93,7 +93,7 @@ export function CampaignGanttNarrativeRow({
         className="grid bg-muted/10"
         style={{ gridTemplateColumns: `22rem 1fr` }}
       >
-        <div className="px-5 py-3 border-r border-border/40 sticky left-0 z-30 bg-background/95 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] flex flex-col gap-1 justify-center">
+        <div className="px-5 py-3 border-r border-border/40 sticky left-0 z-30 bg-background/95 backdrop-blur shadow-(--shadow-rail) flex flex-col gap-1 justify-center">
           <div className="flex items-start gap-1">
             <Link
               href={`/campaigns/${campaign.id}`}

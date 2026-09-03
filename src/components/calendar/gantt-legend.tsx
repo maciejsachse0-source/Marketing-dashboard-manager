@@ -24,7 +24,7 @@ export function SectionHeaderRow({
       className="grid border-b border-border/60 bg-muted/30"
       style={{ gridTemplateColumns: `22rem 1fr` }}
     >
-      <div className="px-5 py-2 border-r border-border/40 sticky left-0 z-30 bg-muted/40 backdrop-blur shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)] flex items-center gap-2">
+      <div className="px-5 py-2 border-r border-border/40 sticky left-0 z-30 bg-muted/40 backdrop-blur shadow-(--shadow-rail) flex items-center gap-2">
         <span className={labelClasses}>{label}</span>
         {hint ? (
           <span className="label-micro text-muted-foreground tabular-nums">

@@ -45,7 +45,7 @@ export function GanttRowRail({
   // buttons (z-20) but below the sticky header (z-40).
   return (
         <div
-          className="pl-5 pr-4 py-3.5 flex flex-col gap-2.5 border-r border-border/40 sticky left-0 z-30 bg-card shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]"
+          className="pl-5 pr-4 py-3.5 flex flex-col gap-2.5 border-r border-border/40 sticky left-0 z-30 bg-card shadow-(--shadow-rail)"
         >
           {isFirstOfArtist ? (
             <>

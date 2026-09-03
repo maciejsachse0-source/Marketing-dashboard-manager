@@ -2915,7 +2915,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     komentarz nad eksportem z powodem i wpis w `DECISIONS.md`
   - negatywne: `npm run typecheck` kod 0, `node scripts/check-trust-boundaries.mjs` kod 0
 
-- [ ] **F7-38** `znalezisko` `ui` Cień pasa ganta wpisany surowym `rgb(`, wbrew Z4
+- [x] **F7-38** `znalezisko` `ui` Cień pasa ganta wpisany surowym `rgb(`, wbrew Z4
   Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   Cztery pliki niosą tę samą klasę `shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]`, czyli
   twardy kolor `rgb(` plus magiczne piksele:
@@ -2923,6 +2923,26 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   `src/components/calendar/gantt-legend.tsx:27`, `src/components/campaigns/gantt-narrative-row.tsx:96`.
   Z4 wymienia `rgb(` wprost. Osobna część znaleziska: żadna z siedmiu bramek dziś tego nie
   łapie, więc reguła istnieje wyłącznie w dokumencie.
+  ZROBIONE 2026-09-03. `--shadow-rail: 2px 0 6px -2px oklch(0 0 0 / 8%)` w `globals.css`,
+  cztery komponenty używają `shadow-(--shadow-rail)`.
+  Nowa, czwarta reguła w `scripts/check-typography.mjs` (`Z4 twardy kolor`, wyrażenie
+  `rgba?\(|#[0-9a-fA-F]{6}`) wskazała **piąte** miejsce, którego recenzja nie wymieniła:
+  `src/components/campaigns/campaign-template-form.tsx:482` trzymało
+  `style={{ borderColor: 'rgba(0,0,0,0.08)' }}`. Poszło tą samą drogą: token
+  `--border-faint` i klasa `border-(--border-faint)`. Reguła skanuje literały tekstowe
+  z parsera, nie grepem, więc `rgb(` opisany w komentarzu jej nie płoszy.
+  Dowód AC: `grep -rn "rgb(" src/components | wc -l` zwraca `0`,
+  `node scripts/check-typography.mjs` kod 0; po tymczasowym wklejeniu starej klasy
+  do `gantt-legend.tsx` kod 1 z nazwą reguły w wypisie.
+  Dowód „wygląd bez zmian" wzięty z wartości wyliczonej, nie z pikseli: przeglądarka
+  liczy nowy cień jako `lab(0 0 0 / 0.08) 2px 0px 6px -2px`, a nową ramkę jako
+  `lab(0 0 0 / 0.08)` — to ta sama czerń w 8%, którą dawały literały.
+  ZMIERZONE PRZY OKAZJI, wbrew wcześniejszej notatce o zerowym szumie zrzutów: widok
+  ganta NIE jest stabilny pikselowo między przebiegami. Dwa zrzuty `/calendar` z tego
+  samego kodu różnią się o 3968 i 4079 pikseli, podczas gdy `/productions/list`
+  i `/calendar?mode=table` dają w tym samym teście **0**. Dlatego dowodem jest tu
+  wartość wyliczona stylu, a nie `pngdiff`.
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, test 224 zielone, typografia 0.
   CZYTAJ: `src/app/globals.css`, cztery pliki wyżej, `scripts/check-typography.mjs`
   AC:
   - `--shadow-rail` zdefiniowany w `globals.css`, komponenty używają `shadow-(--shadow-rail)`

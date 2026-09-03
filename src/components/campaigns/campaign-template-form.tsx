@@ -477,10 +477,7 @@ export function CampaignTemplateForm({
           return (
             <div
               key={`${period.code}-${idx}`}
-              className={`rounded-2xl border-2 ${tone.bg} p-4 sm:p-5 space-y-3`}
-              style={{
-                borderColor: 'rgba(0,0,0,0.08)',
-              }}
+              className={`rounded-2xl border-2 border-(--border-faint) ${tone.bg} p-4 sm:p-5 space-y-3`}
             >
               <header className="flex items-center gap-2.5 flex-wrap">
                 <span
