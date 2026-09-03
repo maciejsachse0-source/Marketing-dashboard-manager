@@ -22,17 +22,18 @@ function chunk<T>(items: readonly T[], size: number): T[][] {
   return out;
 }
 
-function insertValues(person: NormalizedPerson, role: PersonRole) {
-  const base = {
+// Obie tabele mają dziś ten sam zestaw kolumn importowanych — `artists`
+// dostała `status` migracją `0004` (F7-45), więc rola nic tu już nie zmienia.
+function insertValues(person: NormalizedPerson) {
+  return {
     name: person.name,
     handle: person.handle,
     email: person.email,
     phone: person.phone,
     location: person.location,
+    status: person.status,
     notes: person.notes,
   };
-  // Tabela `artists` nie ma kolumny `status`, normalizacja i tak zwraca tam null.
-  return role === 'artist' ? base : { ...base, status: person.status };
 }
 
 /**
@@ -65,7 +66,7 @@ export async function savePlans(
   onBatch?.(done, total);
 
   for (const batch of insertBatches) {
-    await tx.insert(table).values(batch.map((row) => insertValues(row.person, role)));
+    await tx.insert(table).values(batch.map((row) => insertValues(row.person)));
     done += 1;
     onBatch?.(done, total);
   }

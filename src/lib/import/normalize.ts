@@ -13,7 +13,8 @@ export type NormalizedPerson = {
   email: string | null;
   phone: string | null;
   location: string | null;
-  /** Zawsze null dla roli twórcy — tabela `artists` nie ma tej kolumny. */
+  /** Opisowy status z arkusza — od F7-45 wypełniany dla obu ról, bo `artists`
+   *  ma kolumnę `status` od migracji `0004`. */
   status: string | null;
   notes: string | null;
 };
@@ -99,14 +100,14 @@ function normalizeChecked(cells: Cells, errors: string[]): { email: string | nul
   return { email, phone };
 }
 
-function toPerson(cells: Cells, role: PersonRole, email: string | null, phone: string | null): NormalizedPerson {
+function toPerson(cells: Cells, email: string | null, phone: string | null): NormalizedPerson {
   return {
     name: cells.name ?? '',
     handle: cells.handle ? normalizeHandle(cells.handle) : null,
     email,
     phone,
     location: cells.location ? normalizeLocation(cells.location) : null,
-    status: role === 'videographer' ? (cells.status ?? null) : null,
+    status: cells.status ?? null,
     notes: cells.notes ?? null,
   };
 }
@@ -126,7 +127,7 @@ export function contactField(raw: string): 'email' | 'phone' | 'handle' | null {
   return null;
 }
 
-export function normalizeRow(raw: Record<string, unknown>, role: PersonRole): RowResult {
+export function normalizeRow(raw: Record<string, unknown>): RowResult {
   const parsed = rowSchema.safeParse(raw);
   if (!parsed.success) return { kind: 'error', errors: ['nieobsługiwana zawartość komórki'] };
 
@@ -139,5 +140,5 @@ export function normalizeRow(raw: Record<string, unknown>, role: PersonRole): Ro
   const { email, phone } = normalizeChecked(cells, errors);
   if (errors.length > 0) return { kind: 'error', errors };
 
-  return { kind: 'ok', person: toPerson(cells, role, email, phone) };
+  return { kind: 'ok', person: toPerson(cells, email, phone) };
 }

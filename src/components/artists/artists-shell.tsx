@@ -185,6 +185,13 @@ function ArtistCard({
         </div>
       ) : null}
 
+      {artist.status ? (
+        <div className="mt-3 text-xs">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Status</p>
+          <p className="text-foreground/85 leading-relaxed line-clamp-2">{artist.status}</p>
+        </div>
+      ) : null}
+
       <div className="mt-4 pt-3 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1" title="Liczba kolaborów w kalendarzu">
           <Users className="size-3" />

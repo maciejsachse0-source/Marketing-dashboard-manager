@@ -189,6 +189,13 @@ function VideographerCard({
         </div>
       ) : null}
 
+      {v.status ? (
+        <div className="mt-3 text-xs">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Status</p>
+          <p className="text-foreground/85 leading-relaxed line-clamp-2">{v.status}</p>
+        </div>
+      ) : null}
+
       {v.equipment ? (
         <div className="mt-3 text-xs">
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">Sprzęt</p>

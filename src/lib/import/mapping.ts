@@ -1,7 +1,6 @@
 /**
  * Propozycja mapowania nagłówek arkusza na pole osoby (plan/04 sekcja 4).
  */
-import type { PersonRole } from './normalize';
 
 export const PERSON_FIELDS = ['name', 'handle', 'email', 'phone', 'location', 'status', 'notes'] as const;
 export type PersonField = (typeof PERSON_FIELDS)[number];
@@ -36,15 +35,14 @@ for (const field of PERSON_FIELDS) {
 
 /**
  * Propozycja dla każdej kolumny. `null` znaczy „pomijana" i wymaga świadomego
- * wyboru usera. Pole `status` nie jest proponowane dla roli twórcy, bo tabela
- * `artists` go nie ma.
+ * wyboru usera. Od F7-45 `status` proponuje się dla obu ról — `artists` ma tę
+ * kolumnę od migracji `0004`, więc rola przestała mieć tu znaczenie.
  */
-export function autoMap(headers: readonly string[], role: PersonRole): (PersonField | null)[] {
+export function autoMap(headers: readonly string[]): (PersonField | null)[] {
   const used = new Set<PersonField>();
   return headers.map((header) => {
     const field = ALIAS_TO_FIELD.get(normalizeHeader(header)) ?? null;
     if (field === null) return null;
-    if (field === 'status' && role === 'artist') return null;
     if (used.has(field)) return null;
     used.add(field);
     return field;

@@ -3218,7 +3218,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     tam, gdzie handle jest niepusty
   - negatywne: wiersz bez imienia I bez handle nadal jest błędem, nie osobą bez nazwy
 
-- [ ] **F7-45** `znalezisko` `import` `db` Status twórcy z arkusza nie ma gdzie wejść
+- [x] **F7-45** `znalezisko` `import` `db` Status twórcy z arkusza nie ma gdzie wejść
   Waga: **drobne**. Szacunek: godzina. Znalezione w F4-06. Arkusz twórców ma kolumnę
   statusu wypełnioną w 181 wierszach na 294 (siedem różnych wartości, tekst opisowy),
   ale tabela `artists` nie ma kolumny `status` — ma ją tylko `videographers`
@@ -3231,6 +3231,15 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - dowód: suchy przebieg prawdziwego arkusza pokazuje status u twórców albo komunikat
     o jego pominięciu; zrzut z fixture'a syntetycznego
   - negatywne: `npm run perf` kod 0 (zmiana dotyka warstwy danych)
+  ZROBIONE 2026-09-03, wariant „kolumna": migracja `0004_whole_flatman.sql`, jedno
+  zdanie `ALTER TABLE "artists" ADD COLUMN "status" text`, addytywna, dopuszcza `null`.
+  Przepuszczona na `marketing`, `marketing_perf`, `marketing_test`, `marketing_preview`
+  — dowód: `information_schema.columns` oddaje `status text null=YES` na każdej z nich,
+  a `artists` ma po zmianie 11 kolumn, żadna nie zniknęła. `autoMap` proponuje `status`
+  dla obu ról, `normalizeRow` i `insertValues` przestały rozgałęziać się po roli.
+  Status widać na karcie osoby, na obu ekranach — zrzut `test-results/F7-45/`. Suchy
+  przebieg fixture: 732 z 975 planów twórców ze statusem; prawdziwy arkusz twórców:
+  179 wierszy ze statusem. `npm run perf` kod 0, bundel `/calendar` 293,4 kB.
 
 ---
 

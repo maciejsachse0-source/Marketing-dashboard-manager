@@ -4,14 +4,12 @@ import { Button } from '@/components/ui/button';
 import { ImportMapping } from './import-mapping';
 import type { DryRunResult } from '@/lib/import/dry-run';
 import type { PersonField } from '@/lib/import/mapping';
-import type { PersonRole } from '@/lib/import/normalize';
 import type { SheetData } from './import-shell';
 
 /** Krok 3: mapowanie z podglądem liczb przeliczanym przy każdej zmianie. */
 export function ImportMappingStep({
   sheet,
   mapping,
-  role,
   conflicts,
   result,
   onChange,
@@ -20,7 +18,6 @@ export function ImportMappingStep({
 }: {
   sheet: SheetData;
   mapping: readonly (PersonField | null)[];
-  role: PersonRole;
   conflicts: readonly PersonField[];
   result: DryRunResult;
   onChange: (index: number, field: PersonField | null) => void;
@@ -34,7 +31,6 @@ export function ImportMappingStep({
       <ImportMapping
         headers={sheet.headers}
         mapping={mapping}
-        role={role}
         conflicts={conflicts}
         sample={sheet.rows[0] ?? []}
         onChange={onChange}

@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PERSON_FIELDS, type PersonField } from '@/lib/import/mapping';
-import type { PersonRole } from '@/lib/import/normalize';
 
 export const FIELD_LABELS: Record<PersonField, string> = {
   name: 'Nazwa',
@@ -28,20 +27,19 @@ const SKIP = '__pomijana__';
 export function ImportMapping({
   headers,
   mapping,
-  role,
   conflicts,
   sample,
   onChange,
 }: {
   headers: readonly string[];
   mapping: readonly (PersonField | null)[];
-  role: PersonRole;
   conflicts: readonly PersonField[];
   sample: readonly (string | number | boolean | null)[];
   onChange: (index: number, field: PersonField | null) => void;
 }) {
-  // Tabela `artists` nie ma kolumny statusu, więc dla twórcy pole nie istnieje.
-  const fields = PERSON_FIELDS.filter((field) => field !== 'status' || role === 'videographer');
+  // Od F7-45 obie role mają ten sam zestaw pól — `artists` dostała `status`
+  // migracją `0004`.
+  const fields = PERSON_FIELDS;
 
   return (
     <div className="grid gap-3">

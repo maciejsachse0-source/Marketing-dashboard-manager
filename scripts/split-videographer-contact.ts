@@ -42,7 +42,7 @@ function rozdziel(surowy: string, name: string, w: Wiersz): Wynik {
   if (pole === null) return { kind: 'pomin', powod: 'nieznany kształt' };
 
   // Jedne reguły: normalizator dostaje wiersz w kształcie arkusza importu.
-  const wynik = normalizeRow({ name, [pole]: surowy }, 'videographer');
+  const wynik = normalizeRow({ name, [pole]: surowy });
   if (wynik.kind === 'error') return { kind: 'pomin', powod: wynik.errors.join(', ') };
   const wartosc = wynik.kind === 'ok' ? wynik.person[pole] : null;
   if (wartosc === null) return { kind: 'pomin', powod: 'normalizator zwrócił pustkę' };

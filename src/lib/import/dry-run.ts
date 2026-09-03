@@ -74,7 +74,7 @@ export function dryRun(
 
   rows.forEach((cells, index) => {
     const line = index + 2;
-    const result = normalizeRow(toRawRow(cells, mapping), role);
+    const result = normalizeRow(toRawRow(cells, mapping));
 
     if (result.kind === 'empty') {
       out.empty += 1;

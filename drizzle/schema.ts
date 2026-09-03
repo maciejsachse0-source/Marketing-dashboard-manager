@@ -169,6 +169,9 @@ export const artists = pgTable('artists', {
   email: text('email'),
   phone: text('phone'),
   location: text('location'),
+  /** Opisowy status współpracy z arkusza twórców (F7-45). Bez słownika — dane
+   *  wejściowe to wolny tekst. NULL = arkusz nic nie wnosił. */
+  status: text('status'),
   avatarUrl: text('avatar_url'),
   notes: text('notes'),
   lastContactAt: timestamp('last_contact_at', { withTimezone: true, mode: 'date' }),

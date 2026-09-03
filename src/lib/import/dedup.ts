@@ -11,7 +11,7 @@ export type DuplicateMatch =
   | { level: 'certain'; reason: 'handle' | 'email'; existing: ExistingPerson }
   | { level: 'probable'; reason: 'name-location'; existing: ExistingPerson };
 
-/** Pola, które import wypełnia. `status` odpada dla twórcy już w normalizacji. */
+/** Pola, które import wypełnia — od F7-45 identyczne dla obu ról. */
 const UPDATABLE = ['handle', 'email', 'phone', 'location', 'status', 'notes'] as const;
 
 /** Wybór usera z kroku 5: co zrobić z duplikatem pewnym. */

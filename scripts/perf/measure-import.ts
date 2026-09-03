@@ -33,7 +33,7 @@ async function przebieg(data: Buffer) {
   const parsed = await parseWorkbook('osoby.xlsx', data);
   if (!parsed.ok) throw new Error(parsed.message);
   const sheet = parsed.sheets[0];
-  const mapping = autoMap(sheet.headers, 'artist');
+  const mapping = autoMap(sheet.headers);
   const wynik = dryRun(sheet.rows, mapping, 'artist', istniejacy, 'update');
   const ms = performance.now() - start;
   return {

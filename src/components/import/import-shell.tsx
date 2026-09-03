@@ -100,7 +100,7 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
           onRole={setRole}
           onBack={restart}
           onNext={() => {
-            setMapping(autoMap(sheets[sheetIndex].headers, role));
+            setMapping(autoMap(sheets[sheetIndex].headers));
             setStep(3);
           }}
         />
@@ -114,7 +114,6 @@ export function ImportShell({ existing }: { existing: ExistingPerson[] }) {
         <ImportMappingStep
           sheet={sheet}
           mapping={mapping}
-          role={role}
           conflicts={conflicts}
           result={result}
           onChange={(index, field) =>

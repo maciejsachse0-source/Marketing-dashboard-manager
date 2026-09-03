@@ -1293,3 +1293,34 @@ Zostaje więc mniej powierzchni: eksport `'use server'` jest endpointem HTTP nie
 od tego, czy interfejs go woła, a ten nie miał ani jednego wywołania w `src/` ani `e2e/`.
 Dowód: `grep -rn "saveOutreach" src e2e` zwraca `0`, punktów wejścia w bramce granic
 zaufania 73 do 72, „bez schematu mimo argumentów" nadal 0.
+
+## F7-45 — `artists` dostaje kolumnę `status`, ekran twórców ją pokazuje (2026-09-03)
+
+**Dyspozycja usera: dodać kolumnę.** Issue dawało wybór: albo `artists` dostaje
+`status text` migracją addytywną i import go wypełnia, albo ekran importu mówi wprost,
+że dla twórcy kolumna statusu zostanie pominięta. User wybrał pierwszy wariant, bo
+w prawdziwym arkuszu status jest wypełniony w 181 wierszach na 294 i przy drugim
+wariancie ta informacja ginęłaby przy każdym imporcie.
+
+Migracja `0004_whole_flatman.sql` to jedno zdanie: `ALTER TABLE "artists" ADD COLUMN
+"status" text`. Kolumna dopuszcza `null`, nic nie kasuje, nic nie przenosi. Odwrócenie
+jej to `ALTER TABLE "artists" DROP COLUMN "status"` — bezpieczne, dopóki nikt nie zdążył
+wpisać tam danych, których nie ma gdzie indziej.
+
+Po tej zmianie obie role mają **identyczny zestaw pól importu**, więc zniknęły trzy
+rozgałęzienia „a dla twórcy inaczej": `autoMap` przestało brać rolę jako argument,
+`normalizeRow` też, a `insertValues` w `save.ts` buduje jeden obiekt zamiast dwóch.
+To nie jest upiększanie przy okazji — te gałęzie istniały wyłącznie po to, żeby omijać
+brakującą kolumnę, i po jej dodaniu kłamałyby o stanie schematu.
+
+**Gdzie status widać.** Kryterium mówiło „tam, gdzie widać status kamerzysty", ale
+takiego miejsca nie było: `videographers.status` istnieje od migracji `0003` i nie był
+renderowany na żadnym ekranie. Zamiast wymyślać nowy wzorzec, status wchodzi na kartę
+osoby tym samym blokiem, którym karta kamerzysty pokazuje „Sprzęt" i „Dostępność":
+mała etykieta wersalikami plus dwie linie tekstu. Ten sam blok doszedł na obie karty —
+twórcy i kamerzysty — bo inaczej dane zaimportowane do `videographers` dalej byłyby
+niewidoczne, a to jest ta sama usterka, którą issue naprawia dla twórców.
+
+Statusu świadomie NIE ma w oknie edycji osoby. To okno nie edytuje też `location`
+ani `avatarUrl` kamerzysty, więc dokładanie tam jednego pola nie zamknęłoby luki,
+tylko zrobiłoby ją nierówną. Edycja pól z importu to osobna sprawa, nie ta.

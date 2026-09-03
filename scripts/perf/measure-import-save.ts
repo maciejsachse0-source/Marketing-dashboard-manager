@@ -94,7 +94,7 @@ async function pamiec(plik: string): Promise<{ mb: number; bytes: number; wiersz
   const parsed = await parseWorkbook('wielki.xlsx', data);
   if (!parsed.ok) throw new Error(parsed.message);
   const sheet = parsed.sheets[0];
-  const wynik = dryRun(sheet.rows, autoMap(sheet.headers, 'artist'), 'artist', [], 'skip');
+  const wynik = dryRun(sheet.rows, autoMap(sheet.headers), 'artist', [], 'skip');
   const po = process.memoryUsage().rss;
   return { mb: (po - przed) / (1024 * 1024), bytes: data.byteLength, wierszy: wynik.inserts };
 }

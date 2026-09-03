@@ -34,14 +34,15 @@ describe('parseWorkbook - fixture', () => {
   it('nagłówki fixture mapują się automatycznie, bez ręcznego przestawiania', async () => {
     const [kamerzysci, arkusz1, artysci] = await fixtureSheets();
     // Prawdziwe nagłówki: reszta kolumn nie ma odpowiednika w bazie i zostaje pomijana.
-    expect(autoMap(artysci.headers, 'artist').filter(Boolean)).toEqual([
+    expect(autoMap(artysci.headers).filter(Boolean)).toEqual([
       'name',
       'handle',
       'email',
       'location',
+      'status',
       'notes',
     ]);
-    expect(autoMap(kamerzysci.headers, 'videographer').filter(Boolean)).toEqual([
+    expect(autoMap(kamerzysci.headers).filter(Boolean)).toEqual([
       'name',
       'handle',
       'status',
@@ -49,7 +50,7 @@ describe('parseWorkbook - fixture', () => {
       'notes',
     ]);
     // Arkusz z nagłówkami „Imię i nazwisko", „Nr telefonu" i „Notatka".
-    expect(autoMap(arkusz1.headers, 'artist').filter(Boolean)).toEqual([
+    expect(autoMap(arkusz1.headers).filter(Boolean)).toEqual([
       'name',
       'location',
       'handle',
@@ -60,8 +61,8 @@ describe('parseWorkbook - fixture', () => {
 
   it('fixture zawiera wiersze błędne, puste i duplikaty', async () => {
     const [, , artysci] = await fixtureSheets();
-    const mapping = autoMap(artysci.headers, 'artist');
-    const wyniki = artysci.rows.map((cells) => normalizeRow(toRawRow(cells, mapping), 'artist'));
+    const mapping = autoMap(artysci.headers);
+    const wyniki = artysci.rows.map((cells) => normalizeRow(toRawRow(cells, mapping)));
     expect(wyniki.filter((w) => w.kind === 'error').length).toBeGreaterThan(0);
     expect(wyniki.filter((w) => w.kind === 'empty').length).toBeGreaterThan(0);
     const handles = wyniki.flatMap((w) => (w.kind === 'ok' && w.person.handle ? [w.person.handle] : []));
@@ -73,16 +74,16 @@ describe('autoMap - aliasy z plan/04 sekcja 4', () => {
   it.each(PERSON_FIELDS.flatMap((field) => FIELD_ALIASES[field].map((alias) => [alias, field] as const)))(
     'nagłówek %s trafia do pola %s',
     (alias, field) => {
-      expect(autoMap([alias], 'videographer')[0]).toBe(field);
+      expect(autoMap([alias])[0]).toBe(field);
     },
   );
 
   it('nagłówek bez dopasowania jest pomijany', () => {
-    expect(autoMap(['kolumna techniczna'], 'artist')[0]).toBeNull();
+    expect(autoMap(['kolumna techniczna'])[0]).toBeNull();
   });
 
-  it('status nie jest proponowany dla roli twórcy', () => {
-    expect(autoMap(['Status'], 'artist')[0]).toBeNull();
+  it('status jest proponowany także dla roli twórcy (F7-45)', () => {
+    expect(autoMap(['Status'])[0]).toBe('status');
   });
 
   it('to samo pole zmapowane dwa razy to konflikt', () => {

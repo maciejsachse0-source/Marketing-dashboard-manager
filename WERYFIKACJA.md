@@ -495,6 +495,20 @@ listy: to już nie są pytania do Ciebie, tylko rzeczy do klikniętego potwierdz
   `ostrzeżenie`, blokada bez zmian. Przykład z ostatniego przebiegu:
   `poprawa hmrMs: 1961 -> 466 (-76%)`.
 
+- [ ] **Status twórcy z arkusza ma gdzie wejść i widać go na ekranie** (F7-45),
+  przeglądarka plus terminal
+  Uruchamiasz: `/import/osoby`, wgrywasz arkusz z kolumną `Status`, rola „twórca".
+  Oczekujesz: w kroku „Mapowanie" kolumna `Status` jest dopasowana sama, bez ręcznego
+  przestawiania. Po zapisie wchodzisz na `/artists` i na karcie osoby widzisz blok
+  `STATUS` z tekstem z arkusza. Ten sam blok jest na `/videographers`.
+  Uruchamiasz w terminalu: `docker exec mc-pg psql -U postgres -d marketing -tAc
+  "select column_name, data_type, is_nullable from information_schema.columns
+  where table_name='artists' and column_name='status';"`.
+  Oczekujesz: `status|text|YES`. Kolumna dopuszcza pustą wartość i nic nie kasuje.
+  Uwaga: przed wdrożeniem na produkcję trzeba tam wykonać migracje, aplikacja nie
+  robi tego sama.
+
+
 ---
 
 ## Podpis

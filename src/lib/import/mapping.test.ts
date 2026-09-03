@@ -16,7 +16,7 @@ describe('normalizeHeader - sprowadzenie nagłówka do klucza', () => {
 
 describe('autoMap - propozycja mapowania', () => {
   it('dopasowuje po aliasie, nie tylko po dokładnej nazwie pola', () => {
-    expect(autoMap(['Insta', 'Mail', 'Tel'], 'videographer')).toEqual([
+    expect(autoMap(['Insta', 'Mail', 'Tel'])).toEqual([
       'handle',
       'email',
       'phone',
@@ -24,21 +24,20 @@ describe('autoMap - propozycja mapowania', () => {
   });
 
   it('nagłówek z polskimi znakami trafia w to samo pole co bez nich', () => {
-    expect(autoMap(['Imię'], 'artist')).toEqual(['name']);
-    expect(autoMap(['Komórka'], 'artist')).toEqual(['phone']);
+    expect(autoMap(['Imię'])).toEqual(['name']);
+    expect(autoMap(['Komórka'])).toEqual(['phone']);
   });
 
   it('kolizja dwóch kolumn o tym samym polu: druga zostaje pominięta', () => {
-    expect(autoMap(['Imię', 'Nazwa'], 'artist')).toEqual(['name', null]);
+    expect(autoMap(['Imię', 'Nazwa'])).toEqual(['name', null]);
   });
 
   it('kolumna nierozpoznana dostaje null, nie zgaduje pola', () => {
-    expect(autoMap(['Ulubiony kolor'], 'artist')).toEqual([null]);
+    expect(autoMap(['Ulubiony kolor'])).toEqual([null]);
   });
 
-  it('status nie jest proponowany dla roli twórcy, bo tabela go nie ma', () => {
-    expect(autoMap(['Status'], 'artist')).toEqual([null]);
-    expect(autoMap(['Status'], 'videographer')).toEqual(['status']);
+  it('status jest proponowany dla obu ról, bo `artists` ma kolumnę od 0004 (F7-45)', () => {
+    expect(autoMap(['Status'])).toEqual(['status']);
   });
 });
 

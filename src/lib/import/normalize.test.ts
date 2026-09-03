@@ -1,17 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { contactField, normalizeRow } from './normalize';
 
-const artist = { role: 'artist' as const };
-const videographer = { role: 'videographer' as const };
-
-function ok(raw: Record<string, unknown>, role: 'artist' | 'videographer' = 'artist') {
-  const result = normalizeRow(raw, role);
+function ok(raw: Record<string, unknown>) {
+  const result = normalizeRow(raw);
   if (result.kind !== 'ok') throw new Error(`oczekiwano ok, jest ${result.kind}: ${JSON.stringify(result)}`);
   return result.person;
 }
 
-function errors(raw: Record<string, unknown>, role: 'artist' | 'videographer' = 'artist') {
-  const result = normalizeRow(raw, role);
+function errors(raw: Record<string, unknown>) {
+  const result = normalizeRow(raw);
   if (result.kind !== 'error') throw new Error(`oczekiwano error, jest ${result.kind}`);
   return result.errors;
 }
@@ -45,11 +42,11 @@ describe('normalizeRow - nazwa', () => {
 
 describe('normalizeRow - wiersz pusty', () => {
   it('wiersz całkowicie pusty jest pomijany bez błędu', () => {
-    expect(normalizeRow({ name: '', handle: '   ', email: null, phone: undefined }, 'artist').kind).toBe('empty');
+    expect(normalizeRow({ name: '', handle: '   ', email: null, phone: undefined }).kind).toBe('empty');
   });
 
   it('wiersz bez żadnych kluczy też jest pomijany', () => {
-    expect(normalizeRow({}, 'videographer').kind).toBe('empty');
+    expect(normalizeRow({}).kind).toBe('empty');
   });
 });
 
@@ -111,12 +108,12 @@ describe('normalizeRow - lokalizacja', () => {
 });
 
 describe('normalizeRow - status i notatki', () => {
-  it('status kamerzysty zostaje przycięty i zachowany', () => {
-    expect(ok({ name: 'A', status: '  wolny od marca ' }, videographer.role).status).toBe('wolny od marca');
+  it('status zostaje przycięty i zachowany', () => {
+    expect(ok({ name: 'A', status: '  wolny od marca ' }).status).toBe('wolny od marca');
   });
 
-  it('status dla roli twórcy jest ignorowany', () => {
-    expect(ok({ name: 'A', status: 'cokolwiek' }, artist.role).status).toBeNull();
+  it('status twórcy też wchodzi, `artists` ma kolumnę od 0004 (F7-45)', () => {
+    expect(ok({ name: 'A', status: 'zainteresowany' }).status).toBe('zainteresowany');
   });
 
   it('notatki są przycinane', () => {
@@ -126,7 +123,7 @@ describe('normalizeRow - status i notatki', () => {
 
 describe('normalizeRow - pusta komórka nigdy nie daje pustego łańcucha', () => {
   it('wszystkie pola opcjonalne puste dają null', () => {
-    const person = ok({ name: 'A', handle: '  ', email: '', phone: '   ', location: '', status: '  ', notes: '' }, 'videographer');
+    const person = ok({ name: 'A', handle: '  ', email: '', phone: '   ', location: '', status: '  ', notes: '' });
     expect(person.handle).toBeNull();
     expect(person.email).toBeNull();
     expect(person.phone).toBeNull();

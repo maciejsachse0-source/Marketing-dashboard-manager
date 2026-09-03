@@ -73,7 +73,10 @@ Dlatego przed pierwszym wierszem kodu importu wchodzi migracja (issue F4-00):
 | `artists` | `location text` |
 | `videographers` | `handle text`, `email text`, `phone text`, `location text`, `status text` |
 
-Migracja jest wyłącznie addytywna. Istniejące `videographers.contact` zostaje
+Druga migracja addytywna doszła w F7-45: `artists` dostaje `status text`
+(migracja `0004`). Do tej pory kolumna statusu z arkusza twórców po prostu ginęła.
+
+Migracje są wyłącznie addytywne. Istniejące `videographers.contact` zostaje
 nietknięte; import wypełnia nowe kolumny, a jednorazowy skrypt przenoszący dane
 z `contact` do `handle` albo `email` jest osobnym issue w F7, nie częścią importu.
 
@@ -83,7 +86,7 @@ Pola docelowe po migracji F4-00:
 
 | Rola | Pola wymagane | Pola opcjonalne |
 |---|---|---|
-| twórca (`artists`) | `name` | `handle`, `email`, `phone`, `location`, `notes` |
+| twórca (`artists`) | `name` | `handle`, `email`, `phone`, `location`, `status`, `notes` |
 | kamerzysta (`videographers`) | `name` | `handle`, `email`, `phone`, `location`, `status`, `notes` |
 
 Propozycja automatyczna: dopasowanie nagłówka po znormalizowanej formie
@@ -106,7 +109,8 @@ odpowiednik, dopasowują się same i nic nie trzeba przestawiać ręcznie.
 
 Nagłówek bez dopasowania trafia jako „pomijana" i wymaga świadomego wyboru usera.
 Kolumna zmapowana dwa razy do tego samego pola to błąd blokujący przejście dalej.
-Pole `status` zmapowane dla roli twórcy jest błędem, bo `artists` go nie ma.
+Obie role mają ten sam zestaw pól — od migracji `0004` (F7-45) `status` jest
+dostępny także dla twórcy.
 
 ## 5. Normalizacja i walidacja wiersza (S2)
 
@@ -125,7 +129,7 @@ dla wiersza r:
   location = trim, pierwsza litera duża, reszta bez zmian
              synonimy: "tricity", "trojmiasto", "trójmiasto" → "Trójmiasto"
   status   = trim (dowolny tekst, bez słownika, bo dane wejściowe są opisowe)
-             rola twórcy → pole ignorowane
+             od F7-45 zapisywany dla obu ról
   notes    = trim
 ```
 
@@ -146,6 +150,7 @@ nigdy nie kasuje istniejącej wartości w bazie.
 
 Wiersz całkowicie pusty jest pomijany bez zgłaszania błędu. Wiersz z samą nazwą
 i niczym więcej jest poprawny.
+
 
 ## 6. Tabela zdarzeń (S3)
 
