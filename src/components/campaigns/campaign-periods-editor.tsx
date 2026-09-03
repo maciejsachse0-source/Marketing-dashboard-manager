@@ -129,8 +129,15 @@ export function CampaignPeriodsEditor({
   const [pending, startTransition] = useTransition();
   const [dirty, setDirty] = useState(false);
 
+  // Ref na najświeższą wersję wywołania zwrotnego. Zapis w efekcie bez tablicy
+  // zależności (czyli po każdym renderze), a nie w samym renderze: React zastrzega
+  // sobie prawo do porzucenia renderu, a wtedy ref zostałby z wartością, która
+  // nigdy nie trafiła na ekran. Efekty biegną w kolejności deklaracji, więc ref
+  // jest już aktualny, gdy odpala się powiadomienie poniżej.
   const onPeriodsChangeRef = useRef(onPeriodsChange);
-  onPeriodsChangeRef.current = onPeriodsChange;
+  useEffect(() => {
+    onPeriodsChangeRef.current = onPeriodsChange;
+  });
   useEffect(() => {
     onPeriodsChangeRef.current?.(periods);
   }, [periods]);

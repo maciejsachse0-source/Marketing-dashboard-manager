@@ -433,83 +433,87 @@ export function TemplateForm({ mode, initial }: { mode: Mode; initial?: Producti
           </span>
         </header>
 
-        {(() => {
-          let runningOffset = 0;
-          return CATEGORY_ORDER.map((cat) => {
-            const indicesInCat: number[] = [];
-            steps.forEach((s, i) => {
-              if (s.category === cat) indicesInCat.push(i);
-            });
-            const startNumber = runningOffset + 1;
-            runningOffset += indicesInCat.length;
-            const frame = FRAME_FOR_CATEGORY[cat];
-            const tone = FRAME_STYLE[frame];
-
-            return (
-              <div
-                key={cat}
-                className={`rounded-2xl border-2 ${tone.border} ${tone.bg} p-4 sm:p-5 space-y-3`}
-              >
-                <header className="flex items-center gap-2.5 flex-wrap">
-                  <span
-                    className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-md text-[11px] font-bold tracking-[0.18em] tabular-nums ${tone.badge}`}
-                  >
-                    {frame}
-                  </span>
-                  <span
-                    className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.accent}`}
-                  >
-                    {CATEGORY_LABEL[cat]}
-                  </span>
-                  <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
-                    {indicesInCat.length} {indicesInCat.length === 1 ? 'krok' : 'kroków'}
-                  </span>
-                </header>
-
-                {indicesInCat.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-4 text-center text-[11px] text-muted-foreground">
-                    Brak kroków w tej kategorii.
-                  </div>
-                ) : (
-                  <ol className="space-y-2">
-                    {indicesInCat.map((stepsIdx, posInCat) => {
-                      const step = steps[stepsIdx];
-                      const displayNumber = startNumber + posInCat;
-                      const canMoveUp = posInCat > 0;
-                      const canMoveDown = posInCat < indicesInCat.length - 1;
-                      return (
-                        <StepRow
-                          key={step.id}
-                          step={step}
-                          displayNumber={displayNumber}
-                          canMoveUp={canMoveUp}
-                          canMoveDown={canMoveDown}
-                          tone={tone}
-                          onChange={(patch) => updateStep(stepsIdx, patch)}
-                          onRemove={() => removeStep(stepsIdx)}
-                          onMoveUp={() => moveStepInCategory(stepsIdx, -1)}
-                          onMoveDown={() => moveStepInCategory(stepsIdx, 1)}
-                        />
-                      );
-                    })}
-                  </ol>
-                )}
-
-                <div className="pt-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => addStepInCategory(cat)}
-                    type="button"
-                    className="bg-card"
-                  >
-                    <Plus className="size-3.5 mr-1" /> Dodaj krok do {CATEGORY_LABEL[cat]}
-                  </Button>
-                </div>
-              </div>
-            );
+        {CATEGORY_ORDER.map((cat, catIdx) => {
+          const indicesInCat: number[] = [];
+          steps.forEach((s, i) => {
+            if (s.category === cat) indicesInCat.push(i);
           });
-        })()}
+          // Numeracja jest ciagla przez wszystkie kategorie, wiec pierwszy numer
+          // w tej kategorii to liczba krokow ze wszystkich poprzednich plus jeden.
+          // Liczone wprost z `steps`, a nie licznikiem przesuwanym w trakcie
+          // mapowania: zmienna nadpisywana wewnatrz renderu jest tym, co widzi
+          // `react-hooks/immutability`, i ma racje — przy powtorzonym renderze
+          // fragmentu numeracja rozjechalaby sie bez zadnej zmiany danych.
+          const startNumber =
+            steps.filter((s) => CATEGORY_ORDER.slice(0, catIdx).includes(s.category))
+              .length + 1;
+          const frame = FRAME_FOR_CATEGORY[cat];
+          const tone = FRAME_STYLE[frame];
+
+          return (
+            <div
+              key={cat}
+              className={`rounded-2xl border-2 ${tone.border} ${tone.bg} p-4 sm:p-5 space-y-3`}
+            >
+              <header className="flex items-center gap-2.5 flex-wrap">
+                <span
+                  className={`inline-flex items-center justify-center min-w-[2rem] h-6 px-2 rounded-md text-[11px] font-bold tracking-[0.18em] tabular-nums ${tone.badge}`}
+                >
+                  {frame}
+                </span>
+                <span
+                  className={`text-[11px] uppercase tracking-[0.16em] font-semibold ${tone.accent}`}
+                >
+                  {CATEGORY_LABEL[cat]}
+                </span>
+                <span className="ml-auto text-[10px] uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+                  {indicesInCat.length} {indicesInCat.length === 1 ? 'krok' : 'kroków'}
+                </span>
+              </header>
+
+              {indicesInCat.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border bg-card/50 px-3 py-4 text-center text-[11px] text-muted-foreground">
+                  Brak kroków w tej kategorii.
+                </div>
+              ) : (
+                <ol className="space-y-2">
+                  {indicesInCat.map((stepsIdx, posInCat) => {
+                    const step = steps[stepsIdx];
+                    const displayNumber = startNumber + posInCat;
+                    const canMoveUp = posInCat > 0;
+                    const canMoveDown = posInCat < indicesInCat.length - 1;
+                    return (
+                      <StepRow
+                        key={step.id}
+                        step={step}
+                        displayNumber={displayNumber}
+                        canMoveUp={canMoveUp}
+                        canMoveDown={canMoveDown}
+                        tone={tone}
+                        onChange={(patch) => updateStep(stepsIdx, patch)}
+                        onRemove={() => removeStep(stepsIdx)}
+                        onMoveUp={() => moveStepInCategory(stepsIdx, -1)}
+                        onMoveDown={() => moveStepInCategory(stepsIdx, 1)}
+                      />
+                    );
+                  })}
+                </ol>
+              )}
+
+              <div className="pt-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => addStepInCategory(cat)}
+                  type="button"
+                  className="bg-card"
+                >
+                  <Plus className="size-3.5 mr-1" /> Dodaj krok do {CATEGORY_LABEL[cat]}
+                </Button>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       {error ? (

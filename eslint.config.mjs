@@ -55,6 +55,8 @@ export default [
   // F7-02 zamkniete: `react-hooks/purity` tak samo. Trzy z pieciu trafien byly
   // w komponentach serwerowych i maja tam lokalne `eslint-disable-next-line`
   // z uzasadnieniem; dwa w komponentach klienckich zostaly naprawione.
+  // F7-03 zamkniete: `react-hooks/immutability` i `react-hooks/refs` tak samo,
+  // obie listy znikly.
 
   {
     // GRANDFATHER Z11 (F7-06): 58 zastanych funkcji ponad progiem 10. Lista ma sie kurczyc.
@@ -110,22 +112,7 @@ export default [
   },
 
 
-  {
-    // GRANDFATHER (F7-03): mutacja wartosci niezmiennej z punktu widzenia Reacta.
-    files: [
-      'src/components/periods-slider.tsx',
-      'src/components/templates/template-form.tsx',
-    ],
-    rules: { 'react-hooks/immutability': 'warn' },
-  },
 
-  {
-    // GRANDFATHER (F7-03): odczyt refa w renderze.
-    files: [
-      'src/components/campaigns/campaign-periods-editor.tsx',
-    ],
-    rules: { 'react-hooks/refs': 'warn' },
-  },
 
   {
     // GRANDFATHER (F7-05): niezaescapowane apostrofy i cudzyslowy w JSX.

@@ -1679,7 +1679,32 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - pomiar `/calendar` z harnessu przed i po, obie liczby w `DECISIONS.md`
   - te 6 plików wypisane z listy grandfather
 
-- [ ] **F7-03** `znalezisko` `ui` `react-hooks/immutability` i `react-hooks/refs`
+- [x] **F7-03** `znalezisko` `ui` `react-hooks/immutability` i `react-hooks/refs`
+  **DYSPOZYCJA: ZROBIONE.** Uwaga do licznika: trafień są **trzy, nie cztery**
+  (`periods-slider.tsx:155`, `templates/template-form.tsx:444`,
+  `campaigns/campaign-periods-editor.tsx:134`) — pliki zgadzają się co do jednego,
+  tylko `template-form.tsx` miał jedno trafienie, nie dwa.
+  Naprawy: (1) `document.body.style.userSelect` wyjechał z ciała komponentu do funkcji
+  `lockTextSelection` na poziomie modułu — mutacja `document.body` jest świadomie poza
+  światem Reacta i w ciele komponentu nie da się odróżnić wywołania z uchwytu zdarzenia
+  od wywołania w renderze; (2) licznik `runningOffset` nadpisywany w trakcie mapowania
+  zastąpiony wyliczeniem pierwszego numeru wprost z `steps`, a sztuczny IIFE wokół
+  mapowania zniknął; (3) zapis `onPeriodsChangeRef.current` przeniesiony z renderu do
+  efektu bez tablicy zależności (efekty biegną w kolejności deklaracji, więc ref jest
+  aktualny, zanim odpali się powiadomienie).
+  Dowody: `npx eslint . -f json | grep -cE 'react-hooks/(immutability|refs)'` zwraca `0`;
+  obie reguły usunięte z `eslint.config.mjs` razem z listami; ostrzeżenia lintu 88 → 85,
+  0 błędów; `npm run typecheck` 0; `npm run test` 216 zielonych; złożoność
+  `TemplateForm` bez zmian (19 przed i po). Weryfikacja na uruchomionej aplikacji:
+  pngdiff czterech szablonów w oknie 1280x720 `fullPage` — `standard-solo` i
+  `f3-07-po2` **0 pikseli**, `rozszerzony-z-artysta` 21 i `standard-with-artist` 15
+  pikseli, czyli grubo poniżej progu szumu 1 155; tekst obu tych stron przed i po jest
+  **bajt w bajt identyczny** (`diff` na `main.innerText`), więc te kilkanaście pikseli
+  to wygładzanie czcionki, nie zmiana numeracji. Suwak okresów na `/campaigns/1`
+  przeciągnięty myszą: `document.body.style.userSelect` = `none` w trakcie i `''` po
+  puszczeniu, uchwyt przesunął się z `+13d` na `+26d`, a górna oś kampanii
+  zaktualizowała się na żywo, czyli powiadomienie przez ref działa.
+
   Waga: **drobne**. Szacunek: 2 godziny.
   4 trafienia: mutacja wartości traktowanej przez Reacta jako niezmienna
   (`periods-slider.tsx`, `templates/template-form.tsx`) oraz czytanie refa w renderze

@@ -27,6 +27,18 @@ import { Button } from '@/components/ui/button';
 // Re-export for callers that already imported from this file before the split.
 export { toneForIndex, dateAt, fmtDayMonth, isoDate, parseIsoDate } from '@/lib/period-tones';
 
+/**
+ * Blokada zaznaczania tekstu na czas przeciągania uchwytu. Mutacja `document.body`
+ * jest świadomie poza światem Reacta — to element, którego React nie renderuje —
+ * i dlatego siedzi w funkcji na poziomie modułu, a nie w ciele komponentu.
+ * W ciele komponentu `react-hooks/immutability` czyta ją jako mutację wartości
+ * spoza renderu i ma rację: tam nie da się odróżnić wywołania z uchwytu zdarzenia
+ * od wywołania w renderze.
+ */
+function lockTextSelection(locked: boolean): void {
+  document.body.style.userSelect = locked ? 'none' : '';
+}
+
 export function PeriodsSlider({
   periods,
   errors,
@@ -125,7 +137,7 @@ export function PeriodsSlider({
     };
     const onUp = () => {
       dragRef.current = null;
-      document.body.style.userSelect = '';
+      lockTextSelection(false);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
@@ -152,7 +164,7 @@ export function PeriodsSlider({
       originEnd: cur.endOffsetDays,
       originDay: dayFromClientX(e.clientX),
     };
-    document.body.style.userSelect = 'none';
+    lockTextSelection(true);
   };
 
   const dayToPercent = (d: number) => ((d - sliderMin) / (sliderDays - 1)) * 100;

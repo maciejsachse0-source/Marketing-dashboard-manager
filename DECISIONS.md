@@ -809,3 +809,17 @@ na tym samym budowaniu produkcyjnym: **przed 85,2 ms** (72,4 / 85,2 / 92,2),
 301,6 kB w obu przebiegach. Różnica −7% mieści się w zmierzonym szumie 40%, czyli
 zmiana jest wydajnościowo neutralna — czego się spodziewaliśmy, bo rozwijany panel
 kampanii nie wchodzi do pierwszego ładowania strony.
+
+**F7-03, mutacja `document.body` wyprowadzona na poziom modułu.** Blokada zaznaczania
+tekstu na czas przeciągania uchwytu suwaka to mutacja elementu, którego React nie
+renderuje. W ciele komponentu `react-hooks/immutability` czyta ją jako mutację wartości
+spoza renderu i ma rację, bo statycznie nie da się tam odróżnić wywołania z uchwytu
+zdarzenia od wywołania w renderze. Funkcja `lockTextSelection` na poziomie modułu
+nazywa tę granicę wprost i obsługuje oba kierunki (blokada przy `pointerdown`,
+zwolnienie przy `pointerup`), które wcześniej stały w dwóch różnych miejscach pliku.
+
+**F7-03, licznik w trakcie renderu zamieniony na wyliczenie.** `template-form.tsx`
+numerował kroki zmienną `runningOffset` nadpisywaną wewnątrz `map`, opakowaną w IIFE
+tylko po to, żeby ta zmienna miała gdzie mieszkać. Nowy kod liczy pierwszy numer
+kategorii wprost z `steps` i IIFE znika. Sprawdzone porównaniem tekstu strony przed
+i po na czterech szablonach — bajt w bajt to samo.
