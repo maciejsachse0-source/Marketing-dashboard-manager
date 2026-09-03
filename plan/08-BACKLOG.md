@@ -2043,7 +2043,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   Pełne uzasadnienie i warunek powrotu (zdalna baza albo katalog większy o dwa rzędy
   wielkości) w `DECISIONS.md`, wpis „F7-11".
 
-- [ ] **F7-12** `znalezisko` `ui` Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy
+- [x] **F7-12** `znalezisko` `ui` Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy
   Waga: **drobne**. Szacunek: 15 minut. Znalezione przy F2-01.
   `deriveEditingIso` i `subStageState` nie są wołane z żadnego miejsca (ESLint zgłaszał
   to jeszcze przed refaktorem F2-01, w `gantt-view.tsx` linie 139 i 146). Po wydzieleniu
@@ -2059,6 +2059,17 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
     w komentarzu przy kodzie
   - negatywne: `npm run test` kod 0, wygląd `/calendar` bez zmian (dowód: `pngdiff`
     przed i po, poniżej 0,02 procent pikseli)
+  **DYSPOZYCJA: ZROBIONE (2026-09-03).** `deriveEditingIso` i `subStageState` skasowane
+  z `src/components/calendar/gantt-stages.ts` razem z re-eksportem w `gantt-geometry.ts`;
+  w miejscu po nich został komentarz mówiący, dlaczego zniknęły (gant liczy stan kroków
+  z `steps` produkcji przez `gantt-row-model.ts`, a datę montażu bierze z zapisanych dat
+  kroków, nie z reguły „dzień po nagrywkach"). Importów `STAGE_LABEL` i `STAGE_HINT`
+  w `gantt-view.tsx` już nie było — zniknęły przy podziale w F2-02; `STAGE_HINT` ma
+  odbiorcę w `gantt-table-view.tsx`. Dowody: `grep -rn "deriveEditingIso\|subStageState" src/`
+  zwraca wyłącznie ten komentarz, `grep -n "STAGE_LABEL\|STAGE_HINT" gantt-view.tsx` zwraca 0,
+  `npm run lint` nie zgłasza żadnego ostrzeżenia w `gantt-view.tsx`, `gantt-geometry.ts`
+  ani `gantt-stages.ts`. Wygląd `/calendar?week=2026-03-02` na budowaniu produkcyjnym,
+  okno 1280x720: **0 różnych pikseli z 7 823 808** (`scripts/perf/pngdiff.mjs`).
 
 - [ ] **F7-13** `znalezisko` `ui` Wypisać gant z listy grandfather w ESLint
   Waga: **drobne**. Szacunek: pół dnia. Powstało przy F2-02.

@@ -105,26 +105,10 @@ export const STAGE_CATEGORIES: StageCategory[] = [
   },
 ];
 
-// Section frames for the row's expanded panel — derived from the shared
-
-export function deriveEditingIso(shootIso: string): string {
-  const d = new Date(shootIso);
-  d.setDate(d.getDate() + 1);
-  d.setHours(10, 0, 0, 0);
-  return d.toISOString();
-}
-
-export function subStageState(
-  stage: ProductionStatus,
-  current: ProductionStatus,
-): 'passed' | 'active' | 'pending' {
-  if (current === 'cancelled') return 'pending';
-  const cur = STAGE_INDEX[current];
-  const idx = STAGE_INDEX[stage];
-  if (idx < cur) return 'passed';
-  if (idx === cur) return 'active';
-  return 'pending';
-}
+// F7-12: skasowane `deriveEditingIso` i `subStageState`. Nie miały odbiorcy
+// od czasu, gdy gant liczy stan kroków z `steps` produkcji (`gantt-row-model.ts`),
+// a datę montażu bierze z zapisanych dat kroków, nie z reguły "dzień po nagrywkach".
+// Historia w gicie, gdyby reguła miała wrócić.
 
 /**
  * TENTATIVE milestone positions — relative to MONDAY of T-0's week (t0Mon).

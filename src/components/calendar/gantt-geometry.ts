@@ -28,8 +28,6 @@ export {
   STAGE_INDEX,
   STAGE_TO_PERIOD,
   TENTATIVE_OFFSET_FROM_T0_MON,
-  deriveEditingIso,
-  subStageState,
 } from './gantt-stages';
 export type { DateMode, StageCategory, WeekFrameCode } from './gantt-stages';
 
