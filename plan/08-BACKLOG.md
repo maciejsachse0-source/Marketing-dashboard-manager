@@ -3038,12 +3038,25 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - dowód na uruchomionej aplikacji: zrzuty tych ekranów pokazują ikonę w miejscu strzałki
   - negatywne: `node scripts/a11y-audit.mjs` 0 naruszeń, `npm run test` kod 0
 
-- [ ] **F7-40** `znalezisko` `docs` `perf` Kryterium odhaczonego F2-06 dziś nie jest prawdziwe
+- [x] **F7-40** `znalezisko` `docs` `perf` Kryterium odhaczonego F2-06 dziś nie jest prawdziwe
   Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
   `plan/08-BACKLOG.md:2015` (F2-06, odhaczone) podaje jako mierzalny dowód
   `grep -rl "'use client'" src/components | wc -l` równe **50**. Dziś ta sama komenda
   zwraca **65**. Bundel mieści się w budżecie, więc to nie jest regres wydajności, tylko
   gorsze: odhaczone issue z kryterium, które przestało być prawdą, i nic tego nie pilnuje.
+  ZROBIONE 2026-09-03, oba warianty z kryterium. Bramka: `npm run perf` liczy pliki
+  z `'use client'` w `src/components` i porównuje z `perf/budget.json` klucz
+  `clientComponents.maxFiles` (próg **64**, czyli stan po sprzątaniu z F7-36; opis
+  w pliku mówi wprost, że ma maleć, nie rosnąć). Liczy `.ts` i `.tsx`, bo jeden plik
+  kliencki (`src/components/import/use-import-save.ts`) nie jest komponentem —
+  wersja licząca tylko `.tsx` dawała 63 i rozjeżdżała się z komendą z kryterium.
+  Poprawka DOWODU: wpis F2-06 ma teraz adnotację, że liczba **50** przestała być
+  prawdziwa (dziś 64, przed F7-36 było 65), z wypisaniem, w których fazach przybyły
+  pliki, i z informacją, że bundel nadal mieści się w budżecie, więc to nie regres
+  wydajności, tylko niepilnowane kryterium.
+  Dowód AC: `npm run perf` wypisuje `ok pliki z use client 64 plików / limit 64`
+  i kończy kodem 0; `grep -n "wc -l\` równe 50" plan/08-BACKLOG.md` zwraca `0`.
+  Bramki: lint 0 błędów / 35 ostrzeżeń, perf 0.
   CZYTAJ: `plan/08-BACKLOG.md` wpis F2-06, `perf/budget.json`, `scripts/perf/report.mjs`
   AC:
   - albo bramka na liczbę plików klienckich w `npm run perf` (próg w `perf/budget.json`,

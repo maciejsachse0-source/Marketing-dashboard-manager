@@ -7,7 +7,8 @@
  * Uruchomienie: node scripts/perf/report.mjs
  * Kod wyjścia: 0 gdy wszystkie progi trzymają, 1 gdy którykolwiek przekroczony.
  */
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { driftVerdict } from './drift.mjs';
 
 const budget = JSON.parse(readFileSync('perf/budget.json', 'utf8'));
@@ -139,6 +140,23 @@ if (typeof bundleKb === 'number') {
     budget.bundle.calendarFirstLoadKb,
   );
 }
+
+/**
+ * F7-40: liczba plików klienckich w `src/components`. Kryterium odhaczonego F2-06
+ * mówiło 50, po F7-36 jest 64 i nic tego nie pilnowało — bundel mieści się w budżecie,
+ * ale rosnąca liczba wysp klienckich zjada go po cichu.
+ */
+function plikiKlienckie(dir) {
+  return readdirSync(dir).flatMap((wpis) => {
+    const sciezka = join(dir, wpis);
+    if (statSync(sciezka).isDirectory()) return plikiKlienckie(sciezka);
+    if (!/\.tsx?$/.test(sciezka)) return [];
+    return readFileSync(sciezka, 'utf8').includes("'use client'") ? [sciezka] : [];
+  });
+}
+
+lines.push('\nKOMPONENTY KLIENCKIE');
+check('pliki z use client', plikiKlienckie('src/components').length, budget.clientComponents.maxFiles, 'plików');
 
 console.log(lines.join('\n'));
 

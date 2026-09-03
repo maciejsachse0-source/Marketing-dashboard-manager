@@ -27,6 +27,10 @@
     "hmrMs": 3000,
     "peakRssMb": 2500
   },
+  "clientComponents": {
+    "_opis": "Liczba plików z 'use client' w src/components. F2-06 odhaczono z dowodem 50, dziś jest 64 i nic tego nie pilnowało (znalezisko F7-40). Próg = stan po sprzątaniu z F7-36; ma maleć, nie rosnąć. Podniesienie progu wymaga zdania w DECISIONS.md, dlaczego nowy plik kliencki jest tańszy niż serwerowy.",
+    "maxFiles": 64
+  },
   "_zestawL": "plan/03-wydajnosc.md sekcja 2. JEDYNE miejsce, gdzie stoi liczność zestawu L: czyta ją generator (scripts/perf/seed-large.ts) i sędzia (scripts/perf/report.mjs). Pomiar zrobiony na innych liczbach nie jest porównywalny z perf/baseline.json, więc report.mjs kończy wtedy kodem 1 (znalezisko F7-34).",
   "zestawL": {
     "artists": 200,
