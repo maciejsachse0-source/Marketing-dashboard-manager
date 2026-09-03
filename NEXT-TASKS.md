@@ -1,159 +1,138 @@
 # NEXT-TASKS - przekazanie do kolejnego workera
 
-Stan na 2026-09-03, po **F7-06, F7-07, F7-08, F7-09, F7-10**. Wcześniej zamknięte:
-F0 do F6 w całości oraz F7-01 do F7-05. Poza F7 otwarte są tylko dwa issues czekające
+Stan na 2026-09-03, po **F7-11, F7-12, F7-13, F7-14, F7-15**. Wcześniej zamknięte:
+F0 do F6 w całości oraz F7-01 do F7-10. Poza F7 otwarte są tylko dwa issues czekające
 na usera: **F4-06** (prawdziwy plik `.xlsx`) i publiczny adres w **F5-04**.
 Nie ruszać żadnego z nich.
 
 ## Co zastajesz po tej paczce
 
-**Złożoność spadła o 31%, nie o połowę, i tak to zapisałem.** Zastanych trafień reguły
-`complexity` było **58** (nie 63 — pięć zniknęło razem z F7-01 do F7-05), jest **40**
-w 29 plikach. Lista grandfather w `eslint.config.mjs` skurczona z 43 do 29 pozycji.
-Naprawiłem te funkcje, w których „złożoność" była artefaktem metryki: łańcuchy
-`x?.pole ?? ''` i `(a ?? 0) + (b ?? 0)` liczą się do złożoności cyklomatycznej, choć
-niczego nie rozgałęziają. Zostały te, w których złożoność jest prawdziwa. Najwyższe:
-**`ProductionStepRow` 46** (`src/components/productions/production-step-row.tsx:75`)
-i **`CalendarPage` 43** (`src/app/calendar/page.tsx:75`). To komponenty po kilkaset
-linii; ich podział zmienia strukturę renderu, więc potrzebuje własnego issue i własnego
-dowodu wizualnego. Nie doklejaj tego do paczki sprzątającej.
+**Cache Components odrzucone drugi raz i to jest zamknięte na dobre** (F7-11).
+Nie „utonęło w szumie", tylko sufit zysku jest niższy niż próg kryterium: cały odczyt
+katalogu `agents` z bazy to **0,412 ms przy p95 strony 8,5 ms, czyli 4,8 procent**.
+Nawet cache o zerowym koszcie nie da wymaganych 10 procent. Wraca dopiero przy zdalnej
+bazie albo katalogu większym o dwa rzędy wielkości. Przepis techniczny nadal leży
+w `DECISIONS.md` pod „F1-03".
 
-**Jest `fieldText` w `src/lib/utils.ts`.** Trzy linie, zamienia `null`/`undefined`
-z bazy na pusty string. Piszesz formularz, który przepisuje wiersz do stanu? Użyj tego
-plus `const src: Partial<T> = initial ?? {}`, zamiast łańcucha `initial?.pole ?? ''`.
-Ten wzorzec sam zdjął z listy pięć plików.
+**`npm run dev` to teraz TURBOPACK, webpack przeniósł się pod `dev:alt`** (F7-14).
+Objaw z F2-05 (znikająca siatka dni w pasach T) **nie występuje na dzisiejszym kodzie**:
+zrzut samego pasa z dev-turbopacka wobec `next start` to 0 różnych pikseli. Podejrzany
+z issue, modyfikator alfa Tailwinda, był niewinny — tło pasa to w obu bundlerach
+`oklab(0.962 -0.0058 0.0587 / 0.55)`. Jedyna zmierzona różnica: lightningcss
+w turbopacku przepisuje `--border` z `oklch` na równoważne `lab`. HMR **466 ms**
+zamiast 1961 ms.
 
-**Kolory pasm T1/T2/T3 mają jedno źródło: `FRAME_STYLE` w `src/lib/category-colors.ts`.**
-Doszły tam pola `faint` i `glow`, wypadło `rail` (jego jedynym odbiorcą był zakazany
-przez Z8 lewy pasek akcentu). Nie wpisuj `amber-500` ani `violet-500` wprost
-w komponencie, czytaj z tej tabeli.
+**Gant wypisany z listy grandfather w całości** (F7-13). Wszystkie pięć ścieżek
+`src/components/calendar/gantt-*` zniknęło z `eslint.config.mjs`; żadna funkcja w tych
+plikach nie przekracza złożoności 10. Trafień `complexity` **40 → 33**, ostrzeżeń lintu
+**44 → 37**. Zegar zjechał propem: `todayMs` liczone w `src/app/calendar/page.tsx`
+(komponent serwerowy, jedno `eslint-disable` z uzasadnieniem) i podawane `GanttView`,
+więc `Date.now()` zniknęło z renderu klienta. Kaskada „kroki po kolei" była wpisana
+dwa razy — jest raz, jako `cascadeOverrides` i `statusAfterCascade`
+w `gantt-geometry.ts`, z testami.
 
-**Server actions z `src/server/actions/` NIE dają się zaimportować do skryptu `tsx`.**
-Zmierzone: import rzuca `This module cannot be imported from a Client Component module`,
-bo `requireSession()` ciągnie `src/lib/auth.ts`, a ten pakiet `server-only`. Działa
-`db.insert(schema.calendarEntries)` i reszta bezpośredniego Drizzle. Persony agentów
-i `CLAUDE.md` uczą tego pierwszego, czyli kłamią — zapisane jako **F7-30**.
-
-**Zestaw L sieje wreszcie katalogi.** `production_templates` 5, `marketing_templates` 5,
-`agents` 6. Do zestawu mierzonych stron doszły `/templates` i `/agents`.
+**Mikro-etykieta sekcji ma kanon: sześć utility w `src/app/globals.css`** (F7-15) —
+`label-micro`, `label-micro-wide`, `label-micro-wider`, `label-mini`, `label-mini-wide`,
+`label-mini-wider`. Zastąpiły 90 ręcznie wpisanych łańcuchów w 37 plikach. Nie wpisuj
+`text-[10px] uppercase tracking-[0.14em]` z ręki, weź klasę. Tabela w `plan/05`
+sekcja 3b. **Nowe utility MUSI trafić do `extendTailwindMerge` w `src/lib/utils.ts`** —
+patrz pułapka 10 niżej.
 
 ## Liczby, do których porównujesz
 
-`npm run typecheck` kod 0. `npm run lint` kod 0, **45 ostrzeżeń** (było 78), 0 błędów.
-Rozbicie: `complexity` 40, `react-hooks/exhaustive-deps` 2,
-`@next/next/no-img-element` 1, `import/no-anonymous-default-export` 1,
-`@typescript-eslint/no-unused-vars` **0**.
-`npm run test` **216 zielonych w 20 plikach**. `node scripts/check-typography.mjs`
-kod 0. `node scripts/check-trust-boundaries.mjs` kod 0, **73 punkty wejścia**.
-`npm run perf` kod 0, bundel `/calendar` **292,7 kB** przy progu 301,6 kB.
-`npx playwright test` **22 zielone na budowaniu produkcyjnym** (na deweloperskim
-21 + `gantt-filter.spec.ts` czerwony, to znane **F7-28**).
+`npm run typecheck` kod 0. `npm run lint` kod 0, **37 ostrzeżeń** (było 44), 0 błędów.
+Rozbicie: `complexity` **33**, `react-hooks/exhaustive-deps` 2,
+`@next/next/no-img-element` 1, `import/no-anonymous-default-export` 1.
+`npm run test` **219 zielonych w 20 plikach** (było 216; trzy nowe na kaskadzie kroków).
+`node scripts/check-typography.mjs` kod 0. `node scripts/check-trust-boundaries.mjs`
+kod 0, 73 punkty wejścia. `npm run perf` kod 0, bundel `/calendar` **293,2 kB**
+przy progu 301,6 kB. `npx playwright test` **22 zielone** na `next start`.
+Tryb deweloperski (turbopack): `readyMs` 475, `firstCompileMs` 1162, `warmP50Ms` 205,
+`hmrMs` 466, `peakRssMb` 1602.
 
 Uczciwy licznik ostrzeżeń, `grep` kłamie:
 `npx eslint . -f json | jq '[.[].messages[]|select(.ruleId=="X")]|length'`.
 
-## Stan zestawu L po F7-10
+## Największa zastana złożoność, gdyby ktoś chciał ją ruszyć
 
-`npm run pg:info` na `marketing_perf`:
+`ProductionStepRow` **46** (`src/components/productions/production-step-row.tsx:75`)
+i `CalendarPage` **43** (`src/app/calendar/page.tsx:75`). To komponenty po kilkaset
+linii; podział zmienia strukturę renderu, więc potrzebuje własnego issue i własnego
+dowodu wizualnego. Wzorzec, który zadziałał w F7-13: wyjąć pochodne wyliczenia
+(łańcuchy `?:` i `??`) na poziom modułu jako czyste funkcje, potem podzielić JSX
+na podkomponenty. Dowód: zrzut przed i po plus porównanie długości odpowiedzi HTML.
 
-| tabela | wierszy |
-|---|---|
-| agents | **6** |
-| marketing_templates | **5** |
-| production_templates | **5** |
-| artists | 200 |
-| videographers | 60 |
-| campaigns | 40 |
-| productions | 500 |
-| calendar_entries | 3000 |
-| posts | 5000 |
-| csv_uploads | 20 |
-| csv_rows | 12000 |
-| agent_runs | 0 |
+## Znaleziska w F7
 
-**Czy P3 da się wreszcie zmierzyć: tak.** Trzy katalogi, które krok P3 miał wpiąć
-w cache, mają wiersze, a obie strony, które je renderują, są w zestawie mierzonym
-i mają zapisane „przed" w `perf/baseline.json`: `/templates` p50 8,1 ms i p95 9,3 ms,
-`/agents` p50 5,2 ms i p95 5,8 ms (mediany z trzech przebiegów).
-**Ostrzeżenie dla F7-11:** te liczby są jednocyfrowe. Kryterium F7-11 mówi o poprawie
-o 10% p95 na dwóch ścieżkach, czyli o **0,9 ms na `/templates` i 0,6 ms na `/agents`** —
-to jest poniżej szumu maszyny, który na tych stronach sięga kilkudziesięciu procent.
-Zanim wdrożysz Cache Components, ustal metodę: albo mediana z wielu przebiegów i jasno
-nazwany próg istotności, albo pomiar czegoś grubszego niż te dwie strony. Inaczej
-F7-11 skończy się tak samo jak F1-03: hipoteza nie zostanie obalona uczciwie, tylko
-utonie w szumie.
+Zamknięte: **F7-01 do F7-15**. Otwarte: **F7-16 do F7-31**. Nowe z tej paczki:
+
+- **F7-31** - `accentBorderFor` w `gantt-frames.tsx` ma wpisane wprost
+  `border-amber-400` / `violet` / `emerald`, obok tabeli `FRAME_TONE` zbudowanej
+  z `FRAME_STYLE`. Literały pochodzą z F2-02, F7-13 tylko je przeniosło.
+  Naprawa wymaga dołożenia pola do `FRAME_STYLE`, bo odcienia 400 bez przezroczystości
+  tam dziś nie ma. Waga **drobne**.
+
+Żadne nie blokuje.
 
 ## Pułapki
 
 1. **`npx playwright test` bierze serwer z portu 3000** (`reuseExistingServer: true`).
-   Przed przebiegiem `npm run build` i `npx next start -p 3000`, inaczej
-   `gantt-filter.spec.ts` pada na progu 300 ms (F7-28).
-2. **Nie da się zaimportować server action do `tsx`** — patrz wyżej, F7-30.
-   Do ad-hoc zapisów używaj `db` z `src/lib/db.ts` i wołaj skrypt tak:
-   `set -a; . ./.env.local; set +a; npx tsx skrypt.ts`. Bez tego `src/lib/env.ts`
-   wywala się na braku `DATABASE_URL`, bo `dotenv` w pliku `.ts` ładuje się po
-   `require` modułów (CJS hoistuje importy).
-3. **`git stash push -u` zabiera Twoje skrypty pomocnicze.** Używaj
-   `git stash push -- src/ eslint.config.mjs`. Skrypt do zrzutów trzymaj w katalogu
-   repozytorium, ale kasuj przed commitem — poza repem `npx tsx` nie znajdzie
-   `playwright` ani `dotenv` (ESM nie honoruje `NODE_PATH`).
-4. **Zrzuty do porównań rób w oknie 1280x720**, nie `fullPage`. Porównanie:
-   `node scripts/perf/pngdiff.mjs a.png b.png`, próg szumu 1155 do 1680 pikseli
-   z 7 823 808.
-5. **`npx prettier --write` przeformatuje plik na cudzysłowy podwójne.** Repo nie ma
-   konfiguracji prettiera i nie używa go w bramkach. Nie uruchamiaj go na źródłach.
-6. **Do złożoności cyklomatycznej liczą się `?.` i `??`.**
-7. **p95 na `/calendar` skacze między 70,7 a 94,6 ms** w kolejnych przebiegach przy
-   p50 stabilnym 67,8 do 71,5 ms. Wnioski wydajnościowe opieraj na medianie p50
-   z trzech przebiegów, nie na pojedynczym p95.
-8. **`npm run perf:serve` robi `next build`**, więc trwa. Przed jego startem sprawdź
+2. **e2e MUSI biec na `npx next start`, nie na `npm run perf:serve`.** Zmierzone:
+   na serwerze perfowym (baza `marketing_perf`, 500 produkcji) padają dwa scenariusze
+   tworzenia — `f5-scenariusze.spec.ts:88` i `revalidate.spec.ts:99`. To nie regresja,
+   to inna baza. Na `next start` z bazą roboczą wszystkie 22 są zielone.
+3. **Nie da się zaimportować server action do `tsx`** (F7-30). Do ad-hoc zapisów `db`
+   z `src/lib/db.ts`, wołane tak:
+   `set -a; . ./.env.local; set +a; npx tsx skrypt.ts`.
+4. **`git stash push -u` zabiera Twoje skrypty pomocnicze.** Używaj
+   `git stash push -- src/`. Skrypty pomocnicze trzymaj w katalogu repozytorium
+   (poza nim `npx tsx` nie znajdzie `playwright`) i kasuj przed commitem.
+5. **Zrzuty do porównań rób w oknie 1280x720**, nie `fullPage`. Porównanie:
+   `node scripts/perf/pngdiff.mjs a.png b.png`. **Zmierzone: dwa przebiegi zrzutu na
+   TYM SAMYM budowaniu dają 0 różnych pikseli**, a dwa budowania tego samego kodu
+   też 0 — więc próg szumu 1155–1680 jest zawyżony, każdy niezerowy wynik warto
+   obejrzeć. Wyjątek: `/productions` ma 64 piksele szumu z danych.
+6. **`npx prettier --write` przeformatuje plik na cudzysłowy podwójne.** Nie uruchamiaj.
+7. **Do złożoności cyklomatycznej liczą się `?.` i `??`.**
+8. **`npm run perf:dev` kasuje `.next`**, więc po nim `npm run perf` pada na braku
+   budowania. Kolejność: najpierw perf:dev, potem `npm run perf:serve`.
+9. **`npm run perf:serve` robi `next build`.** Przed jego startem sprawdź
    `lsof -nP -iTCP:3000 -sTCP:LISTEN` i ubij to, co tam stoi.
-9. **Zrzuty `screenshots/F5/*.png` zmieniają się przy każdym przebiegu e2e.** Przed
+10. **Własne utility CSS musi być zgłoszone do `tailwind-merge`.** Bez wpisu
+   w `extendTailwindMerge` (`src/lib/utils.ts`) `cn()` nie widzi kolizji z `text-sm`
+   z wariantu `Button` i zostawia obie klasy: rozmiar wygrywa Twój, ale wysokość
+   wiersza zostaje po `text-sm`. Kosztowało 1 512 różnych pikseli na każdej stronie.
+11. **Zrzuty `screenshots/F5/*.png` zmieniają się przy każdym przebiegu e2e.** Przed
    commitem `git checkout screenshots/F5`.
-
-## Znaleziska w F7
-
-Zamknięte: **F7-01 do F7-10**. Otwarte: **F7-11 do F7-28** oraz dwa nowe z tej paczki:
-
-- **F7-29** - trzy metryki czytane z CSV (`Total play time`, `Watch time (hours)`,
-  `Impressions click-through rate (%)`) nie mają kolumn w tabeli `posts`, więc
-  przepadają przy imporcie. Zmienne usunięte w F7-07, pytanie o kolumny zostało.
-  Waga **drobne**.
-- **F7-30** - `agents/schedule-manager.md`, `agents/campaign-strategist.md` i `CLAUDE.md`
-  pokazują import server action do skryptu `tsx` jako działający. Nie działa, rzuca
-  wyjątkiem. Waga **ważne**.
-
-Żadne nie blokuje. **F7-11 jest odblokowane przez F7-10.**
+12. **`perf/baseline.json` jest jedynym zapisem stanu „przed"** dla siedmiu starszych
+   stron. Nie nadpisuj go dla nich.
 
 ## Jak uruchomić
 
 ```
 docker start mc-pg
-npm run dev                                  # webpack, port 3000
+npm run dev                                  # turbopack, port 3000
+npm run dev:alt                              # webpack, gdy potrzebny
 npm run build && npx next start -p 3000      # PRZED e2e
-npx playwright test                          # 22 zielone na budowaniu produkcyjnym
+npx playwright test                          # 22 zielone
 node scripts/check-trust-boundaries.mjs
 node scripts/check-typography.mjs
 lsof -nP -iTCP:3000 -sTCP:LISTEN             # ZAWSZE przed perf:serve
+npm run perf:dev                             # kasuje .next, rób jako pierwsze
 npm run perf:serve                           # terminal 1 (ubij przed e2e)
 npm run perf                                 # terminal 2, oczekiwany kod 0
 npm run pg:info                              # liczby wierszy w bazie pomiarowej
-set -a; . ./.env.local; set +a; npx tsx scripts/perf/seed-large.ts   # przesianie zestawu L
 ```
 
 ## Stan środowiska
 
 Bez zmian: kontener `mc-pg` na porcie 5433 z bazami `marketing`, `marketing_perf`,
 `marketing_test`, `marketing_preview`. `psql` tylko przez `docker exec`, brak
-`magick`, `compare` i `PIL`, tryb deweloperski na webpacku.
+`magick`, `compare` i `PIL`.
 
 ## Decyzje w toku
 
 Bez zmian: publiczny adres środowiska podglądowego (F5-04), `DATABASE_URL` do
-prawdziwej bazy, hosting (Vercel, czyje konto), plik `.xlsx` z osobami (F4-06),
-potwierdzenie `docs/ARCHITEKTURA.md` przez usera, czyszczenie historii gita z danych
-osobowych (F4-07, powiązane F7-23). Nowe: czy `posts` ma dostać kolumny na czas
-oglądania i CTR (F7-29).
-
-Commity paczki: `5ae9013` (F7-06), `e176453` (F7-07), `4105572` (F7-08),
-`9986221` (F7-09), `7c3c45a` (F7-10).
+prawdziwej bazy, hosting, plik `.xlsx` z osobami (F4-06), potwierdzenie
+`docs/ARCHITEKTURA.md` przez usera, czyszczenie historii gita z danych osobowych
+(F4-07, powiązane F7-23), kolumny na czas oglądania i CTR w `posts` (F7-29).

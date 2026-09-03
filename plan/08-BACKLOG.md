@@ -2503,6 +2503,25 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     lista w `DECISIONS.md`
   - negatywne: `npm run test` kod 0
 
+- [ ] **F7-31** `znalezisko` `ui` Kolory pasów T wpisane wprost, obok tabeli `FRAME_STYLE`
+  Waga: **drobne**. Szacunek: godzina. Znalezione przy F7-13.
+  `accentBorderFor` w `src/components/calendar/gantt-frames.tsx` zwraca
+  `border-amber-400`, `border-violet-400` i `border-emerald-400` wpisane wprost,
+  choć w tym samym pliku stoi `FRAME_TONE`, zbudowana z `FRAME_STYLE`
+  w `src/lib/category-colors.ts`, która jest jedynym źródłem kolorów pasm T1/T2/T3
+  (ustalone w F7-08). Funkcja pochodzi z `gantt-substep-bar.tsx`, gdzie te trzy
+  literały siedziały od F2-02 — F7-13 tylko je przeniosło, nie wprowadziło.
+  Trzeci kolor obramowania kółka podkroku nie ma dziś odpowiednika w `FRAME_STYLE`
+  (jest `border` w odcieniu 400/55, potrzebny 400 bez przezroczystości), więc naprawa
+  to dołożenie jednego pola do tabeli, nie samo podstawienie.
+  CZYTAJ: `src/components/calendar/gantt-frames.tsx`, `src/lib/category-colors.ts`
+  AC:
+  - `grep -n "amber-400\|violet-400\|emerald-400" src/components/calendar/gantt-frames.tsx`
+    zwraca wyłącznie linie z tabeli `FRAME_TONE`, nie z `accentBorderFor`
+  - nowe pole opisane komentarzem w `FRAME_STYLE` i użyte przez `accentBorderFor`
+  - negatywne: wygląd `/calendar` bez zmian (dowód: `scripts/perf/pngdiff.mjs`,
+    zrzut 1280x720 przed i po, poniżej progu 1 680 pikseli), `npm run test` kod 0
+
 ---
 
 ## F8 — Bramka decyzyjna (pętla STAJE przed tą fazą i pyta usera)
