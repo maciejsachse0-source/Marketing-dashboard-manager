@@ -27,6 +27,20 @@
     "hmrMs": 3000,
     "peakRssMb": 2500
   },
+  "_zestawL": "plan/03-wydajnosc.md sekcja 2. JEDYNE miejsce, gdzie stoi liczność zestawu L: czyta ją generator (scripts/perf/seed-large.ts) i sędzia (scripts/perf/report.mjs). Pomiar zrobiony na innych liczbach nie jest porównywalny z perf/baseline.json, więc report.mjs kończy wtedy kodem 1 (znalezisko F7-34).",
+  "zestawL": {
+    "artists": 200,
+    "videographers": 60,
+    "campaigns": 40,
+    "productions": 500,
+    "calendar_entries": 3000,
+    "posts": 5000,
+    "csv_uploads": 20,
+    "csv_rows": 12000,
+    "production_templates": 5,
+    "marketing_templates": 5,
+    "agents": 6
+  },
   "driftPct": 15,
   "driftFailPct": 30,
   "_driftAbsFloorPct": "Dryf blokuje fazę dopiero, gdy pogorszenie przekracza driftFailPct ORAZ jest większe niż ten procent limitu budżetowego metryki. Powód zmierzony: szum między przebiegami sięga 77% na szybkich stronach (p95 home 17,6 -> 31,2 ms), co przy limicie 600 ms jest niczym. Bez progu bezwzględnego bramka padałaby na szumie i zostałaby wyłączona.",

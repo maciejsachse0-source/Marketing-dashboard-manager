@@ -65,6 +65,25 @@ for (const [key, r] of Object.entries(page.pages)) {
   drift(`p95 ${key}`, r.p95Ms, pagePrev?.pages?.[key]?.p95Ms, limit);
 }
 
+/**
+ * F7-34: pomiar bez warunków pomiaru jest nieważny. Zestaw L stoi w `budget.zestawL`
+ * (jedyne miejsce, czyta go też generator), a przebieg wiezie policzone wiersze.
+ * Rozjazd blokuje, bo p95 z innej liczby wierszy nie jest porównywalny ani
+ * z `perf/baseline.json`, ani z poprzednim przebiegiem.
+ */
+lines.push('\nZESTAW L');
+if (!page.rows) {
+  breaches.push({ label: 'przebieg bez licznika wierszy', value: 'brak', limit: 'komplet', overPct: null });
+  lines.push(' PRÓG  przebieg sprzed F7-34, przemierz: node scripts/perf/measure-page.mjs');
+} else {
+  for (const [tabela, oczekiwane] of Object.entries(budget.zestawL)) {
+    const teraz = page.rows[tabela];
+    const ok = teraz === oczekiwane;
+    if (!ok) breaches.push({ label: `wiersze ${tabela}`, value: teraz ?? 'brak', limit: oczekiwane, overPct: null });
+    lines.push(`${ok ? '  ok  ' : ' PRÓG '} ${`wiersze ${tabela}`.padEnd(34)} ${String(teraz ?? '-').padStart(8)}    / zestaw L ${oczekiwane}`);
+  }
+}
+
 // --- baza -------------------------------------------------------------------
 const dbRuns = runsOfKind('db');
 if (dbRuns.length === 0) {

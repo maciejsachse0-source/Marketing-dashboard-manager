@@ -4,7 +4,8 @@
  *
  * Uruchomienie: node scripts/perf/measure-page.mjs
  * Zmienne: BASE_URL (domyślnie http://localhost:3000), AUTH_EMAIL, AUTH_PASSWORD,
- *          PERF_DATABASE_URL (tylko do zapisania hosta bazy w wyniku).
+ *          PERF_DATABASE_URL (host bazy w wyniku ORAZ licznik wierszy per tabela,
+ *          zapisywany razem z pomiarem — F7-34).
  * Wynik: perf/runs/page-<timestamp>.json oraz tabela na stdout.
  *
  * Logowanie: proxy w src/proxy.ts odbija każdą ścieżkę poza /login. Formularz
@@ -21,6 +22,7 @@ config({ quiet: true });
 
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
+import postgres from 'postgres';
 
 const BASE_URL = (process.env.BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const EMAIL = process.env.AUTH_EMAIL;
@@ -188,6 +190,26 @@ const bundle = await calendarFirstLoadJsGzipKb(cookie);
 const perfUrl = process.env.PERF_DATABASE_URL;
 const parsed = perfUrl ? new URL(perfUrl) : null;
 
+/**
+ * F7-34: warunki pomiaru zapisywane razem z wynikiem. Bez tego p95 z bazy, która
+ * odjechała od zestawu L (zmierzone: `artists` 1180 przy specyfikacji 200), wyglądał
+ * dokładnie tak samo jak p95 z bazy zgodnej i nic tego nie wykrywało.
+ */
+async function countRows(url, tables) {
+  const sql = postgres(url, { max: 1, prepare: false });
+  const rows = {};
+  for (const t of tables) {
+    const [r] = await sql`select count(*)::int as n from ${sql(t)}`;
+    rows[t] = r.n;
+  }
+  await sql.end();
+  return rows;
+}
+
+const zestawL = JSON.parse(readFileSync('perf/budget.json', 'utf8')).zestawL;
+if (!perfUrl) fail('PERF_DATABASE_URL nie jest ustawiony, nie da się zapisać liczby wierszy');
+const rows = await countRows(perfUrl, Object.keys(zestawL));
+
 const out = {
   kind: 'page',
   at: new Date().toISOString(),
@@ -196,6 +218,7 @@ const out = {
   warmup: WARMUP,
   runs: RUNS,
   bundle: { calendarFirstLoadKb: bundle.gzipKb, files: bundle.files },
+  rows,
   pages: results,
 };
 
@@ -211,4 +234,10 @@ for (const [key, r] of Object.entries(results)) {
   );
 }
 console.log(`\nJS pierwszego ładowania /calendar: ${bundle.gzipKb} kB po gzip (${bundle.files} plików)`);
+console.log(
+  `\nwiersze w bazie pomiarowej: ` +
+    Object.entries(rows)
+      .map(([t, n]) => `${t} ${n}`)
+      .join(', '),
+);
 console.log(`\nzapisano ${file}`);

@@ -2847,7 +2847,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - istniejący śmieciowy katalog usunięty z korzenia repozytorium
   - negatywne: `npm run test` kod 0, `npm run typecheck` kod 0
 
-- [ ] **F7-34** `znalezisko` `perf` Pomiar stron nie zapisuje, na ilu wierszach był robiony
+- [x] **F7-34** `znalezisko` `perf` Pomiar stron nie zapisuje, na ilu wierszach był robiony
   Waga: **ważne**. Szacunek: pół dnia. Znalezione w recenzji końcowej.
   `scripts/perf/measure-page.mjs` zapisuje p50, p95, bajty i rozmiar bundla, ale ani
   jednej liczby wierszy, a `scripts/perf/report.mjs` niczego takiego nie sprawdza.
@@ -2856,6 +2856,20 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   i `productions 504` (specyfikacja 500). p95 mierzone po takim dryfie nie są
   porównywalne z `perf/baseline.json`, a nic tego nie wykrywa. To złamanie Z1 na
   poziomie przyrządu: pomiar bez zapisanych warunków pomiaru.
+  ZROBIONE 2026-09-03. `measure-page.mjs` liczy wiersze w bazie pomiarowej i zapisuje
+  je w przebiegu jako pole `rows` (jedenaście tabel, razem z katalogami z F7-10),
+  a `report.mjs` konfrontuje je z zestawem L i przy rozjeździe kończy kodem 1.
+  Specyfikacja przeniesiona do JEDNEGO miejsca: `perf/budget.json` klucz `zestawL`,
+  kluczowany nazwami tabel. Czyta go zarówno generator (`seed-large.ts`), jak i sędzia,
+  więc rozjazd „generator sieje 200, sędzia sprawdza 500" jest niemożliwy.
+  Baza pomiarowa doprowadzona do zgodności (`npx tsx scripts/perf/seed-large.ts`):
+  `artists` **1180 do 200**, `productions` **504 do 500**, reszta co do wiersza.
+  Dowód AC: `jq '.rows' perf/runs/<najnowszy>.json` zwraca komplet jedenastu liczb;
+  `node scripts/perf/report.mjs` puszczony na przebiegu SPRZED tej zmiany (bez pola
+  `rows`) kończy kodem 1 z wpisem `przebieg bez licznika wierszy: brak wobec komplet`,
+  a na przebiegu zgodnym wypisuje jedenaście linii `ok` i kod 0.
+  Bramki: typecheck 0, lint 0 błędów / 35 ostrzeżeń, perf 0 (`/calendar` 293,4 kB
+  przy progu 301,6 kB, wszystkie p95 pod limitem).
   CZYTAJ: `scripts/perf/measure-page.mjs`, `scripts/perf/report.mjs`,
   `scripts/perf/table-counts.mjs`, `plan/03-wydajnosc.md` sekcja 2
   AC:

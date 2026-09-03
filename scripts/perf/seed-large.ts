@@ -10,25 +10,34 @@ config({ path: '.env.local', quiet: true });
 config({ quiet: true });
 
 import postgres from 'postgres';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const SEED = 1337;
 
+/**
+ * F7-34: licznośći zestawu L stoją w JEDNYM miejscu, `perf/budget.json` klucz
+ * `zestawL`, kluczowane nazwami tabel. Czyta je i ten generator, i sędzia
+ * (`report.mjs`), który odrzuca pomiar zrobiony na innych liczbach. Katalogi
+ * (`production_templates`, `marketing_templates`, `agents`) doszły w F7-10:
+ * bez nich `/templates` i `/agents` renderowały pustkę i nie było czego mierzyć.
+ */
+const ZESTAW_L: Record<string, number> = JSON.parse(
+  readFileSync('perf/budget.json', 'utf8'),
+).zestawL;
+
 const COUNTS = {
-  artists: 200,
-  videographers: 60,
-  campaigns: 40,
-  productions: 500,
-  calendarEntries: 3000,
-  posts: 5000,
-  csvUploads: 20,
-  csvRows: 12000,
-  // Katalogi. Bez nich strony /templates i /agents renderowały pustkę, więc krok
-  // P3 (cache katalogów) nie miał czego mierzyć — znalezisko F7-10.
-  productionTemplates: 5,
-  marketingTemplates: 5,
-  agents: 6,
+  artists: ZESTAW_L.artists,
+  videographers: ZESTAW_L.videographers,
+  campaigns: ZESTAW_L.campaigns,
+  productions: ZESTAW_L.productions,
+  calendarEntries: ZESTAW_L.calendar_entries,
+  posts: ZESTAW_L.posts,
+  csvUploads: ZESTAW_L.csv_uploads,
+  csvRows: ZESTAW_L.csv_rows,
+  productionTemplates: ZESTAW_L.production_templates,
+  marketingTemplates: ZESTAW_L.marketing_templates,
+  agents: ZESTAW_L.agents,
 } as const;
 
 // ---------------------------------------------------------------------------
