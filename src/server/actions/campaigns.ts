@@ -315,7 +315,6 @@ export async function cascadeCampaignMilestonesTo(
     // unmark: target + everything after becomes not done.
     const shouldBeDone =
       mode === 'mark' ? pos <= targetPos : pos < targetPos;
-    const stamp = shouldBeDone ? nowIso : null;
     return {
       ...m,
       doneAt: shouldBeDone ? m.doneAt ?? nowIso : null,

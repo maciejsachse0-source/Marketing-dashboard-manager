@@ -856,3 +856,27 @@ test na commicie `68171c6` sprzed paczki daje na serwerze deweloperskim 316, 333
 301 ms. `reuseExistingServer: true` sprawia, że wynik zależy od tego, co stoi na porcie
 3000. Zapisane jako **F7-28**; przebieg zaliczający tę paczkę wykonany na budowaniu
 produkcyjnym: **22 zielone**.
+
+**F7-06, złożoność spadła o 31%, nie o połowę — i tak to raportuję.** Kryterium
+issue mówiło o spadku o co najmniej połowę. Zastanych trafień było 58 (nie 63, bo
+pięć zniknęło razem z F7-01 do F7-05), po paczce jest 40, czyli 31%. Naprawione
+zostały te funkcje, których „złożoność" była artefaktem metryki: łańcuchy `x?.pole ?? ''`
+w formularzach i `(a ?? 0) + (b ?? 0)` w parserach CSV liczą się do złożoności
+cyklomatycznej, choć nie rozgałęziają niczego. Stąd `fieldText` w `src/lib/utils.ts`,
+`engSum`/`pct` w `csv-mappers.ts` i tablica `KIND` w `artist-avatar.tsx`.
+Nie naprawione zostały funkcje, w których złożoność jest prawdziwa: `ProductionStepRow`
+(46) i `CalendarPage` (43) to komponenty po kilkaset linii z rozgałęzieniami w JSX.
+Ich podział zmienia strukturę renderu, więc wymaga własnego dowodu wizualnego i własnego
+issue, a nie doklejenia do paczki sprzątającej. Świadomy koszt: lista grandfather
+w `eslint.config.mjs` zostaje z 29 plikami zamiast zniknąć.
+
+**F7-07, trzy metryki z CSV były czytane i wyrzucane.** `totalPlay` (TikTok),
+`watchHours` i `ctr` (YouTube) parser wyciągał z arkusza do zmiennych, których nigdzie
+nie używał. Sprawdzone w `drizzle/schema.ts`: tabela `posts` nie ma dla nich kolumn,
+więc nie chodziło o zapomniane przypisanie, tylko o brak miejsca w modelu. Zmienne
+usunięte, a pytanie „czy chcemy czas oglądania i CTR" zapisane jako **F7-29**, żeby nie
+zniknęło razem z nimi. Pozostałe trzynaście trafień to martwe importy, martwe propy
+(`currentStatus`, `status` — przekazywane z `gantt-row.tsx` i nieczytane) oraz aliasy po
+refaktorach (`rangeStart`, `rangeEnd`, `stamp`); żadne z nich nic nie gubiło. Dowód, że
+usunięcie propów nic nie zmieniło w obrazie: pngdiff 0 pikseli na `/calendar`, na
+`/analytics` i na `/calendar` z rozwiniętym panelem produkcji.

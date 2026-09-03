@@ -1821,7 +1821,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   `check-typography` 0, `check-trust-boundaries` 0, `perf` 0, bundel `/calendar`
   292,8 kB przy progu 301,6 kB (bez zmiany).
 
-- [ ] **F7-07** `znalezisko` `tooling` 17 nieużywanych zmiennych i importów
+- [x] **F7-07** `znalezisko` `tooling` 17 nieużywanych zmiennych i importów
   Waga: **drobne**. Szacunek: 1 godzina.
   `@typescript-eslint/no-unused-vars`, 17 ostrzeżeń. Część to prawdopodobnie
   niedokończone refaktory (`totalPlay`, `watchHours`, `ctr` w `csv-mappers.ts`,
@@ -1831,6 +1831,31 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - `npx eslint . -f json | grep -c 'no-unused-vars'` zwraca `0`
   - dla każdej usuniętej zmiennej sprawdzone, czy nie miała być użyta; przypadki
     „miała być" opisane w `DECISIONS.md` zamiast po cichu skasowane
+  DOWÓD (2026-09-03): **ZROBIONE.** Zastanych trafień było **16**, nie 17 (jedno
+  zniknęło wcześniej razem z F7-01 do F7-05). Uczciwy licznik po zmianie:
+  `npx eslint . -f json | jq '[.[].messages[]|select(.ruleId=="@typescript-eslint/no-unused-vars")]|length'`
+  zwraca **0**. Ostrzeżeń lintu ogółem 60 → 45, 0 błędów.
+  Rozbicie po kategoriach:
+  - **martwe importy i typy, skasowane bez śladu** (7): `PRODUCTION_PROGRESSION`
+    i `StageCategory` w `gantt-geometry.ts`, `PeriodTone` w `periods-slider.tsx`,
+    `Trash2` w `file-zone.tsx`, `Mode` w `template-form-utils.ts`, `AgentSlug`
+    w `lib/agents/index.ts`, `StepDateMode` w `production-steps.ts`.
+  - **martwe propy, usunięte także u wywołującego** (3): `currentStatus`
+    w `ExpandedDetails` i `status` w `PipelineMilestones` — oba szły z `gantt-row.tsx`
+    i nie były czytane w ciele komponentu; do tego lokalne `stepDates`
+    w `gantt-expanded.tsx`, którego zastępuje `row.stepDates` czytane w geometrii.
+  - **pozostałości po refaktorach, semantyka bez zmian** (3): `rangeStart`/`rangeEnd`
+    w `app/calendar/page.tsx` (aliasy `weekStart` i policzonego końca, okno i tak
+    liczą `lookaheadEnd`/`lookbehindStart`), `stamp` w `campaigns.ts` (zastąpiony
+    przez `m.doneAt ?? nowIso` w miejscu użycia).
+  - **trzy metryki z CSV, które faktycznie gubimy** (3): `totalPlay` (TikTok),
+    `watchHours` i `ctr` (YouTube). Tabela `posts` nie ma dla nich kolumn, więc nie
+    było gdzie ich zapisać. Usunięte z parsera, opisane w `DECISIONS.md` i zgłoszone
+    jako **F7-29**, żeby decyzja o kolumnach nie utonęła razem z tymi zmiennymi.
+  DOWÓD REGRESJI: pngdiff 1280×720, `/calendar` **0**, `/analytics` **0**,
+  `/calendar` z rozwiniętym panelem produkcji **0** różnych pikseli.
+  BRAMKI: `typecheck` 0, `lint` 0, `test` 0 (216/20), `check-typography` 0,
+  `check-trust-boundaries` 0, `perf` 0.
 
 - [ ] **F7-08** `znalezisko` `ui` Lewy pasek akcentu, zakazany zasadą Z8
   Waga: **ważne**. Szacunek: 1 godzina.
@@ -2230,6 +2255,27 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     (dowód: sztuczne podniesienie kosztu przemalowania wywala test)
   - decyzja opisana w `DECISIONS.md`, razem z liczbami z obu środowisk
   - negatywne: `npx playwright test` 22 zielone na budowaniu produkcyjnym
+
+- [ ] **F7-29** `znalezisko` `import` `db` Trzy metryki z CSV nie mają gdzie wylądować
+  Waga: **drobne**. Szacunek: godzina. Znalezione przy F7-07.
+  Parser CSV czytał z arkuszy trzy kolumny, których tabela `posts` nie przechowuje:
+  `Total play time` (TikTok), `Watch time (hours)` i `Impressions click-through rate (%)`
+  (YouTube). Wartości lądowały w zmiennych `totalPlay`, `watchHours`, `ctr`
+  w `src/lib/csv-mappers.ts` i nie szły dalej — stąd ostrzeżenia lintu, które
+  F7-07 zdjęło razem ze zmiennymi. Kolumny w `drizzle/schema.ts` (tabela `posts`,
+  linie 294–301) kończą się na `reach`, `impressions`, `engagementRate`,
+  `completionRate`, `saves`, `shares`, `comments`, `followersGained`.
+  Do decyzji usera: czy czas oglądania i CTR mają być widoczne w analityce.
+  CZYTAJ: `src/lib/csv-mappers.ts`, `drizzle/schema.ts` sekcja `posts`,
+  `src/components/analytics/analytics-shell.tsx`
+  AC:
+  - decyzja zapisana w `DECISIONS.md`: dokładamy kolumny czy świadomie ich nie zbieramy
+  - wariant „dokładamy": migracja przez `npm run db:generate`, trzy pola w `NormalizedPost`,
+    mapowanie z powrotem w trzech mapperach, wartości widoczne na `/analytics`
+    (dowód: import `scripts/sample-meta.csv` i zrzut ekranu z niepustą kolumną)
+  - wariant „nie zbieramy": komentarz w `csv-mappers.ts` mówiący wprost, których
+    kolumn arkusza nie czytamy i dlaczego
+  - negatywne: `npm run test` kod 0, osiem testów `csv-mappers.test.ts` nadal zielonych
 
 ---
 

@@ -102,8 +102,6 @@ export default async function CalendarPage({
   // (last Monday) puts T1 at strip-week-1, T2 at strip-week-2, T3 at strip-week-3.
   const baseDate = parseWeekParam(sp.week);
   const weekStart = startOfWeek(baseDate);
-  const rangeStart = weekStart;
-  const rangeEnd = endOfDay(addDays(weekStart, zoom * 7 - 1));
 
   // Productions whose T-0 sits up to 3 weeks past the visible window — earlier
   // sub-stages (email-sent at T-21) still land inside the strip.

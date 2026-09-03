@@ -36,7 +36,6 @@ import type {
   CalendarType,
   ProductionStage,
   ProductionStep,
-  StepDateMode,
 } from '../../../drizzle/schema';
 
 /**

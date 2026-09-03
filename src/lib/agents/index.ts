@@ -6,7 +6,6 @@ import {
   WIDGET_KINDS,
   type AgentDef,
   type AgentMeta,
-  type AgentSlug,
   type DashboardWidget,
 } from './types';
 

@@ -51,8 +51,6 @@ export const CALENDAR_TYPE_LABEL: Record<StepCalendarType, string> = {
   deadline: 'Deadline',
 };
 
-type Mode = { kind: 'create' } | { kind: 'edit'; slug: string };
-
 export function newStepId(): string {
   return Math.random().toString(36).slice(2, 14);
 }

@@ -7,7 +7,6 @@
 import { startOfWeek as startOfWeekFn } from '@/lib/dates';
 import { periodsRelativeToT0Mon } from '@/lib/production-periods';
 import {
-  PRODUCTION_PROGRESSION,
   type Platform,
   type ProductionPeriods,
   type ProductionStatus,
@@ -19,7 +18,6 @@ import {
   STAGE_INDEX,
   STAGE_TO_PERIOD,
   TENTATIVE_OFFSET_FROM_T0_MON,
-  type StageCategory,
   type WeekFrameCode,
 } from './gantt-stages';
 

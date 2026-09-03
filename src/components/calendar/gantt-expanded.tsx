@@ -6,7 +6,7 @@ import { AddStepInline } from '@/components/productions/add-step-inline';
 import { T1StartEditor } from '@/components/productions/t1-start-editor';
 import { resolveStepSequence } from '@/lib/category-sequence';
 import { getFirstPeriodStart } from '@/lib/production-steps';
-import { type ProductionStatus, type ProductionStep } from '../../../drizzle/schema';
+import { type ProductionStep } from '../../../drizzle/schema';
 import { STAGE_CATEGORIES, type GanttRow, type StageCategory } from './gantt-geometry';
 import { EXPANDED_FRAMES } from './gantt-frames';
 
@@ -20,15 +20,12 @@ import { EXPANDED_FRAMES } from './gantt-frames';
  */
 export function ExpandedDetails({
   row,
-  currentStatus,
   tLabel,
 }: {
   row: GanttRow;
-  currentStatus: ProductionStatus;
   tLabel: string;
 }) {
   const t0Label = row.t0At.toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' });
-  const stepDates = row.stepDates ?? {};
 
   return (
     <div className="border-t border-border/60 bg-muted/20 py-6">

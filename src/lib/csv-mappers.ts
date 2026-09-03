@@ -124,7 +124,6 @@ function mapTikTokRow(row: Record<string, unknown>): NormalizedPost | null {
   const comments = num(pick(row, 'Comment count', 'Comments', 'Komentarze'));
   const shares = num(pick(row, 'Share count', 'Shares', 'Udostępnienia'));
   const avgWatch = num(pick(row, 'Average watch time', 'Avg watch time'));
-  const totalPlay = num(pick(row, 'Total play time'));
   const reach = num(pick(row, 'Reach', 'Reached audience', 'Zasięg'));
   const followersGained = num(pick(row, 'New followers', 'Followers gained'));
   const duration = num(pick(row, 'Video duration', 'Duration'));
@@ -160,8 +159,6 @@ function mapYouTubeRow(row: Record<string, unknown>): NormalizedPost | null {
   if (!publishedAt) return null;
 
   const views = num(pick(row, 'Views', 'Wyświetlenia'));
-  const watchHours = num(pick(row, 'Watch time (hours)', 'Watch time'));
-  const ctr = num(pick(row, 'Impressions click-through rate (%)', 'CTR (%)', 'Click-through rate'));
   const subsGained = num(pick(row, 'Subscribers gained', 'New subscribers'));
   const likes = num(pick(row, 'Likes', 'Polubienia'));
   const comments = num(pick(row, 'Comments', 'Komentarze'));

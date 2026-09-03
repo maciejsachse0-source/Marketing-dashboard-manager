@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useTransition } from 'react';
-import { Upload, FileText, Trash2 } from 'lucide-react';
+import { Upload, FileText } from 'lucide-react';
 import { uploadProductionAttachment } from '@/server/actions/production-attachments';
 import type { Attachment } from '@/lib/production-files';
 

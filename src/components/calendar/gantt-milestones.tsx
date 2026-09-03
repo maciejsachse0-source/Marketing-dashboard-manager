@@ -27,7 +27,6 @@ export function PipelineMilestones({
   checkpoints,
   allSubSteps,
   dayWidthPct,
-  status,
   cancelled,
   onChange,
   optimisticDoneByKey,
@@ -37,7 +36,6 @@ export function PipelineMilestones({
   checkpoints: CheckpointInfo[];
   allSubSteps: SubStepInfo[];
   dayWidthPct: number;
-  status: ProductionStatus;
   cancelled: boolean;
   onChange: (next: ProductionStatus) => void;
   optimisticDoneByKey: Record<string, boolean>;

@@ -12,7 +12,6 @@ import {
   fmtDayMonth,
   MONTH_PL,
   toneForIndex,
-  type PeriodTone,
 } from '@/lib/period-tones';
 import { Button } from '@/components/ui/button';
 

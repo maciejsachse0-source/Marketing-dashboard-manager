@@ -195,7 +195,6 @@ export const GanttRowView = memo(function GanttRowView({
           checkpoints={checkpoints}
           allSubSteps={allSubSteps}
           dayWidthPct={dayWidthPct}
-          status={optimisticStatus}
           cancelled={cancelled}
           onChange={setStatus}
           optimisticDoneByKey={optimisticDoneByKey}
@@ -240,11 +239,7 @@ export const GanttRowView = memo(function GanttRowView({
 
       {expanded ? (
         <div className="animate-fade-up">
-          <ExpandedDetails
-            row={row}
-            currentStatus={optimisticStatus}
-            tLabel={tLabel}
-          />
+          <ExpandedDetails row={row} tLabel={tLabel} />
         </div>
       ) : null}
     </div>
