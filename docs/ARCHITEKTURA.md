@@ -473,8 +473,8 @@ Komendy sprawdzające, wszystkie kończą się kodem 0 poza `perf` (patrz niżej
 | Komenda | Co robi |
 |---|---|
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | ESLint, dziś **0 błędów i 108 ostrzeżeń**, każde ma issue w fazie F7. Reguła `no-restricted-syntax` na surowym `<button>` jest błędem, lista wyjątków jest pusta |
-| `npm run test` | 216 testów jednostkowych w 20 plikach, Vitest |
+| `npm run lint` | ESLint, dziś **0 błędów i 36 ostrzeżeń**, każde ma issue w fazie F7. Reguła `no-restricted-syntax` na surowym `<button>` jest błędem, lista wyjątków jest pusta |
+| `npm run test` | 223 testy jednostkowe w 20 plikach, Vitest |
 | `npm run e2e` | 22 scenariusze przeglądarkowe, Playwright. Serwer stawia `scripts/e2e-serve.mjs`: czyści i zasiewa bazę **testową**, dopiero potem `next dev` (F7-21). `reuseExistingServer: true`, więc stojący serwer na porcie 3000 zostanie użyty — i odrzucony przez `e2e/global-setup.ts`, gdy siedzi na innej bazie |
 | `npm run pg:info` | wersja bazy, indeksy, liczby wierszy |
 | `npm run perf` | pomiar bazy i stron plus raport progów |
