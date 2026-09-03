@@ -2802,6 +2802,188 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     kontakt (zrzut 1280x720 przed i po czyszczeniu, różnica poniżej progu szumu)
   - negatywne: `npm run test` kod 0, formularz kamerzysty nadal zapisuje wszystkie pola
 
+- [ ] **F7-33** `znalezisko` `tooling` Windowsowa ścieżka robi śmieciowy katalog w korzeniu repo
+  Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  `src/lib/production-work-folder.ts:37` trzyma `HARDCODED_FALLBACK` równy
+  `'C:\Users\Hp omen\OneDrive\MARKETPLACE DOCS\Marketing Content'`. Na POSIX to nie jest
+  ścieżka bezwzględna, tylko jedna nazwa pliku z ukośnikami odwrotnymi w środku, więc
+  `mkdirSync(recursive)` zakłada katalog o TAKIEJ nazwie w katalogu roboczym, czyli
+  w korzeniu repozytorium. Potwierdzone: katalog istnieje i ma 59 podkatalogów, rośnie
+  z każdym przebiegiem testów. Git go nie widzi, bo podkatalogi są puste. Literał wiezie
+  też cudzą nazwę konta Windows. Ten sam brak guardu psuje `resolveSafeStagePath`:
+  jego test na wyjście poza korzeń przy korzeniu WZGLĘDNYM sprawdza pozorną własność.
+  CZYTAJ: `src/lib/production-work-folder.ts`, `tests/production-work-folder.test.ts`
+  AC:
+  - `getRoot()` poza Windows nie zwraca literału windowsowego: albo `join(process.cwd(),
+    '.data-local-content')` (wpisane do `.gitignore`), albo wyjątek z prośbą
+    o `MARKETING_CONTENT_ROOT`
+  - `git status --short` po `npm run test` nie pokazuje nowego katalogu, a
+    `ls -d 'C:\Users\Hp omen'*` w korzeniu repo zwraca `No such file or directory`
+  - istniejący śmieciowy katalog usunięty z korzenia repozytorium
+  - negatywne: `npm run test` kod 0, `npm run typecheck` kod 0
+
+- [ ] **F7-34** `znalezisko` `perf` Pomiar stron nie zapisuje, na ilu wierszach był robiony
+  Waga: **ważne**. Szacunek: pół dnia. Znalezione w recenzji końcowej.
+  `scripts/perf/measure-page.mjs` zapisuje p50, p95, bajty i rozmiar bundla, ale ani
+  jednej liczby wierszy, a `scripts/perf/report.mjs` niczego takiego nie sprawdza.
+  Baza pomiarowa tymczasem odjechała od zestawu L z `plan/03` sekcja 2:
+  `node scripts/perf/table-counts.mjs` daje `artists 1180` (specyfikacja 200)
+  i `productions 504` (specyfikacja 500). p95 mierzone po takim dryfie nie są
+  porównywalne z `perf/baseline.json`, a nic tego nie wykrywa. To złamanie Z1 na
+  poziomie przyrządu: pomiar bez zapisanych warunków pomiaru.
+  CZYTAJ: `scripts/perf/measure-page.mjs`, `scripts/perf/report.mjs`,
+  `scripts/perf/table-counts.mjs`, `plan/03-wydajnosc.md` sekcja 2
+  AC:
+  - przebieg `page-*.json` zawiera pole z licznikiem wierszy per tabela
+    (dowód: `jq '.rows' perf/runs/$(ls -t perf/runs | head -1)` zwraca obiekt, nie `null`)
+  - `report.mjs` kończy kodem 1, gdy komplet wierszy nie zgadza się ze specyfikacją
+    zestawu L; dowód: sztuczny przebieg z rozjechanym licznikiem daje kod 1
+  - specyfikacja zestawu L stoi w JEDNYM miejscu w kodzie, nie jest przepisana dwa razy
+  - negatywne: `npm run perf` na zgodnej bazie kończy kodem 0
+
+- [ ] **F7-35** `znalezisko` `perf` `db` Generator zestawu L nie zasiewa nowych kolumn kamerzysty
+  Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej, zależne od F7-32.
+  `scripts/perf/seed-large.ts:253` daje kamerzystom wyłącznie `contact`, mimo że migracja
+  0003 dołożyła `handle`, `email`, `phone`, `location`, `status`, a F7-32 przepisał na te
+  kolumny cały ekran kamerzystów. W bazie pomiarowej: 36 niepustych `contact`, ZERO
+  niepustych `email`, `handle`, `phone`. Skutek: ścieżka kodu z F7-32 nie jest wykonywana
+  ani w pomiarze wydajności, ani w środowisku podglądowym dla zespołu — mierzymy i
+  pokazujemy gałąź zapasową, nie tę, którą zobaczy użytkownik.
+  CZYTAJ: `scripts/perf/seed-large.ts` (linie 235 do 237 pokazują wzorzec dla artystów)
+  AC:
+  - generator wypełnia `handle`, `email` i `phone` kamerzystów tak jak robi to dla artystów
+  - po `tsx scripts/perf/seed-large.ts` zapytanie o liczbę niepustych `email`, `handle`
+    i `phone` na `videographers` zwraca w każdej kolumnie wartość > 0
+  - `/videographers` na bazie pomiarowej pokazuje kontakty z nowych kolumn (zrzut 1280x720)
+  - negatywne: `npm run perf` kod 0, `npm run test` kod 0
+
+- [ ] **F7-36** `znalezisko` `ui` Tysiąc linii komponentów bez ani jednego odbiorcy
+  Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  Pięć plików, razem 1012 linii, nie jest importowanych z niczego w `src/` ani `e2e/`:
+  `src/components/campaigns/milestones-tracker.tsx` (582),
+  `src/components/ui/dropdown-menu.tsx` (268), `src/components/ui/tabs.tsx` (82),
+  `src/components/ui/scroll-area.tsx` (55), `src/components/ui/separator.tsx` (25).
+  Martwy kod jest czytany przy każdej recenzji, liczony w metrykach `'use client'`
+  i podnosi koszt każdej zmiany globalnej (Z4, Z5), nic za to nie dając.
+  CZYTAJ: pięć plików wyżej
+  AC:
+  - `git rm` na wszystkie pięć plików
+  - `grep -rn "milestones-tracker\|ui/dropdown-menu\|ui/tabs\|ui/scroll-area\|ui/separator" src e2e`
+    zwraca `0` trafień
+  - negatywne: `npm run typecheck` kod 0, `npm run test` kod 0, `npm run perf` kod 0
+
+- [ ] **F7-37** `znalezisko` `security` `arch` Akcja serwerowa `saveOutreach` bez wywołania
+  Waga: **drobne**. Szacunek: pół godziny. Znalezione w recenzji końcowej.
+  `src/server/actions/outreach.ts:9` eksportuje `saveOutreach` z dyrektywą `'use server'`,
+  ale nic jej nie woła w `src/` ani `e2e/`. Wyeksportowana akcja serwerowa jest endpointem
+  HTTP niezależnie od tego, czy interfejs jej używa. Ma `requireSession()` i walidację Zod,
+  więc nie jest dziurą — jest powierzchnią bez odbiorcy, czyli kodem, którego nikt nie
+  testuje, a który da się wywołać z sieci.
+  CZYTAJ: `src/server/actions/outreach.ts`, `plan/08-BACKLOG.md` wpis F7-09
+  AC:
+  - albo plik usunięty (`grep -rn "saveOutreach" src e2e` zwraca `0`), albo akcja
+    udokumentowana jako kanał agentowy dokładnie tak jak `createCalendarEntry` w F7-09:
+    komentarz nad eksportem z powodem i wpis w `DECISIONS.md`
+  - negatywne: `npm run typecheck` kod 0, `node scripts/check-trust-boundaries.mjs` kod 0
+
+- [ ] **F7-38** `znalezisko` `ui` Cień pasa ganta wpisany surowym `rgb(`, wbrew Z4
+  Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  Cztery pliki niosą tę samą klasę `shadow-[2px_0_6px_-2px_rgb(0_0_0_/_0.08)]`, czyli
+  twardy kolor `rgb(` plus magiczne piksele:
+  `src/components/calendar/gantt-row-rail.tsx:48`, `src/components/calendar/gantt-header.tsx:76`,
+  `src/components/calendar/gantt-legend.tsx:27`, `src/components/campaigns/gantt-narrative-row.tsx:96`.
+  Z4 wymienia `rgb(` wprost. Osobna część znaleziska: żadna z siedmiu bramek dziś tego nie
+  łapie, więc reguła istnieje wyłącznie w dokumencie.
+  CZYTAJ: `src/app/globals.css`, cztery pliki wyżej, `scripts/check-typography.mjs`
+  AC:
+  - `--shadow-rail` zdefiniowany w `globals.css`, komponenty używają `shadow-(--shadow-rail)`
+  - `grep -rn "rgb(" src/components | wc -l` zwraca `0`
+  - bramka łapie regres: reguła na `rgb(` i `#rrggbb` w skrypcie sprawdzającym, dowód —
+    tymczasowe wstawienie `rgb(0 0 0)` do komponentu daje kod 1
+  - negatywne: wygląd `/calendar` bez zmian (zrzut 1280x720 przed i po,
+    `scripts/perf/pngdiff.mjs` poniżej progu szumu), `npm run test` kod 0
+
+- [ ] **F7-39** `znalezisko` `ui` Strzałki typograficzne zamiast ikon lucide, wbrew Z5
+  Waga: **ważne**. Szacunek: pół dnia. Znalezione w recenzji końcowej.
+  Z5 mówi „ikony wyłącznie z `lucide-react`". Dziewięć miejsc renderuje zamiast tego znak
+  strzałki w tekście widocznym dla użytkownika: `src/components/productions/production-wizard.tsx:241,249`,
+  `src/components/campaigns/campaign-wizard.tsx:170,181`,
+  `src/components/templates/template-form.tsx:532`, `src/app/agents/[slug]/edit/page.tsx:33`,
+  `src/app/campaigns/[id]/page.tsx:111`, `src/app/productions/[id]/page.tsx:216`,
+  `src/app/page.tsx:238`, `src/components/command-palette.tsx:237`.
+  Potwierdzone na uruchomionej aplikacji. `scripts/check-typography.mjs:20` tego nie łapie,
+  bo strzałki siedzą w zakresie Unicode `2190-21FF`, a reguła Z5 skanuje tylko emoji.
+  Dla czytnika ekranu znak strzałki bywa czytany jako słowo, ikona z `aria-hidden` nie jest.
+  CZYTAJ: dziewięć plików wyżej, `scripts/check-typography.mjs`
+  AC:
+  - w każdym z dziewięciu miejsc jest `ArrowLeft` albo `ArrowRight` z `lucide-react`
+    z `aria-hidden`, a nie znak tekstowy
+  - czwarta reguła w `scripts/check-typography.mjs` na `[\u2190-\u21FF]`;
+    `node scripts/check-typography.mjs` kod 0, a po tymczasowym wstawieniu strzałki kod 1
+  - dowód na uruchomionej aplikacji: zrzuty tych ekranów pokazują ikonę w miejscu strzałki
+  - negatywne: `node scripts/a11y-audit.mjs` 0 naruszeń, `npm run test` kod 0
+
+- [ ] **F7-40** `znalezisko` `docs` `perf` Kryterium odhaczonego F2-06 dziś nie jest prawdziwe
+  Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  `plan/08-BACKLOG.md:2015` (F2-06, odhaczone) podaje jako mierzalny dowód
+  `grep -rl "'use client'" src/components | wc -l` równe **50**. Dziś ta sama komenda
+  zwraca **65**. Bundel mieści się w budżecie, więc to nie jest regres wydajności, tylko
+  gorsze: odhaczone issue z kryterium, które przestało być prawdą, i nic tego nie pilnuje.
+  CZYTAJ: `plan/08-BACKLOG.md` wpis F2-06, `perf/budget.json`, `scripts/perf/report.mjs`
+  AC:
+  - albo bramka na liczbę plików klienckich w `npm run perf` (próg w `perf/budget.json`,
+    dowód: podniesienie liczby ponad próg daje kod 1), albo poprawiony DOWÓD w F2-06
+    na wartość aktualną z wypisaniem, które pliki doszły i dlaczego
+  - `grep -n "wc -l\` równe 50" plan/08-BACKLOG.md` zwraca `0`
+  - negatywne: `npm run perf` kod 0
+
+- [ ] **F7-41** `znalezisko` `docs` `perf` `force-dynamic` bez uzasadnień, wbrew kryterium F1-03
+  Waga: **drobne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  `plan/08-BACKLOG.md:374` (F1-03, odhaczone) mówi, że każdy z 26 plików z `force-dynamic`
+  albo traci deklarację, albo ma nad nią komentarz z powodem. Dziś deklaracji jest **29**
+  i ani jedna nie ma komentarza. Trzy nowe przyszły po F1 bez uzasadnienia:
+  `import/osoby`, `videographers`, `campaigns/templates`. Deklaracja bez powodu jest
+  nieusuwalna, bo nikt nie wie, czy wolno.
+  CZYTAJ: `plan/08-BACKLOG.md` wpis F1-03, 29 plików z `grep -rn "force-dynamic" src`
+  AC:
+  - nad każdą deklaracją `force-dynamic` stoi komentarz z powodem albo deklaracja znika
+  - `node -e` / skrypt liczący deklaracje bez komentarza w linii poprzedzającej zwraca `0`
+  - jeżeli decyzja o którejś wymaga usera, powstaje osobne otwarte issue zamiast
+    cichego przemilczenia
+  - negatywne: `npm run typecheck` kod 0, `npm run perf` kod 0
+
+- [ ] **F7-42** `znalezisko` `test` `tooling` Bramki brudzą drzewo robocze zrzutami dowodowymi
+  Waga: **ważne**. Szacunek: godzina. Znalezione w recenzji końcowej.
+  `screenshots/F5/F5-01-logowanie.png`, `screenshots/F5/F5-04-produkcja-dodana.png`
+  i `screenshots/F6/a11y-audit.json` są śledzone przez gita i nadpisywane przy każdym
+  przebiegu bramek (`e2e/f5-scenariusze.spec.ts:19`, `scripts/a11y-audit.mjs:23`).
+  Skutek: uruchomienie bramek zmienia drzewo robocze, więc `git status` przestaje
+  odpowiadać na pytanie „czy coś zmieniłem", a przypadkowe `git add -A` wciąga do commita
+  szum pomiarowy. Zrzut dowodowy ma być artefaktem świadomym, nie efektem ubocznym.
+  CZYTAJ: `e2e/f5-scenariusze.spec.ts`, `scripts/a11y-audit.mjs`, `.gitignore`
+  AC:
+  - domyślnie zrzuty i `a11y-audit.json` lądują w `test-results/` (już ignorowanym),
+    do `screenshots/` tylko przy `UPDATE_SHOTS=1`
+  - dowód: `npx playwright test` i `node scripts/a11y-audit.mjs` na czystym drzewie,
+    potem `git status --short` zwraca **pustkę**
+  - `UPDATE_SHOTS=1` nadal aktualizuje pliki w `screenshots/` (dowód: zmieniony `mtime`)
+  - negatywne: `npx playwright test` 22 zielone i 1 pominięty, `node scripts/a11y-audit.mjs`
+    0 naruszeń
+
+- [ ] **F7-43** `znalezisko` `perf` `tooling` Dryf ostrzega także wtedy, gdy jest szybciej
+  Waga: **drobne**. Szacunek: pół godziny. Znalezione w recenzji końcowej.
+  `scripts/perf/drift.mjs` liczy `Math.abs(pct)`, więc do listy dryfu trafia również
+  POPRAWA, a `report.mjs` wypisuje ją słowem `ostrzeżenie`
+  (zaobserwowane: `hmrMs 1961 -> 466 (-76%)`). Ostrzeżenie o tym, że jest szybciej, uczy
+  czytelnika przewijać całą sekcję, a wtedy prawdziwe ostrzeżenie też przepada.
+  CZYTAJ: `scripts/perf/drift.mjs`, `scripts/perf/report.mjs`, `scripts/perf/drift-selftest.mjs`
+  AC:
+  - zmiana ujemna wypisuje się jako `poprawa`, słowo `ostrzeżenie` zostaje wyłącznie
+    dla znaku dodatniego; blokada nadal wyłącznie dla dodatniego
+  - dowód: `node scripts/perf/drift-selftest.mjs` kod 0, a `npm run perf` na przebiegu
+    z poprawą pokazuje `poprawa`, nie `ostrzeżenie`
+  - negatywne: `npm run perf` kod 0, próg blokujący zachowuje się jak przed zmianą
+
 ---
 
 ## F8 — Bramka decyzyjna (pętla STAJE przed tą fazą i pyta usera)
