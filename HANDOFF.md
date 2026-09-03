@@ -59,6 +59,17 @@ nieplanowana).
 do bazy roboczej bez ręcznego przestawiania kolumn. Zostały z tego dwie decyzje dla
 usera: `F7-44` (wiersze bez imienia) i `F7-45` (status twórcy bez kolumny w bazie).
 
+`BLOCKED-ASK-USER: wdrożenie na produkcję` — user zgodził się na push, ale wdrożenie
+NIE wykonuje migracji (`build` to samo `next build`), a baza produkcyjna nie ma ani
+`0003` (sześć kolumn kamerzysty), ani `0004` (status twórcy). Bez nich `/artists`
+i `/videographers` wywalą się na nieistniejących kolumnach. Przed pushem na `main`
+trzeba wykonać `DATABASE_URL=<adres produkcyjny> npm run db:migrate`; obie migracje są
+addytywne, zero DROP, odwracalne. Brakuje `DATABASE_URL` produkcji. Wariant bez ryzyka:
+push na gałąź roboczą zamiast `main` daje wdrożenie podglądowe. Repozytorium jest 116
+commitów przed `origin/main` (`github.com/maciejsachse0-source/Marketing-dashboard-manager`),
+wdrożenie produkcyjne odpala się automatycznie z `main`, a orkiestrator nie ma dostępu
+do tamtego konta Vercela, więc nie zobaczy wyniku wdrożenia.
+
 `BLOCKED-ASK-USER: F5-04` — publiczny adres środowiska podglądowego. Środowisko działa
 lokalnie i w sieci lokalnej. Wybór: `tailscale funnel` (zajmuje port 443, na którym stoi
 vibe-kanban) albo hosting (wymaga wypchnięcia repozytorium poza tę maszynę, a w historii
