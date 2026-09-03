@@ -1161,3 +1161,33 @@ Razem z komponentem zniknęła akcja serwerowa `getProductionByEntryId`: to był
 jedyny wywołujący, a każda akcja serwerowa jest publicznym punktem wejścia, który
 trzeba pilnować (`scripts/check-trust-boundaries.mjs`, 74 punkty przed, 73 po).
 Powrót jest tani: kod siedzi w historii gita, commit `F7-26`.
+
+
+## F7-28 — próg 300 ms mierzy się tylko na budowaniu produkcyjnym
+
+`e2e/gantt-filter.spec.ts` sprawdzał medianę przemalowania ganta przeciwko progowi
+300 ms na tym, co akurat stało na porcie 3000. Zmierzone na tej samej maszynie
+i tych samych danych (zestaw L, baza `marketing_perf`):
+
+| serwer | próbki | mediana | wynik |
+|---|---|---|---|
+| `npm run dev` (`next dev`) | 306, 309, 313 ms | 309 ms | czerwony |
+| `npm run perf:serve` (`next build` + `next start`) | 195, 92, 92 ms | 92 ms | zielony |
+
+Różnica nie jest regresją aplikacji, tylko kosztem kodu bez optymalizacji. Bramka,
+która zapala się na czerwono zależnie od tego, kto podniósł serwer, jest gorsza
+niż jej brak, bo uczy ignorowania czerwonego.
+
+Decyzja: pomiar biegnie **wyłącznie na budowaniu produkcyjnym**. `/api/health`
+oddaje teraz `dev` (`process.env.NODE_ENV !== 'production'`), a scenariusz robi
+`test.skip` z komunikatem mówiącym wprost, co podnieść, żeby zmierzyć.
+Nie wybraliśmy wariantu „scenariusz sam robi `next build`", bo budowanie trwa
+ok. 90 s i doliczałoby się do każdego przebiegu `npx playwright test`, który dziś
+zamyka się w 1,6 min.
+
+Skutek uboczny, świadomy: pełny przebieg na bazie testowej (serwer deweloperski
+z `scripts/e2e-serve.mjs`) pokazuje ten scenariusz jako **pominięty**, nie zielony.
+Żeby go zmierzyć: `npm run perf:serve` w jednym terminalu i
+`E2E_EXPECTED_DB=marketing_perf npx playwright test e2e/gantt-filter.spec.ts`
+w drugim. Sprawdzone 2026-09-03, że bramka nadal potrafi zapalić się na czerwono:
+sztuczny koszt 120 ms na klatkę podniósł medianę do 1277 ms i scenariusz padł.

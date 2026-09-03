@@ -13,10 +13,17 @@ export const dynamic = 'force-dynamic';
  * za `getSessionEmail`, bo sama nazwa bazy nie jest sekretem, ale nie ma powodu
  * rozdawać jej komukolwiek. Nazwa czytana z `DATABASE_URL`, bez zapytania do bazy —
  * to ma być tani znacznik, nie kolejny odczyt.
+ *
+ * F7-28: razem z bazą oddaje `dev` — czy to `next dev` (kod bez optymalizacji),
+ * czy `next start`. Scenariusze wydajnościowe pomijają pomiar na serwerze
+ * deweloperskim, bo mierzyłyby narzędzie, nie aplikację.
  */
 export async function GET() {
   if (!(await getSessionEmail())) {
     return Response.json({ error: 'brak sesji' }, { status: 401 });
   }
-  return Response.json({ db: new URL(env.DATABASE_URL).pathname.slice(1) });
+  return Response.json({
+    db: new URL(env.DATABASE_URL).pathname.slice(1),
+    dev: process.env.NODE_ENV !== 'production',
+  });
 }

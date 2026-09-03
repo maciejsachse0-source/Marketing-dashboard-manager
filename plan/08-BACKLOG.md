@@ -2625,7 +2625,7 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
     z tą samą datą docelową przesuwa `t0At` tylko raz
   - negatywne: `npm run test` kod 0, `npx playwright test` 22 zielone
 
-- [ ] **F7-28** `znalezisko` `tooling` Próg 300 ms w `gantt-filter.spec.ts` mierzy serwer deweloperski
+- [x] **F7-28** `znalezisko` `tooling` Próg 300 ms w `gantt-filter.spec.ts` mierzy serwer deweloperski
   Znalezione przy F7-05, gdy pełny przebieg `npx playwright test` dał `21 passed, 1 failed`.
   `e2e/gantt-filter.spec.ts:119` sprawdza `median < 300` dla przemalowania gantu po zmianie
   filtra kampanii. `reuseExistingServer: true` sprawia, że test bierze serwer stojący na
@@ -2637,6 +2637,15 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   (sprzed całej paczki) na serwerze deweloperskim dał 316, 333 i 301 ms, czyli tak samo
   czerwono. Test jest więc zielony albo czerwony zależnie od tego, co akurat stoi na
   porcie 3000, i przy medianie ocierającej się o próg potrafi przejść raz na kilka razy.
+  ZROBIONE 2026-09-03. `/api/health` oddaje `dev`, scenariusz robi `test.skip`
+  z komunikatem „uruchom `npm run perf:serve`". Dowody: przy `npm run dev` na porcie
+  3000 `E2E_EXPECTED_DB=marketing npx playwright test e2e/gantt-filter.spec.ts`
+  kończy się `1 skipped`, kod 0. Na `npm run perf:serve` ten sam scenariusz mierzy
+  i przechodzi (próbki 195, 92, 92 ms, mediana **92 ms**). Bramka nadal potrafi
+  zapalić się na czerwono: sztuczny koszt 120 ms na klatkę dał próbki 1277, 1390,
+  1015 ms i `1 failed`. Liczby z obu środowisk i uzasadnienie wariantu w `DECISIONS.md`.
+  Skutek uboczny opisany tamże: pełny przebieg na bazie testowej pokazuje ten
+  scenariusz jako pominięty (22 zielone + 1 pominięty + F7-27 = 23 wyniki).
   Waga: **ważne** (bramka, która kłamie w obie strony, jest gorsza niż jej brak).
   Szacunek: godzina.
   AC:

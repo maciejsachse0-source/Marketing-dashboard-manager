@@ -13,6 +13,11 @@ import { mkdirSync, writeFileSync } from 'node:fs';
  *
  * Zestaw L: uruchom `npm run perf:serve` (produkcyjny serwer na bazie
  * pomiarowej) i puść `npx playwright test e2e/gantt-filter.spec.ts`.
+ *
+ * F7-28: pomiar biegnie WYŁĄCZNIE na budowaniu produkcyjnym. Na `next dev`
+ * mediana wychodziła 306-313 ms przy progu 300 ms (na `next start`: 116-139 ms),
+ * więc bramka zapalała się na czerwono zależnie od tego, co akurat stoi na
+ * porcie 3000. Serwer deweloperski rozpoznajemy po polu `dev` z `/api/health`.
  */
 
 const EMAIL = process.env.AUTH_EMAIL;
@@ -73,6 +78,16 @@ test('zmiana filtra kampanii przemalowuje gant poniżej progu', async ({ page })
   expect(PASSWORD, 'AUTH_PASSWORD musi być w .env.local').toBeTruthy();
 
   await login(page);
+
+  const health = await page.request.get('/api/health');
+  const { dev } = (await health.json()) as { dev?: boolean };
+  test.skip(
+    dev !== false,
+    'Pomiar przemalowania ganta ma sens tylko na budowaniu produkcyjnym. ' +
+      'Na porcie 3000 stoi `next dev` (kod bez optymalizacji, mediana ~310 ms ' +
+      'przy progu 300 ms). Uruchom `npm run perf:serve` i powtórz.',
+  );
+
   await page.goto('/calendar?view=week');
   const select = page.locator('select[title^="Wybierz kampanię"]');
   await expect(select).toBeVisible({ timeout: 30_000 });
