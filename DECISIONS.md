@@ -918,3 +918,45 @@ medianą p50 z trzech przebiegów przed i trzech po: największa zmiana to 2 pro
 Mierzone p50, nie p95, bo p95 na `/calendar` skacze w dziewięciu kolejnych przebiegach
 między 70,7 a 94,6 ms przy p50 stabilnym w przedziale 67,8 do 71,5 ms — to ogon szumu
 maszyny, a nie sygnał.
+
+## F7-11 — Cache Components odrzucone drugi raz, tym razem z sufitem zysku (2026-09-03)
+
+**Dyspozycja: świadomie odrzucone.** Nie dlatego, że pomiar znowu utonął w szumie,
+tylko dlatego, że sufit możliwego zysku jest niższy niż próg z kryterium akceptacji.
+
+Kryterium F7-11 żąda poprawy p95 o co najmniej 10 procent **na dwóch ścieżkach**:
+`/templates` i `/agents`. Cache Components może usunąć z żądania dokładnie tyle,
+ile kosztują odczyty katalogów z bazy. Zmierzone `\timing` w `psql` na
+`marketing_perf` (kontener `mc-pg`):
+
+| zapytanie | wierszy | czas |
+|---|---|---|
+| `select * from production_templates` | 5 | 1,085 ms |
+| `select * from marketing_templates` | 5 | 0,623 ms |
+| `select * from agents` | 6 | 0,412 ms |
+
+Mediana p95 z trzech przebiegów `measure-page.mjs` na budowaniu produkcyjnym:
+`/templates` **9,6 ms** (przebiegi 10,5 / 9,1 / 9,6), `/agents` **8,5 ms**
+(8,5 / 5,9 / 8,6).
+
+Stąd sufit: na `/agents` cały odczyt katalogu to **0,412 ms z 8,5 ms, czyli 4,8
+procent**. Nawet cache idealny, o zerowym koszcie, daje mniej niż połowę progu
+z kryterium. Ścieżka `/agents` nie może przejść kryterium w żadnym wariancie
+implementacji. Na `/templates` sufit to 1,7 ms, czyli 18 procent, ale próg 10 procent
+to 0,96 ms, a rozrzut samego p95 między trzema przebiegami wynosi 1,4 ms — zysk
+mieściłby się w szumie, więc byłby nie do odróżnienia od jego braku.
+
+**Koszt po drugiej stronie tej wagi jest znany z F1-03 i nie jest hipotetyczny:**
+`cacheComponents: true` wymusza skasowanie 26 deklaracji `export const dynamic`
+(bez wariantu „zostaje z komentarzem" — build przerywa), zdjęcie `export const runtime`
+z dwóch tras API, `<Suspense>` wokół `<Sidebar>` i `await connection()` przed zegarem
+w `src/app/page.tsx`, plus zamianę unieważniania na `updateTag` we wszystkich
+mutacjach dotykających katalogów. Do tego pomiar z F1-03 pokazał na `campaign-detail`
+**pogorszenie o 11 procent**. Zamiana architektury renderowania całej aplikacji za
+zysk, którego na jednej z dwóch wymaganych ścieżek nie da się osiągnąć nawet
+teoretycznie, jest złym interesem.
+
+**Kiedy to wrócić.** Gdy dojdzie zdalna baza (RTT rzędu dziesiątek ms zamiast
+ułamka ms) albo katalog urośnie o dwa rzędy wielkości — wtedy odczyt przestaje być
+4,8 procent żądania i pomiar ma co pokazać. Przepis techniczny leży we wpisie F1-03
+i pozostaje ważny.

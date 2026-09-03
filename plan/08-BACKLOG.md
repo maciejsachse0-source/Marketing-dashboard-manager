@@ -2012,7 +2012,7 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   **Odblokowuje F7-11**: katalogi w bazie pomiarowej są niepuste, a obie strony,
   które je renderują, mają zmierzone „przed".
 
-- [ ] **F7-11** `znalezisko` `perf` `arch` Cache Components: wrócić do P3 na danych, które istnieją
+- [x] **F7-11** `znalezisko` `perf` `arch` Cache Components: wrócić do P3 na danych, które istnieją
   Waga: **drobne**. Szacunek: pół dnia. **Zależy od F7-10.**
   Krok P3 (issue F1-03) został cofnięty zgodnie z własnym kryterium, bo żadna
   z siedmiu mierzonych ścieżek nie poprawiła się o 10%. Droga techniczna jest
@@ -2028,6 +2028,20 @@ do `handle` i `email` (F4-00), ewentualne pozostałości `customSteps` poza gant
   - pomiar przed i po na `/templates` i `/agents`; poprawa co najmniej 10% p95
     na dwóch ścieżkach albo ponowne cofnięcie z wpisem w `DECISIONS.md`
   - negatywne: `e2e/stale-data.spec.ts` zielony
+  **DYSPOZYCJA: ŚWIADOMIE ODRZUCONE (2026-09-03).** Powód nie brzmi „utonęło w szumie",
+  tylko „sufit zysku jest niższy niż próg kryterium". Zmierzone `\timing` w `psql`
+  na `marketing_perf`: `production_templates` 1,085 ms, `marketing_templates` 0,623 ms,
+  `agents` **0,412 ms**. Mediana p95 z trzech przebiegów `measure-page.mjs` na budowaniu
+  produkcyjnym: `/templates` 9,6 ms (10,5 / 9,1 / 9,6), `/agents` 8,5 ms (8,5 / 5,9 / 8,6).
+  Czyli na `/agents` cały odczyt katalogu to **4,8 procent żądania** — cache o zerowym
+  koszcie daje mniej niż połowę wymaganych 10 procent, więc kryterium „poprawa na dwóch
+  ścieżkach" jest nieosiągalne w żadnym wariancie implementacji. Na `/templates` sufit
+  to 18 procent, ale próg 0,96 ms leży wewnątrz rozrzutu p95 między przebiegami (1,4 ms).
+  Koszt drugiej strony jest znany z F1-03: 26 skasowanych `export const dynamic`,
+  `<Suspense>` wokół `<Sidebar>`, `await connection()`, `updateTag` we wszystkich
+  mutacjach katalogów oraz zmierzone tam pogorszenie `campaign-detail` o 11 procent.
+  Pełne uzasadnienie i warunek powrotu (zdalna baza albo katalog większy o dwa rzędy
+  wielkości) w `DECISIONS.md`, wpis „F7-11".
 
 - [ ] **F7-12** `znalezisko` `ui` Martwy kod w gancie: dwie funkcje i dwa importy bez odbiorcy
   Waga: **drobne**. Szacunek: 15 minut. Znalezione przy F2-01.
