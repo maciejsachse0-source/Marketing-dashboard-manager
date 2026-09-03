@@ -45,7 +45,13 @@ export function ImportMapping({
 
   return (
     <div className="grid gap-3">
-      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      {/* Poniżej 768 px tabela mapowania przechodzi w listę kart, jedna kolumna
+          arkusza na kartę (plan/04 sekcja 6). Ten sam DOM, inne wyświetlanie —
+          bez dublowania pól, żeby etykiety `aria-label` zostały unikalne. */}
+      <div
+        data-testid="import-mapping-karty"
+        className="overflow-x-auto rounded-lg border border-border bg-card max-md:border-0 max-md:bg-transparent max-md:[&_table]:block max-md:[&_tbody]:block max-md:[&_td]:block max-md:[&_td]:w-full max-md:[&_td]:border-0 max-md:[&_td]:px-0 max-md:[&_td]:py-1 max-md:[&_thead]:hidden max-md:[&_tr]:mb-2 max-md:[&_tr]:block max-md:[&_tr]:rounded-lg max-md:[&_tr]:border max-md:[&_tr]:border-border max-md:[&_tr]:bg-card max-md:[&_tr]:p-3"
+      >
         <Table>
           <TableHeader>
             <TableRow>

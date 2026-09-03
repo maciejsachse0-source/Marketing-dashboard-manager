@@ -1,0 +1,21 @@
+{
+  "zlyFormat": [
+    {
+      "testid": "import-file-error",
+      "tekst": "Ten format nie jest obsługiwany. Wgraj plik xlsx",
+      "ikona": true
+    }
+  ],
+  "kolizja": [
+    {
+      "testid": "import-mapping-conflict",
+      "tekst": "Email: E-mail, Uwagi. Jedno pole może pochodzić tylko z jednej kolumny.",
+      "ikona": true
+    }
+  ],
+  "kolizjaDalej": true,
+  "obwodka": {
+    "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.62 -0.0618033 -0.190211 / 0.418568) 0px 0px 0px 2.51141px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+    "borderColor": "oklab(0.665602 -0.0521593 -0.160806)"
+  }
+}

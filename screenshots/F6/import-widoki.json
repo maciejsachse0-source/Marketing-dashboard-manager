@@ -1,0 +1,31 @@
+{
+  "pustyKomunikat": "Arkusz nie zawiera wierszy z danymi",
+  "dalejZablokowany": true,
+  "kartyUklad": {
+    "thead": "none",
+    "tr": "block",
+    "td": "block",
+    "trBorder": "1px",
+    "szerokoscOkna": 375
+  },
+  "tabelaUklad": {
+    "thead": "table-header-group",
+    "tr": "table-row"
+  },
+  "import-pasek-postepu-normalny": {
+    "tekst": "Zapisuję, paczka 3 z 10",
+    "szerokosc": "277.797px",
+    "transitionDuration": "0.15s",
+    "animationName": "none",
+    "spinnerAnimacja": "spin",
+    "reduceMatch": false
+  },
+  "import-pasek-postepu-reduced-motion": {
+    "tekst": "Zapisuję, paczka 3 z 10",
+    "szerokosc": "277.797px",
+    "transitionDuration": "0.001s",
+    "animationName": "none",
+    "spinnerAnimacja": "none",
+    "reduceMatch": true
+  }
+}

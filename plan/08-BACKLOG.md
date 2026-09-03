@@ -1428,7 +1428,7 @@ userowi.
 
 ## F6 — Polish: dostępność, bezpieczeństwo, domknięcie dokumentacji
 
-- [ ] **F6-01** `ui` Audyt dostępności
+- [x] **F6-01** `ui` Audyt dostępności
   CZYTAJ: `plan/05-ui-system.md` sekcje 3 i 4, `plan/04` sekcja 6
   AC:
   - przejście klawiaturą przez `/calendar`, `/productions/list`, `/import/osoby` osiąga
@@ -1442,6 +1442,47 @@ userowi.
     (zaimplementowane albo świadomie skreślone; sprawdzasz to, co ustalono, nie to,
     co było w pierwotnej tabeli)
   - negatywne: żaden komunikat o błędzie nie jest przekazywany wyłącznie kolorem
+  DOWÓD (2026-09-03): audyt na URUCHOMIONEJ aplikacji, `node scripts/a11y-audit.mjs`
+  (serwer deweloperski na 3000, logowanie parą z `.env.local`), wynik `RAZEM naruszeń: 0`,
+  surowe dane w `screenshots/F6/a11y-audit.json`. Przejście Tabem osiąga KAŻDY widoczny
+  element akcji: `/calendar` 1544 z 1544, `/productions/list` 88 z 88, `/import/osoby`
+  24 z 24; zero elementów bez obwódki ogniskowania (kryterium: niezerowy `outline`
+  albo `box-shadow`, bo Tailwind `ring-*` renderuje pierścień jako cień). Zmierzona
+  obwódka na guziku „Dziś" w kalendarzu: `box-shadow ... 0px 0px 0px 2.51141px`,
+  `border-color oklab(0.665602 -0.0521593 -0.160806)`, zrzut
+  `screenshots/F6/ognisko-kalendarz-dzis.png`, dane `bledy-i-ognisko.json`.
+  Zero guzików bez tekstu i bez nazwy (`aria-label`, `title`, `aria-labelledby`)
+  na wszystkich trzech stronach. Obszar dotyku: baza `buttonVariants` dostała
+  `pointer-coarse:after:*` z `min-h-11 min-w-11` (halo 44 x 44 px pseudoelementem
+  `::after`, wyłącznie na wskaźniku gruboziarnistym — na myszy zabierałoby kliknięcia
+  sąsiadom w gęstym pasku ganta). Pomiar w drugiej karcie Playwrighta z `hasTouch`
+  i `isMobile` (w Chromium daje `pointer: coarse`; CDP `Emulation.setEmulatedMedia`
+  z cechą `pointer` NIE działa — sprawdzone, `matchMedia` zwracało `false`):
+  przed zmianą 1400 / 308 / 3 guziki poniżej 44 px, po zmianie 0 / 0 / 0.
+  Wiersze prezentacyjne z `plan/04` sekcja 6, dane w `screenshots/F6/import-widoki.json`:
+  (1) stan pusty arkusza — komunikat „Arkusz nie zawiera wierszy z danymi", guzik „Dalej"
+  `disabled=true`, zrzut `import-pusty-arkusz.png`; (2) poniżej 768 px tabela mapowania
+  jest listą kart — przy oknie 375 px `thead: none`, `tr: block` z ramką `1px`,
+  `td: block`, zrzut `import-mapowanie-karty-375.png`, a przy 1280 px zostaje tabelą
+  (`thead: table-header-group`, `tr: table-row`), zrzut `import-mapowanie-tabela-1280.png`;
+  (3) pasek postępu bez animacji przy `prefers-reduced-motion` — `transition-duration`
+  `0.001s` wobec `0.15s` bez preferencji, `animation-name: none`, wirująca ikona guzika
+  `animation-name: none` wobec `spin`, zrzuty `import-pasek-postepu-reduced-motion.png`
+  i `import-pasek-postepu-normalny.png` (strumień NDJSON zapisu podstawiony w przeglądarce,
+  do bazy nie poszedł ani jeden wiersz). Zachowanie przy `prefers-reduced-motion` zgodne
+  z rozstrzygnięciem F3-01 z `DECISIONS.md` (globalna reguła w `globals.css` plus
+  `motion-reduce:animate-none` na ikonie) — zmierzone liczby są dokładnie te, które
+  tam zapisano. Negatywne: oba komunikaty o błędzie ekranu importu niosą treść tekstową
+  i ikonę, nie sam kolor — zły format pliku „Ten format nie jest obsługiwany. Wgraj plik
+  xlsx" (`svg` obecny), kolizja mapowania „Email: E-mail, Uwagi. Jedno pole może pochodzić
+  tylko z jednej kolumny." (`svg` obecny, guzik „dalej" zablokowany), zrzuty
+  `blad-zly-format.png` i `blad-kolizja-mapowania.png`. Tabela w `plan/05` sekcja 4
+  zaktualizowana (wiersz „Ekran dotykowy" przeniesiony z „do sprawdzenia" na „jest").
+  Znalezisko: nawigacja w pasku bocznym to `<a>`, więc halo jej nie obejmuje —
+  dopisane jako **F7-25**. Bramki: `npm run typecheck` 0, `npm run lint` 0 błędów
+  (108 ostrzeżeń), `npm run test` 193 zielone, `npx playwright test` 22 zielone,
+  `node scripts/check-typography.mjs` 0, `npm run perf` 0 (bundel `/calendar`
+  292,6 kB przy progu 301,6 kB), `node scripts/perf/drift-selftest.mjs` 0.
 
 - [ ] **F6-02** `security` Przegląd granic zaufania
   CZYTAJ: `plan/01` zasady Z13 i Z14
@@ -1876,6 +1917,24 @@ odrzucone z powodem, albo przeniesione do trackera zewnętrznego z linkiem.
   - lista produkcji pokazuje tytuł każdej produkcji, nie tylko w nagłówku grupy
     (dowód: zrzut listy z dwiema produkcjami tego samego artysty, obie rozróżnialne)
   - negatywne: `npm run perf` kod 0, bundel `/calendar` bez wzrostu powyżej progu
+
+- [ ] **F7-25** `znalezisko` `ui` Odnośniki nawigacji poniżej 44 px obszaru dotyku
+  Znalezione przy F6-01. Halo 44 x 44 px dostały guziki komponentu `Button`
+  (`pointer-coarse:after:*` w `src/components/ui/button.tsx`), ale nawigacja w pasku
+  bocznym to zwykłe `<a>` z `src/components/sidebar.tsx`, które halo omija. Zmierzone
+  na `pointer: coarse` (`node scripts/a11y-audit.mjs` przed zawężeniem sprawdzenia do
+  `[data-slot="button"]`): pozycje główne 215 x 36 px, podpozycje 178 x 31 px, odnośniki
+  agentów 215 x 24 px, logo 148 x 36 px. Na ekranie dotykowym to poniżej zalecanych
+  44 px w pionie. Nie naprawiane w F6-01, bo kryterium tego issue mówi wprost
+  o rozmiarach guzika (`xs`, `sm`, `icon-xs`, `icon-sm`), a nie o nawigacji.
+  Waga: **drobne**. Szacunek: godzina.
+  AC:
+  - odnośniki nawigacji na `pointer: coarse` mają co najmniej 44 px wysokości obszaru
+    dotyku (dowód: `node scripts/a11y-audit.mjs` po rozszerzeniu sprawdzenia z punktu 4
+    na `a[href]` zwraca zero naruszeń)
+  - układ paska bocznego na myszy bez zmian (dowód: porównanie zrzutów
+    `scripts/perf/pngdiff.mjs` poniżej progu szumu 1 680 px)
+  - negatywne: `npx playwright test` nadal 22 zielone
 
 ---
 

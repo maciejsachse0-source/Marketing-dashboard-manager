@@ -87,8 +87,9 @@ Rozmiary, z faktycznymi wysokościami z klas Tailwind (nie zmyślaj innych):
 
 Guzik bez widocznego tekstu bez `aria-label` jest błędem dostępności i nie przechodzi
 przeglądu. Rozmiary `xs`, `sm`, `icon-xs`, `icon-sm` są mniejsze niż zalecane 44 px
-obszaru dotyku, więc na ekranach dotykowych wymagają wypełnienia zewnętrznego wokół
-elementu; sprawdzane w F6-01.
+obszaru dotyku, więc na ekranach dotykowych dostają wypełnienie zewnętrzne wokół
+elementu: pseudoelement `::after` (`pointer-coarse:after:min-h-11 min-w-11`) w bazie
+`buttonVariants`. Sprawdzone w F6-01 skryptem `scripts/a11y-audit.mjs`.
 
 ## 4. Tabela zdarzeń dla wzorca guzika (S3)
 
@@ -104,7 +105,7 @@ kryteria akceptacji wymagałyby zachowania, którego nikt nie planuje zbudować.
 | Stan zablokowany | Krycie 0.5, brak reakcji na wskaźnik (`disabled:pointer-events-none`) | jest |
 | Wejście niepoprawne | `aria-invalid` zmienia obramowanie i pierścień na destrukcyjne | jest |
 | **Stan pracy (`loading`)** | Ikona wirująca przed tekstem, tekst zachowany, guzik zablokowany, `aria-busy="true"` | **jest** (F3-01). Szerokość rośnie o ikonę i odstęp; blokowanie szerokości wymagałoby ukrycia tekstu albo pomiaru, uzasadnienie w `DECISIONS.md` |
-| Ekran dotykowy | Obszar dotyku co najmniej 44 × 44 px, uzyskiwany wypełnieniem wokół guzika przy rozmiarach poniżej 36 px | do sprawdzenia w F6-01 |
+| Ekran dotykowy | Obszar dotyku co najmniej 44 × 44 px, uzyskiwany wypełnieniem wokół guzika przy rozmiarach poniżej 44 px | **jest** (F6-01): pseudoelement `::after` z `min-h-11 min-w-11` pod wariantem `pointer-coarse:`, czyli wyłącznie na wskaźniku gruboziarnistym. Na myszy halo zabierałoby kliknięcia sąsiadom w gęstych paskach. Zmierzone: `node scripts/a11y-audit.mjs` — zero guzików poniżej 44 px na `/calendar`, `/productions/list`, `/import/osoby` |
 | `prefers-reduced-motion` | Brak przejścia tła i brak wirowania, zmiana stanu natychmiastowa | **jest**: regułą globalną w `globals.css` (`transition-duration: 1ms !important` dla `*`) plus `motion-reduce:animate-none` na wirującej ikonie. Zmierzone w przeglądarce: przejście 0,001 s, `animation-name: none` |
 
 ## 5. Anty-spec
