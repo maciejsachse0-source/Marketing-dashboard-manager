@@ -63,3 +63,8 @@ next-env.d.ts
 
 # perf: wyniki przebiegow sa lokalne, baseline i budzet ida do repo
 /perf/runs/
+
+# import: arkusze poza gitem (zasada Z14). Fixture jest generowany deterministycznie
+# przez `npx tsx scripts/make-fixture-xlsx.ts`, wiec nie ma powodu trzymac go w repo.
+/tests/fixtures/*.xlsx
+/.data-import/

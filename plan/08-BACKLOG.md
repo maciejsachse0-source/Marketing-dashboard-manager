@@ -1484,7 +1484,7 @@ userowi.
   `node scripts/check-typography.mjs` 0, `npm run perf` 0 (bundel `/calendar`
   292,6 kB przy progu 301,6 kB), `node scripts/perf/drift-selftest.mjs` 0.
 
-- [ ] **F6-02** `security` Przegląd granic zaufania
+- [x] **F6-02** `security` Przegląd granic zaufania
   CZYTAJ: `plan/01` zasady Z13 i Z14
   AC:
   - każdy handler w `src/app/api/` i każda akcja serwerowa waliduje wejście schematem
@@ -1497,6 +1497,54 @@ userowi.
     żadne 500
   - negatywne: `git diff --stat package.json` od początku przebudowy pokazuje jedyną
     nową zależność produkcyjną `exceljs`
+  DOWÓD (2026-09-03): lista wszystkich punktów wejścia ze schematem przy każdym powstaje
+  komendą `node scripts/check-trust-boundaries.mjs` (nowy skrypt; wypisuje 4 handlery
+  z `src/app/api/` i 69 eksportowanych akcji serwerowych, razem **73 punkty wejścia**,
+  „Bez schematu mimo argumentów: 0", kod 0). Przed zmianą bez schematu było 40 akcji
+  (m.in. cały `production-steps.ts`, wszystkie kamienie milowe w `campaigns.ts`,
+  `updatePostMetrics`, `deleteArtist`, `openProductionFolder`, `uploadProductionAttachment`,
+  `deleteAgent`, `deleteTemplate`) oraz handler `POST /api/csv`. Dołożone: prymitywy
+  `idSchema`, `opaqueIdSchema`, `slugSchema`, `labelSchema`, `descriptionSchema`,
+  `isoDateSchema`, `markModeSchema`, `moveDirectionSchema`, `uploadedFileSchema(maxBytes)`,
+  `postMetricsSchema`, `productionFilterSchema` w `src/server/actions/schemas.ts` plus
+  `milestonePatchSchema` w `campaigns.ts` i `zapytanieSchema` w `src/app/api/csv/route.ts`
+  (ten ostatni sprawdza teraz też parametr `dryRun`, nazwę i rozmiar pliku). `slugSchema`
+  wycina ukośnik i kropkę, więc slug nie wyjdzie z katalogu `data/agents/`
+  ani `data/templates/`. Nowy test `src/server/actions/schemas.test.ts` (23 scenariusze)
+  strzela do prymitywów złym wejściem: `../etc/passwd`, `a/b`, `kropka.json`, `id = 0`,
+  `id = -1`, `id = 1.5`, `NaN`, `Infinity`, `mode = 'drop'`, `direction = 'left'`,
+  data `jutro`, plik o rozmiarze 0 i ponad limit — wszystkie odrzucone.
+  OSTRZAŁ NA URUCHOMIONEJ APLIKACJI (serwer deweloperski, ciasteczko sesji z logowania
+  Playwrightem, `curl`): `POST /api/csv` bez pliku → 400 `Missing file`;
+  `POST /api/csv?dryRun=zle` z poprawnym plikiem → 400 `Nieprawidłowe parametry żądania`
+  (przed zmianą przechodziło jako `dryRun=false`); `POST /api/upload` z
+  `category=../../etc` → 400 `Invalid category`; `POST /api/import/people` z plikiem CSV →
+  400 `Ten format nie jest obsługiwany. Wgraj plik xlsx`; `POST /api/import/people/save`
+  z ciałem `{"role":"kot","policy":"x","mapping":[1],"rows":"nie tablica"}` → 400
+  `Nieprawidłowe dane importu`; ten sam upload bez ciasteczka → 307 na
+  `/login?next=%2Fapi%2Fimport%2Fpeople`; `.xlsx` wysłany na `/api/csv` → 400
+  `Could not detect CSV source`. Zero odpowiedzi 500.
+  PARAMETRY URL: osiem żądań `curl` z sesją, wartości niepoprawne, żadnego 500 —
+  `/calendar?week=nie-data` 200, `/calendar?view=<script>&weeks=-99` 200,
+  `/calendar?mode=../../etc/passwd` 200, `/calendar?campaign=abc&sort=DROP%20TABLE` 200,
+  `/productions/list?type=999&status=%00` 200, `/productions/99999999` 404,
+  `/productions/abc` 404, `/campaigns/-1` 404.
+  SEKRETY I DANE OSOBOWE: `git ls-files | grep -E '\.env|\.xlsx|\.db$' | grep -v
+  '^\.env\.example$' | wc -l` zwraca **0**. Przed zmianą zwracało **1** i był to
+  `tests/fixtures/osoby.xlsx` — syntetyczny fixture dodany w F4, więc nie wyciek danych,
+  ale mimo to arkusz w repozytorium wbrew Z14. Rozwiązanie: plik wypisany z gita
+  (`git rm --cached`), wzorzec `/tests/fixtures/*.xlsx` i `/.data-import/` dopisany do
+  `.gitignore`, a `e2e/import-osoby.spec.ts` odtwarza go w `test.beforeAll` deterministycznym
+  generatorem `scripts/make-fixture-xlsx.ts`. Sprawdzone przez skasowanie pliku i przebieg
+  `npx playwright test e2e/import-osoby.spec.ts` — 12 zielonych, plik odtworzony.
+  Negatywne: `git diff --stat $(git rev-parse 4b01a8a^) -- package.json` pokazuje 23
+  wstawienia i 4 usunięcia, w sekcji `dependencies` jedyny nowy wiersz to
+  `"exceljs": "^4.4.0"`; reszta to skrypty npm i `devDependencies` (`@playwright/test`,
+  `@testing-library/dom`, `@testing-library/react`, `eslint`, `eslint-config-next`,
+  `jsdom`, `vitest`). Bramki: `npm run typecheck` 0, `npm run lint` 0 błędów,
+  `npm run test` **216 zielonych** (było 193), `npx playwright test` 22 zielone,
+  `node scripts/check-typography.mjs` 0, `npm run perf` 0 (bundel `/calendar` 292,6 kB
+  przy progu 301,6 kB), `node scripts/perf/drift-selftest.mjs` 0.
 
 - [ ] **F6-03** `docs` Domknięcie dokumentu architektury
   CZYTAJ: `plan/02-architektura.md` sekcja 3

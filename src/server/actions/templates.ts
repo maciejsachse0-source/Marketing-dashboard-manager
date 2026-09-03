@@ -12,6 +12,7 @@ import {
 import type { ProductionTemplate } from '@/lib/production-templates-types';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
+import { labelSchema, slugSchema } from './schemas';
 
 function safeSlug(input: string): string {
   return input
@@ -85,6 +86,7 @@ export async function updateTemplate(
   input: TemplateFormInput,
 ): Promise<ProductionTemplate> {
   await requireSession();
+  slugSchema.parse(slug);
   if (!(await getTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   const parsed = formInputSchema.parse(input);
   const def = productionTemplateSchema.parse({ ...parsed, slug });
@@ -95,6 +97,7 @@ export async function updateTemplate(
 
 export async function deleteTemplate(slug: string): Promise<void> {
   await requireSession();
+  slugSchema.parse(slug);
   if (!(await getTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   if ((await loadTemplates()).length <= 1) {
     throw new Error('Nie można usunąć ostatniego szablonu.');
@@ -109,6 +112,9 @@ export async function duplicateTemplate(
   newName?: string,
 ): Promise<ProductionTemplate> {
   await requireSession();
+  slugSchema.parse(sourceSlug);
+  if (newSlug !== undefined) slugSchema.parse(newSlug);
+  if (newName !== undefined) labelSchema.parse(newName);
   const source = await getTemplate(sourceSlug);
   if (!source) throw new Error(`Szablon źródłowy "${sourceSlug}" nie istnieje.`);
   const baseSlug = newSlug?.trim() || `${sourceSlug}-kopia`;

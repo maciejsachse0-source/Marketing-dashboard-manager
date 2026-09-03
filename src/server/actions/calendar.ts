@@ -7,6 +7,7 @@ import { requireSession } from '@/lib/auth';
 import {
   calendarEntryInputSchema,
   calendarEntryUpdateSchema,
+  idSchema,
   type CalendarEntryInput,
 } from './schemas';
 
@@ -63,6 +64,7 @@ export async function updateCalendarEntry(input: unknown) {
 
 export async function deleteCalendarEntry(id: number) {
   await requireSession();
+  idSchema.parse(id);
   await db.delete(schema.calendarEntries).where(eq(schema.calendarEntries.id, id));
   revalidatePath('/calendar');
   // Pulpit pokazuje najblizsze wpisy kalendarza i strumien ostatnich zmian,

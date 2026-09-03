@@ -11,6 +11,7 @@ import {
 import type { MarketingTemplate } from '@/lib/campaign-templates-types';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
+import { labelSchema, slugSchema } from './schemas';
 
 function safeSlug(input: string): string {
   return input
@@ -83,6 +84,7 @@ export async function updateMarketingTemplate(
   input: MarketingTemplateFormInput,
 ): Promise<MarketingTemplate> {
   await requireSession();
+  slugSchema.parse(slug);
   if (!(await getMarketingTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   const parsed = formInputSchema.parse(input);
   const def = marketingTemplateSchema.parse({ ...parsed, slug });
@@ -93,6 +95,7 @@ export async function updateMarketingTemplate(
 
 export async function deleteMarketingTemplate(slug: string): Promise<void> {
   await requireSession();
+  slugSchema.parse(slug);
   if (!(await getMarketingTemplate(slug))) throw new Error(`Szablon "${slug}" nie istnieje.`);
   await db.delete(schema.marketingTemplates).where(eq(schema.marketingTemplates.slug, slug));
   bumpRevalidations();
@@ -104,6 +107,9 @@ export async function duplicateMarketingTemplate(
   newName?: string,
 ): Promise<MarketingTemplate> {
   await requireSession();
+  slugSchema.parse(sourceSlug);
+  if (newSlug !== undefined) slugSchema.parse(newSlug);
+  if (newName !== undefined) labelSchema.parse(newName);
   const source = await getMarketingTemplate(sourceSlug);
   if (!source) throw new Error(`Szablon źródłowy "${sourceSlug}" nie istnieje.`);
   const baseSlug = newSlug?.trim() || `${sourceSlug}-kopia`;

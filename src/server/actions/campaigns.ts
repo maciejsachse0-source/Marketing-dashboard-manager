@@ -4,7 +4,22 @@ import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
-import { campaignInputSchema, type CampaignInput } from './schemas';
+import {
+  campaignInputSchema,
+  idSchema,
+  labelSchema,
+  markModeSchema,
+  opaqueIdSchema,
+  slugSchema,
+  type CampaignInput,
+} from './schemas';
+import { z } from 'zod';
+
+/** Łatka etykiety i opisu kamienia milowego (granica zaufania Z13). */
+const milestonePatchSchema = z.object({
+  label: z.string().min(1).max(200).optional(),
+  description: z.string().max(2000).nullable().optional(),
+});
 import { getMarketingTemplate } from '@/lib/campaign-templates';
 import type {
   CampaignMilestone,
@@ -75,6 +90,7 @@ export async function createCampaign(
 
 export async function updateCampaign(id: number, input: Partial<CampaignInput>) {
   await requireSession();
+  idSchema.parse(id);
   const parsed = campaignInputSchema.partial().parse(input);
   const { releaseAt, ...rest } = parsed;
   const [row] = await db
@@ -89,6 +105,7 @@ export async function updateCampaign(id: number, input: Partial<CampaignInput>) 
 
 export async function deleteCampaign(id: number) {
   await requireSession();
+  idSchema.parse(id);
   await db.delete(schema.campaigns).where(eq(schema.campaigns.id, id));
   revalidatePath('/campaigns');
 }
@@ -109,6 +126,7 @@ export async function updateCampaignPeriods(
   periods: TemplatePeriod[],
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
   const parsed = periodsSchema.parse(periods);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -148,6 +166,8 @@ export async function applyTemplateToCampaign(
   templateSlug: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  slugSchema.parse(templateSlug);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -201,6 +221,9 @@ export async function toggleCampaignMilestone(
   submilestoneId?: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  if (submilestoneId !== undefined) opaqueIdSchema.parse(submilestoneId);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -244,6 +267,9 @@ export async function cascadeCampaignMilestonesTo(
   mode: 'mark' | 'unmark',
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  markModeSchema.parse(mode);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -321,6 +347,9 @@ export async function cascadeCampaignMilestone(
   mode: 'mark' | 'unmark',
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  markModeSchema.parse(mode);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -357,6 +386,9 @@ export async function updateCampaignMilestone(
   patch: { label?: string; description?: string | null },
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  milestonePatchSchema.parse(patch);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -395,6 +427,10 @@ export async function updateCampaignSubmilestone(
   patch: { label?: string; description?: string | null },
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  opaqueIdSchema.parse(submilestoneId);
+  milestonePatchSchema.parse(patch);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -442,6 +478,9 @@ export async function addCampaignMilestone(
   label: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  labelSchema.parse(period);
+  labelSchema.parse(label);
   if (!label.trim()) throw new Error('Nazwa milestone\'u nie może być pusta.');
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -473,6 +512,9 @@ export async function addCampaignSubmilestone(
   label: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  labelSchema.parse(label);
   if (!label.trim()) throw new Error('Nazwa kroku nie może być pusta.');
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
@@ -505,6 +547,8 @@ export async function deleteCampaignMilestone(
   milestoneId: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });
@@ -526,6 +570,9 @@ export async function deleteCampaignSubmilestone(
   submilestoneId: string,
 ) {
   await requireSession();
+  idSchema.parse(campaignId);
+  opaqueIdSchema.parse(milestoneId);
+  opaqueIdSchema.parse(submilestoneId);
   const campaign = await db.query.campaigns.findFirst({
     where: eq(schema.campaigns.id, campaignId),
   });

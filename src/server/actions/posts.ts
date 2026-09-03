@@ -4,7 +4,7 @@ import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
-import { postInputSchema, type PostInput } from './schemas';
+import { idSchema, postInputSchema, postMetricsSchema, type PostInput } from './schemas';
 
 export async function createPost(input: PostInput) {
   await requireSession();
@@ -40,6 +40,8 @@ export async function updatePostMetrics(
   }>,
 ) {
   await requireSession();
+  idSchema.parse(id);
+  postMetricsSchema.parse(metrics);
   const [row] = await db
     .update(schema.posts)
     .set(metrics)
@@ -51,6 +53,7 @@ export async function updatePostMetrics(
 
 export async function deletePost(id: number) {
   await requireSession();
+  idSchema.parse(id);
   await db.delete(schema.posts).where(eq(schema.posts.id, id));
   revalidatePath('/analytics');
 }

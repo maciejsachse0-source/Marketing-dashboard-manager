@@ -13,6 +13,32 @@ const isoDate = z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
   message: 'Invalid ISO datetime',
 });
 
+/**
+ * Prymitywy powtarzające się w argumentach akcji serwerowych (zasada Z13).
+ * Akcja serwerowa jest publicznym punktem wejścia — przeglądarka może wysłać
+ * cokolwiek, więc argument prosty też przechodzi przez schemat.
+ */
+export const idSchema = z.number().int().positive();
+/** Identyfikator kroku albo kamienia milowego w JSON-ie produkcji i kampanii. */
+export const opaqueIdSchema = z.string().min(1).max(200);
+/** Slug pliku definicji (agent, szablon): bez ukośnika i kropki, więc bez ucieczki z katalogu. */
+export const slugSchema = z
+  .string()
+  .min(1)
+  .max(120)
+  .regex(/^[a-z0-9][a-z0-9-]*$/, 'slug: małe litery, cyfry i myślniki');
+export const labelSchema = z.string().min(1).max(200);
+export const descriptionSchema = z.string().max(2000);
+export const isoDateSchema = isoDate;
+/** Metadane pliku z formularza. Nazwa i rozmiar to wejście od użytkownika (Z13). */
+export const uploadedFileSchema = (maxBytes: number) =>
+  z.object({
+    name: z.string().min(1).max(255),
+    size: z.number().int().positive().max(maxBytes),
+  });
+export const markModeSchema = z.enum(['mark', 'unmark']);
+export const moveDirectionSchema = z.enum(['up', 'down']);
+
 export const platformSchema = z.enum(PLATFORMS);
 export const calendarTypeSchema = z.enum(CALENDAR_TYPES);
 export const calendarStatusSchema = z.enum(CALENDAR_STATUSES);
@@ -69,6 +95,26 @@ export const postInputSchema = z.object({
   campaignId: z.number().int().positive().optional().nullable(),
 });
 export type PostInput = z.infer<typeof postInputSchema>;
+
+/** Metryki dosypywane do posta z importu CSV (granica zaufania Z13). */
+export const postMetricsSchema = z
+  .object({
+    reach: z.number().int().min(0),
+    impressions: z.number().int().min(0),
+    engagementRate: z.number().min(0),
+    completionRate: z.number().min(0),
+    saves: z.number().int().min(0),
+    shares: z.number().int().min(0),
+    comments: z.number().int().min(0),
+    followersGained: z.number().int(),
+    rawCsvRowId: z.number().int().positive(),
+  })
+  .partial();
+
+/** Filtr listy produkcji. */
+export const productionFilterSchema = z
+  .object({ type: productionTypeSchema.optional() })
+  .optional();
 
 export const outreachInputSchema = z.object({
   artistId: z.number().int().positive(),

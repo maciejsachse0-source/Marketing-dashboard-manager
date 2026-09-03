@@ -12,6 +12,7 @@ import {
   resolveSafeStagePath,
   countWorkFolderFiles,
 } from '@/lib/production-work-folder';
+import { idSchema } from './schemas';
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -50,6 +51,7 @@ export async function openProductionFolder(
   stage: WorkStage,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
   if (!isValidStage(stage)) return { ok: false, error: `Nieznana faza: ${stage}` };
 
   const ctx = await loadProductionWithArtist(productionId);
@@ -97,6 +99,7 @@ export async function getProductionFolderStats(
   productionId: number,
 ): Promise<{ stage: WorkStage; fileCount: number }[]> {
   await requireSession();
+  idSchema.parse(productionId);
   const ctx = await loadProductionWithArtist(productionId);
   if (!ctx || !ctx.artist) return WORK_STAGES.map((stage) => ({ stage, fileCount: 0 }));
   return countWorkFolderFiles(ctx.artist.name, ctx.production.title);

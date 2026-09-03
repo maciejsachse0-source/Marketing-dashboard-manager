@@ -14,6 +14,18 @@ import {
   newStepId,
 } from '@/lib/production-steps';
 import { getTemplate } from '@/lib/production-templates';
+import {
+  descriptionSchema,
+  idSchema,
+  isoDateSchema,
+  labelSchema,
+  markModeSchema,
+  moveDirectionSchema,
+  opaqueIdSchema,
+  slugSchema,
+  uploadedFileSchema,
+} from './schemas';
+import { z } from 'zod';
 import { periodsRelativeToT0Mon, resolvePeriods } from '@/lib/production-periods';
 import { startOfWeek } from '@/lib/dates';
 import type {
@@ -68,6 +80,8 @@ export async function applyTemplateToProduction(
   templateSlug: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  slugSchema.parse(templateSlug);
   const tpl = await getTemplate(templateSlug);
   if (!tpl) return { ok: false, error: `Szablon "${templateSlug}" nie istnieje` };
   const steps = cloneTemplateSteps(tpl.steps);
@@ -89,6 +103,9 @@ export async function addStepToProduction(
   description?: string,
 ): Promise<{ ok: true; stepId: string } | { ok: false; error: string }> {
   await requireSession();
+  idSchema.parse(productionId);
+  labelSchema.parse(label);
+  if (description !== undefined) descriptionSchema.parse(description);
   const trimmed = label.trim();
   if (!trimmed) return { ok: false, error: 'Etykieta nie może być pusta' };
   if (trimmed.length > 80) return { ok: false, error: 'Maks. 80 znaków' };
@@ -134,6 +151,8 @@ export async function removeStepFromProduction(
   stepId: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -149,6 +168,9 @@ export async function renameStep(
   label: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  labelSchema.parse(label);
   const trimmed = label.trim();
   if (!trimmed) return { ok: false, error: 'Etykieta nie może być pusta' };
   if (trimmed.length > 80) return { ok: false, error: 'Maks. 80 znaków' };
@@ -169,6 +191,9 @@ export async function updateStepDescription(
   description: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  descriptionSchema.parse(description);
   const trimmed = description.trim();
   if (trimmed.length > 1000) return { ok: false, error: 'Maks. 1000 znaków' };
   const prod = await loadProduction(productionId);
@@ -190,6 +215,9 @@ export async function moveStepInProduction(
   direction: 'up' | 'down',
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  moveDirectionSchema.parse(direction);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -231,6 +259,9 @@ export async function cascadeStepsTo(
   mode: 'mark' | 'unmark',
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  markModeSchema.parse(mode);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   if (prod.cancelledAt) return { ok: false, error: 'Produkcja anulowana' };
@@ -258,6 +289,8 @@ export async function toggleStepDone(
   stepId: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   if (prod.cancelledAt) return { ok: false, error: 'Produkcja anulowana' };
@@ -355,6 +388,9 @@ export async function setStepDate(
   dateIso: string | null,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  isoDateSchema.nullable().parse(dateIso);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -433,6 +469,9 @@ export async function attachFileToStep(
   if (!(file instanceof File)) return { ok: false, error: 'Brak pliku' };
   if (file.size === 0) return { ok: false, error: 'Pusty plik' };
   if (file.size > 25 * 1024 * 1024) return { ok: false, error: 'Plik > 25 MB' };
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
+  uploadedFileSchema(25 * 1024 * 1024).parse({ name: file.name, size: file.size });
 
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
@@ -458,6 +497,8 @@ export async function removeStepAttachment(
   stepId: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  opaqueIdSchema.parse(stepId);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
   const steps = prod.steps ?? [];
@@ -490,6 +531,8 @@ export async function shiftProductionT1Start(
   newT1StartIso: string,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  isoDateSchema.parse(newT1StartIso);
   const prod = await loadProduction(productionId);
   if (!prod) return { ok: false, error: 'Brak produkcji' };
 
@@ -553,6 +596,8 @@ export async function setProductionCancelled(
   cancelled: boolean,
 ): Promise<Result> {
   await requireSession();
+  idSchema.parse(productionId);
+  z.boolean().parse(cancelled);
   await db
     .update(schema.productions)
     .set({ cancelledAt: cancelled ? new Date() : null })

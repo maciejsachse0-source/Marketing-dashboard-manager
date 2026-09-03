@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
 import { saveProductionAttachment } from '@/lib/production-files';
+import { idSchema, labelSchema, uploadedFileSchema } from './schemas';
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 
@@ -18,6 +19,9 @@ export async function uploadProductionAttachment(
   if (!(file instanceof File)) return { ok: false, error: 'Brak pliku' };
   if (file.size === 0) return { ok: false, error: 'Plik jest pusty' };
   if (file.size > MAX_BYTES) return { ok: false, error: 'Plik > 25 MB' };
+  idSchema.parse(productionId);
+  labelSchema.parse(stage);
+  uploadedFileSchema(MAX_BYTES).parse({ name: file.name, size: file.size });
 
   const production = await db.query.productions.findFirst({
     where: eq(schema.productions.id, productionId),

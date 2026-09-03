@@ -4,7 +4,7 @@ import { safeRevalidatePath as revalidatePath } from './revalidate';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
-import { videographerInputSchema, type VideographerInput } from './schemas';
+import { idSchema, videographerInputSchema, type VideographerInput } from './schemas';
 
 export async function createVideographer(input: VideographerInput) {
   await requireSession();
@@ -16,6 +16,7 @@ export async function createVideographer(input: VideographerInput) {
 
 export async function updateVideographer(id: number, input: Partial<VideographerInput>) {
   await requireSession();
+  idSchema.parse(id);
   const parsed = videographerInputSchema.partial().parse(input);
   const [row] = await db
     .update(schema.videographers)
@@ -28,6 +29,7 @@ export async function updateVideographer(id: number, input: Partial<Videographer
 
 export async function deleteVideographer(id: number) {
   await requireSession();
+  idSchema.parse(id);
   await db.delete(schema.videographers).where(eq(schema.videographers.id, id));
   revalidatePath('/videographers');
 }

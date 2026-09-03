@@ -14,6 +14,7 @@ import {
 import { getAgent, loadAgents } from '@/lib/agents';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
+import { labelSchema, slugSchema } from './schemas';
 
 export type AgentFormInput = {
   slug?: string;
@@ -108,6 +109,7 @@ export async function updateAgent(
   rawInput: AgentFormInput,
 ): Promise<AgentDef> {
   await requireSession();
+  slugSchema.parse(slug);
   const parsed = formSchema.parse(rawInput);
   if (!(await getAgent(slug))) throw new Error(`Agent "${slug}" nie istnieje.`);
   const def = inputToDef(parsed, slug);
@@ -118,6 +120,7 @@ export async function updateAgent(
 
 export async function deleteAgent(slug: string) {
   await requireSession();
+  slugSchema.parse(slug);
   if (!(await getAgent(slug))) throw new Error(`Agent "${slug}" nie istnieje.`);
   if ((await loadAgents()).length <= 1) {
     throw new Error('Nie można usunąć ostatniego agenta.');
@@ -132,6 +135,9 @@ export async function cloneAgent(
   newName?: string,
 ): Promise<AgentDef> {
   await requireSession();
+  slugSchema.parse(sourceSlug);
+  slugSchema.parse(newSlug);
+  if (newName !== undefined) labelSchema.parse(newName);
   const source = await getAgent(sourceSlug);
   if (!source) throw new Error(`Agent źródłowy "${sourceSlug}" nie istnieje.`);
   if (await getAgent(newSlug)) throw new Error(`Slug "${newSlug}" jest już zajęty.`);

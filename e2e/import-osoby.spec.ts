@@ -1,4 +1,5 @@
-import { mkdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
@@ -6,6 +7,14 @@ import postgres from 'postgres';
 const EMAIL = process.env.AUTH_EMAIL;
 const PASSWORD = process.env.AUTH_PASSWORD;
 const FIXTURE = path.join(process.cwd(), 'tests', 'fixtures', 'osoby.xlsx');
+
+// Fixture jest poza gitem (zasada Z14: zero arkuszy w repozytorium). Generator
+// jest deterministyczny, wiec brakujacy plik odtwarzamy przed pierwszym testem.
+test.beforeAll(() => {
+  if (!existsSync(FIXTURE)) {
+    execFileSync('npx', ['tsx', 'scripts/make-fixture-xlsx.ts'], { stdio: 'inherit' });
+  }
+});
 
 async function zaloguj(page: Page) {
   await page.goto('/login');

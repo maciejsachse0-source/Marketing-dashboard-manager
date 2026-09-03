@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 import { saveBuffer } from '@/lib/files';
 import { db, schema } from '@/lib/db';
 import { getSessionEmail } from '@/lib/auth';
@@ -10,6 +11,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_BYTES = 50 * 1024 * 1024;
+
+/** Granica zaufania (Z13): wszystko, co przyszło z formularza i z adresu. */
+const zapytanieSchema = z.object({
+  dryRun: z.enum(['true', 'false']).nullable(),
+  name: z.string().min(1).max(255),
+  size: z.number().int().positive().max(MAX_BYTES),
+});
 
 type PreviewRow =
   | {
@@ -38,9 +46,6 @@ export async function POST(req: NextRequest) {
   const email = await getSessionEmail();
   if (!email) return Response.json({ error: 'unauthorized' }, { status: 401 });
 
-  const url = new URL(req.url);
-  const dryRun = url.searchParams.get('dryRun') === 'true';
-
   const form = await req.formData();
   const file = form.get('file');
   if (!(file instanceof File)) {
@@ -49,6 +54,17 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_BYTES) {
     return Response.json({ error: 'File too large (>50MB)' }, { status: 413 });
   }
+
+  const url = new URL(req.url);
+  const parsed = zapytanieSchema.safeParse({
+    dryRun: url.searchParams.get('dryRun'),
+    name: file.name,
+    size: file.size,
+  });
+  if (!parsed.success) {
+    return Response.json({ error: 'Nieprawidłowe parametry żądania' }, { status: 400 });
+  }
+  const dryRun = parsed.data.dryRun === 'true';
 
   const buf = Buffer.from(await file.arrayBuffer());
   const text = buf.toString('utf8');

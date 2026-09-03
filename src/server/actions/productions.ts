@@ -5,6 +5,8 @@ import { eq, desc } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { requireSession } from '@/lib/auth';
 import {
+  idSchema,
+  productionFilterSchema,
   productionInputSchema,
   type ProductionInput,
 } from './schemas';
@@ -81,6 +83,7 @@ export async function createProduction(input: ProductionInput): Promise<Producti
 
 export async function updateProduction(id: number, input: Partial<ProductionInput>): Promise<Production> {
   await requireSession();
+  idSchema.parse(id);
   const parsed = productionInputSchema.partial().parse(input);
   const { t0At, ...rest } = parsed;
   const [row] = await db
@@ -99,6 +102,7 @@ export async function updateProduction(id: number, input: Partial<ProductionInpu
 
 export async function deleteProduction(id: number): Promise<void> {
   await requireSession();
+  idSchema.parse(id);
   let title: string | null = null;
   let artistName: string | null = null;
   try {
@@ -165,6 +169,7 @@ export async function listProductions(filter?: {
   type?: ProductionType;
 }): Promise<Production[]> {
   await requireSession();
+  productionFilterSchema.parse(filter);
   if (filter?.type) {
     return db.query.productions.findMany({
       where: eq(schema.productions.type, filter.type),
@@ -176,6 +181,7 @@ export async function listProductions(filter?: {
 
 export async function getProduction(id: number) {
   await requireSession();
+  idSchema.parse(id);
   const production = await db.query.productions.findFirst({
     where: eq(schema.productions.id, id),
   });
@@ -206,6 +212,7 @@ export async function getProduction(id: number) {
 
 export async function getProductionByEntryId(entryId: number) {
   await requireSession();
+  idSchema.parse(entryId);
   const entry = await db.query.calendarEntries.findFirst({
     where: eq(schema.calendarEntries.id, entryId),
   });
