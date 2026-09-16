@@ -71,3 +71,4 @@ next-env.d.ts
 
 # F7-33: awaryjny korzeń folderów roboczych poza Windowsem
 /.data-local-content/
+.zenrows/
