@@ -1,3 +1,7 @@
+// F7-41: layout czyta bazę (agenci w sidebarze) — bez tego Next prerenderuje /_not-found
+// przy buildzie i odpytuje bazę niedostępną na serwerze CI
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import { Manrope, Geist_Mono } from 'next/font/google';
 import { Sidebar } from '@/components/sidebar';
