@@ -1,3 +1,6 @@
+// F7-41: layout czyta bazę (agenci) na każde żądanie — prerender przy buildzie odpytuje lokalny docker
+export const dynamic = 'force-dynamic';
+
 import { PageShell } from '@/components/page-shell';
 import { CampaignTemplateForm } from '@/components/campaigns/campaign-template-form';
 
